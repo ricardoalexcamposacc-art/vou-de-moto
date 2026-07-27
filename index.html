@@ -250,8 +250,17 @@ a{color:var(--accent)}
   display:grid;place-items:center;font-size:12px;font-weight:750;flex:none}
 .x-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;flex:none}
 .x-btn:hover{border-color:var(--crit)}
+.mic-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;flex:none;font-size:15px}
+.mic-btn:hover{border-color:var(--accent)}
+.mic-in{position:absolute;right:5px;bottom:5px;width:31px;height:31px;border-radius:8px;border:none;
+  background:transparent;cursor:pointer;font-size:15px;line-height:1;padding:0}
+.mic-in:hover{background:var(--accent-soft)}
+.field input.has-mic{padding-right:42px}
+.mic-btn.rec,.mic-in.rec{background:var(--crit);color:#fff}
 .stop-pin{background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;
   font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.cam-pin{background:#fff;border:2px solid #d03b3b;border-radius:50%;width:22px;height:22px;
+  display:grid;place-items:center;font-size:11px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 /* assistente */
 .ai-row{display:flex;gap:8px;align-items:flex-start}
 .ai-mic{height:41px;width:41px;font-size:17px}
@@ -455,6 +464,7 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
     </div>
     <div id="route-departures"></div>
     <div id="route-segments"></div>
+    <div id="route-cameras"></div>
   </section>
 
   <!-- ============ RADAR ============ -->
@@ -662,6 +672,34 @@ async function fetchRouteWx(points, startEpoch, endEpoch){
   return Array.isArray(j)?j:[j];
 }
 
+/* Nominatim exige ≥1 pedido/seg — fila global para nunca sermos bloqueados */
+let nomLast=0;
+async function nomFetch(url){
+  const wait=Math.max(0, nomLast+1200-Date.now());
+  nomLast=Date.now()+wait;
+  if(wait) await new Promise(r=>setTimeout(r,wait));
+  return jfetch(url);
+}
+/* Photon (komoot) — pesquisa instantânea, tolerante a gralhas, com viés de proximidade */
+function photonMap(f){
+  const p=f.properties||{};
+  const name=p.name||[p.street,p.housenumber].filter(Boolean).join(" ")||"—";
+  const sub=[p.city||p.town||p.village||p.district, p.state||p.country].filter(Boolean).join(", ");
+  return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value};
+}
+async function photonSearch(q,pos,limit=7){
+  const u=new URL("https://photon.komoot.io/api/");
+  const params={q, limit:String(limit)};
+  if(pos&&isFinite(pos.lat)){ params.lat=pos.lat.toFixed(4); params.lon=pos.lon.toFixed(4); }
+  u.search=new URLSearchParams(params).toString();
+  const j=await jfetch(u.toString(), 9000);
+  const seen=new Set();
+  return (j.features||[]).map(photonMap)
+    .filter(r=>isFinite(r.lat)&&isFinite(r.lon))
+    .filter(r=>{ const k=`${r.name}|${r.lat.toFixed(3)},${r.lon.toFixed(3)}`;
+      if(seen.has(k)) return false; seen.add(k); return true; });
+}
+
 const geoCache=new Map();
 async function geocode(q){
   const key=q.trim().toLowerCase();
@@ -669,17 +707,24 @@ async function geocode(q){
   const m=q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;]\s*(-?\d{1,3}[.,]\d+)\s*$/);
   if(m){ const lat=parseFloat(m[1].replace(",",".")), lon=parseFloat(m[2].replace(",","."));
     return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:"coordenadas", lat, lon}]; }
-  const u=new URL("https://nominatim.openstreetmap.org/search");
-  u.search=new URLSearchParams({q, format:"jsonv2", limit:"6", addressdetails:"1",
-    "accept-language":"pt", dedupe:"1"}).toString();
-  const j=await jfetch(u.toString());
-  const out=(j||[]).map(r=>{
-    const a=r.address||{};
-    const name=r.name||a.road||a.city||a.town||a.village||(r.display_name||"").split(",")[0];
-    const sub=(r.display_name||"").split(",").slice(1,4).join(",").trim();
-    return {name, sub, lat:+r.lat, lon:+r.lon};
-  });
-  geoCache.set(key,out);
+  // 1º Photon (rápido, aguenta escrita contínua), com viés para a tua zona
+  let out=await photonSearch(q, state.home).catch(()=>[]);
+  // reserva: Nominatim (com fila)
+  if(!out.length){
+    try{
+      const u=new URL("https://nominatim.openstreetmap.org/search");
+      u.search=new URLSearchParams({q, format:"jsonv2", limit:"6", addressdetails:"1",
+        "accept-language":"pt", dedupe:"1"}).toString();
+      const j=await nomFetch(u.toString());
+      out=(j||[]).map(r=>{
+        const a=r.address||{};
+        const name=r.name||a.road||a.city||a.town||a.village||(r.display_name||"").split(",")[0];
+        const sub=(r.display_name||"").split(",").slice(1,4).join(",").trim();
+        return {name, sub, lat:+r.lat, lon:+r.lon};
+      });
+    }catch(e){}
+  }
+  if(out.length) geoCache.set(key,out);
   return out;
 }
 
@@ -687,15 +732,26 @@ const revCache=new Map();
 async function revGeocode(lat,lon){
   const key=`${lat.toFixed(2)},${lon.toFixed(2)}`;
   if(revCache.has(key)) return revCache.get(key);
+  // 1º Photon reverse (sem limites apertados); reserva: Nominatim em fila
+  try{
+    const u=new URL("https://photon.komoot.io/reverse");
+    u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5)}).toString();
+    const j=await jfetch(u.toString(), 8000);
+    const p=j.features?.[0]?.properties;
+    if(p){
+      const out={name:p.city||p.town||p.village||p.district||p.name||p.county||"—",
+        sub:p.state||p.country||""};
+      revCache.set(key,out); return out;
+    }
+  }catch(e){}
   try{
     const u=new URL("https://nominatim.openstreetmap.org/reverse");
     u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5),
       format:"jsonv2", zoom:"12", "accept-language":"pt"}).toString();
-    const j=await jfetch(u.toString());
+    const j=await nomFetch(u.toString());
     const a=j.address||{};
     const name=a.village||a.town||a.suburb||a.city||a.municipality||a.county||j.name||"—";
-    const sub=a.state||a.region||a.country||"";
-    const out={name, sub};
+    const out={name, sub:a.state||a.region||a.country||""};
     revCache.set(key,out);
     return out;
   }catch(e){ return {name:`${lat.toFixed(3)}, ${lon.toFixed(3)}`, sub:""}; }
@@ -712,13 +768,20 @@ async function osrmRoute(points){ // points: [{lat,lon},...]
 
 /* pesquisa de sítios perto de uma posição (ex.: "mediamarkt") */
 async function geocodeNear(q,pos,bounded){
+  // 1º Photon com viés de proximidade
+  try{
+    const res=await photonSearch(q,pos,12);
+    const near=res.filter(r=>haversine(pos,r)<= (bounded?70:400));
+    if(near.length) return near;
+  }catch(e){}
+  // reserva: Nominatim com viewbox
   const dLat=0.45, dLon=0.55;
   const u=new URL("https://nominatim.openstreetmap.org/search");
   const params={q, format:"jsonv2", limit:"10", addressdetails:"1", "accept-language":"pt", dedupe:"1",
     viewbox:`${(pos.lon-dLon).toFixed(3)},${(pos.lat+dLat).toFixed(3)},${(pos.lon+dLon).toFixed(3)},${(pos.lat-dLat).toFixed(3)}`};
   if(bounded) params.bounded="1";
   u.search=new URLSearchParams(params).toString();
-  const j=await jfetch(u.toString());
+  const j=await nomFetch(u.toString());
   return (j||[]).map(r=>{
     const a=r.address||{};
     const name=r.name||(r.display_name||"").split(",")[0];
@@ -726,6 +789,94 @@ async function geocodeNear(q,pos,bounded){
     return {name, sub:where?where:(r.display_name||"").split(",").slice(1,3).join(",").trim(),
       lat:+r.lat, lon:+r.lon, kind:r.type};
   }).filter(r=>isFinite(r.lat));
+}
+
+/* =====================================================================
+   RADARES DE VELOCIDADE FIXOS — OpenStreetMap (Overpass, gratuito)
+   ===================================================================== */
+async function fetchCameras(coords){
+  const step=Math.max(1,Math.floor(coords.length/110));
+  const pts=[];
+  for(let i=0;i<coords.length;i+=step) pts.push(coords[i]);
+  if(pts[pts.length-1]!==coords[coords.length-1]) pts.push(coords[coords.length-1]);
+  const chain=pts.map(c=>`${c.lat.toFixed(5)},${c.lon.toFixed(5)}`).join(",");
+  const q=`[out:json][timeout:12];node["highway"="speed_camera"](around:170,${chain});out body 80;`;
+  const ctl=new AbortController(); const th=setTimeout(()=>ctl.abort(),15000);
+  try{
+    const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:"data="+encodeURIComponent(q), signal:ctl.signal});
+    if(!r.ok) throw new Error("overpass "+r.status);
+    const j=await r.json();
+    return (j.elements||[]).map(e=>({lat:e.lat, lon:e.lon, max:e.tags?.maxspeed||null}));
+  } finally { clearTimeout(th); }
+}
+
+async function loadRouteCameras(){
+  const R=state.route; if(!R) return;
+  const v=R.variants?.[R.active]||R;
+  if(v.cameras){ R.cameras=v.cameras; drawRoute(false); renderRouteSummary(); renderCameras(); return; }
+  try{
+    const cams=await fetchCameras(v.coords);
+    // projeção exata de cada radar no traçado (distância ao segmento + km ao longo da rota)
+    const distToSeg=(p,a,b)=>{
+      const kx=111.32*Math.cos(p.lat*Math.PI/180), ky=110.57;
+      const ax=(a.lon-p.lon)*kx, ay=(a.lat-p.lat)*ky;
+      const bx=(b.lon-p.lon)*kx, by=(b.lat-p.lat)*ky;
+      const dx=bx-ax, dy=by-ay, L2=dx*dx+dy*dy||1e-12;
+      const t=clamp((-(ax*dx+ay*dy))/L2,0,1);
+      const cx=ax+dx*t, cy=ay+dy*t;
+      return {d:Math.hypot(cx,cy), t};
+    };
+    cams.forEach(c=>{
+      let best={d:1e12,t:0,i:0};
+      for(let i=0;i<v.coords.length-1;i++){
+        const r=distToSeg(c,v.coords[i],v.coords[i+1]);
+        if(r.d<best.d) best={d:r.d,t:r.t,i};
+      }
+      c.off=best.d;
+      const D=v.cum[best.i]+(v.cum[best.i+1]-v.cum[best.i])*best.t;
+      c.km=(D/v.geomKm)*v.totalKm;
+    });
+    const list=cams.filter(c=>c.off<=0.25).sort((a,b)=>a.km-b.km)
+      .filter((c,i,arr)=>i===0||c.km-arr[i-1].km>0.12);
+    v.cameras=list; R.cameras=list; R.camerasError=false;
+  }catch(e){ R.cameras=null; R.camerasError=true; }
+  drawRoute(false); renderRouteSummary(); renderCameras();
+}
+
+function renderCameras(){
+  const R=state.route, box=$("#route-cameras");
+  if(!R||!box){ if(box) box.textContent=""; return; }
+  box.textContent="";
+  const card=el("div","card");
+  card.appendChild(el("h2",null,"📸 Radares de velocidade no trajeto"));
+  if(R.camerasError){
+    card.appendChild(el("p","h-sub","Não consegui consultar os radares agora — tenta recalcular daqui a pouco."));
+    box.appendChild(card); return;
+  }
+  if(!R.cameras){ card.appendChild(el("p","h-sub","A procurar radares fixos ao longo do caminho…")); box.appendChild(card); return; }
+  if(!R.cameras.length){
+    card.appendChild(el("p","h-sub","Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉"));
+    box.appendChild(card); return;
+  }
+  card.appendChild(el("p","h-sub","Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km."));
+  const ul=el("ul","seg-list");
+  R.cameras.slice(0,14).forEach(async (c)=>{
+    const li=el("li","seg-item");
+    const bar=el("span","seg-bar"); bar.style.background="var(--crit)";
+    const main=el("div","seg-main");
+    main.append(el("b",null,`km ${rnd(c.km)}`));
+    const place=el("span",null,"…");
+    main.append(place);
+    li.append(bar,main,el("span","seg-val",`📸 ${c.max?`limite ${String(c.max).replace("mph"," mph")}`:"radar fixo"}`));
+    ul.appendChild(li);
+    const n=await revGeocode(c.lat,c.lon);
+    place.textContent=`perto de ${n.name}`;
+  });
+  card.appendChild(ul);
+  if(R.cameras.length>14) card.appendChild(el("p","map-note",`+${R.cameras.length-14} radares adicionais no mapa.`));
+  box.appendChild(card);
 }
 
 async function rainviewerMeta(){
@@ -878,6 +1029,41 @@ function attachAC(input, list, onPick){
     else if(e.key==="Escape") close();
   });
   input.addEventListener("blur",()=>setTimeout(close,180));
+}
+
+/* =====================================================================
+   VOZ — ditado em qualquer campo de pesquisa
+   ===================================================================== */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let activeRec=null;
+function voiceInto(btn,cb){
+  if(!SR){ toast("Voz não suportada neste browser — escreve o destino."); return; }
+  if(activeRec){ try{activeRec.stop();}catch(e){} return; }
+  try{
+    const rec=new SR(); activeRec=rec;
+    rec.lang="pt-PT"; rec.interimResults=false; rec.maxAlternatives=1;
+    const old=btn.textContent;
+    btn.classList.add("rec"); btn.textContent="⏹";
+    rec.onresult=(e)=>{ try{ cb(e.results[0][0].transcript); }catch(err){} };
+    rec.onerror=()=>toast("Não consegui ouvir — tenta de novo ou escreve.");
+    rec.onend=()=>{ btn.classList.remove("rec"); btn.textContent=old; activeRec=null; };
+    rec.start();
+  }catch(e){ activeRec=null; btn.classList.remove("rec"); toast("Voz indisponível neste browser."); }
+}
+function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomplete
+  if(!SR||!input) return;
+  const wrap=input.closest(".field")||input.parentElement;
+  const b=el("button","mic-in","🎤"); b.type="button";
+  b.title="Ditar por voz"; b.setAttribute("aria-label","Ditar por voz");
+  b.addEventListener("click",(ev)=>{ ev.preventDefault();
+    voiceInto(b,(txt)=>{
+      input.value=txt; input._picked=null; input.focus();
+      input.dispatchEvent(new Event("input",{bubbles:true})); // dispara as sugestões
+      toast(`🎤 "${txt}" — escolhe a sugestão certa`);
+    });
+  });
+  wrap.appendChild(b);
+  input.classList.add("has-mic");
 }
 
 /* =====================================================================
@@ -1228,7 +1414,18 @@ function addStopRow(prefill){
   inp.type="text"; inp.placeholder="Paragem (ex.: Continente, bomba de gasolina, casa do João…)"; inp.autocomplete="off";
   const x=el("button","x-btn","✕"); x.title="Remover paragem"; x.setAttribute("aria-label","Remover paragem");
   const list=el("div","ac-list");
-  row.append(dot,inp,x,list);
+  row.append(dot,inp);
+  if(SR){
+    const m=el("button","mic-btn","🎤"); m.type="button";
+    m.title="Ditar a paragem por voz"; m.setAttribute("aria-label","Ditar a paragem por voz");
+    m.addEventListener("click",()=>voiceInto(m,(txt)=>{
+      inp.value=txt; inp._picked=null; inp.focus();
+      inp.dispatchEvent(new Event("input",{bubbles:true}));
+      toast(`🎤 "${txt}" — escolhe a sugestão certa`);
+    }));
+    row.append(m);
+  }
+  row.append(x,list);
   $("#stops-wrap").appendChild(row);
   attachAC(inp,list);
   if(prefill){ inp.value=prefill.name; inp._picked=prefill; }
@@ -1311,8 +1508,10 @@ function switchVariant(i){
   const v=R.variants[i];
   Object.assign(R,{active:i, coords:v.coords, cum:v.cum, geomKm:v.geomKm, totalKm:v.totalKm,
     travelTotal:v.travelTotal, totalSec:v.travelTotal, samples:v.samples});
+  R.cameras=null;
   applyShift(R.shift);
   renderDepartures();
+  renderCameras(); loadRouteCameras();
   toast(`Trajeto ${String.fromCharCode(65+i)} aplicado 🗺️`);
 }
 
@@ -1351,6 +1550,7 @@ async function computeRoute(){
       travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples};
     applyShift(0,true);
     renderDepartures();
+    renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
     if($("#rt-radar-toggle").checked) toggleRouteRadar(true);
     try{ history.replaceState(null,"",
       "#r2="+pts.map(p=>`${p.lat.toFixed(4)},${p.lon.toFixed(4)},${encodeURIComponent(p.name)}`).join("~")
@@ -1446,6 +1646,17 @@ function drawRoute(fit){
       if(s.stop==null){ const n=await revGeocode(s.lat,s.lon); t4.textContent=`📍 perto de ${n.name}`; }
     });
   });
+  // radares fixos 📸
+  (R.cameras||[]).forEach(c=>{
+    const mk=L.marker([c.lat,c.lon],{icon:L.divIcon({className:"",html:'<div class="cam-pin">📸</div>',
+      iconSize:[22,22], iconAnchor:[11,11]})}).addTo(g);
+    const div=el("div");
+    const t=el("div"); t.style.fontWeight="700";
+    t.textContent=`📸 Radar fixo${c.max?` — limite ${c.max}`:""}`;
+    div.append(t, el("div",null,`km ${rnd(c.km)} do teu trajeto`),
+      el("div","muted small","dados OpenStreetMap"));
+    mk.bindPopup(div,{maxWidth:220});
+  });
   if(fit){ state.maps.route.fitBounds(L.latLngBounds(all),{padding:[26,26]}); }
 }
 
@@ -1497,6 +1708,7 @@ function renderRouteSummary(){
   mk(`💨 rajadas até ${rnd(maxGust)} km/h · vento ${wind.desc}`);
   if(maxCross>=40) mk(`⚠️💨 vento lateral até ~${rnd(maxCross)} km/h${wind.crossPlace?` perto do km ${rnd(wind.crossKm)}`:""}`);
   if(elevMax!=null&&elevMax-elevMin>250) mk(`⛰️ sobe até ~${rnd(elevMax)} m`);
+  if(R.cameras?.length) mk(`📸 ${R.cameras.length} ${R.cameras.length===1?"radar fixo":"radares fixos"}`);
   // noite?
   const sunset=state.wx?.daily?.sunset?.find(s=>isSameDay(s,dep));
   if(sunset&&arrive>sunset) mk("🌙 chegada depois do pôr-do-sol");
@@ -1945,6 +2157,22 @@ function onTravelPos(p){
     drawRoute(false);
     if(travel.marker) travel.marker.addTo(state.maps.route);
   }
+  // radares à frente — aviso por voz a ~1 km e a ~400 m
+  if(R.cameras?.length){
+    const nextCam=R.cameras.find(c=>c.km>here.km-0.05);
+    if(nextCam){
+      const dc=nextCam.km-here.km;
+      for(const [th,lab] of [[1.0,"1 quilómetro"],[0.4,"400 metros"]]){
+        const key=`cam${nextCam.km.toFixed(1)}-${th}`;
+        if(dc<=th&&dc>-0.05&&!travel.alerted.has(key)){
+          travel.alerted.add(key);
+          buzz([180,80,180]);
+          speak(`Radar de velocidade dentro de ${lab}.${nextCam.max?` Limite ${String(nextCam.max).replace(/\D/g,"")}.`:""}`);
+          break;
+        }
+      }
+    }
+  }
   // chegada
   const last=R.samples[R.samples.length-1];
   const remKm=Math.max(0,last.km-here.km);
@@ -2230,25 +2458,16 @@ function init(){
   // assistente
   $("#ai-go").addEventListener("click",assistantAsk);
   $("#ai-q").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ e.preventDefault(); assistantAsk(); } });
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ $("#ai-mic").style.display="none"; }
   else{
-    let rec=null;
-    $("#ai-mic").addEventListener("click",()=>{
-      if(rec){ try{rec.stop();}catch(e){} return; }
-      try{
-        rec=new SR(); rec.lang="pt-PT"; rec.interimResults=false; rec.maxAlternatives=1;
-        $("#ai-mic").classList.add("rec"); $("#ai-mic").textContent="⏹";
-        rec.onresult=(e)=>{ $("#ai-q").value=e.results[0][0].transcript; assistantAsk(); };
-        rec.onerror=()=>toast("Não consegui ouvir — escreve o destino.");
-        rec.onend=()=>{ $("#ai-mic").classList.remove("rec"); $("#ai-mic").textContent="🎤"; rec=null; };
-        rec.start();
-      }catch(e){
-        $("#ai-mic").classList.remove("rec"); $("#ai-mic").textContent="🎤"; rec=null;
-        toast("Voz indisponível neste browser — escreve o destino.");
-      }
-    });
+    $("#ai-mic").addEventListener("click",()=>voiceInto($("#ai-mic"),(txt)=>{
+      $("#ai-q").value=txt; assistantAsk();
+    }));
   }
+  // 🎤 em todos os campos de pesquisa (origem, destino, cidade)
+  addMicTo($("#loc-search"));
+  addMicTo($("#rt-o"));
+  addMicTo($("#rt-d"));
   $("#btn-route").addEventListener("click",computeRoute);
   $("#rt-swap").addEventListener("click",()=>{
     const o=$("#rt-o"), d=$("#rt-d");
