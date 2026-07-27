@@ -368,6 +368,12 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   footer{font-size:11px}
 }
 .legs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.hz-row{display:flex;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface2);margin-top:8px;border-left:3px solid var(--warn,#fab219);align-items:flex-start}
+.hz-row.lvl3{border-left-color:#d03b3b}
+.hz-row.lvl2{border-left-color:#ec835a}
+.hz-ico{font-size:19px;line-height:1.2;flex:none}
+.hz-meta{font-size:11.5px;color:var(--muted);font-weight:650;letter-spacing:.02em}
+.hz-txt{font-size:13.5px;line-height:1.45;margin-top:2px}
 .stay-line{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:13.5px;line-height:1.45;background:var(--surface2);border-left:3px solid #0ca30c}
 .stay-line.lvl1{border-left-color:#fab219}
 .stay-line.lvl2{border-left-color:#ec835a}
@@ -546,6 +552,7 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
       <p class="map-note">A cor de cada troço mostra o tempo previsto <b>à hora a que lá vais passar</b>, não o tempo de agora.</p>
     </div>
     <div id="route-departures"></div>
+    <div id="route-hazards"></div>
     <div id="route-segments"></div>
     <div id="route-cameras"></div>
   </section>
@@ -1247,6 +1254,16 @@ Object.assign(I18N.en,{
 "Ida seca — mas vai chover em {p} depois de chegares":"Dry ride there — but it will rain in {p} after you arrive",
 "🌧️ O tempo vai mudar em {p}":"🌧️ Weather is about to turn in {p}",
 "Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Rain around {h} where you are/will be. If you're still out there, plan the ride home or get the bike under cover.",
+"⚠️ Perigos específicos de mota":"⚠️ Rider-specific hazards",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Beyond rain: road surface, wind, cold at speed, visibility and sun — with thresholds tuned for two wheels.",
+"km {a}–{b}":"km {a}–{b}","km {a}":"km {a}",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"First rain after {n} dry days: oil built up on the tarmac lifts and the road turns to soap for the first half hour. Brake early and gently, avoid road paint and manhole covers.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind up to ~{g} km/h between km {a} and km {b} — firm on the bars; extra care on bridges, viaducts and when passing trucks.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"At ~{v} km/h it effectively feels like {c}° (air {t}°) — hands go numb and reactions slow down. Winter gloves, layers, and stop to warm up mid-way on longer rides.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Air at {t}° with {h}% humidity near km {k}: the road can be freezing even with air above zero — bridges, viaducts and shaded spots first. Stay upright and smooth through corners.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Fog / visor fogging likely near km {k} (~{h}) — pinlock or visor cracked open, low beam on (never high beam) and double your following distance.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Low sun straight ahead near km {k} (~{h}) — blinds you and the drivers behind you. Dark visor/peak, add distance, and assume cars don't see you.",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Careful: first rain after a dry spell — treacherous road surface",
 });
 Object.assign(I18N.es,{
 "Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
@@ -1278,6 +1295,16 @@ Object.assign(I18N.es,{
 "Ida seca — mas vai chover em {p} depois de chegares":"Ida seca — pero lloverá en {p} después de llegar",
 "🌧️ O tempo vai mudar em {p}":"🌧️ El tiempo va a cambiar en {p}",
 "Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Lluvia hacia las {h} donde estás/estarás. Si sigues por allí, prepara la vuelta o resguarda la moto.",
+"⚠️ Perigos específicos de mota":"⚠️ Peligros específicos de moto",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Más allá de la lluvia: asfalto, viento, frío en marcha, visibilidad y sol — con umbrales pensados para dos ruedas.",
+"km {a}–{b}":"km {a}–{b}","km {a}":"km {a}",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Primera lluvia tras {n} días secos: el aceite acumulado en el asfalto se suelta y el piso se vuelve jabón la primera media hora. Frena pronto y suave, evita pinturas y tapas de alcantarilla.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral hasta ~{g} km/h entre el km {a} y el km {b} — firme en el manillar; ojo en puentes, viaductos y al adelantar camiones.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"A ~{v} km/h la sensación real es de {c}° (aire a {t}°) — las manos se entumecen y reaccionas tarde. Guantes de invierno, capas, y para a calentarte a mitad si el viaje es largo.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Aire a {t}° con {h}% de humedad cerca del km {k}: el asfalto puede estar helándose aun con el aire sobre cero — puentes, viaductos y sombras primero. Recto y suave en las curvas.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Niebla/visera empañada probable cerca del km {k} (~{h}) — pinlock o visera entreabierta, cortas encendidas (nunca largas) y el doble de distancia.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Sol bajo de frente cerca del km {k} (~{h}) — te deslumbra a ti y a los de atrás. Visera oscura/visera pico, más distancia y asume que los coches no te ven.",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Cuidado: primera lluvia tras días secos — asfalto traicionero",
 });
 Object.assign(I18N.fr,{
 "Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
@@ -1309,6 +1336,16 @@ Object.assign(I18N.fr,{
 "Ida seca — mas vai chover em {p} depois de chegares":"Aller au sec — mais il pleuvra à {p} après ton arrivée",
 "🌧️ O tempo vai mudar em {p}":"🌧️ Le temps va changer à {p}",
 "Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Pluie vers {h} là où tu es/seras. Si tu y es encore, prépare le retour ou mets la moto à l'abri.",
+"⚠️ Perigos específicos de mota":"⚠️ Dangers spécifiques moto",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Au-delà de la pluie : chaussée, vent, froid en roulant, visibilité et soleil — avec des seuils pensés pour deux roues.",
+"km {a}–{b}":"km {a}–{b}","km {a}":"km {a}",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Première pluie après {n} jours secs : l'huile accumulée sur le bitume remonte et la route devient une savonnette la première demi-heure. Freine tôt et en douceur, évite peintures et plaques d'égout.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral jusqu'à ~{g} km/h entre le km {a} et le km {b} — tiens bien le guidon ; prudence sur les ponts, viaducs et en doublant les camions.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"À ~{v} km/h le ressenti réel est de {c}° (air à {t}°) — les mains s'engourdissent et les réflexes ralentissent. Gants d'hiver, couches, et pause pour te réchauffer à mi-chemin si c'est long.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Air à {t}° avec {h}% d'humidité vers le km {k} : la chaussée peut geler même avec l'air au-dessus de zéro — ponts, viaducs et zones d'ombre d'abord. Droit et souple dans les virages.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Brouillard/visière embuée probable vers le km {k} (~{h}) — pinlock ou visière entrouverte, feux de croisement (jamais pleins phares) et double la distance.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Soleil bas de face vers le km {k} (~{h}) — il t'éblouit toi et ceux derrière. Visière teintée/casquette, plus de distance, et pars du principe que les voitures ne te voient pas.",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Attention : première pluie après des jours secs — chaussée traître",
 });
 
 /* ---------------- WMO → texto/emoji ---------------- */
@@ -1448,7 +1485,7 @@ async function fetchRouteWx(points, startEpoch, endEpoch){
   u.search=new URLSearchParams({
     latitude:points.map(p=>p.lat.toFixed(3)).join(","),
     longitude:points.map(p=>p.lon.toFixed(3)).join(","),
-    hourly:"temperature_2m,precipitation_probability,precipitation,weather_code,wind_gusts_10m,wind_direction_10m",
+    hourly:"temperature_2m,precipitation_probability,precipitation,weather_code,wind_gusts_10m,wind_direction_10m,relative_humidity_2m,visibility",
     start_date:isoDate(startEpoch), end_date:isoDate(endEpoch),
     timeformat:"unixtime", timezone:"auto",
   }).toString();
@@ -2370,6 +2407,7 @@ async function computeRoute(){
     renderDepartures();
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
     scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
+    loadDrySpell(); // historial de dias secos → aviso de óleo na primeira chuva
     autoT.used=false;
     if(state._resumeTravel&&!travel.active){ state._resumeTravel=false; setTimeout(startTravel,600); }
     else maybeAutoTravel(); // liga o Modo Viagem sozinho se detetar movimento
@@ -2416,6 +2454,7 @@ function applyShift(shiftMin, fit=false){
   drawRoute(fit);
   renderRouteSummary();
   renderSegments();
+  renderHazards();
   // realça o chip selecionado
   $$(".dep-chip").forEach(c=>c.classList.toggle("sel",+c.dataset.shift===shiftMin));
 }
@@ -2710,6 +2749,184 @@ function computeWindStats(R){
   const headAvg=len?headSum/len:0;
   const desc=Math.abs(headAvg)<8?t("maioritariamente lateral"):headAvg>0?t("de frente"):t("de costas");
   return {crossMax, crossKm, crossPlace:crossMax>=40, headAvg, desc, gustMax};
+}
+
+/* =====================================================================
+   PERIGOS ESPECÍFICOS DE MOTA — todos os limiares AQUI, com a razão à frente.
+   Afina estes valores com experiência real de estrada; o código não muda.
+   ===================================================================== */
+const HAZARD_CFG={
+  drySpellDays:4,        // dias seguidos sem chuva para o óleo/borracha acumular no alcatrão
+  drySpellWetMm:1.0,     // ≥1 mm num dia conta como "a estrada foi lavada" (quebra a contagem)
+  firstRainMm:0.25,      // basta chuva fraca para reativar o filme de óleo — é aí que escorrega
+  crossWindKmh:38,       // componente lateral a partir da qual a moto "anda de lado" (guiador firme)
+  crossWindStrongKmh:55, // lateral forte: pontes/viadutos/camiões tornam-se perigosos — reduzir
+  crossAngleMinDeg:55,   // ângulo mínimo vento↔rumo para contar como lateral (90° = perpendicular)
+  chillColdC:5,          // sensação EM ANDAMENTO abaixo disto: mãos frias, atenção a cair
+  chillSevereC:-2,       // sensação em andamento perigosa: dedos dormentes, reação lenta — parar a aquecer
+  frostAirC:4,           // com o ar ≤4° o piso pode estar a 0° (irradiação): pontes e sombras primeiro
+  frostHumidity:82,      // humidade alta = orvalho que congela no alcatrão frio
+  fogSpreadC:2.5,        // T−ponto de orvalho ≤2,5° = nevoeiro provável e viseira a embaciar
+  fogHumidity:94,        // acima disto a viseira embacia mesmo sem nevoeiro declarado
+  fogVisM:350,           // visibilidade prevista abaixo disto agrava para "sério"
+  glareElevDeg:10,       // sol abaixo de ~10° encandeia de frente (nascer/pôr-do-sol)
+  glareAngleDeg:28,      // diferença rumo↔azimute do sol para contar como "de frente"
+  minRideKmh:20, maxRideKmh:130, // limites de sanidade para a velocidade média do troço (dados OSRM)
+};
+/* posição do sol (elevação/azimute) — cálculo local, sem API */
+function sunPos(tEpoch,lat,lon){
+  const rad=Math.PI/180;
+  const days=tEpoch/86400-10957.5; // dias desde J2000
+  const g=(357.529+0.98560028*days)*rad;
+  const q=280.459+0.98564736*days;
+  const L=(q+1.915*Math.sin(g)+0.020*Math.sin(2*g))*rad;
+  const e=(23.439-0.00000036*days)*rad;
+  const RA=Math.atan2(Math.cos(e)*Math.sin(L),Math.cos(L));
+  const dec=Math.asin(Math.sin(e)*Math.sin(L));
+  const GMST=(18.697374558+24.06570982441908*days)%24;
+  const H=((GMST+lon/15)*15*rad)-RA;
+  const la=lat*rad;
+  const elev=Math.asin(Math.sin(la)*Math.sin(dec)+Math.cos(la)*Math.cos(dec)*Math.cos(H));
+  const az=Math.atan2(-Math.sin(H)*Math.cos(dec),Math.sin(dec)*Math.cos(la)-Math.cos(dec)*Math.sin(la)*Math.cos(H));
+  return {elev:elev/rad, azim:((az/rad)+360)%360};
+}
+/* ponto de orvalho (fórmula de Magnus) */
+function dewPointC(T,RH){
+  if(RH==null||T==null||RH<=0) return null;
+  const a=17.625,b=243.04, g=Math.log(RH/100)+a*T/(b+T);
+  return b*g/(a-g);
+}
+/* sensação térmica À VELOCIDADE DA MOTO (não à de quem caminha) */
+function ridingChill(T,vKmh){
+  const v=clamp(vKmh,HAZARD_CFG.minRideKmh,HAZARD_CFG.maxRideKmh);
+  if(T>12) return T;
+  const p=Math.pow(v,0.16);
+  return 13.12+0.6215*T-11.37*p+0.3965*T*p;
+}
+function routeHazards(R){
+  if(!R?.samples?.length||R.samples.length<2) return [];
+  const cfg=HAZARD_CFG, segs=R.samples, H=[];
+  const hv=(s,f)=>{ const hh=s.wx?.hourly; if(!hh?.time?.length||!hh[f]) return null;
+    let i=hh.time.findIndex(tt=>tt>s.eta); if(i<=0)i=hh.time.length;
+    return hh[f][Math.max(0,i-1)]??null; };
+  // 1) PRIMEIRA CHUVA APÓS DIAS SECOS — óleo no piso (a mais grave de todas)
+  if((R.drySpellDays??0)>=cfg.drySpellDays){
+    const first=segs.find(s=>s.cond.lvl>=1||s.cond.pr>=cfg.firstRainMm);
+    if(first) H.push({sev:3,ico:"🛢️",kind:"oleo",km0:first.km,km1:null,t0:first.eta,t1:null,
+      txt:t("Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.",{n:R.drySpellDays})});
+  }
+  // 2) VENTO LATERAL por troço, usando o rumo real da rota
+  let run=null;
+  const flushW=()=>{ if(!run) return;
+    H.push({sev:run.max>=cfg.crossWindStrongKmh?3:2,ico:"💨",kind:"lateral",km0:run.k0,km1:run.k1,t0:run.t0,t1:run.t1,
+      txt:t("Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.",{g:rnd(run.max),a:rnd(run.k0),b:rnd(run.k1)})});
+    run=null; };
+  for(let j=0;j<segs.length-1;j++){
+    const a=segs[j], b=segs[j+1];
+    const d=(a.cond.dir-bearing(a,b))*Math.PI/180;
+    const cross=Math.abs(Math.sin(d))*a.cond.gust;
+    const lateralEnough=Math.abs(Math.sin(d))>=Math.sin(cfg.crossAngleMinDeg*Math.PI/180);
+    if(cross>=cfg.crossWindKmh&&lateralEnough){
+      if(!run) run={k0:a.km,k1:b.km,t0:a.eta,t1:b.eta,max:cross};
+      else { run.k1=b.km; run.t1=b.eta; run.max=Math.max(run.max,cross); }
+    } else flushW();
+  }
+  flushW();
+  // 3) WINDCHILL À VELOCIDADE REAL de cada troço (velocidade média OSRM)
+  let wc=null;
+  for(let j=0;j<segs.length-1;j++){
+    const a=segs[j], b=segs[j+1];
+    const dt=Math.max(60,(b.travelSec-a.travelSec)), dk=Math.max(0.2,b.km-a.km);
+    const v=clamp(dk/(dt/3600),cfg.minRideKmh,cfg.maxRideKmh);
+    const ch=ridingChill(a.cond.t,v);
+    if(ch<=cfg.chillColdC&&(!wc||ch<wc.ch)) wc={ch,v,t:a.cond.t,km:a.km,eta:a.eta};
+  }
+  if(wc) H.push({sev:wc.ch<=cfg.chillSevereC?3:2,ico:"🥶",kind:"chill",km0:wc.km,km1:null,t0:wc.eta,t1:null,
+    txt:t("A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.",{v:rnd(wc.v),c:rnd(wc.ch),t:rnd(wc.t)})});
+  // 4) GELO NO PISO com o ar ainda acima de zero (pontes e sombras primeiro)
+  let fr=null;
+  for(const s of segs){
+    const T=s.cond.t, RH=hv(s,"relative_humidity_2m");
+    if(T<=cfg.frostAirC&&T>-0.5&&RH!=null&&RH>=cfg.frostHumidity&&sunPos(s.eta,s.lat,s.lon).elev<12){
+      if(!fr||T<fr.T) fr={T,RH,km:s.km,eta:s.eta};
+    }
+  }
+  if(fr) H.push({sev:fr.T<=1.5?3:2,ico:"🧊",kind:"gelo",km0:fr.km,km1:null,t0:fr.eta,t1:null,
+    txt:t("Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.",{t:rnd(fr.T),h:rnd(fr.RH),k:rnd(fr.km)})});
+  // 5) NEVOEIRO / VISEIRA EMBACIADA — ponto de orvalho e humidade
+  let fg=null;
+  for(const s of segs){
+    const T=s.cond.t, RH=hv(s,"relative_humidity_2m"), vis=hv(s,"visibility");
+    const Td=dewPointC(T,RH);
+    const spread=Td==null?null:T-Td;
+    if((spread!=null&&spread<=cfg.fogSpreadC)||(RH!=null&&RH>=cfg.fogHumidity)){
+      const sev=(vis!=null&&vis<=cfg.fogVisM)?3:2;
+      if(!fg||sev>fg.sev) fg={sev,km:s.km,eta:s.eta,vis};
+    }
+  }
+  if(fg) H.push({sev:fg.sev,ico:"🌫️",kind:"nevoeiro",km0:fg.km,km1:null,t0:fg.eta,t1:null,
+    txt:t("Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.",{k:rnd(fg.km),h:fmtHM(fg.eta)})});
+  // 6) SOL BAIXO DE FRENTE — nascer/pôr-do-sol contra o rumo
+  let gl=null;
+  for(let j=0;j<segs.length-1;j++){
+    const a=segs[j], b=segs[j+1];
+    const sp=sunPos(a.eta,a.lat,a.lon);
+    if(sp.elev>0.5&&sp.elev<=cfg.glareElevDeg){
+      const dAz=Math.abs(((sp.azim-bearing(a,b)+540)%360)-180);
+      if(dAz<=cfg.glareAngleDeg&&(!gl||sp.elev<gl.elev)) gl={elev:sp.elev,km:a.km,eta:a.eta};
+    }
+  }
+  if(gl) H.push({sev:2,ico:"🌅",kind:"sol",km0:gl.km,km1:null,t0:gl.eta,t1:null,
+    txt:t("Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.",{k:rnd(gl.km),h:fmtHM(gl.eta)})});
+  return H.sort((x,y)=>y.sev-x.sev||x.km0-y.km0);
+}
+/* histórico de chuva dos últimos dias (3 pontos da rota) para o aviso do óleo */
+async function loadDrySpell(){
+  const R=state.route; if(!R?.samples?.length) return;
+  try{
+    const idx=[0,Math.floor(R.samples.length/2),R.samples.length-1];
+    const pts=[...new Set(idx)].map(i=>R.samples[i]);
+    const dep=R.dep+(R.shift||0)*60;
+    const u=new URL(OM_BASE);
+    u.search=new URLSearchParams({
+      latitude:pts.map(p=>p.lat.toFixed(3)).join(","),
+      longitude:pts.map(p=>p.lon.toFixed(3)).join(","),
+      daily:"precipitation_sum",
+      start_date:isoDate(dep-(HAZARD_CFG.drySpellDays+3)*86400),
+      end_date:isoDate(dep-86400),
+      timeformat:"unixtime", timezone:"auto",
+    }).toString();
+    const j=await jfetch(u.toString(), 15000);
+    const arr=Array.isArray(j)?j:[j];
+    let best=0;
+    for(const w of arr){
+      const s=w?.daily?.precipitation_sum||[]; let runD=0;
+      for(let i=s.length-1;i>=0;i--){ if((s[i]??0)<HAZARD_CFG.drySpellWetMm) runD++; else break; }
+      best=Math.max(best,runD);
+    }
+    R.drySpellDays=best;
+  }catch(e){ R.drySpellDays=null; }
+  renderHazards();
+}
+function renderHazards(){
+  const box=$("#route-hazards"); if(!box) return;
+  const R=state.route; box.textContent=""; if(!R) return;
+  const list=routeHazards(R);
+  R.hazards=list;
+  if(!list.length) return;
+  const card=el("div","card"); card.setAttribute("data-test","hazards");
+  card.appendChild(el("h2",null,t("⚠️ Perigos específicos de mota")));
+  card.appendChild(el("p","h-sub",t("Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.")));
+  list.forEach(h=>{
+    const row=el("div","hz-row lvl"+h.sev);
+    const meta=[h.km1!=null?t("km {a}–{b}",{a:rnd(h.km0),b:rnd(h.km1)}):t("km {a}",{a:rnd(h.km0)}),
+      h.t1?`${fmtHM(h.t0)}–${fmtHM(h.t1)}`:`~${fmtHM(h.t0)}`].join(" · ");
+    const main=el("div","hz-main");
+    main.append(el("div","hz-meta",meta), el("div","hz-txt",h.txt));
+    row.append(el("span","hz-ico",h.ico), main);
+    card.appendChild(row);
+  });
+  box.appendChild(card);
 }
 
 /* troços contíguos com chuva */
@@ -3060,6 +3277,12 @@ function buildRecommendation(cand){
   // noite
   const sunset=state.wx?.daily?.sunset?.find(x=>isSameDay(x,R.dep+R.shift*60));
   if(sunset&&(R.arrive??0)>sunset) A("🌙",t("Chegas depois do pôr-do-sol — luzes verificadas e algo refletor."));
+  // perigos específicos de mota — os 2 piores entram na recomendação
+  const hzAll=R.hazards||routeHazards(R);
+  const hzTop=hzAll.filter(h=>h.sev>=2).slice(0,2);
+  hzTop.forEach(h=>A(h.ico,h.txt));
+  if(hzAll.some(h=>h.kind==="oleo")&&lvl<2){ lvl=2; emoji="🛢️"; title=t("Cuidado: primeira chuva depois de dias secos — piso traiçoeiro"); }
+  else if(hzTop.some(h=>h.sev===3)&&lvl<1){ lvl=1; }
   // estadia: o que te espera no destino (mesmo sem saberes quanto tempo ficas)
   const sInfo=stayInfo(R);
   if(sInfo){
@@ -3155,6 +3378,7 @@ async function rerouteFromHere(pos){
     renderDepartures();
     renderCameras(); loadRouteCameras();
     scheduleStayAlerts(state.route);
+    loadDrySpell();
     try{ history.replaceState(null,"",
       "#r2="+pts.map(q=>`${q.lat.toFixed(4)},${q.lon.toFixed(4)},${encodeURIComponent(q.name)}`).join("~")
       +`|${Math.round(now)}|${Math.round((R.pauseSec||0)/60)}`);}catch(e){}
