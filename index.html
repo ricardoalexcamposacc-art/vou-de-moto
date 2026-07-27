@@ -13,6 +13,8 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <title>Vou de Moto? — meteo para motociclistas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 /* ================= TOKENS ================= */
@@ -319,20 +321,71 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
   #map-route,#map-radar{height:340px}
   .brand-sub{display:none}
 }
+
+/* ================= POLIMENTO (nível loja) ================= */
+body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.brand-tile{width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,#2a78d6,#0d366b);
+  display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 4px 14px -6px rgba(26,90,180,.55)}
+.brand-name{font-size:19px;font-weight:800}
+.card{border-radius:18px;padding:18px;margin-bottom:12px}
+.card h2{font-size:14.5px}
+.card .h-sub{font-size:12px;margin-bottom:10px}
+.tabs{border-radius:14px}
+.tab{border-radius:10px}
+.btn{border-radius:12px}
+.btn.ghost{background:transparent;border:1px dashed var(--border);color:var(--ink2);font-weight:600;width:100%;justify-content:center}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent);filter:none}
+#plan-card{display:none}
+#plan-card.open{display:block}
+.ac-item{flex-direction:row;align-items:center;gap:10px}
+.ac-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ac-main b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-dist{flex:none;font-size:11.5px;color:var(--muted);font-weight:650;font-variant-numeric:tabular-nums}
+.fav-x{margin-left:2px;opacity:.5;padding:0 2px;font-size:11px}
+.fav-x:hover{opacity:1;color:var(--crit)}
+.fav-chip b{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-ring svg{width:100%;height:100%}
+@media (max-width:720px){
+  .wrap{padding:0 10px 46px}
+  .card{padding:14px;margin-bottom:10px;border-radius:16px}
+  .app-head{padding:12px 0 8px}
+  .hero{gap:12px}
+  .hero-title{font-size:18px}
+  .hero-sub{font-size:12.5px}
+  .reasons li{font-size:12.5px}
+  .chip{font-size:11.5px;padding:5px 9px}
+  .gear-chips .chip{font-size:12px;padding:7px 11px}
+  .route-grid{gap:6px}
+  .swap-btn{width:44px;height:32px;margin:0 auto;display:block}
+  .route-actions .btn{flex:1 1 auto;justify-content:center}
+  .route-actions{gap:6px}
+  .seg-item{font-size:12.5px;padding:9px 10px}
+  .dep-chip{min-width:66px;padding:7px 10px}
+  .rec .rec-title{font-size:15.5px}
+  .rec li{font-size:12.5px}
+  .daily{gap:6px}
+  .day-card{padding:8px 4px}
+  footer{font-size:11px}
+}
+.legs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.leg-row{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink2);flex-wrap:wrap}
+.leg-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:750;font-size:11px;flex:none}
+.leg-main{flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--ink)}
+.leg-meta{color:var(--muted);font-variant-numeric:tabular-nums;font-size:11.5px}
+.pt-a{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid #0ca30c;color:#0b0b0b;
+  display:grid;place-items:center;font-weight:800;font-size:12px;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.pt-b{width:27px;height:27px;border-radius:50%;background:#fff;border:3px solid #d03b3b;
+  display:grid;place-items:center;font-size:13px;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.locate-btn{width:34px;height:34px;border-radius:9px;border:2px solid rgba(0,0,0,.2);background:var(--surface);
+  color:var(--ink);font-size:17px;cursor:pointer;line-height:1;box-shadow:0 1px 5px rgba(0,0,0,.25)}
+.locate-btn:hover{background:var(--surface2)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="app-head">
     <div class="brand">
-      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-        <rect x="1" y="1" width="46" height="46" rx="13" fill="var(--accent)" opacity=".14"/>
-        <rect x="1" y="1" width="46" height="46" rx="13" stroke="var(--accent)" stroke-opacity=".35" stroke-width="1.5"/>
-        <circle cx="13.5" cy="32" r="6" stroke="var(--ink)" stroke-width="2.6"/>
-        <circle cx="35.5" cy="32" r="6" stroke="var(--ink)" stroke-width="2.6"/>
-        <path d="M13.5 32l6-11h6l-3.5-5.5h5M25.5 21c4 0 8 4 10 11" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M30 12.5h6" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/>
-      </svg>
+      <div class="brand-tile" aria-hidden="true">🏍️</div>
       <div>
         <div class="brand-name">Vou de Moto?</div>
         <div class="brand-sub">meteorologia para motociclistas · 100% grátis</div>
@@ -353,6 +406,13 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
             <span><b>Tolerante</b><span>Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.</span></span></label>
         </div>
         <p class="small muted" style="margin:10px 0 0">Trovoada, gelo e neve dão sempre vermelho, por segurança.</p>
+        <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
+        <div class="chips" id="lang-row">
+          <button class="chip click" data-lang="pt">PT</button>
+          <button class="chip click" data-lang="en">EN</button>
+          <button class="chip click" data-lang="es">ES</button>
+          <button class="chip click" data-lang="fr">FR</button>
+        </div>
       </div>
     </div>
   </header>
@@ -403,9 +463,11 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
         <button class="btn primary" id="ai-go">Perguntar</button>
       </div>
       <div id="ai-cands" class="chips" style="margin-top:10px"></div>
+      <div id="fav-row" class="chips" style="margin-top:10px"></div>
       <div id="ai-answer" aria-live="polite"></div>
+      <button class="btn ghost" id="btn-plan-toggle" style="margin-top:12px">✎ Planear manualmente (paragens, hora de partida)</button>
     </div>
-    <div class="card">
+    <div class="card" id="plan-card">
       <h2>Planear trajeto</h2>
       <p class="h-sub">Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.</p>
       <div class="route-grid">
@@ -506,6 +568,7 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2/dist/leaflet-rotate.min.js" onerror="window.__noRotate=1"></script>
 <script>
 "use strict";
 /* =====================================================================
@@ -539,6 +602,637 @@ const store={
   del(k){ try{ localStorage.removeItem("vdm-"+k); }catch(e){} },
 };
 
+/* =====================================================================
+   IDIOMAS — PT (base), EN, ES, FR · escolha do utilizador + deteção
+   ===================================================================== */
+const LOCALES={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR"};
+const SPEECH_LANGS={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR"};
+state.lang=(function(){
+  const s=store.get("lang");
+  if(s&&LOCALES[s]) return s;
+  const n=(navigator.language||"pt").slice(0,2).toLowerCase();
+  return LOCALES[n]?n:"en";
+})();
+function LOC(){ return LOCALES[state.lang]||"pt-PT"; }
+function t(s,vars){
+  let out=(state.lang!=="pt"&&I18N[state.lang]&&I18N[state.lang][s])||s;
+  if(vars) for(const k in vars) out=out.split("{"+k+"}").join(vars[k]);
+  return out;
+}
+function setLang(l){
+  if(!LOCALES[l]) return;
+  state.lang=l; store.set("lang",l);
+  document.documentElement.lang=l;
+  applyStaticI18n();
+  $$("#lang-row .chip").forEach(c=>c.classList.toggle("sel",c.dataset.lang===l));
+  if(state.wx) renderDashboard();
+  if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); }
+  if(state.radar.frames.length) showRadarFrame(state.radar.idx);
+  renderFavRow();
+}
+function applyStaticI18n(){
+  const map=[
+    [".brand-sub","txt","meteorologia para motociclistas · 100% grátis"],
+    ["#tab-agora","txt2","🏍️ ","Agora"], ["#tab-rota","txt2","🗺️ ","Rota"], ["#tab-radar","txt2","🛰️ ","Radar"],
+    ["#loc-search","ph","Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)"],
+    ["#btn-install","txt","📲 Instalar"],
+    ["#sentinel-card h2","txt","🔔 Sentinela meteorológica"],
+    ["#view-rota .card h2","txt","✨ Assistente de viagem"],
+    ["#ai-card .h-sub","txt","Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir."],
+    ["#ai-q","ph",'ex.: "vou ao MediaMarkt" · "decathlon" · "bombas de gasolina"'],
+    ["#ai-go","txt","Perguntar"],
+    ["#btn-route","txt","Calcular rota e chuva"],
+    ["#btn-rt-gps","txt","📍 A minha posição"],
+    ["#btn-add-stop","txt","➕ Adicionar paragem"],
+    ["#rt-o","ph","📍 Ponto de partida"], ["#rt-d","ph","🏁 Para onde vais?"],
+    ['label[for="rt-o"]',"txt","Origem"], ['label[for="rt-d"]',"txt","Destino"],
+    ['label[for="rt-when"]',"txt","Hora de partida"],
+    ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
+    ["#lang-title","txt","Idioma"],
+  ];
+  for(const [sel,kind,a,b] of map){
+    const n=$(sel); if(!n) continue;
+    if(kind==="txt") n.textContent=t(a);
+    else if(kind==="txt2") n.textContent=a+t(b);
+    else if(kind==="ph") n.placeholder=t(a);
+  }
+  const planTitle=$$("#view-rota .card h2")[1];
+  if(planTitle) planTitle.textContent=t("Planear trajeto");
+  const planSub=$$("#view-rota .card .h-sub")[1];
+  if(planSub) planSub.textContent=t("Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.");
+  const stopsLab=$$("#view-rota .route-extra label")[0];
+  if(stopsLab){ stopsLab.textContent=""; stopsLab.append(document.createTextNode(t("Paragens no caminho")+" "));
+    const s=el("span","muted",`(${t("até 4")})`); s.style.fontWeight="400"; stopsLab.appendChild(s); }
+  $$("#stop-pause option").forEach(o=>{ const v=+o.value;
+    o.textContent=v===0?t("fico 0 min"):v===60?t("fico 1 h"):t("fico {n} min",{n:v}); });
+  $$(".chip.click[data-dep]").forEach(c=>{ const m=+c.dataset.dep;
+    c.textContent=m===0?t("Agora"):`+${m/60} h`; });
+  // legenda do mapa
+  const lg=$$("#view-rota .legend span");
+  const legendTxt=["✔ Seco","⚠ Chuvisco / possível","🌧 Chuva","⛈ Forte / trovoada"];
+  lg.forEach((s,i)=>{ if(i<4&&s.childNodes.length>1) s.childNodes[1].textContent=t(legendTxt[i]); });
+  const radarLbl=$("#view-rota .legend label");
+  if(radarLbl&&radarLbl.childNodes.length>1) radarLbl.childNodes[1].textContent=" "+t("radar ao vivo");
+  const notes=$$(".map-note");
+  if(notes[0]){ notes[0].textContent=""; notes[0].append(document.createTextNode(t("A cor de cada troço mostra o tempo previsto ")),
+    el("b",null,t("à hora a que lá vais passar")), document.createTextNode(t(", não o tempo de agora."))); }
+  if(notes[1]) notes[1].textContent=t("Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.");
+  // definições
+  const pop=$("#settings-pop");
+  if(pop){
+    pop.querySelector("h3").textContent=t("Perfil de decisão");
+    const labs=$$("#profile-radios label");
+    const P=[["Conservador","Qualquer risco relevante já pesa na decisão."],
+             ["Equilibrado","Avisos com chuvisco/vento moderado; vermelho só com condições más."],
+             ["Tolerante","Só chuva a sério, trovoada, gelo ou vento forte travam a viagem."]];
+    labs.forEach((lab,i)=>{ const b=lab.querySelector("b"), sp=lab.querySelector("b + span")||lab.querySelectorAll("span span")[0];
+      if(b) b.textContent=t(P[i][0]); const small=lab.querySelector("span span"); if(small) small.textContent=t(P[i][1]); });
+    const note=pop.querySelector("p.small");
+    if(note) note.textContent=t("Trovoada, gelo e neve dão sempre vermelho, por segurança.");
+  }
+  const sentSub=$("#sentinel-status");
+  if(sentSub&&!sentinel.on) sentSub.textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
+  const sentBtn=$("#btn-sentinel");
+  if(sentBtn) sentBtn.textContent=sentinel.on?t("🛑 Desligar"):t("Ligar");
+  const nb=$("#net-banner span:last-child");
+  if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
+  const ft=$("footer");
+  if(ft){ ft.textContent="";
+    ft.append(document.createTextNode(t("Dados gratuitos:")+" Open-Meteo · OSRM & OpenStreetMap · RainViewer · CARTO — "));
+    ft.append(document.createTextNode(t("Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️"));
+  }
+  const tbStop=$("#tb-stop"); if(tbStop) tbStop.textContent=t("🛑 Terminar");
+  updateTravelButtons();
+}
+const I18N={pt:{},
+en:{
+"meteorologia para motociclistas · 100% grátis":"weather for motorcyclists · 100% free",
+"Agora":"Now","Rota":"Route","Radar":"Radar",
+"Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Search city or address… (e.g. London, Lisbon)",
+"📲 Instalar":"📲 Install","🔔 Sentinela meteorológica":"🔔 Weather sentinel",
+"✨ Assistente de viagem":"✨ Trip assistant",
+"Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Tell me where you're going — I'll find the nearest match, plan the route and tell you whether to ride, wait, take another transport, and what to wear.",
+'ex.: "vou ao MediaMarkt" · "decathlon" · "bombas de gasolina"':'e.g. "going to MediaMarkt" · "decathlon" · "petrol stations"',
+"Perguntar":"Ask","Calcular rota e chuva":"Route & rain","📍 A minha posição":"📍 My location","➕ Adicionar paragem":"➕ Add stop",
+"📍 Ponto de partida":"📍 Starting point","🏁 Para onde vais?":"🏁 Where are you going?",
+"Origem":"From","Destino":"To","Hora de partida":"Departure time","Planear trajeto":"Plan a trip",
+"Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"See exactly where along the way it will rain — and the best time to leave.",
+"Paragens no caminho":"Stops on the way","até 4":"up to 4","fico 0 min":"stay 0 min","fico 1 h":"stay 1 h","fico {n} min":"stay {n} min",
+"✔ Seco":"✔ Dry","⚠ Chuvisco / possível":"⚠ Drizzle / possible","🌧 Chuva":"🌧 Rain","⛈ Forte / trovoada":"⛈ Heavy / storm","radar ao vivo":"live radar",
+"A cor de cada troço mostra o tempo previsto ":"Each segment's colour shows the forecast ",
+"à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
+"Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.":"Real radar (last 2 h) + nowcast (next 30 min) by RainViewer. Blue = light rain · green/yellow = moderate · red = heavy.",
+"Perfil de decisão":"Decision profile","Conservador":"Cautious","Equilibrado":"Balanced","Tolerante":"Tolerant",
+"Qualquer risco relevante já pesa na decisão.":"Any relevant risk already counts against riding.",
+"Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Warnings for drizzle/moderate wind; red only in bad conditions.",
+"Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Only real rain, storms, ice or strong wind stop the trip.",
+"Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Storms, ice and snow are always red, for safety.",
+"Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. Turn it on and I'll watch the weather where you are, minute by minute, and alert you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.",
+"Ligar":"Turn on","🛑 Desligar":"🛑 Turn off","🛑 Terminar":"🛑 End",
+"Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"I can't reach the weather services. Check your connection and try again — or open the app in your browser.",
+"Dados gratuitos:":"Free data:","Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no keys, no costs. Ride smart: on a red warning, stay home.",
+"Céu limpo":"Clear sky","Quase limpo":"Mostly clear","Parcialmente nublado":"Partly cloudy","Encoberto":"Overcast",
+"Nevoeiro":"Fog","Nevoeiro com sincelo":"Freezing fog","Chuvisco fraco":"Light drizzle","Chuvisco":"Drizzle","Chuvisco intenso":"Heavy drizzle",
+"Chuvisco gelado":"Freezing drizzle","Chuvisco gelado forte":"Heavy freezing drizzle","Chuva fraca":"Light rain","Chuva":"Rain","Chuva forte":"Heavy rain",
+"Chuva gelada":"Freezing rain","Chuva gelada forte":"Heavy freezing rain","Neve fraca":"Light snow","Neve":"Snow","Neve forte":"Heavy snow","Grãos de neve":"Snow grains",
+"Aguaceiros fracos":"Light showers","Aguaceiros":"Showers","Aguaceiros violentos":"Violent showers","Aguaceiros de neve":"Snow showers","Aguaceiros de neve fortes":"Heavy snow showers",
+"Trovoada":"Thunderstorm","Trovoada com granizo":"Thunderstorm w/ hail","Trovoada com granizo forte":"Severe storm w/ hail",
+"Vai de moto!":"Ride on!","Vai, mas equipado":"Go, but geared up","Arriscado — pensa duas vezes":"Risky — think twice","Melhor não ir de moto":"Better not ride",
+"via verde":"all clear","atenção":"caution","risco":"risk","não recomendado":"not advised",
+"Seco":"Dry","Chuvisco / possível":"Drizzle / possible","Forte / trovoada":"Heavy / storm","Chuvisco possível":"Possible drizzle","Chuva forte / trovoada":"Heavy rain / storm",
+"índice moto":"ride index","{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° in {p} — call for the next 3 h",
+"Sem chuva, vento controlado e temperatura agradável.":"No rain, manageable wind and pleasant temperature.",
+"A partir das {h}: {c} — se fores, volta antes disso.":"From {h}: {c} — if you go, be back before then.",
+"Melhora a partir das {h} ({d}).":"Improves from {h} ({d}).",
+"hoje":"today","amanhã":"tomorrow",
+"{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} around {h} ({d}). Avoid being on the road then.",
+"sensação {t}°":"feels {t}°","vento":"wind","rajadas":"gusts","humidade":"humidity","visibilidade":"visibility","UV máx":"UV max","sol":"sun",
+"🧤 Equipamento recomendado":"🧤 Recommended gear","Com base nas próximas 6 horas.":"Based on the next 6 hours.",
+"🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Full rain suit (jacket + trousers + boot covers)",
+"🌦️ Leva o fato de chuva na mala — vais precisar dele":"🌦️ Pack the rain suit — you'll need it",
+"🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra":"🧊 Possible ice: avoid early hours, bridges and shaded spots",
+"🥶 Luvas de inverno + forro térmico + proteção de pescoço":"🥶 Winter gloves + thermal layer + neck warmer",
+"🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa":"🧥 Warm layers — wind chill on the bike is much colder",
+"🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres":"🥵 Hydrate and take breaks — vented jacket if you have one",
+"💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados":"💨 Strong gusts: extra care on bridges, viaducts and when passing trucks",
+"🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas":"🌫️ Pinlock/anti-fog visor and lights always on",
+"🦺 Parte do período é de noite — colete ou elementos refletores ajudam":"🦺 Part of it is after dark — hi-viz or reflective gear helps",
+"😎 Condições confortáveis — equipamento habitual chega":"😎 Comfortable conditions — your usual gear is fine",
+"⏱️ Próximas 24 horas":"⏱️ Next 24 hours","melhor janela":"best window","índice {v}":"index {v}",
+"Altura da barra = índice moto (quanto mais alta, melhor). Passa o rato para detalhes.":"Bar height = ride index (taller is better). Hover for details.",
+"Altura da barra = índice moto (quanto mais alta, melhor). Sem janelas boas nas próximas horas.":"Bar height = ride index (taller is better). No good windows in the next hours.",
+"AGORA":"NOW","Condições":"Conditions","Temperatura":"Temperature","sente-se {t}°":"feels {t}°","Rajadas":"Gusts","Prob. chuva":"Rain prob.","Total chuva":"Rain total","Rajadas máx":"Max gusts",
+"💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45":"💨 wind — direction (arrow) and gusts in km/h · bold = gusts ≥ 45",
+"🌦️ Próximas 2 horas, ao quarto de hora":"🌦️ Next 2 hours, in 15-min steps",
+"Sem chuva prevista nas próximas 2 horas — arranca à vontade.":"No rain expected in the next 2 hours — ride away.",
+"Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).":"Rain from ~{h} — intensity in blue (darker = heavier).",
+"Precipitação":"Precipitation","📅 Próximos 7 dias":"📅 Next 7 days","Para planear a voltinha de fim de semana.":"To plan the weekend ride.",
+"Bom p/ moto":"Good to ride","Com aviso":"With caution","Arriscado":"Risky","Mau p/ moto":"Bad to ride","Máx / mín":"Max / min",
+"Trajeto seco — boa viagem!":"Dry route — enjoy the ride!",
+"Possível chuvisco em ~{n} km do caminho":"Possible drizzle on ~{n} km of the way",
+"Vais apanhar chuva em ~{n} km ({p}% do trajeto)":"You'll hit rain on ~{n} km ({p}% of the route)",
+"Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.":"Heavy rain/storm on the way — {n} km affected. Postpone if you can.",
+"paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
+"pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
+"vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
+"radar fixo":"fixed camera","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
+"maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
+"Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
+"O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
+"🧭 Modo viagem (avisos de chuva)":"🧭 Trip mode (rain alerts)","🛑 Terminar modo viagem":"🛑 End trip mode","📋 Copiar resumo":"📋 Copy summary",
+"Resumo copiado! 📋":"Summary copied! 📋","Não consegui copiar automaticamente.":"Couldn't copy automatically.",
+"🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 What if you leave later (or earlier)?",
+"Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Compare route rain for different departure times — tap to apply. No new downloads: it's instant.",
+"Se saíres às {h} apanhas {x}.":"Leaving at {h} you get {x}.","o trajeto praticamente seco":"an almost dry route","só ~{n} km de chuva":"only ~{n} km of rain",
+"🌧️💨 Onde apanhas chuva e vento":"🌧️💨 Where you'll hit rain and wind",
+"Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉":"No segments with rain or dangerous wind at this departure time. 🎉",
+"Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Route segments needing attention, at the time you'll pass them.",
+"a identificar a zona…":"identifying the area…","perto de {p}":"near {p}","vento lateral":"crosswind","abranda e segura bem o guiador":"slow down and hold firm",
+"📸 Radares de velocidade no trajeto":"📸 Speed cameras on the route",
+"Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"Couldn't fetch cameras right now — try recalculating shortly.",
+"A procurar radares fixos ao longo do caminho…":"Looking for fixed cameras along the way…",
+"Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"No known fixed cameras on this route (OpenStreetMap data). Mobile ones don't show — behave! 😉",
+"Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Fixed cameras (OpenStreetMap community data — may be incomplete; mobile units don't show). In Trip mode I warn you by voice at 1 km.",
+"limite {v}":"limit {v}","+{n} radares adicionais no mapa.":"+{n} more cameras on the map.","km {k} do teu trajeto":"km {k} of your route","dados OpenStreetMap":"OpenStreetMap data",
+"📸 Radar fixo":"📸 Fixed speed camera","— limite {v}":"— limit {v}",
+"🏁 Partida":"🏁 Start","🎯 Chegada":"🎯 Arrival","🛑 Paragem {n}: {p}":"🛑 Stop {n}: {p}","chegas ~{a} · voltas à estrada ~{b}":"arrive ~{a} · back on the road ~{b}",
+"Diz-me para onde queres ir 🙂":"Tell me where you want to go 🙂","A pensar…":"Thinking…",
+"À procura de \"{q}\" perto de ti…":"Looking for \"{q}\" near you…",
+"Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"I need to know where you are: allow GPS, or search your city in the Now tab and come back.",
+"Não encontrei \"{q}\" por aqui. Tenta com a cidade (ex.: \"{q} {c}\").":"Couldn't find \"{q}\" around here. Try adding the city (e.g. \"{q} {c}\").",
+"A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculating the route to {p} and the weather along every stretch…",
+"A minha posição":"My location","a tua zona":"your area",
+"Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"Couldn't route you there — pick another place above or adjust the form.",
+"Não vás de moto nesta viagem":"Don't ride for this trip",
+"Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Storms, ice or snow are forecast on the way — really not one for the bike.",
+"Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Take the car/public transport — or wait: by {h} the route looks decent.",
+"Vai de carro ou de transportes públicos; o risco não compensa.":"Take the car or public transport; the risk isn't worth it.",
+"Espera um pouco — sai às {h}":"Wait a bit — leave at {h}",
+"Se saíres já, apanhas chuva em ~{n} km; às {h} vais {x}.":"Leaving now you'd hit rain on ~{n} km; at {h} you go {x}.",
+"praticamente seco":"almost dry","só com ~{n} km molhados":"with only ~{n} km wet",
+"Se não puderes esperar: fato de chuva completo e reduz a velocidade no molhado.":"If you can't wait: full rain suit and slow down on the wet.",
+"De moto vais apanhar chuva — pondera outro transporte":"You'll hit rain on the bike — consider another transport",
+"Chuva em ~{n} km do trajeto ({p}%), e não melhora nas próximas 4 horas.":"Rain on ~{n} km of the route ({p}%), and it doesn't improve in the next 4 hours.",
+"Se tiveres alternativa (carro, transportes), hoje é o dia de a usar. Se fores mesmo: fato de chuva completo, viseira limpa e o dobro da distância de travagem.":"If you have an alternative (car, transit), today's the day. If you ride anyway: full rain suit, clean visor and double the braking distance.",
+"Podes ir de moto — mas leva o fato de chuva":"You can ride — but take the rain suit",
+"Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão.":"Some stretches risk drizzle; keep the rain suit handy.",
+"Sim — vai de moto!":"Yes — take the bike!","Trajeto seco até {p} a esta hora.":"Dry route to {p} at this time.",
+"Vento demasiado forte para ir descansado":"Wind too strong for a relaxed ride",
+"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Gusts up to {g} km/h, {d} wind{x} — punishing on a bike; if you go, keep speed moderate and don't squeeze past trucks.",
+", com lateral forte perto do km {k}":", with strong crosswind near km {k}",
+"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Gusts up to {g} km/h, {d} wind{x} — firm grip on bridges and exposed stretches.",
+" com lateral perto do km {k}":" with crosswind near km {k}",
+"Vento tranquilo: rajadas máximas de {g} km/h, {d}.":"Calm wind: gusts max {g} km/h, {d}.",
+"Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.":"Seriously cold (route low {t}°): winter gloves, thermal layer and windproof.",
+"Leva casaco quente: mínima de {t}° no percurso — em andamento sente-se bastante menos.":"Take a warm jacket: route low {t}° — it feels much colder at speed.",
+"Muito calor: hidrata-te antes de sair e usa equipamento ventilado.":"Very hot: hydrate before leaving and wear vented gear.",
+"Temperatura amena (mín. {t}°) — equipamento habitual com casaco serve.":"Mild temperatures (low {t}°) — usual gear with a jacket is fine.",
+"Chegas depois do pôr-do-sol — luzes verificadas e algo refletor.":"You arrive after sunset — check your lights and wear something reflective.",
+"Ao longo do caminho: {x}.":"Along the way: {x}.","🗺️ Ver no mapa":"🗺️ See on map","🕒 Aplicar partida às {h}":"🕒 Set departure to {h}",
+"Partida ajustada para as {h} ✔":"Departure set to {h} ✔",
+"🧭 Modo viagem ligado":"🧭 Trip mode on","à procura do teu GPS…":"finding your GPS…",
+"sem sinal GPS — continuo a tentar…":"no GPS signal — still trying…",
+"Modo viagem ligado. Boa estrada.":"Trip mode on. Ride safe.",
+"🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso.":"🧭 Trip mode: I'll warn you about rain ahead. Screen stays on.",
+"Modo viagem terminado.":"Trip mode ended.","🎉 Chegaste! Modo viagem terminado.":"🎉 You've arrived! Trip mode ended.",
+"Chegaste ao destino. Boa!":"You've reached your destination. Nice!",
+"estás a {d} km da rota traçada — recalcula se mudaste de caminho":"you're {d} km off the planned route — recalculate if you changed course",
+"🌧️ Estás na zona de chuva ({x})":"🌧️ You're in the rain zone ({x})","faltam {d} km · chegada ~{h}":"{d} km left · arrival ~{h}",
+"🌧️ Chuva dentro de ~{m} min ({d} km)":"🌧️ Rain in ~{m} min ({d} km)","por volta das {h} · faltam {d} km até ao destino":"around {h} · {d} km to destination",
+"Dica: se parares uns vinte minutos, escapas a esta chuva.":"Tip: stop for about twenty minutes and you'll dodge this rain.",
+"Dica: se parares uns quarenta minutos, escapas a esta chuva.":"Tip: stop for about forty minutes and you'll dodge this rain.",
+"Atenção: chuva já a seguir. Abranda e liga as luzes.":"Warning: rain just ahead. Slow down and lights on.",
+"Atenção: chuva dentro de cerca de {m} minutos. {x}":"Warning: rain in about {m} minutes. {x}",
+"Última oportunidade para parar num sítio seco.":"Last chance to stop somewhere dry.",
+"Aviso antecipado: chuva dentro de cerca de {m} minutos, a {d} quilómetros. {x}":"Early warning: rain in about {m} minutes, {d} kilometres ahead. {x}",
+"Tens tempo para parar ou mudar de caminho na aplicação.":"You have time to stop or change route in the app.",
+"⚠️ Possível chuvisco dentro de {d} km":"⚠️ Possible drizzle in {d} km","✅ Caminho seco daqui até ao destino":"✅ Dry all the way to your destination",
+"Radar de velocidade dentro de {x}.":"Speed camera in {x}.","1 quilómetro":"one kilometre","400 metros":"400 metres","Limite {v}.":"Limit {v}.",
+"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movement detected — Trip mode turned on.",
+"🏍️ Vou de Moto — em viagem":"🏍️ Vou de Moto — on the road",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"On · {p} · last check {h} — {s} Current gusts: {g} km/h. Keep the app open to receive alerts.",
+"🌧️ A chover agora — deve parar ~{h}.":"🌧️ Raining now — should stop ~{h}.",
+"🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Raining now, no break in sight for ~2 h.",
+"☁️ Chuva a caminho: ~{h}.":"☁️ Rain on the way: ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ No rain in sight for the next 2 hours.",
+"Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Storm expected around {h}. If your bike is outside, bring it in.",
+"Chuva a chegar à tua zona dentro de cerca de {m} minutos.":"Rain reaching your area in about {m} minutes.",
+"Boa notícia: a chuva deve parar dentro de {m} minutos.":"Good news: the rain should stop in {m} minutes.",
+"O vento subiu: rajadas de {g} quilómetros por hora.":"Wind is up: gusts of {g} kilometres per hour.",
+"Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"On, but no position — enable GPS or search your city.",
+"Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"On — last check failed, retrying in ~2 min.",
+"Sentinela desligada.":"Sentinel off.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinel on — checking your area every ~2 minutes.",
+"radar real":"live radar","previsão imediata":"nowcast","Radar sem dados de momento.":"No radar data right now.","Não consegui carregar o radar.":"Couldn't load the radar.",
+"Previsão para {p}":"Forecast for {p}","Localização: {p}":"Location: {p}","Origem: {p}":"From: {p}",
+"A obter a tua posição… 📡":"Getting your position… 📡","O teu browser não suporta GPS — pesquisa a cidade.":"Your browser has no GPS — search the city.",
+"Sem acesso ao GPS — escreve a origem.":"No GPS access — type the origin.","Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"No GPS access — using {p}. Search your city above.",
+"Máximo de 4 paragens.":"Maximum of 4 stops.","Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Stop (e.g. supermarket, petrol station, John's place…)",
+"Ditar por voz":"Voice input","Ditar a paragem por voz":"Dictate the stop by voice",
+"Voz não suportada neste browser — escreve o destino.":"Voice not supported in this browser — type instead.",
+"Não consegui ouvir — tenta de novo ou escreve.":"Couldn't hear you — try again or type.","Voz indisponível neste browser.":"Voice unavailable in this browser.",
+'🎤 "{q}" — escolhe a sugestão certa':'🎤 "{q}" — pick the right suggestion',
+"Indica {x}.":"Please fill in {x}.","a origem":"the origin","o destino":"the destination","a paragem":"the stop",
+"Não encontrei \"{q}\" — tenta \"cidade, país\".":"Couldn't find \"{q}\" — try \"city, country\".",
+"Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"Couldn't find a road route between these points. Make sure they're reachable by road.",
+"Rota demasiado curta.":"Route too short.","Algo correu mal. Tenta novamente.":"Something went wrong. Try again.","A calcular…":"Calculating…",
+"Sem resultados — tenta \"cidade, país\"":"No results — try \"city, country\"","coordenadas":"coordinates",
+"Trajeto {x} aplicado 🗺️":"Route {x} applied 🗺️","Perfil: {p} ✔":"Profile: {p} ✔","Mapa indisponível — precisa de ligação à internet.":"Map unavailable — internet connection needed.",
+"Radar indisponível sem internet.":"Radar unavailable offline.","Radar indisponível de momento.":"Radar unavailable right now.",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️",
+"💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 On iPhone: Share button → “Add to Home Screen” to install the app.",
+"Calcula primeiro uma rota.":"Calculate a route first.","Este dispositivo não dá acesso ao GPS.":"This device doesn't provide GPS access.",
+"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"Couldn't fetch the forecast. Check your connection and try again.","Tentar de novo":"Try again",
+"Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
+},
+es:{
+"meteorologia para motociclistas · 100% grátis":"meteorología para motociclistas · 100% gratis","Agora":"Ahora","Rota":"Ruta","Radar":"Radar",
+"Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Buscar ciudad o dirección… (ej.: Madrid, Lisboa)",
+"📲 Instalar":"📲 Instalar","🔔 Sentinela meteorológica":"🔔 Centinela meteorológico","✨ Assistente de viagem":"✨ Asistente de viaje",
+"Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Dime a dónde vas: encuentro el sitio más cercano, trazo la ruta y te digo si ir en moto, esperar, usar otro transporte y qué ponerte.",
+'ex.: "vou ao MediaMarkt" · "decathlon" · "bombas de gasolina"':'ej.: "voy al MediaMarkt" · "decathlon" · "gasolineras"',
+"Perguntar":"Preguntar","Calcular rota e chuva":"Calcular ruta y lluvia","📍 A minha posição":"📍 Mi posición","➕ Adicionar paragem":"➕ Añadir parada",
+"📍 Ponto de partida":"📍 Punto de partida","🏁 Para onde vais?":"🏁 ¿A dónde vas?","Origem":"Origen","Destino":"Destino","Hora de partida":"Hora de salida","Planear trajeto":"Planificar ruta",
+"Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Ve exactamente en qué tramos lloverá — y la mejor hora para salir.",
+"Paragens no caminho":"Paradas en el camino","até 4":"hasta 4","fico 0 min":"paro 0 min","fico 1 h":"paro 1 h","fico {n} min":"paro {n} min",
+"✔ Seco":"✔ Seco","⚠ Chuvisco / possível":"⚠ Llovizna / posible","🌧 Chuva":"🌧 Lluvia","⛈ Forte / trovoada":"⛈ Fuerte / tormenta","radar ao vivo":"radar en vivo",
+"A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
+"Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.":"Radar real (últimas 2 h) + previsión inmediata (30 min), por RainViewer. Azul = lluvia débil · verde/amarillo = moderada · rojo = fuerte.",
+"Perfil de decisão":"Perfil de decisión","Conservador":"Prudente","Equilibrado":"Equilibrado","Tolerante":"Tolerante",
+"Qualquer risco relevante já pesa na decisão.":"Cualquier riesgo relevante ya pesa en la decisión.",
+"Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Avisos con llovizna/viento moderado; rojo solo con malas condiciones.",
+"Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Solo lluvia seria, tormenta, hielo o viento fuerte frenan el viaje.",
+"Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Tormenta, hielo y nieve siempre dan rojo, por seguridad.",
+"Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Apagado. Actívalo y vigilo el tiempo donde estés, minuto a minuto, avisándote con voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.",
+"Ligar":"Activar","🛑 Desligar":"🛑 Apagar","🛑 Terminar":"🛑 Terminar",
+"Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"No consigo contactar los servicios meteorológicos. Revisa la conexión e inténtalo de nuevo.",
+"Dados gratuitos:":"Datos gratuitos:","Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas, sin claves, sin costes. Conduce con cabeza: con aviso rojo, quédate en casa.",
+"Céu limpo":"Cielo despejado","Quase limpo":"Casi despejado","Parcialmente nublado":"Parcialmente nublado","Encoberto":"Cubierto","Nevoeiro":"Niebla","Nevoeiro com sincelo":"Niebla helada",
+"Chuvisco fraco":"Llovizna débil","Chuvisco":"Llovizna","Chuvisco intenso":"Llovizna intensa","Chuvisco gelado":"Llovizna helada","Chuvisco gelado forte":"Llovizna helada fuerte",
+"Chuva fraca":"Lluvia débil","Chuva":"Lluvia","Chuva forte":"Lluvia fuerte","Chuva gelada":"Lluvia helada","Chuva gelada forte":"Lluvia helada fuerte",
+"Neve fraca":"Nieve débil","Neve":"Nieve","Neve forte":"Nieve fuerte","Grãos de neve":"Granos de nieve","Aguaceiros fracos":"Chubascos débiles","Aguaceiros":"Chubascos","Aguaceiros violentos":"Chubascos violentos",
+"Aguaceiros de neve":"Chubascos de nieve","Aguaceiros de neve fortes":"Chubascos de nieve fuertes","Trovoada":"Tormenta","Trovoada com granizo":"Tormenta con granizo","Trovoada com granizo forte":"Tormenta fuerte con granizo",
+"Vai de moto!":"¡Sal en moto!","Vai, mas equipado":"Ve, pero equipado","Arriscado — pensa duas vezes":"Arriesgado — piénsalo dos veces","Melhor não ir de moto":"Mejor no salgas en moto",
+"via verde":"vía libre","atenção":"atención","risco":"riesgo","não recomendado":"no recomendado",
+"Seco":"Seco","Chuvisco / possível":"Llovizna / posible","Forte / trovoada":"Fuerte / tormenta","Chuvisco possível":"Llovizna posible","Chuva forte / trovoada":"Lluvia fuerte / tormenta",
+"índice moto":"índice moto","{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° en {p} — decisión para las próximas 3 h",
+"Sem chuva, vento controlado e temperatura agradável.":"Sin lluvia, viento controlado y temperatura agradable.",
+"A partir das {h}: {c} — se fores, volta antes disso.":"A partir de las {h}: {c} — si vas, vuelve antes.",
+"Melhora a partir das {h} ({d}).":"Mejora a partir de las {h} ({d}).","hoje":"hoy","amanhã":"mañana",
+"{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} hacia las {h} ({d}). Evita estar en carretera entonces.",
+"sensação {t}°":"sensación {t}°","vento":"viento","rajadas":"rachas","humidade":"humedad","visibilidade":"visibilidad","UV máx":"UV máx","sol":"sol",
+"🧤 Equipamento recomendado":"🧤 Equipación recomendada","Com base nas próximas 6 horas.":"Basado en las próximas 6 horas.",
+"🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Traje de agua completo (chaqueta + pantalón + cubrebotas)",
+"🌦️ Leva o fato de chuva na mala — vais precisar dele":"🌦️ Lleva el traje de agua — lo vas a necesitar",
+"🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra":"🧊 Posible hielo: evita la madrugada, puentes y zonas de sombra",
+"🥶 Luvas de inverno + forro térmico + proteção de pescoço":"🥶 Guantes de invierno + capa térmica + braga de cuello",
+"🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa":"🧥 Capas de abrigo — en marcha la sensación es mucho más fría",
+"🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres":"🥵 Hidrátate y haz pausas — chaqueta ventilada si tienes",
+"💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados":"💨 Rachas fuertes: cuidado extra en puentes, viaductos y al adelantar camiones",
+"🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas":"🌫️ Visera con pinlock/antivaho y luces siempre encendidas",
+"🦺 Parte do período é de noite — colete ou elementos refletores ajudam":"🦺 Parte será de noche — chaleco o reflectantes ayudan",
+"😎 Condições confortáveis — equipamento habitual chega":"😎 Condiciones cómodas — tu equipación habitual basta",
+"⏱️ Próximas 24 horas":"⏱️ Próximas 24 horas","melhor janela":"mejor ventana","índice {v}":"índice {v}",
+"Altura da barra = índice moto (quanto mais alta, melhor). Passa o rato para detalhes.":"Altura de la barra = índice moto (más alta, mejor). Pasa el cursor para detalles.",
+"Altura da barra = índice moto (quanto mais alta, melhor). Sem janelas boas nas próximas horas.":"Altura de la barra = índice moto (más alta, mejor). Sin buenas ventanas próximas.",
+"AGORA":"AHORA","Condições":"Condiciones","Temperatura":"Temperatura","sente-se {t}°":"sensación {t}°","Rajadas":"Rachas","Prob. chuva":"Prob. lluvia","Total chuva":"Lluvia total","Rajadas máx":"Rachas máx",
+"💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45":"💨 viento — dirección (flecha) y rachas en km/h · negrita = rachas ≥ 45",
+"🌦️ Próximas 2 horas, ao quarto de hora":"🌦️ Próximas 2 horas, cada 15 min",
+"Sem chuva prevista nas próximas 2 horas — arranca à vontade.":"Sin lluvia prevista en 2 horas — arranca tranquilo.",
+"Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).":"Lluvia desde ~{h} — intensidad en azul (más oscuro = más fuerte).",
+"Precipitação":"Precipitación","📅 Próximos 7 dias":"📅 Próximos 7 días","Para planear a voltinha de fim de semana.":"Para planificar la salida del finde.",
+"Bom p/ moto":"Bueno p/ moto","Com aviso":"Con aviso","Arriscado":"Arriesgado","Mau p/ moto":"Malo p/ moto","Máx / mín":"Máx / mín",
+"Trajeto seco — boa viagem!":"Ruta seca — ¡buen viaje!","Possível chuvisco em ~{n} km do caminho":"Posible llovizna en ~{n} km del camino",
+"Vais apanhar chuva em ~{n} km ({p}% do trajeto)":"Pillarás lluvia en ~{n} km ({p}% de la ruta)",
+"Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.":"Lluvia fuerte/tormenta en el camino — {n} km afectados. Aplaza si puedes.",
+"paragem":"parada","paragens":"paradas","em andamento":"en marcha","partida":"salida","chegada":"llegada","por":"por",
+"pico {n} mm/h":"pico {n} mm/h","mínima no percurso {t}°":"mínima en ruta {t}°","rajadas até {g} km/h · vento {d}":"rachas hasta {g} km/h · viento {d}",
+"vento lateral até ~{g} km/h":"viento lateral hasta ~{g} km/h","perto do km {k}":"cerca del km {k}","sobe até ~{m} m":"sube hasta ~{m} m",
+"radar fixo":"radar fijo","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
+"maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
+"Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
+"🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
+"Resumo copiado! 📋":"¡Resumen copiado! 📋","Não consegui copiar automaticamente.":"No pude copiar automáticamente.",
+"🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 ¿Y si sales más tarde (o antes)?",
+"Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Compara la lluvia para distintas horas de salida — toca para aplicar. Instantáneo.",
+"Se saíres às {h} apanhas {x}.":"Saliendo a las {h} pillas {x}.","o trajeto praticamente seco":"la ruta casi seca","só ~{n} km de chuva":"solo ~{n} km de lluvia",
+"🌧️💨 Onde apanhas chuva e vento":"🌧️💨 Dónde pillas lluvia y viento",
+"Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉":"Ningún tramo con lluvia o viento peligroso a esta hora. 🎉",
+"Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Tramos que requieren atención, a la hora en que pasarás.",
+"a identificar a zona…":"identificando la zona…","perto de {p}":"cerca de {p}","vento lateral":"viento lateral","abranda e segura bem o guiador":"reduce y sujeta firme el manillar",
+"📸 Radares de velocidade no trajeto":"📸 Radares de velocidad en la ruta",
+"Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"No pude consultar los radares — recalcula en un momento.",
+"A procurar radares fixos ao longo do caminho…":"Buscando radares fijos por el camino…",
+"Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Ningún radar fijo conocido en esta ruta (datos OpenStreetMap). Los móviles no aparecen — ¡juicio! 😉",
+"Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Radares fijos (datos OpenStreetMap — puede estar incompleto; los móviles no aparecen). En Modo Viaje aviso por voz a 1 km.",
+"limite {v}":"límite {v}","+{n} radares adicionais no mapa.":"+{n} radares más en el mapa.","km {k} do teu trajeto":"km {k} de tu ruta","dados OpenStreetMap":"datos OpenStreetMap",
+"📸 Radar fixo":"📸 Radar fijo","— limite {v}":"— límite {v}","🏁 Partida":"🏁 Salida","🎯 Chegada":"🎯 Llegada","🛑 Paragem {n}: {p}":"🛑 Parada {n}: {p}",
+"chegas ~{a} · voltas à estrada ~{b}":"llegas ~{a} · vuelves a la carretera ~{b}",
+"Diz-me para onde queres ir 🙂":"Dime a dónde quieres ir 🙂","A pensar…":"Pensando…","À procura de \"{q}\" perto de ti…":"Buscando \"{q}\" cerca de ti…",
+"Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"Necesito saber dónde estás: permite el GPS o busca tu ciudad en Ahora.",
+"Não encontrei \"{q}\" por aqui. Tenta com a cidade (ex.: \"{q} {c}\").":"No encontré \"{q}\" por aquí. Prueba con la ciudad (ej.: \"{q} {c}\").",
+"A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculando la ruta hasta {p} y el tiempo en cada tramo…",
+"A minha posição":"Mi posición","a tua zona":"tu zona","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"No pude trazar ruta hasta ahí — elige otro sitio o ajusta el formulario.",
+"Não vás de moto nesta viagem":"No vayas en moto en este viaje",
+"Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Hay tormenta, hielo o nieve previstos — en moto mejor evitarlo.",
+"Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Ve en coche/transporte — o espera: a las {h} la ruta mejora.",
+"Vai de carro ou de transportes públicos; o risco não compensa.":"Ve en coche o transporte público; el riesgo no compensa.",
+"Espera um pouco — sai às {h}":"Espera un poco — sal a las {h}",
+"Se saíres já, apanhas chuva em ~{n} km; às {h} vais {x}.":"Si sales ya, pillas lluvia en ~{n} km; a las {h} vas {x}.",
+"praticamente seco":"casi en seco","só com ~{n} km molhados":"con solo ~{n} km mojados",
+"Se não puderes esperar: fato de chuva completo e reduz a velocidade no molhado.":"Si no puedes esperar: traje de agua completo y reduce en mojado.",
+"De moto vais apanhar chuva — pondera outro transporte":"En moto pillarás lluvia — considera otro transporte",
+"Chuva em ~{n} km do trajeto ({p}%), e não melhora nas próximas 4 horas.":"Lluvia en ~{n} km de la ruta ({p}%), y no mejora en 4 horas.",
+"Se tiveres alternativa (carro, transportes), hoje é o dia de a usar. Se fores mesmo: fato de chuva completo, viseira limpa e o dobro da distância de travagem.":"Si tienes alternativa (coche, transporte), hoy es el día. Si vas igual: traje de agua, visera limpia y el doble de distancia de frenado.",
+"Podes ir de moto — mas leva o fato de chuva":"Puedes ir en moto — pero lleva el traje de agua",
+"Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão.":"Riesgo de llovizna en algunos tramos; lleva el traje a mano.",
+"Sim — vai de moto!":"¡Sí — ve en moto!","Trajeto seco até {p} a esta hora.":"Ruta seca hasta {p} a esta hora.",
+"Vento demasiado forte para ir descansado":"Viento demasiado fuerte para ir tranquilo",
+"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Rachas hasta {g} km/h, viento {d}{x} — en moto castiga; si vas, velocidad moderada y no adelantes camiones justo.",
+", com lateral forte perto do km {k}":", con lateral fuerte cerca del km {k}",
+"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Rachas hasta {g} km/h, viento {d}{x} — firme en puentes y zonas expuestas.",
+" com lateral perto do km {k}":" con lateral cerca del km {k}","Vento tranquilo: rajadas máximas de {g} km/h, {d}.":"Viento tranquilo: rachas máximas de {g} km/h, {d}.",
+"Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.":"Frío serio (mínima {t}° en ruta): guantes de invierno, térmica y cortavientos.",
+"Leva casaco quente: mínima de {t}° no percurso — em andamento sente-se bastante menos.":"Lleva abrigo: mínima {t}° en ruta — en marcha se siente mucho menos.",
+"Muito calor: hidrata-te antes de sair e usa equipamento ventilado.":"Mucho calor: hidrátate y usa equipación ventilada.",
+"Temperatura amena (mín. {t}°) — equipamento habitual com casaco serve.":"Temperatura suave (mín. {t}°) — equipación habitual con chaqueta.",
+"Chegas depois do pôr-do-sol — luzes verificadas e algo refletor.":"Llegas tras la puesta de sol — revisa luces y lleva reflectante.",
+"Ao longo do caminho: {x}.":"A lo largo del camino: {x}.","🗺️ Ver no mapa":"🗺️ Ver en el mapa","🕒 Aplicar partida às {h}":"🕒 Aplicar salida a las {h}","Partida ajustada para as {h} ✔":"Salida ajustada a las {h} ✔",
+"🧭 Modo viagem ligado":"🧭 Modo viaje activado","à procura do teu GPS…":"buscando tu GPS…","sem sinal GPS — continuo a tentar…":"sin señal GPS — sigo intentando…",
+"Modo viagem ligado. Boa estrada.":"Modo viaje activado. Buen viaje.","🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso.":"🧭 Modo viaje: te aviso de la lluvia por delante. La pantalla queda encendida.",
+"Modo viagem terminado.":"Modo viaje terminado.","🎉 Chegaste! Modo viagem terminado.":"🎉 ¡Has llegado! Modo viaje terminado.","Chegaste ao destino. Boa!":"Has llegado a tu destino. ¡Bien!",
+"estás a {d} km da rota traçada — recalcula se mudaste de caminho":"estás a {d} km de la ruta — recalcula si cambiaste de camino",
+"🌧️ Estás na zona de chuva ({x})":"🌧️ Estás en la zona de lluvia ({x})","faltam {d} km · chegada ~{h}":"quedan {d} km · llegada ~{h}",
+"🌧️ Chuva dentro de ~{m} min ({d} km)":"🌧️ Lluvia en ~{m} min ({d} km)","por volta das {h} · faltam {d} km até ao destino":"hacia las {h} · quedan {d} km al destino",
+"Dica: se parares uns vinte minutos, escapas a esta chuva.":"Consejo: para unos veinte minutos y esquivas esta lluvia.",
+"Dica: se parares uns quarenta minutos, escapas a esta chuva.":"Consejo: para unos cuarenta minutos y esquivas esta lluvia.",
+"Atenção: chuva já a seguir. Abranda e liga as luzes.":"Atención: lluvia justo delante. Reduce y luces.",
+"Atenção: chuva dentro de cerca de {m} minutos. {x}":"Atención: lluvia en unos {m} minutos. {x}","Última oportunidade para parar num sítio seco.":"Última oportunidad de parar en seco.",
+"Aviso antecipado: chuva dentro de cerca de {m} minutos, a {d} quilómetros. {x}":"Aviso: lluvia en unos {m} minutos, a {d} kilómetros. {x}",
+"Tens tempo para parar ou mudar de caminho na aplicação.":"Tienes tiempo de parar o cambiar de ruta en la app.",
+"⚠️ Possível chuvisco dentro de {d} km":"⚠️ Posible llovizna en {d} km","✅ Caminho seco daqui até ao destino":"✅ Camino seco hasta el destino",
+"Radar de velocidade dentro de {x}.":"Radar de velocidad en {x}.","1 quilómetro":"un kilómetro","400 metros":"400 metros","Limite {v}.":"Límite {v}.",
+"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movimiento detectado — Modo Viaje activado.","🏍️ Vou de Moto — em viagem":"🏍️ Vou de Moto — en ruta",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"Activado · {p} · última comprobación {h} — {s} Rachas actuales: {g} km/h. Mantén la app abierta.",
+"🌧️ A chover agora — deve parar ~{h}.":"🌧️ Lloviendo ahora — debería parar ~{h}.","🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Lloviendo ahora, sin pausa a la vista en ~2 h.",
+"☁️ Chuva a caminho: ~{h}.":"☁️ Lluvia en camino: ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ Sin lluvia a la vista en 2 horas.",
+"Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Tormenta prevista hacia las {h}. Si la moto está fuera, guárdala.",
+"Chuva a chegar à tua zona dentro de cerca de {m} minutos.":"Lluvia llegando a tu zona en unos {m} minutos.",
+"Boa notícia: a chuva deve parar dentro de {m} minutos.":"Buena noticia: la lluvia parará en {m} minutos.",
+"O vento subiu: rajadas de {g} quilómetros por hora.":"El viento subió: rachas de {g} kilómetros por hora.",
+"Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Activado, pero sin posición — activa el GPS o busca tu ciudad.",
+"Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Activado — falló la última comprobación, reintento en ~2 min.",
+"Sentinela desligada.":"Centinela apagado.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Centinela activado — vigilo tu zona cada ~2 minutos.",
+"radar real":"radar real","previsão imediata":"previsión inmediata","Radar sem dados de momento.":"Radar sin datos ahora.","Não consegui carregar o radar.":"No pude cargar el radar.",
+"Previsão para {p}":"Previsión para {p}","Localização: {p}":"Ubicación: {p}","Origem: {p}":"Origen: {p}","A obter a tua posição… 📡":"Obteniendo tu posición… 📡",
+"O teu browser não suporta GPS — pesquisa a cidade.":"Tu navegador no soporta GPS — busca la ciudad.","Sem acesso ao GPS — escreve a origem.":"Sin acceso al GPS — escribe el origen.",
+"Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"Sin GPS — usando {p}. Busca tu ciudad arriba.","Máximo de 4 paragens.":"Máximo 4 paradas.",
+"Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Parada (ej.: súper, gasolinera, casa de Juan…)","Ditar por voz":"Dictar por voz","Ditar a paragem por voz":"Dictar la parada por voz",
+"Voz não suportada neste browser — escreve o destino.":"Voz no soportada — escribe el destino.","Não consegui ouvir — tenta de novo ou escreve.":"No te oí — inténtalo de nuevo o escribe.",
+"Voz indisponível neste browser.":"Voz no disponible en este navegador.",'🎤 "{q}" — escolhe a sugestão certa':'🎤 "{q}" — elige la sugerencia correcta',
+"Indica {x}.":"Indica {x}.","a origem":"el origen","o destino":"el destino","a paragem":"la parada",
+"Não encontrei \"{q}\" — tenta \"cidade, país\".":"No encontré \"{q}\" — prueba \"ciudad, país\".",
+"Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"No encontré ruta por carretera entre estos puntos.",
+"Rota demasiado curta.":"Ruta demasiado corta.","Algo correu mal. Tenta novamente.":"Algo salió mal. Inténtalo de nuevo.","A calcular…":"Calculando…",
+"Sem resultados — tenta \"cidade, país\"":"Sin resultados — prueba \"ciudad, país\"","coordenadas":"coordenadas","Trajeto {x} aplicado 🗺️":"Ruta {x} aplicada 🗺️","Perfil: {p} ✔":"Perfil: {p} ✔",
+"Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.","Radar indisponível sem internet.":"Radar no disponible sin internet.","Radar indisponível de momento.":"Radar no disponible ahora.",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️",
+"💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 En iPhone: botón Compartir → “Añadir a pantalla de inicio”.",
+"Calcula primeiro uma rota.":"Calcula primero una ruta.","Este dispositivo não dá acesso ao GPS.":"Este dispositivo no da acceso al GPS.",
+"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"No pude obtener la previsión. Revisa la conexión.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
+},
+fr:{
+"meteorologia para motociclistas · 100% grátis":"météo pour motards · 100% gratuit","Agora":"Maintenant","Rota":"Itinéraire","Radar":"Radar",
+"Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Rechercher une ville ou adresse… (ex. Paris, Lyon)",
+"📲 Instalar":"📲 Installer","🔔 Sentinela meteorológica":"🔔 Sentinelle météo","✨ Assistente de viagem":"✨ Assistant de trajet",
+"Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Dis-moi où tu vas — je trouve le lieu le plus proche, trace l'itinéraire et te dis s'il faut rouler, attendre, changer de transport et quoi porter.",
+'ex.: "vou ao MediaMarkt" · "decathlon" · "bombas de gasolina"':'ex. : « je vais chez Darty » · « decathlon » · « stations-service »',
+"Perguntar":"Demander","Calcular rota e chuva":"Itinéraire & pluie","📍 A minha posição":"📍 Ma position","➕ Adicionar paragem":"➕ Ajouter un arrêt",
+"📍 Ponto de partida":"📍 Point de départ","🏁 Para onde vais?":"🏁 Où vas-tu ?","Origem":"Départ","Destino":"Arrivée","Hora de partida":"Heure de départ","Planear trajeto":"Planifier un trajet",
+"Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Vois exactement sur quels tronçons il pleuvra — et la meilleure heure pour partir.",
+"Paragens no caminho":"Arrêts en chemin","até 4":"jusqu'à 4","fico 0 min":"pause 0 min","fico 1 h":"pause 1 h","fico {n} min":"pause {n} min",
+"✔ Seco":"✔ Sec","⚠ Chuvisco / possível":"⚠ Bruine / possible","🌧 Chuva":"🌧 Pluie","⛈ Forte / trovoada":"⛈ Forte / orage","radar ao vivo":"radar en direct",
+"A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
+"Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.":"Radar réel (2 h) + prévision immédiate (30 min), par RainViewer. Bleu = pluie faible · vert/jaune = modérée · rouge = forte.",
+"Perfil de decisão":"Profil de décision","Conservador":"Prudent","Equilibrado":"Équilibré","Tolerante":"Tolérant",
+"Qualquer risco relevante já pesa na decisão.":"Tout risque pertinent pèse déjà dans la décision.",
+"Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Alertes dès bruine/vent modéré ; rouge seulement par mauvaises conditions.",
+"Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Seules vraie pluie, orage, verglas ou vent fort stoppent le trajet.",
+"Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Orage, verglas et neige donnent toujours rouge, par sécurité.",
+"Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Active-la et je surveille la météo où tu es, minute par minute, avec alertes voix, vibration et notification quand la pluie arrive (ou s'arrête), le vent monte ou l'orage approche.",
+"Ligar":"Activer","🛑 Desligar":"🛑 Désactiver","🛑 Terminar":"🛑 Terminer",
+"Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"Impossible de joindre les services météo. Vérifie ta connexion et réessaie.",
+"Dados gratuitos:":"Données gratuites :","Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans comptes, sans clés, sans frais. Roule malin : en cas d'alerte rouge, reste chez toi.",
+"Céu limpo":"Ciel dégagé","Quase limpo":"Presque dégagé","Parcialmente nublado":"Partiellement nuageux","Encoberto":"Couvert","Nevoeiro":"Brouillard","Nevoeiro com sincelo":"Brouillard givrant",
+"Chuvisco fraco":"Bruine légère","Chuvisco":"Bruine","Chuvisco intenso":"Bruine forte","Chuvisco gelado":"Bruine verglaçante","Chuvisco gelado forte":"Bruine verglaçante forte",
+"Chuva fraca":"Pluie faible","Chuva":"Pluie","Chuva forte":"Pluie forte","Chuva gelada":"Pluie verglaçante","Chuva gelada forte":"Pluie verglaçante forte",
+"Neve fraca":"Neige faible","Neve":"Neige","Neve forte":"Neige forte","Grãos de neve":"Grésil","Aguaceiros fracos":"Averses faibles","Aguaceiros":"Averses","Aguaceiros violentos":"Averses violentes",
+"Aguaceiros de neve":"Averses de neige","Aguaceiros de neve fortes":"Fortes averses de neige","Trovoada":"Orage","Trovoada com granizo":"Orage avec grêle","Trovoada com granizo forte":"Fort orage avec grêle",
+"Vai de moto!":"Fonce en moto !","Vai, mas equipado":"Vas-y, mais équipé","Arriscado — pensa duas vezes":"Risqué — réfléchis-y","Melhor não ir de moto":"Mieux vaut ne pas rouler",
+"via verde":"feu vert","atenção":"prudence","risco":"risque","não recomendado":"déconseillé",
+"Seco":"Sec","Chuvisco / possível":"Bruine / possible","Forte / trovoada":"Forte / orage","Chuvisco possível":"Bruine possible","Chuva forte / trovoada":"Pluie forte / orage",
+"índice moto":"indice moto","{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° à {p} — décision pour les 3 prochaines heures",
+"Sem chuva, vento controlado e temperatura agradável.":"Pas de pluie, vent maîtrisé et température agréable.",
+"A partir das {h}: {c} — se fores, volta antes disso.":"À partir de {h} : {c} — si tu pars, reviens avant.",
+"Melhora a partir das {h} ({d}).":"Ça s'améliore à partir de {h} ({d}).","hoje":"aujourd'hui","amanhã":"demain",
+"{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} vers {h} ({d}). Évite d'être sur la route à ce moment-là.",
+"sensação {t}°":"ressenti {t}°","vento":"vent","rajadas":"rafales","humidade":"humidité","visibilidade":"visibilité","UV máx":"UV max","sol":"soleil",
+"🧤 Equipamento recomendado":"🧤 Équipement recommandé","Com base nas próximas 6 horas.":"Basé sur les 6 prochaines heures.",
+"🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Tenue de pluie complète (veste + pantalon + sur-bottes)",
+"🌦️ Leva o fato de chuva na mala — vais precisar dele":"🌦️ Emporte la tenue de pluie — tu en auras besoin",
+"🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra":"🧊 Verglas possible : évite l'aube, les ponts et les zones d'ombre",
+"🥶 Luvas de inverno + forro térmico + proteção de pescoço":"🥶 Gants d'hiver + couche thermique + tour de cou",
+"🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa":"🧥 Couches chaudes — le ressenti en roulant est bien plus froid",
+"🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres":"🥵 Hydrate-toi et fais des pauses — veste ventilée si possible",
+"💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados":"💨 Fortes rafales : prudence sur ponts, viaducs et en doublant les camions",
+"🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas":"🌫️ Écran pinlock/anti-buée et feux toujours allumés",
+"🦺 Parte do período é de noite — colete ou elementos refletores ajudam":"🦺 Une partie sera de nuit — gilet ou éléments réfléchissants utiles",
+"😎 Condições confortáveis — equipamento habitual chega":"😎 Conditions confortables — ton équipement habituel suffit",
+"⏱️ Próximas 24 horas":"⏱️ Prochaines 24 heures","melhor janela":"meilleur créneau","índice {v}":"indice {v}",
+"Altura da barra = índice moto (quanto mais alta, melhor). Passa o rato para detalhes.":"Hauteur de barre = indice moto (plus c'est haut, mieux c'est). Survole pour les détails.",
+"Altura da barra = índice moto (quanto mais alta, melhor). Sem janelas boas nas próximas horas.":"Hauteur de barre = indice moto. Pas de bon créneau dans les prochaines heures.",
+"AGORA":"MAINT.","Condições":"Conditions","Temperatura":"Température","sente-se {t}°":"ressenti {t}°","Rajadas":"Rafales","Prob. chuva":"Prob. pluie","Total chuva":"Pluie totale","Rajadas máx":"Rafales max",
+"💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45":"💨 vent — direction (flèche) et rafales en km/h · gras = rafales ≥ 45",
+"🌦️ Próximas 2 horas, ao quarto de hora":"🌦️ 2 prochaines heures, par quart d'heure",
+"Sem chuva prevista nas próximas 2 horas — arranca à vontade.":"Pas de pluie prévue dans les 2 heures — roule tranquille.",
+"Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).":"Pluie dès ~{h} — intensité en bleu (plus foncé = plus fort).",
+"Precipitação":"Précipitations","📅 Próximos 7 dias":"📅 7 prochains jours","Para planear a voltinha de fim de semana.":"Pour planifier la balade du week-end.",
+"Bom p/ moto":"Bon pour rouler","Com aviso":"Avec prudence","Arriscado":"Risqué","Mau p/ moto":"Mauvais pour rouler","Máx / mín":"Max / min",
+"Trajeto seco — boa viagem!":"Trajet sec — bonne route !","Possível chuvisco em ~{n} km do caminho":"Bruine possible sur ~{n} km du trajet",
+"Vais apanhar chuva em ~{n} km ({p}% do trajeto)":"Tu prendras la pluie sur ~{n} km ({p}% du trajet)",
+"Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.":"Pluie forte/orage en chemin — {n} km touchés. Reporte si possible.",
+"paragem":"arrêt","paragens":"arrêts","em andamento":"en roulant","partida":"départ","chegada":"arrivée","por":"via",
+"pico {n} mm/h":"pic {n} mm/h","mínima no percurso {t}°":"minimale du trajet {t}°","rajadas até {g} km/h · vento {d}":"rafales jusqu'à {g} km/h · vent {d}",
+"vento lateral até ~{g} km/h":"vent latéral jusqu'à ~{g} km/h","perto do km {k}":"vers le km {k}","sobe até ~{m} m":"monte à ~{m} m",
+"radar fixo":"radar fixe","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
+"maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
+"Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
+"🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
+"Resumo copiado! 📋":"Résumé copié ! 📋","Não consegui copiar automaticamente.":"Copie automatique impossible.",
+"🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 Et si tu partais plus tard (ou plus tôt) ?",
+"Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Compare la pluie selon l'heure de départ — touche pour appliquer. Instantané.",
+"Se saíres às {h} apanhas {x}.":"En partant à {h} tu prends {x}.","o trajeto praticamente seco":"un trajet presque sec","só ~{n} km de chuva":"seulement ~{n} km de pluie",
+"🌧️💨 Onde apanhas chuva e vento":"🌧️💨 Où tu prendras pluie et vent",
+"Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉":"Aucun tronçon avec pluie ou vent dangereux à cette heure. 🎉",
+"Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Tronçons à surveiller, à l'heure où tu y passeras.",
+"a identificar a zona…":"identification de la zone…","perto de {p}":"près de {p}","vento lateral":"vent latéral","abranda e segura bem o guiador":"ralentis et tiens bien le guidon",
+"📸 Radares de velocidade no trajeto":"📸 Radars de vitesse sur le trajet",
+"Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"Impossible de consulter les radars — recalcule dans un instant.",
+"A procurar radares fixos ao longo do caminho…":"Recherche des radars fixes en chemin…",
+"Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Aucun radar fixe connu sur ce trajet (données OpenStreetMap). Les mobiles n'apparaissent pas — prudence ! 😉",
+"Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Radars fixes (données OpenStreetMap — possiblement incomplet ; les mobiles n'apparaissent pas). En mode trajet, alerte vocale à 1 km.",
+"limite {v}":"limite {v}","+{n} radares adicionais no mapa.":"+{n} radars de plus sur la carte.","km {k} do teu trajeto":"km {k} de ton trajet","dados OpenStreetMap":"données OpenStreetMap",
+"📸 Radar fixo":"📸 Radar fixe","— limite {v}":"— limite {v}","🏁 Partida":"🏁 Départ","🎯 Chegada":"🎯 Arrivée","🛑 Paragem {n}: {p}":"🛑 Arrêt {n} : {p}",
+"chegas ~{a} · voltas à estrada ~{b}":"arrivée ~{a} · reprise de la route ~{b}",
+"Diz-me para onde queres ir 🙂":"Dis-moi où tu veux aller 🙂","A pensar…":"Je réfléchis…","À procura de \"{q}\" perto de ti…":"Recherche de « {q} » près de toi…",
+"Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"J'ai besoin de ta position : autorise le GPS ou cherche ta ville dans Maintenant.",
+"Não encontrei \"{q}\" por aqui. Tenta com a cidade (ex.: \"{q} {c}\").":"« {q} » introuvable par ici. Essaie avec la ville (ex. « {q} {c} »).",
+"A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calcul de l'itinéraire vers {p} et de la météo sur chaque tronçon…",
+"A minha posição":"Ma position","a tua zona":"ta zone","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"Impossible de tracer l'itinéraire — choisis un autre lieu ou ajuste le formulaire.",
+"Não vás de moto nesta viagem":"Ne prends pas la moto pour ce trajet",
+"Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Orage, verglas ou neige prévus en chemin — à éviter à moto.",
+"Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Prends la voiture/les transports — ou attends : à {h} le trajet devient correct.",
+"Vai de carro ou de transportes públicos; o risco não compensa.":"Prends la voiture ou les transports ; le risque n'en vaut pas la peine.",
+"Espera um pouco — sai às {h}":"Attends un peu — pars à {h}",
+"Se saíres já, apanhas chuva em ~{n} km; às {h} vais {x}.":"En partant maintenant, pluie sur ~{n} km ; à {h} tu roules {x}.",
+"praticamente seco":"presque au sec","só com ~{n} km molhados":"avec seulement ~{n} km mouillés",
+"Se não puderes esperar: fato de chuva completo e reduz a velocidade no molhado.":"Si tu ne peux pas attendre : tenue de pluie complète et ralentis sur le mouillé.",
+"De moto vais apanhar chuva — pondera outro transporte":"À moto tu prendras la pluie — envisage un autre transport",
+"Chuva em ~{n} km do trajeto ({p}%), e não melhora nas próximas 4 horas.":"Pluie sur ~{n} km du trajet ({p}%), sans amélioration avant 4 heures.",
+"Se tiveres alternativa (carro, transportes), hoje é o dia de a usar. Se fores mesmo: fato de chuva completo, viseira limpa e o dobro da distância de travagem.":"Si tu as une alternative (voiture, transports), c'est le jour. Sinon : tenue de pluie complète, écran propre et double distance de freinage.",
+"Podes ir de moto — mas leva o fato de chuva":"Tu peux rouler — mais prends la tenue de pluie",
+"Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão.":"Risque de bruine par endroits ; garde la tenue de pluie à portée.",
+"Sim — vai de moto!":"Oui — prends la moto !","Trajeto seco até {p} a esta hora.":"Trajet sec jusqu'à {p} à cette heure.",
+"Vento demasiado forte para ir descansado":"Vent trop fort pour rouler serein",
+"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Rafales jusqu'à {g} km/h, vent {d}{x} — éprouvant à moto ; si tu pars, vitesse modérée et pas de dépassement serré de camions.",
+", com lateral forte perto do km {k}":", avec fort latéral vers le km {k}",
+"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Rafales jusqu'à {g} km/h, vent {d}{x} — tiens bon sur les ponts et zones exposées.",
+" com lateral perto do km {k}":" avec latéral vers le km {k}","Vento tranquilo: rajadas máximas de {g} km/h, {d}.":"Vent calme : rafales max {g} km/h, {d}.",
+"Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.":"Vrai froid (minimale {t}°) : gants d'hiver, couche thermique et coupe-vent.",
+"Leva casaco quente: mínima de {t}° no percurso — em andamento sente-se bastante menos.":"Prends une veste chaude : minimale {t}° — en roulant le ressenti est bien plus froid.",
+"Muito calor: hidrata-te antes de sair e usa equipamento ventilado.":"Forte chaleur : hydrate-toi et porte un équipement ventilé.",
+"Temperatura amena (mín. {t}°) — equipamento habitual com casaco serve.":"Températures douces (min {t}°) — équipement habituel avec veste.",
+"Chegas depois do pôr-do-sol — luzes verificadas e algo refletor.":"Arrivée après le coucher du soleil — vérifie tes feux et porte du réfléchissant.",
+"Ao longo do caminho: {x}.":"En chemin : {x}.","🗺️ Ver no mapa":"🗺️ Voir sur la carte","🕒 Aplicar partida às {h}":"🕒 Définir le départ à {h}","Partida ajustada para as {h} ✔":"Départ réglé à {h} ✔",
+"🧭 Modo viagem ligado":"🧭 Mode trajet activé","à procura do teu GPS…":"recherche du GPS…","sem sinal GPS — continuo a tentar…":"pas de signal GPS — je réessaie…",
+"Modo viagem ligado. Boa estrada.":"Mode trajet activé. Bonne route.","🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso.":"🧭 Mode trajet : je t'alerte de la pluie devant. L'écran reste allumé.",
+"Modo viagem terminado.":"Mode trajet terminé.","🎉 Chegaste! Modo viagem terminado.":"🎉 Arrivé ! Mode trajet terminé.","Chegaste ao destino. Boa!":"Tu es arrivé à destination. Bravo !",
+"estás a {d} km da rota traçada — recalcula se mudaste de caminho":"tu es à {d} km de l'itinéraire — recalcule si tu as changé de route",
+"🌧️ Estás na zona de chuva ({x})":"🌧️ Tu es dans la zone de pluie ({x})","faltam {d} km · chegada ~{h}":"{d} km restants · arrivée ~{h}",
+"🌧️ Chuva dentro de ~{m} min ({d} km)":"🌧️ Pluie dans ~{m} min ({d} km)","por volta das {h} · faltam {d} km até ao destino":"vers {h} · {d} km jusqu'à destination",
+"Dica: se parares uns vinte minutos, escapas a esta chuva.":"Astuce : arrête-toi vingt minutes et tu évites cette pluie.",
+"Dica: se parares uns quarenta minutos, escapas a esta chuva.":"Astuce : arrête-toi quarante minutes et tu évites cette pluie.",
+"Atenção: chuva já a seguir. Abranda e liga as luzes.":"Attention : pluie juste devant. Ralentis et allume tes feux.",
+"Atenção: chuva dentro de cerca de {m} minutos. {x}":"Attention : pluie dans environ {m} minutes. {x}","Última oportunidade para parar num sítio seco.":"Dernière chance de t'arrêter au sec.",
+"Aviso antecipado: chuva dentro de cerca de {m} minutos, a {d} quilómetros. {x}":"Alerte anticipée : pluie dans environ {m} minutes, à {d} kilomètres. {x}",
+"Tens tempo para parar ou mudar de caminho na aplicação.":"Tu as le temps de t'arrêter ou de changer d'itinéraire dans l'app.",
+"⚠️ Possível chuvisco dentro de {d} km":"⚠️ Bruine possible dans {d} km","✅ Caminho seco daqui até ao destino":"✅ Sec jusqu'à destination",
+"Radar de velocidade dentro de {x}.":"Radar de vitesse dans {x}.","1 quilómetro":"un kilomètre","400 metros":"400 mètres","Limite {v}.":"Limite {v}.",
+"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Mouvement détecté — Mode trajet activé.","🏍️ Vou de Moto — em viagem":"🏍️ Vou de Moto — en route",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"Activée · {p} · dernier contrôle {h} — {s} Rafales actuelles : {g} km/h. Garde l'app ouverte.",
+"🌧️ A chover agora — deve parar ~{h}.":"🌧️ Il pleut — arrêt prévu ~{h}.","🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Il pleut, sans accalmie en vue pendant ~2 h.",
+"☁️ Chuva a caminho: ~{h}.":"☁️ Pluie en approche : ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ Pas de pluie en vue pendant 2 heures.",
+"Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Orage prévu vers {h}. Si ta moto est dehors, rentre-la.",
+"Chuva a chegar à tua zona dentro de cerca de {m} minutos.":"Pluie sur ta zone dans environ {m} minutes.",
+"Boa notícia: a chuva deve parar dentro de {m} minutos.":"Bonne nouvelle : la pluie devrait cesser dans {m} minutes.",
+"O vento subiu: rajadas de {g} quilómetros por hora.":"Le vent monte : rafales de {g} kilomètres-heure.",
+"Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Activée, mais sans position — active le GPS ou cherche ta ville.",
+"Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Activée — dernier contrôle échoué, nouvel essai dans ~2 min.",
+"Sentinela desligada.":"Sentinelle désactivée.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinelle activée — je surveille ta zone toutes les ~2 minutes.",
+"radar real":"radar réel","previsão imediata":"prévision immédiate","Radar sem dados de momento.":"Pas de données radar pour l'instant.","Não consegui carregar o radar.":"Impossible de charger le radar.",
+"Previsão para {p}":"Prévisions pour {p}","Localização: {p}":"Position : {p}","Origem: {p}":"Départ : {p}","A obter a tua posição… 📡":"Localisation en cours… 📡",
+"O teu browser não suporta GPS — pesquisa a cidade.":"Ton navigateur n'a pas de GPS — cherche la ville.","Sem acesso ao GPS — escreve a origem.":"Pas d'accès GPS — saisis le départ.",
+"Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"Pas de GPS — {p} utilisé. Cherche ta ville ci-dessus.","Máximo de 4 paragens.":"Maximum 4 arrêts.",
+"Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Arrêt (ex. supermarché, station-service, chez Jean…)","Ditar por voz":"Dicter à la voix","Ditar a paragem por voz":"Dicter l'arrêt à la voix",
+"Voz não suportada neste browser — escreve o destino.":"Voix non prise en charge — saisis la destination.","Não consegui ouvir — tenta de novo ou escreve.":"Je n'ai pas entendu — réessaie ou écris.",
+"Voz indisponível neste browser.":"Voix indisponible dans ce navigateur.",'🎤 "{q}" — escolhe a sugestão certa':'🎤 « {q} » — choisis la bonne suggestion',
+"Indica {x}.":"Indique {x}.","a origem":"le départ","o destino":"la destination","a paragem":"l'arrêt",
+"Não encontrei \"{q}\" — tenta \"cidade, país\".":"« {q} » introuvable — essaie « ville, pays ».",
+"Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"Pas d'itinéraire routier entre ces points.",
+"Rota demasiado curta.":"Trajet trop court.","Algo correu mal. Tenta novamente.":"Un problème est survenu. Réessaie.","A calcular…":"Calcul…",
+"Sem resultados — tenta \"cidade, país\"":"Aucun résultat — essaie « ville, pays »","coordenadas":"coordonnées","Trajeto {x} aplicado 🗺️":"Trajet {x} appliqué 🗺️","Perfil: {p} ✔":"Profil : {p} ✔",
+"Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.","Radar indisponível sem internet.":"Radar indisponible hors ligne.","Radar indisponível de momento.":"Radar indisponible pour l'instant.",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️",
+"💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Sur iPhone : bouton Partager → « Sur l'écran d'accueil ».",
+"Calcula primeiro uma rota.":"Calcule d'abord un itinéraire.","Este dispositivo não dá acesso ao GPS.":"Cet appareil ne fournit pas de GPS.",
+"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"Impossible d'obtenir les prévisions. Vérifie ta connexion.","Tentar de novo":"Réessayer","Idioma":"Langue","norte":"nord",
+}};
+/* razões do índice + favoritos */
+Object.assign(I18N.en,{
+"Chuva forte ({n} mm/h)":"Heavy rain ({n} mm/h)","Chuva ({n} mm/h)":"Rain ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Drizzle / light rain ({n} mm/h)",
+"{p}% de probabilidade de chuva":"{p}% chance of rain","Rajadas até {g} km/h":"Gusts up to {g} km/h","Vento sustentado forte":"Strong sustained wind",
+"Temperatura negativa — risco de gelo no piso":"Below freezing — risk of ice on the road","Sensação de {t}° — frio extremo":"Feels like {t}° — extreme cold",
+"Sensação de {t}° — frio a sério":"Feels like {t}° — seriously cold","Fresco (sensação {t}°)":"Chilly (feels {t}°)","Calor extremo (sensação {t}°)":"Extreme heat (feels {t}°)",
+"Muito calor (sensação {t}°)":"Very hot (feels {t}°)","Risco de gelo em zonas de sombra e pontes":"Ice risk in shaded spots and bridges","Visibilidade reduzida ({v})":"Low visibility ({v})",
+"Trovoada prevista — risco elevado":"Thunderstorm expected — high risk","Chuva/chuvisco gelado — piso traiçoeiro":"Freezing rain/drizzle — treacherous surface","Neve — não é dia de duas rodas":"Snow — not a day for two wheels",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Tip: save your home, usual petrol stations and routes — I'll recognise them in whatever you type.",
+"Guardar destino":"Save place","Guardar rota":"Save route","Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Name it (e.g. Home, Work, John's place)",
+"Nome da rota?":"Route name?","Guardado: {p} ⭐":"Saved: {p} ⭐","Apagado: {p}":"Deleted: {p}","Apagar":"Delete",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Plan manually (stops, departure time)",
+});
+Object.assign(I18N.es,{
+"Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
+"{p}% de probabilidade de chuva":"{p}% de probabilidad de lluvia","Rajadas até {g} km/h":"Rachas hasta {g} km/h","Vento sustentado forte":"Viento sostenido fuerte",
+"Temperatura negativa — risco de gelo no piso":"Bajo cero — riesgo de hielo en el asfalto","Sensação de {t}° — frio extremo":"Sensación de {t}° — frío extremo",
+"Sensação de {t}° — frio a sério":"Sensación de {t}° — frío serio","Fresco (sensação {t}°)":"Fresco (sensación {t}°)","Calor extremo (sensação {t}°)":"Calor extremo (sensación {t}°)",
+"Muito calor (sensação {t}°)":"Mucho calor (sensación {t}°)","Risco de gelo em zonas de sombra e pontes":"Riesgo de hielo en sombras y puentes","Visibilidade reduzida ({v})":"Visibilidad reducida ({v})",
+"Trovoada prevista — risco elevado":"Tormenta prevista — riesgo alto","Chuva/chuvisco gelado — piso traiçoeiro":"Lluvia helada — asfalto traicionero","Neve — não é dia de duas rodas":"Nieve — no es día de dos ruedas",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Consejo: guarda tu casa, gasolineras y rutas — los reconoceré en lo que escribas.",
+"Guardar destino":"Guardar sitio","Guardar rota":"Guardar ruta","Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"¿Nombre? (ej.: Casa, Trabajo, Casa de Juan)",
+"Nome da rota?":"¿Nombre de la ruta?","Guardado: {p} ⭐":"Guardado: {p} ⭐","Apagado: {p}":"Borrado: {p}","Apagar":"Borrar",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Planificar manualmente (paradas, hora de salida)",
+});
+Object.assign(I18N.fr,{
+"Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
+"{p}% de probabilidade de chuva":"{p}% de risque de pluie","Rajadas até {g} km/h":"Rafales jusqu'à {g} km/h","Vento sustentado forte":"Vent soutenu fort",
+"Temperatura negativa — risco de gelo no piso":"Températures négatives — risque de verglas","Sensação de {t}° — frio extremo":"Ressenti {t}° — froid extrême",
+"Sensação de {t}° — frio a sério":"Ressenti {t}° — vrai froid","Fresco (sensação {t}°)":"Frais (ressenti {t}°)","Calor extremo (sensação {t}°)":"Chaleur extrême (ressenti {t}°)",
+"Muito calor (sensação {t}°)":"Très chaud (ressenti {t}°)","Risco de gelo em zonas de sombra e pontes":"Risque de verglas à l'ombre et sur les ponts","Visibilidade reduzida ({v})":"Visibilité réduite ({v})",
+"Trovoada prevista — risco elevado":"Orage prévu — risque élevé","Chuva/chuvisco gelado — piso traiçoeiro":"Pluie verglaçante — chaussée traître","Neve — não é dia de duas rodas":"Neige — pas un jour pour deux roues",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Astuce : enregistre ta maison, tes stations et tes trajets — je les reconnaîtrai dans ce que tu écris.",
+"Guardar destino":"Enregistrer le lieu","Guardar rota":"Enregistrer le trajet","Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Un nom ? (ex. Maison, Travail, Chez Jean)",
+"Nome da rota?":"Nom du trajet ?","Guardado: {p} ⭐":"Enregistré : {p} ⭐","Apagado: {p}":"Supprimé : {p}","Apagar":"Supprimer",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Planifier manuellement (arrêts, heure de départ)",
+});
+
 /* ---------------- WMO → texto/emoji ---------------- */
 const WMO = {
   0:["Céu limpo","☀️","🌙"],1:["Quase limpo","🌤️","🌙"],2:["Parcialmente nublado","⛅","☁️"],3:["Encoberto","☁️","☁️"],
@@ -552,7 +1246,7 @@ const WMO = {
   85:["Aguaceiros de neve","🌨️","🌨️"],86:["Aguaceiros de neve fortes","❄️","❄️"],
   95:["Trovoada","⛈️","⛈️"],96:["Trovoada com granizo","⛈️","⛈️"],99:["Trovoada com granizo forte","⛈️","⛈️"],
 };
-const wmoTxt = (c)=> (WMO[c]||["—","❓","❓"])[0];
+const wmoTxt = (c)=> t((WMO[c]||["—","❓","❓"])[0]);
 const wmoIco = (c,day=1)=> (WMO[c]||["—","❓","❓"])[day?1:2];
 const THUNDER=[95,96,99], FREEZING=[56,57,66,67], SNOW=[71,73,75,77,85,86], FOG=[45,48];
 
@@ -563,17 +1257,17 @@ function el(tag, cls, txt){ const n=document.createElement(tag); if(cls)n.classN
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const lerp=(a,b,f)=>a+(b-a)*f;
 const rnd=(v,d=0)=>{ const p=10**d; return Math.round(v*p)/p; };
-const fmtN=(v,d=0)=>Number(v).toLocaleString("pt-PT",{minimumFractionDigits:d,maximumFractionDigits:d});
-const fmtHM=(epoch)=>new Date(epoch*1000).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});
-const fmtH=(epoch)=>new Date(epoch*1000).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"}).replace(":00","h");
-const fmtDow=(epoch)=>new Date(epoch*1000).toLocaleDateString("pt-PT",{weekday:"short"}).replace(".","");
-const fmtDayMo=(epoch)=>new Date(epoch*1000).toLocaleDateString("pt-PT",{day:"numeric",month:"numeric"});
+const fmtN=(v,d=0)=>Number(v).toLocaleString(LOC(),{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtHM=(epoch)=>new Date(epoch*1000).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"});
+const fmtH=(epoch)=>new Date(epoch*1000).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"}).replace(":00","h");
+const fmtDow=(epoch)=>new Date(epoch*1000).toLocaleDateString(LOC(),{weekday:"short"}).replace(".","");
+const fmtDayMo=(epoch)=>new Date(epoch*1000).toLocaleDateString(LOC(),{day:"numeric",month:"numeric"});
 const fmtDur=(sec)=>{ const m=Math.round(sec/60); return m<60?`${m} min`:`${Math.floor(m/60)} h ${String(m%60).padStart(2,"0")} min`; };
 const isSameDay=(e1,e2)=>new Date(e1*1000).toDateString()===new Date(e2*1000).toDateString();
 const dayLabel=(epoch)=>{ const now=Date.now()/1000;
-  if(isSameDay(epoch,now))return "hoje";
-  if(isSameDay(epoch,now+86400))return "amanhã";
-  return new Date(epoch*1000).toLocaleDateString("pt-PT",{weekday:"long"}); };
+  if(isSameDay(epoch,now))return t("hoje");
+  if(isSameDay(epoch,now+86400))return t("amanhã");
+  return new Date(epoch*1000).toLocaleDateString(LOC(),{weekday:"long"}); };
 function haversine(a,b){ const R=6371, d=Math.PI/180;
   const dLat=(b.lat-a.lat)*d, dLon=(b.lon-a.lon)*d;
   const h=Math.sin(dLat/2)**2+Math.cos(a.lat*d)*Math.cos(b.lat*d)*Math.sin(dLon/2)**2;
@@ -695,8 +1389,10 @@ async function nomFetch(url){
 /* Photon (komoot) — pesquisa instantânea, tolerante a gralhas, com viés de proximidade */
 function photonMap(f){
   const p=f.properties||{};
-  const name=p.name||[p.street,p.housenumber].filter(Boolean).join(" ")||"—";
-  const sub=[p.city||p.town||p.village||p.district, p.state||p.country].filter(Boolean).join(", ");
+  const addr=[p.street,p.housenumber].filter(Boolean).join(" ");
+  const name=p.name||addr||"—";
+  const place=p.city||p.town||p.village||p.district||"";
+  const sub=[p.name?addr:"", place].filter(Boolean).join(", ")||(p.state||p.country||"");
   return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value};
 }
 async function photonSearch(q,pos,limit=7){
@@ -708,7 +1404,7 @@ async function photonSearch(q,pos,limit=7){
   const seen=new Set();
   return (j.features||[]).map(photonMap)
     .filter(r=>isFinite(r.lat)&&isFinite(r.lon))
-    .filter(r=>{ const k=`${r.name}|${r.lat.toFixed(3)},${r.lon.toFixed(3)}`;
+    .filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
       if(seen.has(k)) return false; seen.add(k); return true; });
 }
 
@@ -718,7 +1414,7 @@ async function geocode(q){
   if(geoCache.has(key)) return geoCache.get(key);
   const m=q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;]\s*(-?\d{1,3}[.,]\d+)\s*$/);
   if(m){ const lat=parseFloat(m[1].replace(",",".")), lon=parseFloat(m[2].replace(",","."));
-    return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:"coordenadas", lat, lon}]; }
+    return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:t("coordenadas"), lat, lon}]; }
   // 1º Photon (rápido, aguenta escrita contínua), com viés para a tua zona
   let out=await photonSearch(q, state.home).catch(()=>[]);
   // reserva: Nominatim (com fila)
@@ -872,17 +1568,17 @@ function renderCameras(){
   if(!R||!box){ if(box) box.textContent=""; return; }
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,"📸 Radares de velocidade no trajeto"));
+  card.appendChild(el("h2",null,t("📸 Radares de velocidade no trajeto")));
   if(R.camerasError){
-    card.appendChild(el("p","h-sub","Não consegui consultar os radares agora — tenta recalcular daqui a pouco."));
+    card.appendChild(el("p","h-sub",t("Não consegui consultar os radares agora — tenta recalcular daqui a pouco.")));
     box.appendChild(card); return;
   }
-  if(!R.cameras){ card.appendChild(el("p","h-sub","A procurar radares fixos ao longo do caminho…")); box.appendChild(card); return; }
+  if(!R.cameras){ card.appendChild(el("p","h-sub",t("A procurar radares fixos ao longo do caminho…"))); box.appendChild(card); return; }
   if(!R.cameras.length){
-    card.appendChild(el("p","h-sub","Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉"));
+    card.appendChild(el("p","h-sub",t("Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉")));
     box.appendChild(card); return;
   }
-  card.appendChild(el("p","h-sub","Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km."));
+  card.appendChild(el("p","h-sub",t("Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.")));
   const ul=el("ul","seg-list");
   R.cameras.slice(0,14).forEach(async (c)=>{
     const li=el("li","seg-item");
@@ -891,13 +1587,13 @@ function renderCameras(){
     main.append(el("b",null,`km ${rnd(c.km)}`));
     const place=el("span",null,"…");
     main.append(place);
-    li.append(bar,main,el("span","seg-val",`📸 ${c.max?`limite ${String(c.max).replace("mph"," mph")}`:"radar fixo"}`));
+    li.append(bar,main,el("span","seg-val",`📸 ${c.max?t("limite {v}",{v:String(c.max).replace("mph"," mph")}):t("radar fixo")}`));
     ul.appendChild(li);
     const n=await revGeocode(c.lat,c.lon);
-    place.textContent=`perto de ${n.name}`;
+    place.textContent=t("perto de {p}",{p:n.name});
   });
   card.appendChild(ul);
-  if(R.cameras.length>14) card.appendChild(el("p","map-note",`+${R.cameras.length-14} radares adicionais no mapa.`));
+  if(R.cameras.length>14) card.appendChild(el("p","map-note",t("+{n} radares adicionais no mapa.",{n:R.cameras.length-14})));
   box.appendChild(card);
 }
 
@@ -926,9 +1622,9 @@ function scoreHour(m, prof=PROFILES[state.profile]){
   let pen=0;
   const code=m.code;
 
-  if(THUNDER.includes(code)){ hard=true; add(95,"⛈️","Trovoada prevista — risco elevado"); }
-  else if(FREEZING.includes(code)){ hard=true; add(95,"🧊","Chuva/chuvisco gelado — piso traiçoeiro"); }
-  else if(SNOW.includes(code)){ hard=true; add(92,"❄️","Neve — não é dia de duas rodas"); }
+  if(THUNDER.includes(code)){ hard=true; add(95,"⛈️",t("Trovoada prevista — risco elevado")); }
+  else if(FREEZING.includes(code)){ hard=true; add(95,"🧊",t("Chuva/chuvisco gelado — piso traiçoeiro")); }
+  else if(SNOW.includes(code)){ hard=true; add(92,"❄️",t("Neve — não é dia de duas rodas")); }
 
   if(!hard){
     // chuva: intensidade vs probabilidade (usa a pior)
@@ -937,33 +1633,33 @@ function scoreHour(m, prof=PROFILES[state.profile]){
     const ppPen = pp>=80?26 : pp>=60?18 : pp>=40?10 : pp>=25?5 : 0;
     const wet=Math.max(prPen,ppPen)*prof.wet;
     if(wet>0){
-      const lab = pr>3?`Chuva forte (${fmtN(pr,1)} mm/h)` :
-                  pr>1?`Chuva (${fmtN(pr,1)} mm/h)` :
-                  pr>0.05?`Chuvisco / chuva fraca (${fmtN(pr,1)} mm/h)` :
-                  `${pp}% de probabilidade de chuva`;
+      const lab = pr>3?t("Chuva forte ({n} mm/h)",{n:fmtN(pr,1)}) :
+                  pr>1?t("Chuva ({n} mm/h)",{n:fmtN(pr,1)}) :
+                  pr>0.05?t("Chuvisco / chuva fraca ({n} mm/h)",{n:fmtN(pr,1)}) :
+                  t("{p}% de probabilidade de chuva",{p:pp});
       pen+=add(wet,"🌧️",lab);
     }
     // vento
     const g=m.gust;
     let gp = g<=35?0 : g<=50?(g-35)*0.9 : g<=65?13.5+(g-50)*1.8 : Math.min(62,40.5+(g-65)*2);
     gp*=prof.wind;
-    if(gp>0) pen+=add(gp,"💨",`Rajadas até ${rnd(g)} km/h`);
-    if(m.wind>40) pen+=add(6,"💨","Vento sustentado forte");
+    if(gp>0) pen+=add(gp,"💨",t("Rajadas até {g} km/h",{g:rnd(g)}));
+    if(m.wind>40) pen+=add(6,"💨",t("Vento sustentado forte"));
     // frio/calor (sensação térmica — em cima da moto conta a dobrar)
     const at=m.at;
-    if(m.t<=0) pen+=add(50,"🧊","Temperatura negativa — risco de gelo no piso");
-    else if(at<=0) pen+=add(26+Math.min(14,-at*2),"🥶",`Sensação de ${rnd(at)}° — frio extremo`);
-    else if(at<=6) pen+=add(12+(6-at)*2.3,"🥶",`Sensação de ${rnd(at)}° — frio a sério`);
-    else if(at<=12) pen+=add((12-at)*1.3,"🧥",`Fresco (sensação ${rnd(at)}°)`);
-    if(at>=36) pen+=add(20,"🥵",`Calor extremo (sensação ${rnd(at)}°)`);
-    else if(at>=32) pen+=add((at-32)*3,"🥵",`Muito calor (sensação ${rnd(at)}°)`);
+    if(m.t<=0) pen+=add(50,"🧊",t("Temperatura negativa — risco de gelo no piso"));
+    else if(at<=0) pen+=add(26+Math.min(14,-at*2),"🥶",t("Sensação de {t}° — frio extremo",{t:rnd(at)}));
+    else if(at<=6) pen+=add(12+(6-at)*2.3,"🥶",t("Sensação de {t}° — frio a sério",{t:rnd(at)}));
+    else if(at<=12) pen+=add((12-at)*1.3,"🧥",t("Fresco (sensação {t}°)",{t:rnd(at)}));
+    if(at>=36) pen+=add(20,"🥵",t("Calor extremo (sensação {t}°)",{t:rnd(at)}));
+    else if(at>=32) pen+=add((at-32)*3,"🥵",t("Muito calor (sensação {t}°)",{t:rnd(at)}));
     // gelo escondido
-    if(m.t<=3 && (m.pr>0||m.rh>=93)) pen+=add(25,"🧊","Risco de gelo em zonas de sombra e pontes");
+    if(m.t<=3 && (m.pr>0||m.rh>=93)) pen+=add(25,"🧊",t("Risco de gelo em zonas de sombra e pontes"));
     // visibilidade
     const v=m.vis;
     let vp = v<200?38 : v<500?28 : v<1000?18 : v<2500?8 : 0;
     if(FOG.includes(code)) vp=Math.max(vp,20);
-    if(vp>0) pen+=add(vp,"🌫️",`Visibilidade reduzida (${v<1000?`${rnd(v)} m`:`${fmtN(v/1000,1)} km`})`);
+    if(vp>0) pen+=add(vp,"🌫️",t("Visibilidade reduzida ({v})",{v:v<1000?`${rnd(v)} m`:`${fmtN(v/1000,1)} km`}));
   } else pen=100;
 
   R.sort((a,b)=>b.pen-a.pen);
@@ -988,7 +1684,7 @@ function rainLevel(pr, pp, code, prof=PROFILES[state.profile]){
   if(pp>=prof.ppRisk) return 1;
   return 0;
 }
-const rainLabel=(lvl,pr)=>["Seco","Chuvisco possível","Chuva","Chuva forte / trovoada"][lvl];
+const rainLabel=(lvl,pr)=>t(["Seco","Chuvisco possível","Chuva","Chuva forte / trovoada"][lvl]);
 
 /* equipamento recomendado a partir das próximas horas */
 function gearAdvice(hs){ // hs: métricas das próximas ~n horas
@@ -1001,16 +1697,16 @@ function gearAdvice(hs){ // hs: métricas das próximas ~n horas
   const fog=hs.some(m=>FOG.includes(m.code)||m.vis<2000);
   const ice=hs.some(m=>m.t<=3);
   const night=hs.some(m=>!m.isDay);
-  if(heavyRain) chips.push("🌧️ Fato de chuva completo (casaco + calças + cobre-botas)");
-  else if(anyRain) chips.push("🌦️ Leva o fato de chuva na mala — vais precisar dele");
-  if(ice) chips.push("🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra");
-  if(minAt<=6) chips.push("🥶 Luvas de inverno + forro térmico + proteção de pescoço");
-  else if(minAt<=12) chips.push("🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa");
-  if(maxAt>=30) chips.push("🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres");
-  if(maxGust>=45) chips.push("💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados");
-  if(fog) chips.push("🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas");
-  if(night) chips.push("🦺 Parte do período é de noite — colete ou elementos refletores ajudam");
-  if(!chips.length) chips.push("😎 Condições confortáveis — equipamento habitual chega");
+  if(heavyRain) chips.push(t("🌧️ Fato de chuva completo (casaco + calças + cobre-botas)"));
+  else if(anyRain) chips.push(t("🌦️ Leva o fato de chuva na mala — vais precisar dele"));
+  if(ice) chips.push(t("🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra"));
+  if(minAt<=6) chips.push(t("🥶 Luvas de inverno + forro térmico + proteção de pescoço"));
+  else if(minAt<=12) chips.push(t("🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa"));
+  if(maxAt>=30) chips.push(t("🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres"));
+  if(maxGust>=45) chips.push(t("💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados"));
+  if(fog) chips.push(t("🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas"));
+  if(night) chips.push(t("🦺 Parte do período é de noite — colete ou elementos refletores ajudam"));
+  if(!chips.length) chips.push(t("😎 Condições confortáveis — equipamento habitual chega"));
   return chips;
 }
 
@@ -1022,12 +1718,15 @@ function attachAC(input, list, onPick){
   const close=()=>{ list.classList.remove("open"); list.textContent=""; active=-1; };
   const render=()=>{
     list.textContent="";
-    if(!items.length){ const d=el("div","ac-empty","Sem resultados — tenta \"cidade, país\""); list.appendChild(d); }
+    if(!items.length){ const d=el("div","ac-empty",t('Sem resultados — tenta "cidade, país"')); list.appendChild(d); }
     items.forEach((it,i)=>{
       const d=el("div","ac-item"+(i===active?" active":""));
       d.setAttribute("role","option");
-      d.appendChild(el("b",null,it.name));
-      if(it.sub) d.appendChild(el("span",null,it.sub));
+      const mainCol=el("div","ac-main");
+      mainCol.appendChild(el("b",null,it.name));
+      if(it.sub) mainCol.appendChild(el("span",null,it.sub));
+      d.appendChild(mainCol);
+      if(state.home&&isFinite(it.lat)) d.appendChild(el("span","ac-dist",fmtN(haversine(state.home,it),1)+" km"));
       d.addEventListener("mousedown",(e)=>{ e.preventDefault(); pick(i); });
       list.appendChild(d);
     });
@@ -1059,29 +1758,29 @@ function attachAC(input, list, onPick){
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let activeRec=null;
 function voiceInto(btn,cb){
-  if(!SR){ toast("Voz não suportada neste browser — escreve o destino."); return; }
+  if(!SR){ toast(t("Voz não suportada neste browser — escreve o destino.")); return; }
   if(activeRec){ try{activeRec.stop();}catch(e){} return; }
   try{
     const rec=new SR(); activeRec=rec;
-    rec.lang="pt-PT"; rec.interimResults=false; rec.maxAlternatives=1;
+    rec.lang=SPEECH_LANGS[state.lang]||"pt-PT"; rec.interimResults=false; rec.maxAlternatives=1;
     const old=btn.textContent;
     btn.classList.add("rec"); btn.textContent="⏹";
     rec.onresult=(e)=>{ try{ cb(e.results[0][0].transcript); }catch(err){} };
-    rec.onerror=()=>toast("Não consegui ouvir — tenta de novo ou escreve.");
+    rec.onerror=()=>toast(t("Não consegui ouvir — tenta de novo ou escreve."));
     rec.onend=()=>{ btn.classList.remove("rec"); btn.textContent=old; activeRec=null; };
     rec.start();
-  }catch(e){ activeRec=null; btn.classList.remove("rec"); toast("Voz indisponível neste browser."); }
+  }catch(e){ activeRec=null; btn.classList.remove("rec"); toast(t("Voz indisponível neste browser.")); }
 }
 function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomplete
   if(!SR||!input) return;
   const wrap=input.closest(".field")||input.parentElement;
   const b=el("button","mic-in","🎤"); b.type="button";
-  b.title="Ditar por voz"; b.setAttribute("aria-label","Ditar por voz");
+  b.title=t("Ditar por voz"); b.setAttribute("aria-label",t("Ditar por voz"));
   b.addEventListener("click",(ev)=>{ ev.preventDefault();
     voiceInto(b,(txt)=>{
       input.value=txt; input._picked=null; input.focus();
       input.dispatchEvent(new Event("input",{bubbles:true})); // dispara as sugestões
-      toast(`🎤 "${txt}" — escolhe a sugestão certa`);
+      toast(t('🎤 "{q}" — escolhe a sugestão certa',{q:txt}));
     });
   });
   wrap.appendChild(b);
@@ -1102,24 +1801,24 @@ function setHome(loc, {silent=false}={}){
     .then(wx=>{ state.wx=wx; renderDashboard(); })
     .catch(()=>{ if(!silent){ box.textContent="";
       const b=el("div","banner err"); b.append(el("span",null,"⚠️"),
-        el("span",null,"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente."));
-      const r=el("button","btn","Tentar de novo"); r.style.marginTop="8px";
+        el("span",null,t("Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.")));
+      const r=el("button","btn",t("Tentar de novo")); r.style.marginTop="8px";
       r.addEventListener("click",()=>setHome(loc));
       box.appendChild(b); box.appendChild(r); } });
 }
 
 function useGPS(fromRoute){
-  if(!navigator.geolocation){ toast("O teu browser não suporta GPS — pesquisa a cidade."); return; }
-  toast("A obter a tua posição… 📡");
+  if(!navigator.geolocation){ toast(t("O teu browser não suporta GPS — pesquisa a cidade.")); return; }
+  toast(t("A obter a tua posição… 📡"));
   navigator.geolocation.getCurrentPosition(async pos=>{
     const {latitude:lat, longitude:lon}=pos.coords;
     const n=await revGeocode(lat,lon);
     const loc={name:n.name, sub:n.sub, lat, lon};
-    if(fromRoute){ const o=$("#rt-o"); o.value=`📍 ${n.name}`; o._picked=loc; toast(`Origem: ${n.name}`); }
-    else { setHome(loc); toast(`Localização: ${n.name}`); }
+    if(fromRoute){ const o=$("#rt-o"); o.value=`📍 ${n.name}`; o._picked=loc; toast(t("Origem: {p}",{p:n.name})); }
+    else { setHome(loc); toast(t("Localização: {p}",{p:n.name})); }
   },err=>{
     const fb=store.get("home")||DEFAULT_LOC;
-    toast(fromRoute?"Sem acesso ao GPS — escreve a origem.":"Sem acesso ao GPS — a usar "+fb.name+". Pesquisa a tua cidade acima.");
+    toast(fromRoute?t("Sem acesso ao GPS — escreve a origem."):t("Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.",{p:fb.name}));
     if(!fromRoute && !state.wx) setHome(fb);
   },{enableHighAccuracy:false, timeout:9000, maximumAge:300000});
 }
@@ -1155,7 +1854,7 @@ function renderDashboard(){
   if(alerts.length){
     const a=alerts[0], b=el("div","banner err");
     b.append(el("span",null,a.r.icon), el("span",null,
-      `${a.r.label} por volta das ${fmtH(a.t)} (${dayLabel(a.t)}). Evita estar na estrada nesse período.`));
+      t("{r} por volta das {h} ({d}). Evita estar na estrada nesse período.",{r:a.r.label,h:fmtH(a.t),d:dayLabel(a.t)})));
     const strip=el("div","alert-strip"); strip.appendChild(b); box.appendChild(strip);
   }
 
@@ -1174,26 +1873,26 @@ function renderDashboard(){
   ring.appendChild(si); sw.appendChild(ring);
   const main=el("div","hero-main");
   const title=el("div","hero-title");
-  title.append(el("span","hero-emoji",V.e), el("span",null,V.t), el("span","hero-tag",V.tag));
-  const condTxt=`${wmoTxt(mNow.code)} · ${rnd(mNow.t)}° em ${state.home.name} — decisão para as próximas 3 h`;
+  title.append(el("span","hero-emoji",V.e), el("span",null,t(V.t)), el("span","hero-tag",t(V.tag)));
+  const condTxt=t("{c} · {t}° em {p} — decisão para as próximas 3 h",{c:wmoTxt(mNow.code),t:rnd(mNow.t),p:state.home.name});
   main.append(title, el("div","hero-sub",condTxt));
   const ul=el("ul","reasons");
   if(worst.s.reasons.length){
     worst.s.reasons.forEach(r=>{ const li=el("li");
       li.append(el("span","r-ico",r.icon), el("span",null,r.label)); ul.appendChild(li); });
   } else { const li=el("li"); li.append(el("span","r-ico","😎"),
-      el("span",null,"Sem chuva, vento controlado e temperatura agradável.")); ul.appendChild(li); }
+      el("span",null,t("Sem chuva, vento controlado e temperatura agradável."))); ul.appendChild(li); }
   // mudança relevante nas próximas 12h
   const curLvl=worst.s.lvl;
   for(let i=i0+3;i<Math.min(i0+14,scores.length);i++){
     if(scores[i].lvl>curLvl+0&&scores[i].lvl>=2&&curLvl<2){
       const li=el("li"); li.append(el("span","r-ico","🕒"),
-        el("span",null,`A partir das ${fmtH(H.time[i])}: ${wmoTxt(metrics[i].code).toLowerCase()} — se fores, volta antes disso.`));
+        el("span",null,t("A partir das {h}: {c} — se fores, volta antes disso.",{h:fmtH(H.time[i]),c:wmoTxt(metrics[i].code).toLowerCase()})));
       ul.appendChild(li); break;
     }
     if(curLvl>=2&&scores[i].lvl<=1){
       const li=el("li"); li.append(el("span","r-ico","🕒"),
-        el("span",null,`Melhora a partir das ${fmtH(H.time[i])} (${dayLabel(H.time[i])}).`));
+        el("span",null,t("Melhora a partir das {h} ({d}).",{h:fmtH(H.time[i]),d:dayLabel(H.time[i])})));
       ul.appendChild(li); break;
     }
   }
@@ -1208,19 +1907,19 @@ function renderDashboard(){
   const mkChip=(ico,lab,val)=>{ const c=el("span","chip");
     c.append(el("span",null,ico), el("span",null,lab+" "), el("b",null,val)); return c; };
   cw.append(
-    mkChip("🌡️","", `${rnd(mNow.t)}° (sensação ${rnd(mNow.at)}°)`),
-    mkChip("💨","vento", `${rnd(mNow.wind)} km/h ${windArrow(mNow.dir)} · rajadas ${rnd(mNow.gust)}`),
-    mkChip("💧","humidade", `${rnd(mNow.rh)}%`),
-    mkChip("👁️","visibilidade", mNow.vis<1000?`${rnd(mNow.vis)} m`:`${fmtN(mNow.vis/1000,0)} km`),
+    mkChip("🌡️","", `${rnd(mNow.t)}° (${t("sensação {t}°",{t:rnd(mNow.at)})})`),
+    mkChip("💨",t("vento"), `${rnd(mNow.wind)} km/h ${windArrow(mNow.dir)} · ${t("rajadas")} ${rnd(mNow.gust)}`),
+    mkChip("💧",t("humidade"), `${rnd(mNow.rh)}%`),
+    mkChip("👁️",t("visibilidade"), mNow.vis<1000?`${rnd(mNow.vis)} m`:`${fmtN(mNow.vis/1000,0)} km`),
   );
-  if(daily.uv_index_max?.[0]!=null) cw.append(mkChip("☀️","UV máx", fmtN(daily.uv_index_max[0],0)));
-  if(daily.sunrise?.[0]) cw.append(mkChip("🌅","sol", `${fmtHM(daily.sunrise[0])} – ${fmtHM(daily.sunset[0])}`));
+  if(daily.uv_index_max?.[0]!=null) cw.append(mkChip("☀️",t("UV máx"), fmtN(daily.uv_index_max[0],0)));
+  if(daily.sunrise?.[0]) cw.append(mkChip("🌅",t("sol"), `${fmtHM(daily.sunrise[0])} – ${fmtHM(daily.sunset[0])}`));
   chips.appendChild(cw); box.appendChild(chips);
 
   // ---- equipamento ----
   const gearCard=el("div","card gear-chips");
-  gearCard.appendChild(el("h2",null,"🧤 Equipamento recomendado"));
-  gearCard.appendChild(el("p","h-sub","Com base nas próximas 6 horas."));
+  gearCard.appendChild(el("h2",null,t("🧤 Equipamento recomendado")));
+  gearCard.appendChild(el("p","h-sub",t("Com base nas próximas 6 horas.")));
   const gc=el("div","chips");
   gearAdvice(metrics.slice(i0,i0+6)).forEach(g=>gc.appendChild(el("span","chip",g)));
   gearCard.appendChild(gc); box.appendChild(gearCard);
@@ -1243,7 +1942,7 @@ function renderDashboard(){
 function renderTimeline(H,metrics,scores,i0,prof){
   const card=el("div","card");
   const head=el("div","card-head");
-  head.appendChild(el("h2",null,"⏱️ Próximas 24 horas"));
+  head.appendChild(el("h2",null,t("⏱️ Próximas 24 horas")));
   // melhor janela de 2h nas próximas 14h
   let best=null;
   for(let i=i0;i<Math.min(i0+13,scores.length-1);i++){
@@ -1253,13 +1952,13 @@ function renderTimeline(H,metrics,scores,i0,prof){
   head.appendChild(el("span","spacer"));
   if(best&&best.v>=prof.tWarn){
     const c=el("span","chip");
-    c.append(el("span",null,"⭐"), el("span",null,"melhor janela "),
-      el("b",null,`${fmtH(H.time[best.i])}–${fmtH(H.time[best.i+1]+3600)} (índice ${best.v})`));
-    card.appendChild(head); card.appendChild(el("p","h-sub","Altura da barra = índice moto (quanto mais alta, melhor). Passa o rato para detalhes."));
+    c.append(el("span",null,"⭐"), el("span",null,t("melhor janela")+" "),
+      el("b",null,`${fmtH(H.time[best.i])}–${fmtH(H.time[best.i+1]+3600)} (${t("índice {v}",{v:best.v})})`));
+    card.appendChild(head); card.appendChild(el("p","h-sub",t("Altura da barra = índice moto (quanto mais alta, melhor). Passa o rato para detalhes.")));
     head.appendChild(c);
   } else {
     card.appendChild(head);
-    card.appendChild(el("p","h-sub","Altura da barra = índice moto (quanto mais alta, melhor). Sem janelas boas nas próximas horas."));
+    card.appendChild(el("p","h-sub",t("Altura da barra = índice moto (quanto mais alta, melhor). Sem janelas boas nas próximas horas.")));
   }
   const scroll=el("div","tl-scroll");
   const tl=el("div","tl"); tl.setAttribute("data-test","timeline");
@@ -1274,15 +1973,15 @@ function renderTimeline(H,metrics,scores,i0,prof){
     const bar=el("div","tl-bar");
     bar.style.height=`${Math.max(4,s.score*0.78)}%`;
     bar.style.background=`var(--${["good","warn","serious","crit"][s.lvl]})`;
-    if(k===0){ col.appendChild(el("div","tl-now","AGORA")); }
+    if(k===0){ col.appendChild(el("div","tl-now",t("AGORA"))); }
     col.append(ico,bar);
     const show=(ev)=>{ const r=col.getBoundingClientRect();
       tipShow(ev.clientX??r.left+r.width/2, r.top,
-        `${fmtH(H.time[i])} · ${dayLabel(H.time[i])} — ${LVL_ICON[s.lvl]} índice ${s.score}`,
-        [["Condições",wmoTxt(m.code)],
-         ["Temperatura",`${rnd(m.t)}° (sente-se ${rnd(m.at)}°)`],
-         ["Chuva",`${fmtN(m.pr,1)} mm · ${rnd(m.pp)}%`],
-         ["Rajadas",`${rnd(m.gust)} km/h`]]); };
+        `${fmtH(H.time[i])} · ${dayLabel(H.time[i])} — ${LVL_ICON[s.lvl]} ${t("índice {v}",{v:s.score})}`,
+        [[t("Condições"),wmoTxt(m.code)],
+         [t("Temperatura"),`${rnd(m.t)}° (${t("sente-se {t}°",{t:rnd(m.at)})})`],
+         [t("Chuva"),`${fmtN(m.pr,1)} mm · ${rnd(m.pp)}%`],
+         [t("Rajadas"),`${rnd(m.gust)} km/h`]]); };
     col.addEventListener("pointermove",show);
     col.addEventListener("focus",show);
     col.addEventListener("pointerleave",tipHide);
@@ -1301,15 +2000,15 @@ function renderTimeline(H,metrics,scores,i0,prof){
     arr.setAttribute("aria-hidden","true");
     const num=el("i",null,String(rnd(m.gust)));
     cell.append(arr,num);
-    cell.title=`${fmtH(H.time[i])}: vento ${rnd(m.wind)} km/h, rajadas ${rnd(m.gust)} km/h ${windArrow(m.dir)}`;
+    cell.title=`${fmtH(H.time[i])}: ${t("vento")} ${rnd(m.wind)} km/h, ${t("rajadas")} ${rnd(m.gust)} km/h ${windArrow(m.dir)}`;
     wr.appendChild(cell);
   }
-  scroll.append(tl,xr,el("div","tl-windcap","💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45"),wr);
+  scroll.append(tl,xr,el("div","tl-windcap",t("💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45")),wr);
   card.appendChild(scroll);
   const lg=el("div","legend");
   LVL_NAME.forEach((n,i)=>{ const s=el("span");
     const d=el("span","dot"); d.style.background=`var(--${["good","warn","serious","crit"][i]})`;
-    s.append(d, document.createTextNode(`${LVL_ICON[i]} ${n}`)); lg.appendChild(s); });
+    s.append(d, document.createTextNode(`${LVL_ICON[i]} ${t(n)}`)); lg.appendChild(s); });
   card.appendChild(lg);
   return card;
 }
@@ -1323,11 +2022,11 @@ function renderNowcast(wx){
   for(let k=0;k<8&&i0+k<M.time.length;k++) cells.push({t:M.time[i0+k], pr:M.precipitation[i0+k]??0});
   if(!cells.length) return null;
   const card=el("div","card");
-  card.appendChild(el("h2",null,"🌦️ Próximas 2 horas, ao quarto de hora"));
+  card.appendChild(el("h2",null,t("🌦️ Próximas 2 horas, ao quarto de hora")));
   const startRain=cells.find(c=>c.pr>0.05);
   const allDry=!startRain;
-  card.appendChild(el("p","h-sub", allDry?"Sem chuva prevista nas próximas 2 horas — arranca à vontade."
-    :`Chuva a partir de ~${fmtHM(startRain.t)} — intensidade em azul (mais escuro = mais forte).`));
+  card.appendChild(el("p","h-sub", allDry?t("Sem chuva prevista nas próximas 2 horas — arranca à vontade.")
+    :t("Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).",{h:fmtHM(startRain.t)})));
   const row=el("div","nowcast");
   const xs=el("div","nc-x");
   cells.forEach((c,k)=>{
@@ -1340,7 +2039,7 @@ function renderNowcast(wx){
       if(c.pr<0.6) d.style.color="#0b0b0b";
     } else d.textContent="·";
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,`${fmtHM(c.t)}–${fmtHM(c.t+900)}`,
-      [["Precipitação",`${fmtN(c.pr,2)} mm/15 min`]]);
+      [[t("Precipitação"),`${fmtN(c.pr,2)} mm/15 min`]]);
     d.addEventListener("pointermove",show); d.addEventListener("pointerleave",tipHide);
     row.appendChild(d);
     xs.appendChild(el("span",null,k%2===0?fmtHM(c.t):""));
@@ -1362,13 +2061,13 @@ function dayVerdict(D,i){
 }
 function renderDaily(wx){
   const D=wx.daily, card=el("div","card");
-  card.appendChild(el("h2",null,"📅 Próximos 7 dias"));
-  card.appendChild(el("p","h-sub","Para planear a voltinha de fim de semana."));
+  card.appendChild(el("h2",null,t("📅 Próximos 7 dias")));
+  card.appendChild(el("p","h-sub",t("Para planear a voltinha de fim de semana.")));
   const grid=el("div","daily");
-  (D.time||[]).forEach((t,i)=>{
+  (D.time||[]).forEach((ep,i)=>{
     const lvl=dayVerdict(D,i);
     const d=el("div","day-card");
-    d.append(el("div","d-name", i===0?"hoje":`${fmtDow(t+43200)} ${fmtDayMo(t+43200)}`));
+    d.append(el("div","d-name", i===0?t("hoje"):`${fmtDow(ep+43200)} ${fmtDayMo(ep+43200)}`));
     d.append(el("div","d-emoji", wmoIco(D.weather_code?.[i],1)));
     const tt=el("div","d-temp");
     tt.append(el("b",null,`${rnd(D.temperature_2m_max[i])}°`), document.createTextNode(" "),
@@ -1377,15 +2076,15 @@ function renderDaily(wx){
     d.append(el("div","d-meta",`☔ ${rnd(D.precipitation_probability_max?.[i]??0)}% · 💨 ${rnd(D.wind_gusts_10m_max?.[i]??0)}`));
     const v=el("span","day-verdict");
     const dot=el("span","dot"); dot.style.background=`var(--${["good","warn","serious","crit"][lvl]})`;
-    v.append(dot, document.createTextNode(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl]));
+    v.append(dot, document.createTextNode(t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl])));
     d.append(v);
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,
-      `${dayLabel(t+43200)} — ${wmoTxt(D.weather_code?.[i])}`,
-      [["Máx / mín",`${rnd(D.temperature_2m_max[i])}° / ${rnd(D.temperature_2m_min[i])}°`],
-       ["Prob. chuva",`${rnd(D.precipitation_probability_max?.[i]??0)}%`],
-       ["Total chuva",`${fmtN(D.precipitation_sum?.[i]??0,1)} mm`],
-       ["Rajadas máx",`${rnd(D.wind_gusts_10m_max?.[i]??0)} km/h`],
-       ["UV máx",fmtN(D.uv_index_max?.[i]??0,0)]]);
+      `${dayLabel(ep+43200)} — ${wmoTxt(D.weather_code?.[i])}`,
+      [[t("Máx / mín"),`${rnd(D.temperature_2m_max[i])}° / ${rnd(D.temperature_2m_min[i])}°`],
+       [t("Prob. chuva"),`${rnd(D.precipitation_probability_max?.[i]??0)}%`],
+       [t("Total chuva"),`${fmtN(D.precipitation_sum?.[i]??0,1)} mm`],
+       [t("Rajadas máx"),`${rnd(D.wind_gusts_10m_max?.[i]??0)} km/h`],
+       [t("UV máx"),fmtN(D.uv_index_max?.[i]??0,0)]]);
     d.addEventListener("pointermove",show); d.addEventListener("pointerleave",tipHide);
     grid.appendChild(d);
   });
@@ -1404,20 +2103,35 @@ function cartoLayer(){
 }
 function initRouteMap(){
   if(state.maps.route) return;
-  if(typeof L==="undefined"){ routeError("Mapa indisponível — precisa de ligação à internet."); return; }
-  const m=L.map("map-route",{preferCanvas:true, zoomSnap:.5}).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
+  if(typeof L==="undefined"){ routeError(t("Mapa indisponível — precisa de ligação à internet.")); return; }
+  const rotOpts=(L.Map.prototype.setBearing&&!window.__noRotate)?{rotate:true, touchRotate:true, rotateControl:{closeOnZeroBearing:false}}:{};
+  const m=L.map("map-route",Object.assign({preferCanvas:true, zoomSnap:.5},rotOpts)).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
   m._base=cartoLayer().addTo(m);
   state.maps.route=m;
   state.routeLayers=L.layerGroup().addTo(m);
+  // botão "centrar em mim"
+  const Locate=L.Control.extend({options:{position:"topleft"},
+    onAdd(){ const b=L.DomUtil.create("button","locate-btn");
+      b.type="button"; b.textContent="◎"; b.title=t("A minha posição");
+      L.DomEvent.on(b,"click",(e)=>{ L.DomEvent.stop(e);
+        travel.follow=true;
+        if(travel.marker){ m.setView(travel.marker.getLatLng(),Math.max(m.getZoom(),14)); return; }
+        navigator.geolocation&&navigator.geolocation.getCurrentPosition(
+          p=>m.setView([p.coords.latitude,p.coords.longitude],Math.max(m.getZoom(),13)),
+          ()=>toast(t("Sem acesso ao GPS — escreve a origem.")),{timeout:8000,maximumAge:60000});
+      });
+      return b; }});
+  m.addControl(new Locate());
+  m.on("dragstart",()=>{ if(travel.active) travel.follow=false; });
 }
 function surfaceColor(){ return getComputedStyle(document.documentElement).getPropertyValue("--surface").trim()||"#fff"; }
 
 async function resolveInput(input, label){
   if(input._picked) return input._picked;
   const q=input.value.trim();
-  if(q.length<3) throw new Error(`Indica ${label}.`);
+  if(q.length<3) throw new Error(t("Indica {x}.",{x:t(label)}));
   const r=await geocode(q);
-  if(!r.length) throw new Error(`Não encontrei "${q}" — tenta "cidade, país".`);
+  if(!r.length) throw new Error(t('Não encontrei "{q}" — tenta "cidade, país".',{q}));
   input._picked=r[0];
   return r[0];
 }
@@ -1431,21 +2145,21 @@ function routeError(msg){
 
 function renumberStops(){ $$(".stop-row .stop-dot").forEach((d,i)=>d.textContent=String(i+1)); }
 function addStopRow(prefill){
-  if($$(".stop-row").length>=4){ toast("Máximo de 4 paragens."); return null; }
+  if($$(".stop-row").length>=4){ toast(t("Máximo de 4 paragens.")); return null; }
   const row=el("div","stop-row field");
   const dot=el("span","stop-dot","1");
   const inp=document.createElement("input");
-  inp.type="text"; inp.placeholder="Paragem (ex.: Continente, bomba de gasolina, casa do João…)"; inp.autocomplete="off";
+  inp.type="text"; inp.placeholder=t("Paragem (ex.: Continente, bomba de gasolina, casa do João…)"); inp.autocomplete="off";
   const x=el("button","x-btn","✕"); x.title="Remover paragem"; x.setAttribute("aria-label","Remover paragem");
   const list=el("div","ac-list");
   row.append(dot,inp);
   if(SR){
     const m=el("button","mic-btn","🎤"); m.type="button";
-    m.title="Ditar a paragem por voz"; m.setAttribute("aria-label","Ditar a paragem por voz");
+    m.title=t("Ditar a paragem por voz"); m.setAttribute("aria-label",t("Ditar a paragem por voz"));
     m.addEventListener("click",()=>voiceInto(m,(txt)=>{
       inp.value=txt; inp._picked=null; inp.focus();
       inp.dispatchEvent(new Event("input",{bubbles:true}));
-      toast(`🎤 "${txt}" — escolhe a sugestão certa`);
+      toast(t('🎤 "{q}" — escolhe a sugestão certa',{q:txt}));
     }));
     row.append(m);
   }
@@ -1536,12 +2250,12 @@ function switchVariant(i){
   applyShift(R.shift);
   renderDepartures();
   renderCameras(); loadRouteCameras();
-  toast(`Trajeto ${String.fromCharCode(65+i)} aplicado 🗺️`);
+  toast(t("Trajeto {x} aplicado 🗺️",{x:String.fromCharCode(65+i)}));
 }
 
 async function computeRoute(){
   const btn=$("#btn-route");
-  btn.disabled=true; btn.textContent="A calcular…"; routeError(null);
+  btn.disabled=true; btn.textContent=t("A calcular…"); routeError(null);
   try{
     const o=await resolveInput($("#rt-o"),"a origem");
     const d=await resolveInput($("#rt-d"),"o destino");
@@ -1553,12 +2267,12 @@ async function computeRoute(){
     const pauseSec=(+$("#stop-pause").value||0)*60;
 
     const pts=[o,...stops,d];
-    const {routes,waypoints}=await osrmRoute(pts).catch(()=>{throw new Error("Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.");});
+    const {routes,waypoints}=await osrmRoute(pts).catch(()=>{throw new Error(t("Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada."));});
 
     // constrói cada trajeto (o principal denso; alternativas mais leves)
     const list=stops.length===0?routes.slice(0,3):[routes[0]];
     const variants=list.map((rt,vi)=>buildVariant(rt,pts,waypoints,pauseSec,vi===0));
-    if(!variants.length||variants[0].coords.length<2) throw new Error("Rota demasiado curta.");
+    if(!variants.length||variants[0].coords.length<2) throw new Error(t("Rota demasiado curta."));
 
     // meteo: UMA chamada multi-localização para os pontos de todos os trajetos
     const allSamples=variants.flatMap(v=>v.samples);
@@ -1584,10 +2298,10 @@ async function computeRoute(){
       +`|${Math.round(dep)}|${Math.round(pauseSec/60)}`);}catch(e){}
     return true;
   }catch(e){
-    routeError(e.message||"Algo correu mal. Tenta novamente.");
+    routeError(e.message||t("Algo correu mal. Tenta novamente."));
     return false;
   }finally{
-    btn.disabled=false; btn.textContent="Calcular rota e chuva";
+    btn.disabled=false; btn.textContent=t("Calcular rota e chuva");
   }
 }
 
@@ -1657,8 +2371,14 @@ function drawRoute(fit){
     if(s.stop!=null){
       mk=L.marker([s.lat,s.lon],{icon:L.divIcon({className:"",html:`<div class="stop-pin">${s.stop}</div>`,
         iconSize:[24,24],iconAnchor:[12,12]})}).addTo(g);
+    } else if(i===0){
+      mk=L.marker([s.lat,s.lon],{zIndexOffset:800,icon:L.divIcon({className:"",html:'<div class="pt-a">A</div>',
+        iconSize:[26,26],iconAnchor:[13,13]})}).addTo(g);
+    } else if(i===R.samples.length-1){
+      mk=L.marker([s.lat,s.lon],{zIndexOffset:800,icon:L.divIcon({className:"",html:'<div class="pt-b">🏁</div>',
+        iconSize:[28,28],iconAnchor:[14,14]})}).addTo(g);
     } else {
-      mk=L.circleMarker([s.lat,s.lon],{radius:i===0||i===R.samples.length-1?7:4.5,
+      mk=L.circleMarker([s.lat,s.lon],{radius:4.5,
         color:surf,weight:2,fillColor:lvlColor(s.cond.lvl),fillOpacity:1}).addTo(g);
     }
     mk.on("click",async ()=>{
@@ -1666,16 +2386,16 @@ function drawRoute(fit){
       const div=el("div");
       const t1=el("div"); t1.style.fontWeight="700"; t1.style.marginBottom="3px";
       const stopName=s.stop!=null?(R.pts[s.stop]?.name||`Paragem ${s.stop}`):null;
-      t1.textContent= s.stop!=null?`🛑 Paragem ${s.stop}: ${stopName}`
-        :(i===0?"🏁 Partida":i===R.samples.length-1?"🎯 Chegada":`km ${rnd(s.km)}`)+` · ~${fmtHM(s.eta)}`;
+      t1.textContent= s.stop!=null?t("🛑 Paragem {n}: {p}",{n:s.stop,p:stopName})
+        :(i===0?t("🏁 Partida"):i===R.samples.length-1?t("🎯 Chegada"):`km ${rnd(s.km)}`)+` · ~${fmtHM(s.eta)}`;
       const div2=el("div");
-      if(s.stop!=null&&R.pauseSec>0) div2.textContent=`chegas ~${fmtHM(s.eta-R.pauseSec)} · voltas à estrada ~${fmtHM(s.eta)}`;
+      if(s.stop!=null&&R.pauseSec>0) div2.textContent=t("chegas ~{a} · voltas à estrada ~{b}",{a:fmtHM(s.eta-R.pauseSec),b:fmtHM(s.eta)});
       const t2=el("div",null,`${LVL_ICON[c.lvl]} ${rainLabel(c.lvl)} — ${wmoTxt(c.code)}`);
-      const t3=el("div",null,`💧 ${fmtN(c.pr,1)} mm/h (${rnd(c.pp)}%) · 🌡️ ${rnd(c.t)}° · 💨 rajadas ${rnd(c.gust)} km/h ${windArrow(c.dir)}`);
-      const t4=el("div","muted small",s.stop!=null?"":"a identificar o local…");
+      const t3=el("div",null,`💧 ${fmtN(c.pr,1)} mm/h (${rnd(c.pp)}%) · 🌡️ ${rnd(c.t)}° · 💨 ${t("rajadas")} ${rnd(c.gust)} km/h ${windArrow(c.dir)}`);
+      const t4=el("div","muted small",s.stop!=null?"":t("a identificar a zona…"));
       div.append(t1,div2,t2,t3,t4);
       mk.bindPopup(div,{maxWidth:280}).openPopup();
-      if(s.stop==null){ const n=await revGeocode(s.lat,s.lon); t4.textContent=`📍 perto de ${n.name}`; }
+      if(s.stop==null){ const n=await revGeocode(s.lat,s.lon); t4.textContent=`📍 ${t("perto de {p}",{p:n.name})}`; }
     });
   });
   // radares fixos 📸
@@ -1683,10 +2403,10 @@ function drawRoute(fit){
     const mk=L.marker([c.lat,c.lon],{icon:L.divIcon({className:"",html:'<div class="cam-pin">📸</div>',
       iconSize:[22,22], iconAnchor:[11,11]})}).addTo(g);
     const div=el("div");
-    const t=el("div"); t.style.fontWeight="700";
-    t.textContent=`📸 Radar fixo${c.max?` — limite ${c.max}`:""}`;
-    div.append(t, el("div",null,`km ${rnd(c.km)} do teu trajeto`),
-      el("div","muted small","dados OpenStreetMap"));
+    const tt=el("div"); tt.style.fontWeight="700";
+    tt.textContent=`${t("📸 Radar fixo")}${c.max?` ${t("— limite {v}",{v:c.max})}`:""}`;
+    div.append(tt, el("div",null,t("km {k} do teu trajeto",{k:rnd(c.km)})),
+      el("div","muted small",t("dados OpenStreetMap")));
     mk.bindPopup(div,{maxWidth:220});
   });
   if(fit){ state.maps.route.fitBounds(L.latLngBounds(all),{padding:[26,26]}); }
@@ -1718,10 +2438,10 @@ function renderRouteSummary(){
   const big=el("div","summary-hero");
   const dep=R.dep+R.shift*60;
   let headline, emoji;
-  if(worst===0){ emoji="🟢"; headline="Trajeto seco — boa viagem!"; }
-  else if(worst===1){ emoji="🟡"; headline=`Possível chuvisco em ~${fmtN(riskKm,0)} km do caminho`; }
-  else if(worst===2){ emoji="🟠"; headline=`Vais apanhar chuva em ~${fmtN(wetKm,0)} km (${rnd(wetKm/R.totalKm*100)}% do trajeto)`; }
-  else { emoji="🔴"; headline=`Chuva forte/trovoada no caminho — ${fmtN(wetKm,0)} km afetados. Adia se puderes.`; }
+  if(worst===0){ emoji="🟢"; headline=t("Trajeto seco — boa viagem!"); }
+  else if(worst===1){ emoji="🟡"; headline=t("Possível chuvisco em ~{n} km do caminho",{n:fmtN(riskKm,0)}); }
+  else if(worst===2){ emoji="🟠"; headline=t("Vais apanhar chuva em ~{n} km ({p}% do trajeto)",{n:fmtN(wetKm,0),p:rnd(wetKm/R.totalKm*100)}); }
+  else { emoji="🔴"; headline=t("Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.",{n:fmtN(wetKm,0)}); }
   const bigLine=el("div","big");
   bigLine.append(el("span",null,emoji), el("span",null,headline));
   big.appendChild(bigLine);
@@ -1729,21 +2449,40 @@ function renderRouteSummary(){
   const nStops=(R.pts?.length||2)-2;
   const arrive=dep+R.travelTotal+nStops*R.pauseSec;
   R.arrive=arrive;
-  const viaTxt=nStops?` · ${nStops} ${nStops===1?"paragem":"paragens"} (${R.stops.map(s=>s.name).join(", ")}${R.pauseSec?`, +${Math.round(R.pauseSec/60)} min cada`:""})`:"";
+  const viaTxt=nStops?` · ${nStops} ${nStops===1?t("paragem"):t("paragens")} (${R.stops.map(s=>s.name).join(", ")}${R.pauseSec?`, +${Math.round(R.pauseSec/60)} min`:""})`:"";
   const sub=el("div","hero-sub",
-    `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} em andamento${viaTxt} · partida ${fmtHM(dep)} (${dayLabel(dep)}) · chegada ~${fmtHM(arrive)}`);
+    `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} ${t("em andamento")}${viaTxt} · ${t("partida")} ${fmtHM(dep)} (${dayLabel(dep)}) · ${t("chegada")} ~${fmtHM(arrive)}`);
   main.appendChild(sub);
+  // etapas: 1 → paragem, 2 → destino… com km, duração e horários
+  if(nStops>0){
+    const legsArr=(R.variants?.[R.active]?.legs)||[];
+    const lg=el("div","legs");
+    let acc=0;
+    for(let i=0;i<R.pts.length-1;i++){
+      const durL=legsArr[i]?.duration??(R.travelTotal/(R.pts.length-1));
+      const distL=legsArr[i]?.distance!=null?legsArr[i].distance/1000:R.totalKm/(R.pts.length-1);
+      const st=dep+acc+i*R.pauseSec;
+      acc+=durL;
+      const en=dep+acc+i*R.pauseSec;
+      const row=el("div","leg-row");
+      row.append(el("span","leg-num",String(i+1)),
+        el("span","leg-main",`${R.pts[i].name} → ${R.pts[i+1].name}`),
+        el("span","leg-meta",`${fmtN(distL,0)} km · ${fmtDur(durL)} · ${fmtHM(st)}–${fmtHM(en)}`));
+      lg.appendChild(row);
+    }
+    main.appendChild(lg);
+  }
   const chips=el("div","chips"); chips.style.marginTop="10px";
   const mk=(txt)=>chips.appendChild(el("span","chip",txt));
-  if(maxPr>0.05) mk(`💧 pico ${fmtN(maxPr,1)} mm/h`);
-  mk(`🌡️ mínima no percurso ${rnd(minT)}°`);
-  mk(`💨 rajadas até ${rnd(maxGust)} km/h · vento ${wind.desc}`);
-  if(maxCross>=40) mk(`⚠️💨 vento lateral até ~${rnd(maxCross)} km/h${wind.crossPlace?` perto do km ${rnd(wind.crossKm)}`:""}`);
-  if(elevMax!=null&&elevMax-elevMin>250) mk(`⛰️ sobe até ~${rnd(elevMax)} m`);
-  if(R.cameras?.length) mk(`📸 ${R.cameras.length} ${R.cameras.length===1?"radar fixo":"radares fixos"}`);
+  if(maxPr>0.05) mk(`💧 ${t("pico {n} mm/h",{n:fmtN(maxPr,1)})}`);
+  mk(`🌡️ ${t("mínima no percurso {t}°",{t:rnd(minT)})}`);
+  mk(`💨 ${t("rajadas até {g} km/h · vento {d}",{g:rnd(maxGust),d:wind.desc})}`);
+  if(maxCross>=40) mk(`⚠️💨 ${t("vento lateral até ~{g} km/h",{g:rnd(maxCross)})}${wind.crossPlace?` ${t("perto do km {k}",{k:rnd(wind.crossKm)})}`:""}`);
+  if(elevMax!=null&&elevMax-elevMin>250) mk(`⛰️ ${t("sobe até ~{m} m",{m:rnd(elevMax)})}`);
+  if(R.cameras?.length) mk(`📸 ${R.cameras.length} ${R.cameras.length===1?t("radar fixo"):t("radares fixos")}`);
   // noite?
   const sunset=state.wx?.daily?.sunset?.find(s=>isSameDay(s,dep));
-  if(sunset&&arrive>sunset) mk("🌙 chegada depois do pôr-do-sol");
+  if(sunset&&arrive>sunset) mk(t("🌙 chegada depois do pôr-do-sol"));
   main.appendChild(chips);
   // comparação de trajetos alternativos (mudar de caminho para fugir à chuva)
   if(R.variants&&R.variants.length>1){
@@ -1751,8 +2490,8 @@ function renderRouteSummary(){
     R.variants.forEach((v,i)=>{
       const w=variantWet(v,dep);
       const c=el("button","chip click variant-chip"+(i===R.active?" sel":""));
-      c.append(el("b",null,`Trajeto ${String.fromCharCode(65+i)}`),
-        el("span",null,`${fmtDur(v.travelTotal)} · ${fmtN(v.totalKm,0)} km · ${w<0.5?"seco ✅":`~${fmtN(w,0)} km 🌧️`}`));
+      c.append(el("b",null,t("Trajeto {x}",{x:String.fromCharCode(65+i)})),
+        el("span",null,`${fmtDur(v.travelTotal)} · ${fmtN(v.totalKm,0)} km · ${w<0.5?t("seco ✅"):t("~{n} km 🌧️",{n:fmtN(w,0)})}`));
       c.addEventListener("click",()=>switchVariant(i));
       vrow.appendChild(c);
     });
@@ -1762,16 +2501,16 @@ function renderRouteSummary(){
     if(bestV!==R.active){
       const p=el("p",null); p.style.margin="8px 0 0"; p.style.fontSize="13.5px";
       p.append(el("span",null,"💡 "),
-        el("b",null,`O Trajeto ${String.fromCharCode(65+bestV)} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.`));
+        el("b",null,t("O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.",{x:String.fromCharCode(65+bestV)})));
       main.appendChild(p);
     }
   }
   // ações: modo viagem + copiar resumo
   const acts=el("div","rec-actions");
   const trv=el("button","btn primary"); trv.id="btn-travel";
-  trv.textContent=travel.active?"🛑 Terminar modo viagem":"🧭 Modo viagem (avisos de chuva)";
+  trv.textContent=travel.active?t("🛑 Terminar modo viagem"):t("🧭 Modo viagem (avisos de chuva)");
   trv.addEventListener("click",()=>travel.active?stopTravel("Modo viagem terminado."):startTravel());
-  const share=el("button","btn","📋 Copiar resumo");
+  const share=el("button","btn",t("📋 Copiar resumo"));
   share.addEventListener("click",()=>{
     const lines=[`🏍️ ${R.o.name} → ${R.d.name}${nStops?` (via ${R.stops.map(s=>s.name).join(", ")})`:""} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)}`,
       `Partida ${fmtHM(dep)} (${dayLabel(dep)}) → chegada ~${fmtHM(arrive)}`,
@@ -1780,9 +2519,21 @@ function renderRouteSummary(){
       ...currentStretches().map(st=>`• km ${rnd(st.k0)}–${rnd(st.k1)} (~${fmtHM(st.t0)}): ${rainLabel(st.lvl)}${st.place?` — perto de ${st.place}`:""}`),
       `via app "Vou de Moto?" — dados Open-Meteo/OSM`];
     (navigator.clipboard?.writeText(lines.join("\n"))||Promise.reject())
-      .then(()=>toast("Resumo copiado! 📋")).catch(()=>toast("Não consegui copiar automaticamente."));
+      .then(()=>toast(t("Resumo copiado! 📋"))).catch(()=>toast(t("Não consegui copiar automaticamente.")));
   });
-  acts.append(trv,share);
+  const favD=el("button","btn","⭐ "+t("Guardar destino"));
+  favD.addEventListener("click",()=>{
+    let lab=null; try{ lab=prompt(t("Nome do favorito? (ex.: Casa, Trabalho, Casa do João)"),R.d.name); }catch(e){}
+    if(lab===null) return; lab=(lab||R.d.name).trim(); if(!lab) return;
+    saveFav(R.d,lab); toast(t("Guardado: {p} ⭐",{p:lab}));
+  });
+  const favR2=el("button","btn","💾 "+t("Guardar rota"));
+  favR2.addEventListener("click",()=>{
+    let lab=null; try{ lab=prompt(t("Nome da rota?"),`${R.o.name} → ${R.d.name}`); }catch(e){}
+    if(lab===null) return; lab=(lab||`${R.o.name} → ${R.d.name}`).trim();
+    saveFavRoute(lab, location.hash); toast(t("Guardado: {p} ⭐",{p:lab}));
+  });
+  acts.append(trv,share,favD,favR2);
   main.appendChild(acts);
   card.appendChild(main);
   box.appendChild(card);
@@ -1803,7 +2554,7 @@ function computeWindStats(R){
     gustMax=Math.max(gustMax,a.cond.gust,b.cond.gust);
   }
   const headAvg=len?headSum/len:0;
-  const desc=Math.abs(headAvg)<8?"maioritariamente lateral":headAvg>0?"de frente":"de costas";
+  const desc=Math.abs(headAvg)<8?t("maioritariamente lateral"):headAvg>0?t("de frente"):t("de costas");
   return {crossMax, crossKm, crossPlace:crossMax>=40, headAvg, desc, gustMax};
 }
 
@@ -1851,40 +2602,40 @@ function renderSegments(){
   const st=currentStretches(), wv=windStretches();
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,"🌧️💨 Onde apanhas chuva e vento"));
+  card.appendChild(el("h2",null,t("🌧️💨 Onde apanhas chuva e vento")));
   if(!st.length&&!wv.length){
-    card.appendChild(el("p","h-sub","Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉"));
+    card.appendChild(el("p","h-sub",t("Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉")));
     box.appendChild(card); return;
   }
-  card.appendChild(el("p","h-sub","Troços do trajeto com condições a merecer atenção, à hora a que lá passas."));
+  card.appendChild(el("p","h-sub",t("Troços do trajeto com condições a merecer atenção, à hora a que lá passas.")));
   const ul=el("ul","seg-list");
   st.forEach(async (s)=>{
     const li=el("li","seg-item");
     const bar=el("span","seg-bar"); bar.style.background=lvlColor(s.lvl);
     const main=el("div","seg-main");
     const b=el("b",null,`km ${rnd(s.k0)} – ${rnd(s.k1)}`);
-    const place=el("span",null,"a identificar a zona…");
+    const place=el("span",null,t("a identificar a zona…"));
     main.append(b,place);
     const val=el("span","seg-val",`${LVL_ICON[s.lvl]} ${rainLabel(s.lvl)}`);
     li.append(bar,main,val);
     ul.appendChild(li);
     const mid=R.samples[Math.round((s.i0+s.i1)/2)];
     const n=await revGeocode(mid.lat,mid.lon);
-    place.textContent=`perto de ${n.name} · ~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · até ${fmtN(s.pr,1)} mm/h`:""}`;
+    place.textContent=`${t("perto de {p}",{p:n.name})} · ~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${fmtN(s.pr,1)} mm/h`:""}`;
   });
   wv.forEach(async (s)=>{
     const li=el("li","seg-item");
     const bar=el("span","seg-bar"); bar.style.background="var(--warn)";
     const main=el("div","seg-main");
     const b=el("b",null,`km ${rnd(s.k0)} – ${rnd(s.k1)}`);
-    const place=el("span",null,"a identificar a zona…");
+    const place=el("span",null,t("a identificar a zona…"));
     main.append(b,place);
-    const val=el("span","seg-val",`💨 ${s.cross>=45?"vento lateral":"rajadas"} ${rnd(Math.max(s.gust,s.cross))} km/h`);
+    const val=el("span","seg-val",`💨 ${s.cross>=45?t("vento lateral"):t("rajadas")} ${rnd(Math.max(s.gust,s.cross))} km/h`);
     li.append(bar,main,val);
     ul.appendChild(li);
     const mid=R.samples[Math.round((s.i0+s.i1)/2)];
     const n=await revGeocode(mid.lat,mid.lon);
-    place.textContent=`perto de ${n.name} · ~${fmtHM(s.t0)} · abranda e segura bem o guiador`;
+    place.textContent=`${t("perto de {p}",{p:n.name})} · ~${fmtHM(s.t0)} · ${t("abranda e segura bem o guiador")}`;
   });
   card.appendChild(ul);
   box.appendChild(card);
@@ -1919,15 +2670,15 @@ function renderDepartures(){
   const R=state.route, box=$("#route-departures"); if(!R){box.textContent="";return;}
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,"🕒 E se saíres mais tarde (ou mais cedo)?"));
-  card.appendChild(el("p","h-sub","Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo."));
+  card.appendChild(el("h2",null,t("🕒 E se saíres mais tarde (ou mais cedo)?")));
+  card.appendChild(el("p","h-sub",t("Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.")));
   const row=el("div","dep-chips");
   const {evals,best}=evalDepartures();
   evals.forEach(ev=>{
     const c=el("button","dep-chip"+(ev===best&&best.wet<evals.find(e=>e.sh===R.shift)?.wet-0.5?" best":""));
     c.dataset.shift=ev.sh;
     c.appendChild(el("div","t",fmtHM(ev.dep)));
-    c.appendChild(el("div","v", ev.wet<0.5?"seco ✅":`~${fmtN(ev.wet,0)} km 🌧️`));
+    c.appendChild(el("div","v", ev.wet<0.5?t("seco ✅"):t("~{n} km 🌧️",{n:fmtN(ev.wet,0)})));
     if(ev===best&&ev.wet<0.5) c.title="A opção mais seca";
     c.addEventListener("click",()=>{
       $("#rt-when").value=localDT(new Date(ev.dep*1000));
@@ -1938,7 +2689,7 @@ function renderDepartures(){
   card.appendChild(row);
   if(best&&best.sh!==0&&best.wet<evals.find(e=>e.sh===0).wet-0.5){
     const p=el("p",null); p.style.margin="8px 0 0"; p.style.fontSize="13.5px";
-    p.append(el("span",null,"💡 "), el("b",null,`Se saíres às ${fmtHM(best.dep)} apanhas ${best.wet<0.5?"o trajeto praticamente seco":`só ~${fmtN(best.wet,0)} km de chuva`}.`));
+    p.append(el("span",null,"💡 "), el("b",null,t("Se saíres às {h} apanhas {x}.",{h:fmtHM(best.dep),x:best.wet<0.5?t("o trajeto praticamente seco"):t("só ~{n} km de chuva",{n:fmtN(best.wet,0)})})));
     card.appendChild(p);
   }
   box.appendChild(card);
@@ -1956,7 +2707,73 @@ async function toggleRouteRadar(on){
     routeRadarLayer=L.tileLayer(`${state.radar.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`,
       {opacity:.65, maxNativeZoom:7, maxZoom:19, attribution:"RainViewer"});
     routeRadarLayer.addTo(m);
-  }catch(e){ toast("Radar indisponível de momento."); $("#rt-radar-toggle").checked=false; }
+  }catch(e){ toast(t("Radar indisponível de momento.")); $("#rt-radar-toggle").checked=false; }
+}
+
+/* =====================================================================
+   FAVORITOS — casa, bombas, amigos, restaurantes e rotas guardadas
+   ===================================================================== */
+function getFavs(){ return store.get("favs")||[]; }
+function getFavRoutes(){ return store.get("favRoutes")||[]; }
+function normTxt(x){ return (x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+function saveFav(place,label){
+  const favs=getFavs().filter(f=>normTxt(f.label)!==normTxt(label));
+  favs.unshift({label, name:place.name, sub:place.sub||"", lat:place.lat, lon:place.lon});
+  store.set("favs",favs.slice(0,20)); renderFavRow();
+}
+function saveFavRoute(name,hash){
+  const rs=getFavRoutes().filter(r=>r.hash!==hash&&normTxt(r.name)!==normTxt(name));
+  rs.unshift({name,hash}); store.set("favRoutes",rs.slice(0,12)); renderFavRow();
+}
+function renderFavRow(){
+  const row=$("#fav-row"); if(!row) return;
+  row.textContent="";
+  const favs=getFavs(), routes=getFavRoutes();
+  if(!favs.length&&!routes.length){
+    row.appendChild(el("span","small muted",t("⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.")));
+    return;
+  }
+  favs.forEach(f=>{
+    const c=el("button","chip click fav-chip");
+    c.append(el("span",null,"⭐"), el("b",null,f.label));
+    const x=el("span","fav-x","✕"); x.title=t("Apagar");
+    x.addEventListener("click",(ev)=>{ ev.stopPropagation();
+      store.set("favs",getFavs().filter(g=>normTxt(g.label)!==normTxt(f.label)));
+      renderFavRow(); toast(t("Apagado: {p}",{p:f.label})); });
+    c.appendChild(x);
+    c.addEventListener("click",async ()=>{
+      const pos=(await freshPos())||state.home;
+      if(!pos){ toast(t("Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.")); return; }
+      assistantGo(pos,{name:f.label, sub:f.sub, lat:f.lat, lon:f.lon},[]);
+    });
+    row.appendChild(c);
+  });
+  routes.forEach(r=>{
+    const c=el("button","chip click fav-chip");
+    c.append(el("span",null,"🗺️"), el("b",null,r.name));
+    const x=el("span","fav-x","✕"); x.title=t("Apagar");
+    x.addEventListener("click",(ev)=>{ ev.stopPropagation();
+      store.set("favRoutes",getFavRoutes().filter(g=>g.hash!==r.hash));
+      renderFavRow(); toast(t("Apagado: {p}",{p:r.name})); });
+    c.appendChild(x);
+    c.addEventListener("click",()=>{ $$(".stop-row").forEach(rw=>rw.remove());
+      if(state._restore) state._restore(r.hash); });
+    row.appendChild(c);
+  });
+}
+/* input à balda → favorito ("vou a casa do joao" acerta em "Casa do João") */
+function favMatch(q){
+  const nq=normTxt(q);
+  let best=null,bs=0;
+  for(const f of getFavs()){
+    const nl=normTxt(f.label); if(!nl) continue;
+    let score=0;
+    if(nq===nl||nq.includes(nl)) score=nl.length*2;
+    else{ const toks=nl.split(/\s+/).filter(w=>w.length>2);
+      if(toks.length&&toks.every(w=>nq.includes(w))) score=nl.length; }
+    if(score>bs){ bs=score; best=f; }
+  }
+  return best;
 }
 
 /* =====================================================================
@@ -1976,7 +2793,7 @@ function freshPos(){
   return new Promise(res=>{
     if(!navigator.geolocation) return res(null);
     navigator.geolocation.getCurrentPosition(
-      p=>res({lat:p.coords.latitude, lon:p.coords.longitude, name:"A minha posição", sub:""}),
+      p=>res({lat:p.coords.latitude, lon:p.coords.longitude, name:t("A minha posição"), sub:""}),
       ()=>res(null), {timeout:6500, maximumAge:120000});
   });
 }
@@ -1999,30 +2816,32 @@ function renderCands(cands,pos,picked){
 async function assistantAsk(){
   const btn=$("#ai-go");
   const q=parseDest($("#ai-q").value);
-  if(q.length<2){ toast("Diz-me para onde queres ir 🙂"); return; }
-  btn.disabled=true; btn.textContent="A pensar…";
-  $("#ai-cands").textContent=""; aiMsg("info",`À procura de "${q}" perto de ti…`);
+  if(q.length<2){ toast(t("Diz-me para onde queres ir 🙂")); return; }
+  btn.disabled=true; btn.textContent=t("A pensar…");
+  $("#ai-cands").textContent=""; aiMsg("info",t('À procura de "{q}" perto de ti…',{q}));
   try{
     let pos=await freshPos();
-    if(!pos&&state.home) pos={...state.home, name:state.home.name||"a tua zona"};
-    if(!pos){ aiMsg("err","Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá."); return; }
+    if(!pos&&state.home) pos={...state.home, name:state.home.name||t("a tua zona")};
+    if(!pos){ aiMsg("err",t("Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.")); return; }
+    const fav=favMatch(q);
+    if(fav){ await assistantGo(pos,{name:fav.label, sub:fav.sub, lat:fav.lat, lon:fav.lon},[]); return; }
     let res=await geocodeNear(q,pos,true).catch(()=>[]);
     if(!res.length) res=await geocodeNear(q,pos,false).catch(()=>[]);
-    if(!res.length){ aiMsg("err",`Não encontrei "${q}" por aqui. Tenta com a cidade (ex.: "${q} ${state.home?.name??"Lisboa"}").`); return; }
+    if(!res.length){ aiMsg("err",t('Não encontrei "{q}" por aqui. Tenta com a cidade (ex.: "{q} {c}").',{q,c:state.home?.name??"Lisboa"})); return; }
     res.forEach(r=>r.dist=haversine(pos,r));
     res.sort((a,b)=>a.dist-b.dist);
     await assistantGo(pos,res[0],res.slice(0,5));
-  } finally { btn.disabled=false; btn.textContent="Perguntar"; }
+  } finally { btn.disabled=false; btn.textContent=t("Perguntar"); }
 }
 async function assistantGo(pos,cand,cands){
   renderCands(cands,pos,cand);
-  aiMsg("info",`A calcular a rota até ${cand.name} e o tempo em cada troço do caminho…`);
-  const o=$("#rt-o"); o.value=pos.name==="A minha posição"?"📍 A minha posição":pos.name; o._picked={...pos};
+  aiMsg("info",t("A calcular a rota até {p} e o tempo em cada troço do caminho…",{p:cand.name}));
+  const o=$("#rt-o"); o.value=pos.name===t("A minha posição")||pos.name==="A minha posição"?"📍 "+t("A minha posição"):pos.name; o._picked={...pos};
   const d=$("#rt-d"); d.value=cand.name+(cand.sub?` — ${cand.sub}`:""); d._picked=cand;
   $$(".stop-row").forEach(r=>r.remove());
   $("#rt-when").value=localDT(new Date(Date.now()+5*60000));
   const ok=await computeRoute();
-  if(!ok){ aiMsg("err","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário."); return; }
+  if(!ok){ aiMsg("err",t("Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.")); return; }
   buildRecommendation(cand);
 }
 function tripTransitions(R){
@@ -2048,72 +2867,72 @@ function buildRecommendation(cand){
   const adv=[]; const A=(icon,txt)=>adv.push({icon,txt});
   let lvl,title,emoji;
   if(hard){
-    lvl=3; emoji="⛔"; title="Não vás de moto nesta viagem";
-    A("⚠️","Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.");
-    A("🚗", canWait?`Vai de carro/transportes — ou espera: às ${fmtHM(best.dep)} o trajeto já fica decente.`
-      :"Vai de carro ou de transportes públicos; o risco não compensa.");
+    lvl=3; emoji="⛔"; title=t("Não vás de moto nesta viagem");
+    A("⚠️",t("Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar."));
+    A("🚗", canWait?t("Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.",{h:fmtHM(best.dep)})
+      :t("Vai de carro ou de transportes públicos; o risco não compensa."));
   } else if(worst>=2){
     if(canWait){
-      lvl=1; emoji="⏳"; title=`Espera um pouco — sai às ${fmtHM(best.dep)}`;
-      A("🌧️",`Se saíres já, apanhas chuva em ~${fmtN(wetKm,0)} km; às ${fmtHM(best.dep)} vais ${best.wet<0.5?"praticamente seco":`só com ~${fmtN(best.wet,0)} km molhados`}.`);
-      A("🧥","Se não puderes esperar: fato de chuva completo e reduz a velocidade no molhado.");
+      lvl=1; emoji="⏳"; title=t("Espera um pouco — sai às {h}",{h:fmtHM(best.dep)});
+      A("🌧️",t("Se saíres já, apanhas chuva em ~{n} km; às {h} vais {x}.",{n:fmtN(wetKm,0),h:fmtHM(best.dep),x:best.wet<0.5?t("praticamente seco"):t("só com ~{n} km molhados",{n:fmtN(best.wet,0)})}));
+      A("🧥",t("Se não puderes esperar: fato de chuva completo e reduz a velocidade no molhado."));
     } else {
-      lvl=2; emoji="🌧️"; title="De moto vais apanhar chuva — pondera outro transporte";
-      A("🌧️",`Chuva em ~${fmtN(wetKm,0)} km do trajeto (${rnd(wetKm/R.totalKm*100)}%), e não melhora nas próximas 4 horas.`);
-      A("🚗","Se tiveres alternativa (carro, transportes), hoje é o dia de a usar. Se fores mesmo: fato de chuva completo, viseira limpa e o dobro da distância de travagem.");
+      lvl=2; emoji="🌧️"; title=t("De moto vais apanhar chuva — pondera outro transporte");
+      A("🌧️",t("Chuva em ~{n} km do trajeto ({p}%), e não melhora nas próximas 4 horas.",{n:fmtN(wetKm,0),p:rnd(wetKm/R.totalKm*100)}));
+      A("🚗",t("Se tiveres alternativa (carro, transportes), hoje é o dia de a usar. Se fores mesmo: fato de chuva completo, viseira limpa e o dobro da distância de travagem."));
     }
   } else if(worst===1){
-    lvl=1; emoji="🟡"; title="Podes ir de moto — mas leva o fato de chuva";
-    A("🌦️","Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão.");
+    lvl=1; emoji="🟡"; title=t("Podes ir de moto — mas leva o fato de chuva");
+    A("🌦️",t("Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão."));
   } else {
-    lvl=0; emoji="✅"; title="Sim — vai de moto!";
-    A("😎",`Trajeto seco até ${cand.name} a esta hora.`);
+    lvl=0; emoji="✅"; title=t("Sim — vai de moto!");
+    A("😎",t("Trajeto seco até {p} a esta hora.",{p:cand.name}));
   }
   // vento — reporta sempre
   if(wind.gustMax>=60){
-    if(lvl<2){ lvl=2; emoji="💨"; title="Vento demasiado forte para ir descansado"; }
-    A("💨",`Rajadas até ${rnd(wind.gustMax)} km/h, vento ${wind.desc}${wind.crossPlace?`, com lateral forte perto do km ${rnd(wind.crossKm)}`:""} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.`);
+    if(lvl<2){ lvl=2; emoji="💨"; title=t("Vento demasiado forte para ir descansado"); }
+    A("💨",t("Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.",{g:rnd(wind.gustMax),d:wind.desc,x:wind.crossPlace?t(", com lateral forte perto do km {k}",{k:rnd(wind.crossKm)}):""}));
   } else if(wind.gustMax>=45){
     if(lvl<1) lvl=1;
-    A("💨",`Rajadas até ${rnd(wind.gustMax)} km/h, vento ${wind.desc}${wind.crossPlace?` com lateral perto do km ${rnd(wind.crossKm)}`:""} — firme no guiador em pontes e zonas expostas.`);
+    A("💨",t("Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.",{g:rnd(wind.gustMax),d:wind.desc,x:wind.crossPlace?t(" com lateral perto do km {k}",{k:rnd(wind.crossKm)}):""}));
   } else {
-    A("💨",`Vento tranquilo: rajadas máximas de ${rnd(wind.gustMax)} km/h, ${wind.desc}.`);
+    A("💨",t("Vento tranquilo: rajadas máximas de {g} km/h, {d}.",{g:rnd(wind.gustMax),d:wind.desc}));
   }
   // roupa
-  if(minT<=6) A("🥶",`Frio a sério (mínima de ${rnd(minT)}° no percurso): luvas de inverno, camada térmica e corta-vento.`);
-  else if(minT<=13) A("🧥",`Leva casaco quente: mínima de ${rnd(minT)}° no percurso — em andamento sente-se bastante menos.`);
-  else if(minT>=30) A("🥵","Muito calor: hidrata-te antes de sair e usa equipamento ventilado.");
-  else A("👕",`Temperatura amena (mín. ${rnd(minT)}°) — equipamento habitual com casaco serve.`);
+  if(minT<=6) A("🥶",t("Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.",{t:rnd(minT)}));
+  else if(minT<=13) A("🧥",t("Leva casaco quente: mínima de {t}° no percurso — em andamento sente-se bastante menos.",{t:rnd(minT)}));
+  else if(minT>=30) A("🥵",t("Muito calor: hidrata-te antes de sair e usa equipamento ventilado."));
+  else A("👕",t("Temperatura amena (mín. {t}°) — equipamento habitual com casaco serve.",{t:rnd(minT)}));
   // noite
   const sunset=state.wx?.daily?.sunset?.find(x=>isSameDay(x,R.dep+R.shift*60));
-  if(sunset&&(R.arrive??0)>sunset) A("🌙","Chegas depois do pôr-do-sol — luzes verificadas e algo refletor.");
+  if(sunset&&(R.arrive??0)>sunset) A("🌙",t("Chegas depois do pôr-do-sol — luzes verificadas e algo refletor."));
   // linha do tempo da viagem
   const tr=tripTransitions(R);
   if(tr.length>1){
     const parts=tr.slice(0,5).map((t,i)=>`${fmtHM(t.eta)}${i===0?"":` (km ${rnd(t.km)})`} ${rainLabel(t.lvl).toLowerCase()}`);
-    A("🗺️","Ao longo do caminho: "+parts.join(" → ")+".");
+    A("🗺️",t("Ao longo do caminho: {x}.",{x:parts.join(" → ")}));
   }
   // render
   const rec=el("div",`rec lvl${lvl}`); rec.setAttribute("data-test","ai-rec");
   const tt=el("div","rec-title"); tt.append(el("span",null,emoji), el("span",null,title));
   rec.appendChild(tt);
   rec.appendChild(el("div","rec-sub",
-    `${R.o.name} → ${cand.name}${cand.sub?` (${cand.sub})`:""} · ${fmtN(R.totalKm,1)} km · ${fmtDur(R.travelTotal)} · chegada ~${fmtHM(R.arrive??(R.dep+R.travelTotal))}`));
+    `${R.o.name} → ${cand.name}${cand.sub?` (${cand.sub})`:""} · ${fmtN(R.totalKm,1)} km · ${fmtDur(R.travelTotal)} · ${t("chegada")} ~${fmtHM(R.arrive??(R.dep+R.travelTotal))}`));
   const ul=el("ul");
   adv.forEach(a=>{ const li=el("li"); li.append(el("span","r-ico",a.icon), el("span",null,a.txt)); ul.appendChild(li); });
   rec.appendChild(ul);
   const acts=el("div","rec-actions");
   if(canWait&&!hard){
-    const b=el("button","btn primary",`🕒 Aplicar partida às ${fmtHM(best.dep)}`);
+    const b=el("button","btn primary",t("🕒 Aplicar partida às {h}",{h:fmtHM(best.dep)}));
     b.addEventListener("click",()=>{
       $("#rt-when").value=localDT(new Date(best.dep*1000));
       applyShift(best.sh);
-      toast(`Partida ajustada para as ${fmtHM(best.dep)} ✔`);
+      toast(t("Partida ajustada para as {h} ✔",{h:fmtHM(best.dep)}));
       buildRecommendation(cand);
     });
     acts.appendChild(b);
   }
-  const m=el("button","btn","🗺️ Ver no mapa");
+  const m=el("button","btn",t("🗺️ Ver no mapa"));
   m.addEventListener("click",()=>$("#map-route").scrollIntoView({behavior:"smooth",block:"center"}));
   acts.appendChild(m);
   rec.appendChild(acts);
@@ -2139,11 +2958,11 @@ function travelNotify(){
   try{
     if(!("Notification" in window)||Notification.permission!=="granted") return;
     const now=Date.now(); if(now-travel.lastNotif<25000) return; travel.lastNotif=now;
-    const opts={body:`${$("#tb-next").textContent}\n${$("#tb-sub").textContent}`,
-      tag:"vdm-travel", silent:true};
+    const opts={body:`🎯 ${state.route?.d?.name??""}\n${$("#tb-next").textContent}\n${$("#tb-sub").textContent}`,
+      tag:"vdm-travel", silent:true, requireInteraction:true, renotify:false};
     if(navigator.serviceWorker&&navigator.serviceWorker.controller){
-      navigator.serviceWorker.ready.then(r=>r.showNotification("🏍️ Vou de Moto — em viagem",opts)).catch(()=>{});
-    } else { try{ new Notification("🏍️ Vou de Moto — em viagem",opts); }catch(e){} }
+      navigator.serviceWorker.ready.then(r=>r.showNotification(t("🏍️ Vou de Moto — em viagem"),opts)).catch(()=>{});
+    } else { try{ new Notification(t("🏍️ Vou de Moto — em viagem"),opts); }catch(e){} }
   }catch(e){}
 }
 function travelNotifyClose(){
@@ -2164,35 +2983,35 @@ function maybeAutoTravel(){
     if(sp!=null&&sp>3.5) autoT.hits++; else if(sp!=null) autoT.hits=0;
     if(autoT.hits>=2){
       stopAutoTravel(); autoT.used=true;
-      toast("🏍️ Detetei que estás em andamento — Modo Viagem ligado.");
+      toast(t("🏍️ Detetei que estás em andamento — Modo Viagem ligado."));
       startTravel();
     }
   },()=>stopAutoTravel(),{enableHighAccuracy:false, maximumAge:5000, timeout:30000});
   setTimeout(stopAutoTravel, 10*60000);
 }
 function speak(txt){ try{ if(!("speechSynthesis" in window)) return;
-  const u=new SpeechSynthesisUtterance(txt); u.lang="pt-PT"; u.rate=1.03; speechSynthesis.speak(u); }catch(e){} }
+  const u=new SpeechSynthesisUtterance(txt); u.lang=SPEECH_LANGS[state.lang]||"pt-PT"; u.rate=1.03; speechSynthesis.speak(u); }catch(e){} }
 function buzz(pat){ try{ navigator.vibrate&&navigator.vibrate(pat); }catch(e){} }
 
 async function startTravel(){
   const R=state.route;
-  if(!R){ toast("Calcula primeiro uma rota."); return; }
-  if(!navigator.geolocation){ toast("Este dispositivo não dá acesso ao GPS."); return; }
+  if(!R){ toast(t("Calcula primeiro uma rota.")); return; }
+  if(!navigator.geolocation){ toast(t("Este dispositivo não dá acesso ao GPS.")); return; }
   travel.active=true; travel.alerted.clear(); travel.lastRecalc=0; travel.lastPaint=0;
   travel.geomIdx=0; travel.kmDone=0; travel.lastNotif=0;
   stopAutoTravel();
   document.body.classList.add("traveling");
   $("#travel-bar").style.display="flex";
-  $("#tb-next").textContent="🧭 Modo viagem ligado";
-  $("#tb-sub").textContent="à procura do teu GPS…";
+  $("#tb-next").textContent=t("🧭 Modo viagem ligado");
+  $("#tb-sub").textContent=t("à procura do teu GPS…");
   try{ travel.wakeLock=await navigator.wakeLock?.request?.("screen"); }catch(e){}
   try{ if("Notification" in window&&Notification.permission==="default") Notification.requestPermission(); }catch(e){}
   store.set("travel",{hash:location.hash||"", at:Date.now()});
   travel.watch=navigator.geolocation.watchPosition(onTravelPos,
-    ()=>{ $("#tb-sub").textContent="sem sinal GPS — continuo a tentar…"; },
+    ()=>{ $("#tb-sub").textContent=t("sem sinal GPS — continuo a tentar…"); },
     {enableHighAccuracy:true, maximumAge:3000, timeout:20000});
-  speak("Modo viagem ligado. Boa estrada.");
-  toast("🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso.");
+  speak(t("Modo viagem ligado. Boa estrada."));
+  toast(t("🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso."));
   updateTravelButtons();
 }
 function stopTravel(msg){
@@ -2205,13 +3024,14 @@ function stopTravel(msg){
   $("#travel-bar").style.display="none";
   store.del("travel");
   travelNotifyClose();
+  try{ state.maps.route&&state.maps.route.setBearing&&state.maps.route.setBearing(0); }catch(e){}
   if(state.route&&state.maps.route) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
   updateTravelButtons();
 }
 function updateTravelButtons(){
   const b=$("#btn-travel");
-  if(b) b.textContent=travel.active?"🛑 Terminar modo viagem":"🧭 Modo viagem (avisos de chuva)";
+  if(b) b.textContent=travel.active?t("🛑 Terminar modo viagem"):t("🧭 Modo viagem (avisos de chuva)");
 }
 function nearestSampleIdx(pos){
   const R=state.route; let bi=0,bd=1e12;
@@ -2230,11 +3050,15 @@ function onTravelPos(p){
         icon:L.divIcon({className:"", html:'<div class="me-pin"></div>', iconSize:[22,22], iconAnchor:[11,11]})})
         .addTo(state.maps.route);
     } else travel.marker.setLatLng([pos.lat,pos.lon]);
-    try{ if(!state.maps.route.getBounds().contains([pos.lat,pos.lon])) state.maps.route.panTo([pos.lat,pos.lon]); }catch(e){}
+    try{ if(travel.follow!==false&&!state.maps.route.getBounds().pad(-0.25).contains([pos.lat,pos.lon])) state.maps.route.panTo([pos.lat,pos.lon]); }catch(e){}
+    // course-up: roda o mapa para a tua direção (como o Google Maps)
+    try{ const hd=p.coords.heading;
+      if(state.maps.route.setBearing&&hd!=null&&!isNaN(hd)&&(p.coords.speed||0)>2) state.maps.route.setBearing(-hd);
+    }catch(e){}
   }
   const {i:idx, off}=nearestSampleIdx(pos);
   const here=R.samples[idx];
-  if(off>4){ $("#tb-sub").textContent=`estás a ${fmtN(off,1)} km da rota traçada — recalcula se mudaste de caminho`; return; }
+  if(off>4){ $("#tb-sub").textContent=t("estás a {d} km da rota traçada — recalcula se mudaste de caminho",{d:fmtN(off,1)}); return; }
   // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
   const pj=travelProject(pos);
   travel.geomIdx=pj.idx; travel.kmDone=pj.km;
@@ -2260,7 +3084,7 @@ function onTravelPos(p){
         if(dc<=th&&dc>-0.05&&!travel.alerted.has(key)){
           travel.alerted.add(key);
           buzz([180,80,180]);
-          speak(`Radar de velocidade dentro de ${lab}.${nextCam.max?` Limite ${String(nextCam.max).replace(/\D/g,"")}.`:""}`);
+          speak(t("Radar de velocidade dentro de {x}.",{x:t(lab)})+(nextCam.max?" "+t("Limite {v}.",{v:String(nextCam.max).replace(/\D/g,"")}):""));
           break;
         }
       }
@@ -2271,27 +3095,27 @@ function onTravelPos(p){
   const remKm=Math.max(0,last.km-kmNow);
   const etaArr=now+Math.max(0,last.travelSec-here.travelSec);
   if(haversine(pos,last)<0.35&&idx>=R.samples.length-2){
-    speak("Chegaste ao destino. Boa!"); buzz([120,60,120]);
-    stopTravel("🎉 Chegaste! Modo viagem terminado."); return;
+    speak(t("Chegaste ao destino. Boa!")); buzz([120,60,120]);
+    stopTravel(t("🎉 Chegaste! Modo viagem terminado.")); return;
   }
   // próxima zona de chuva à frente
   let next=null, nextWarn=null;
   for(let k=idx;k<R.samples.length;k++){ if(R.samples[k].cond.lvl>=2){ next=R.samples[k]; break; } }
   if(!next) for(let k=idx;k<R.samples.length;k++){ if(R.samples[k].cond.lvl>=1){ nextWarn=R.samples[k]; break; } }
   if(here.cond.lvl>=2){
-    $("#tb-next").textContent=`🌧️ Estás na zona de chuva (${rainLabel(here.cond.lvl).toLowerCase()})`;
-    $("#tb-sub").textContent=`faltam ${fmtN(remKm,1)} km · chegada ~${fmtHM(etaArr)}`;
+    $("#tb-next").textContent=t("🌧️ Estás na zona de chuva ({x})",{x:rainLabel(here.cond.lvl).toLowerCase()});
+    $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
     const key="in-"+Math.floor(here.km/3);
     if(!travel.alerted.has(key)){ travel.alerted.add(key); buzz([250,100,250]); }
   } else if(next){
     const dist=Math.max(0,next.km-kmNow);
     const mins=Math.max(0,Math.round((next.travelSec-here.travelSec)/60));
-    $("#tb-next").textContent=`🌧️ Chuva dentro de ~${mins} min (${fmtN(dist,1)} km)`;
-    $("#tb-sub").textContent=`por volta das ${fmtHM(next.eta)} · faltam ${fmtN(remKm,1)} km até ao destino`;
+    $("#tb-next").textContent=t("🌧️ Chuva dentro de ~{m} min ({d} km)",{m:mins,d:fmtN(dist,1)});
+    $("#tb-sub").textContent=t("por volta das {h} · faltam {d} km até ao destino",{h:fmtHM(next.eta),d:fmtN(remKm,1)});
     // dica de fuga: parar e deixar a célula passar?
     const esc=(delay)=>{ const c=sampleAt(next,next.eta+delay); return c&&rainLevel(c.pr,c.pp,c.code)<2; };
-    const tip= esc(1200)?"Dica: se parares uns vinte minutos, escapas a esta chuva."
-             : esc(2400)?"Dica: se parares uns quarenta minutos, escapas a esta chuva."
+    const tip= esc(1200)?t("Dica: se parares uns vinte minutos, escapas a esta chuva.")
+             : esc(2400)?t("Dica: se parares uns quarenta minutos, escapas a esta chuva.")
              : "";
     const zone=`z${next.km.toFixed(0)}`;
     const fire=(key,msg)=>{
@@ -2302,15 +3126,15 @@ function onTravelPos(p){
       const bar=$("#travel-bar"); bar.classList.remove("alert"); void bar.offsetWidth; bar.classList.add("alert");
       return true;
     };
-    if(dist<=0.8) fire(zone+"-fim","Atenção: chuva já a seguir. Abranda e liga as luzes.");
-    else if(mins<=5) fire(zone+"-m5",`Atenção: chuva dentro de cerca de ${Math.max(1,mins)} minutos. ${tip||"Última oportunidade para parar num sítio seco."}`);
-    else if(mins<=12) fire(zone+"-m12",`Aviso antecipado: chuva dentro de cerca de ${mins} minutos, a ${Math.round(dist)} quilómetros. ${tip||"Tens tempo para parar ou mudar de caminho na aplicação."}`);
+    if(dist<=0.8) fire(zone+"-fim",t("Atenção: chuva já a seguir. Abranda e liga as luzes."));
+    else if(mins<=5) fire(zone+"-m5",t("Atenção: chuva dentro de cerca de {m} minutos. {x}",{m:Math.max(1,mins),x:tip||t("Última oportunidade para parar num sítio seco.")}));
+    else if(mins<=12) fire(zone+"-m12",t("Aviso antecipado: chuva dentro de cerca de {m} minutos, a {d} quilómetros. {x}",{m:mins,d:Math.round(dist),x:tip||t("Tens tempo para parar ou mudar de caminho na aplicação.")}));
   } else if(nextWarn){
-    $("#tb-next").textContent=`⚠️ Possível chuvisco dentro de ${fmtN(Math.max(0,nextWarn.km-kmNow),1)} km`;
-    $("#tb-sub").textContent=`faltam ${fmtN(remKm,1)} km · chegada ~${fmtHM(etaArr)}`;
+    $("#tb-next").textContent=t("⚠️ Possível chuvisco dentro de {d} km",{d:fmtN(Math.max(0,nextWarn.km-kmNow),1)});
+    $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
   } else {
-    $("#tb-next").textContent="✅ Caminho seco daqui até ao destino";
-    $("#tb-sub").textContent=`faltam ${fmtN(remKm,1)} km · chegada ~${fmtHM(etaArr)}`;
+    $("#tb-next").textContent=t("✅ Caminho seco daqui até ao destino");
+    $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
   }
   travelNotify(); // progresso na barra de notificações
 }
@@ -2346,7 +3170,7 @@ async function sentinelCheck(){
   sentinel.checking=true;
   try{
     const pos=(await freshPos())||state.home;
-    if(!pos){ $("#sentinel-status").textContent="Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade."; return; }
+    if(!pos){ $("#sentinel-status").textContent=t("Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade."); return; }
     const j=await fetchSentinelWx(pos.lat,pos.lon);
     const now=Date.now()/1000;
     const M=j.minutely_15||{}, times=M.time||[], prs=M.precipitation||[];
@@ -2359,41 +3183,41 @@ async function sentinelCheck(){
     const H=j.hourly||{}; let thunderAt=-1;
     (H.time||[]).forEach((t,k)=>{ if(thunderAt<0&&t>now&&t<now+2.5*3600&&THUNDER.includes(H.weather_code?.[k])) thunderAt=t; });
     if(thunderAt>0) sentinelAlert("th-"+Math.floor(thunderAt/3600),
-      `Trovoada prevista por volta das ${fmtHM(thunderAt)}. Se tens a moto na rua, recolhe-a.`,true);
+      t("Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.",{h:fmtHM(thunderAt)}),true);
     if(!curWet&&startIdx>=0){
       const mins=Math.max(1,Math.round((times[startIdx]-now)/60));
       if(mins<=45) sentinelAlert("start-"+times[startIdx],
-        `Chuva a chegar à tua zona dentro de cerca de ${mins} minutos.`,true);
+        t("Chuva a chegar à tua zona dentro de cerca de {m} minutos.",{m:mins}),true);
     }
     if(curWet&&stopIdx>=0){
       const mins=Math.max(1,Math.round((times[stopIdx]-now)/60));
-      sentinelAlert("stop-"+times[stopIdx],`Boa notícia: a chuva deve parar dentro de ${mins} minutos.`);
+      sentinelAlert("stop-"+times[stopIdx],t("Boa notícia: a chuva deve parar dentro de {m} minutos.",{m:mins}));
     }
     if(gust>=45&&(sentinel.last?.gust??0)<gust-8)
-      sentinelAlert("gust-"+Math.round(gust/10),`O vento subiu: rajadas de ${Math.round(gust)} quilómetros por hora.`);
+      sentinelAlert("gust-"+Math.round(gust/10),t("O vento subiu: rajadas de {g} quilómetros por hora.",{g:Math.round(gust)}));
     sentinel.last={gust, curWet};
     let st;
-    if(curWet) st=stopIdx>=0?`🌧️ A chover agora — deve parar ~${fmtHM(times[stopIdx])}.`:"🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.";
-    else if(startIdx>=0) st=`☁️ Chuva a caminho: ~${fmtHM(times[startIdx])}.`;
-    else st="✅ Sem chuva à vista nas próximas 2 horas.";
-    $("#sentinel-status").textContent=`Ligada · ${pos.name||"posição atual"} · última verificação ${fmtHM(now)} — ${st} Rajadas atuais: ${Math.round(gust)} km/h. Mantém a app aberta para os avisos chegarem.`;
+    if(curWet) st=stopIdx>=0?t("🌧️ A chover agora — deve parar ~{h}.",{h:fmtHM(times[stopIdx])}):t("🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.");
+    else if(startIdx>=0) st=t("☁️ Chuva a caminho: ~{h}.",{h:fmtHM(times[startIdx])});
+    else st=t("✅ Sem chuva à vista nas próximas 2 horas.");
+    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:Math.round(gust)});
   }catch(e){
-    $("#sentinel-status").textContent="Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.";
+    $("#sentinel-status").textContent=t("Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.");
   }finally{ sentinel.checking=false; }
 }
 async function toggleSentinel(){
   const b=$("#btn-sentinel");
   if(sentinel.on){
     sentinel.on=false; clearInterval(sentinel.timer); sentinel.timer=null;
-    b.textContent="Ligar";
-    $("#sentinel-status").textContent="Desligada. Liga para eu vigiar o tempo onde estás e avisar-te quando mudar.";
-    toast("Sentinela desligada.");
+    b.textContent=t("Ligar");
+    $("#sentinel-status").textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
+    toast(t("Sentinela desligada."));
     return;
   }
   sentinel.on=true; sentinel.lastAlerts.clear(); sentinel.last=null;
-  b.textContent="🛑 Desligar";
+  b.textContent=t("🛑 Desligar");
   try{ if("Notification" in window&&Notification.permission==="default") await Notification.requestPermission(); }catch(e){}
-  toast("🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.");
+  toast(t("🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos."));
   sentinelCheck();
   sentinel.timer=setInterval(sentinelCheck,150000);
 }
@@ -2454,19 +3278,19 @@ async function loadRadarMeta(){
   return state.radar.frames;
 }
 function initRadar(){
-  if(typeof L==="undefined"){ toast("Radar indisponível sem internet."); return; }
+  if(typeof L==="undefined"){ toast(t("Radar indisponível sem internet.")); return; }
   if(state.maps.radar){ state.maps.radar.invalidateSize(); return; }
-  const m=L.map("map-radar").setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
+  const m=L.map("map-radar",(L.Map.prototype.setBearing&&!window.__noRotate)?{rotate:true,touchRotate:true,rotateControl:{closeOnZeroBearing:false}}:{}).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
   m._base=cartoLayer().addTo(m);
   state.maps.radar=m;
   loadRadarMeta().then(frames=>{
-    if(!frames.length){ toast("Radar sem dados de momento."); return; }
+    if(!frames.length){ toast(t("Radar sem dados de momento.")); return; }
     const sl=$("#radar-slider");
     sl.max=String(frames.length-1);
     const lastPast=frames.reduce((acc,f,i)=>f.now?acc:i,0);
     sl.value=String(lastPast);
     showRadarFrame(lastPast);
-  }).catch(()=>toast("Não consegui carregar o radar."));
+  }).catch(()=>toast(t("Não consegui carregar o radar.")));
 }
 function showRadarFrame(idx){
   const R=state.radar, m=state.maps.radar;
@@ -2485,7 +3309,7 @@ function showRadarFrame(idx){
   const lab=$("#radar-time");
   lab.textContent="";
   lab.append(document.createTextNode(fmtHM(fr.time)),
-    el("span",null, fr.now?"previsão imediata":"radar real"));
+    el("span",null, fr.now?t("previsão imediata"):t("radar real")));
 }
 function radarPlay(on){
   const R=state.radar;
@@ -2520,6 +3344,14 @@ function setTheme(t){
 }
 
 function init(){
+  // idioma + estáticos
+  document.documentElement.lang=state.lang;
+  applyStaticI18n();
+  $$("#lang-row .chip").forEach(c=>{ c.classList.toggle("sel",c.dataset.lang===state.lang);
+    c.addEventListener("click",()=>setLang(c.dataset.lang)); });
+  renderFavRow();
+  $("#btn-plan-toggle").addEventListener("click",()=>$("#plan-card").classList.toggle("open"));
+
   // tema: sistema por defeito; a tua escolha fica memorizada
   if(matchMedia&&matchMedia("(prefers-color-scheme: light)").matches) setTheme("light");
   const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth);
@@ -2535,7 +3367,7 @@ function init(){
   $$("#profile-radios input").forEach(r=>r.addEventListener("change",()=>{
     state.profile=r.value;
     store.set("profile",r.value);
-    toast(`Perfil: ${r.value} ✔`);
+    toast(t("Perfil: {p} ✔",{p:t(r.value.charAt(0).toUpperCase()+r.value.slice(1))}));
     if(state.wx) renderDashboard();
     if(state.route){ applyShift(state.route.shift); renderDepartures(); }
   }));
@@ -2544,7 +3376,7 @@ function init(){
   $$(".tab").forEach(t=>t.addEventListener("click",()=>switchTab(t.dataset.view)));
 
   // pesquisa de localização + GPS
-  attachAC($("#loc-search"),$("#loc-results"),(it)=>{ setHome(it); $("#loc-search").value=""; toast(`Previsão para ${it.name}`); });
+  attachAC($("#loc-search"),$("#loc-results"),(it)=>{ setHome(it); $("#loc-search").value=""; toast(t("Previsão para {p}",{p:it.name})); });
   $("#btn-gps").addEventListener("click",()=>useGPS(false));
 
   // rota
@@ -2592,19 +3424,19 @@ function init(){
   let deferredPrompt=null;
   addEventListener("beforeinstallprompt",(e)=>{ e.preventDefault(); deferredPrompt=e; $("#btn-install").style.display="inline-flex"; });
   $("#btn-install").addEventListener("click",async ()=>{
-    if(!deferredPrompt){ toast("Menu do browser → “Adicionar ao ecrã principal”."); return; }
+    if(!deferredPrompt){ toast(t("Menu do browser → “Adicionar ao ecrã principal”.")); return; }
     deferredPrompt.prompt();
     const r=await deferredPrompt.userChoice.catch(()=>null);
-    if(r&&r.outcome==="accepted"){ toast("Instalada! Procura o ícone no teu ecrã 🏍️"); $("#btn-install").style.display="none"; }
+    if(r&&r.outcome==="accepted"){ toast(t("Instalada! Procura o ícone no teu ecrã 🏍️")); $("#btn-install").style.display="none"; }
     deferredPrompt=null;
   });
-  addEventListener("appinstalled",()=>{ $("#btn-install").style.display="none"; toast("App instalada! 🏍️"); });
+  addEventListener("appinstalled",()=>{ $("#btn-install").style.display="none"; toast(t("App instalada! 🏍️")); });
   if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){
     addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
   }
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   if(isIOS&&!navigator.standalone&&/^https?:$/.test(location.protocol)){
-    setTimeout(()=>toast("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.",7000),4000);
+    setTimeout(()=>toast(t("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app."),7000),4000);
   }
 
   // restaurar rota (URL #r2=… ou memória da última viagem — nada se perde ao fechar)
@@ -2623,11 +3455,13 @@ function init(){
       if([...sel.options].some(op=>op.value===pauseMin)) sel.value=pauseMin;
       const dep=+h[2];
       if(dep*1000>Date.now()) when.value=localDT(new Date(dep*1000));
+      $("#plan-card").classList.add("open");
       switchTab("rota");
       setTimeout(computeRoute,300);
       return true;
     }catch(e){ return false; }
   };
+  state._restore=tryRestore;
   let restored=tryRestore(location.hash);
   const tv=store.get("travel");
   if(tv&&Date.now()-(tv.at||0)>12*3600*1000){ store.del("travel"); }
