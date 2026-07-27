@@ -1,8 +1,7 @@
-/* Vou de Moto? — service worker: app abre offline (os dados meteo precisam de rede) */
-const V = "vdm-v3";
+/* Vou de Moto? — service worker v4: app atualiza sempre que há rede; offline usa a cache */
+const V = "vdm-v4";
 const SHELL = [
-  "./", "./index.html", "./manifest.webmanifest",
-  "./icon.svg",
+  "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
 ];
@@ -18,16 +17,24 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   const u = new URL(e.request.url);
-  const isShell = u.origin === self.location.origin || u.host === "cdnjs.cloudflare.com";
-  if (!isShell) return; // APIs meteo/rotas/radar: sempre rede (dados frescos)
+  const sameOrigin = u.origin === self.location.origin;
+  const isCDN = u.host === "cdnjs.cloudflare.com";
+  if (!sameOrigin && !isCDN) return; // APIs meteo/rotas/radar: sempre rede (dados frescos)
+  const putCache = (res) => {
+    const copy = res.clone();
+    caches.open(V).then((c) => c.put(e.request, copy)).catch(() => {});
+    return res;
+  };
+  if (e.request.mode === "navigate" || (sameOrigin && /index\.html$/.test(u.pathname))) {
+    e.respondWith(
+      fetch(e.request).then(putCache)
+        .catch(() => caches.match(e.request, { ignoreSearch: true })
+          .then((h) => h || caches.match("./index.html")))
+    );
+    return;
+  }
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: u.origin === self.location.origin }).then((hit) =>
-      hit ||
-      fetch(e.request).then((res) => {
-        const copy = res.clone();
-        caches.open(V).then((c) => c.put(e.request, copy)).catch(() => {});
-        return res;
-      }).catch(() => caches.match("./index.html"))
-    )
+    caches.match(e.request, { ignoreSearch: sameOrigin })
+      .then((hit) => hit || fetch(e.request).then(putCache))
   );
 });
