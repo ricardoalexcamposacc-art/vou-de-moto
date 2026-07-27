@@ -129,7 +129,7 @@ a{color:var(--accent)}
 .score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .score-in{display:flex;flex-direction:column;align-items:center;line-height:1}
 .score-num{font-size:34px;font-weight:800;letter-spacing:-.03em}
-.score-lab{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.score-lab{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;max-width:92%;text-align:center;white-space:nowrap}
 .hero-main{min-width:0;flex:1}
 .hero-emoji{font-size:15px}
 .hero-title{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -324,7 +324,7 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
 
 /* ================= POLIMENTO (nível loja) ================= */
 body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.brand-tile{width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,#2a78d6,#0d366b);
+.brand-tile{width:42px;height:42px;border-radius:13px;object-fit:cover;display:block;background:linear-gradient(140deg,#2a78d6,#0d366b);
   display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 4px 14px -6px rgba(26,90,180,.55)}
 .brand-name{font-size:19px;font-weight:800}
 .card{border-radius:18px;padding:18px;margin-bottom:12px}
@@ -368,6 +368,10 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   footer{font-size:11px}
 }
 .legs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.stay-line{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:13.5px;line-height:1.45;background:var(--surface2);border-left:3px solid #0ca30c}
+.stay-line.lvl1{border-left-color:#fab219}
+.stay-line.lvl2{border-left-color:#ec835a}
+.stay-line.lvl3{border-left-color:#d03b3b}
 .leg-row{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink2);flex-wrap:wrap}
 .leg-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:750;font-size:11px;flex:none}
 .leg-main{flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--ink)}
@@ -385,7 +389,7 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 <div class="wrap">
   <header class="app-head">
     <div class="brand">
-      <div class="brand-tile" aria-hidden="true">🏍️</div>
+      <img class="brand-tile" alt="" src="data:image/jpeg;base64,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">
       <div>
         <div class="brand-name">Vou de Moto?</div>
         <div class="brand-sub">meteorologia para motociclistas · 100% grátis</div>
@@ -502,6 +506,18 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
         <div class="field">
           <label for="rt-when">Hora de partida</label>
           <input type="datetime-local" id="rt-when">
+        </div>
+        <div class="field">
+          <label for="rt-stay">Tempo no destino</label>
+          <select id="rt-stay" class="sel" style="width:100%" title="Quanto tempo contas ficar no destino" aria-label="Tempo no destino">
+            <option value="-1" selected>o resto do dia</option>
+            <option value="0">só passo lá</option>
+            <option value="60">~1 h</option>
+            <option value="120">~2 h</option>
+            <option value="180">~3 h</option>
+            <option value="240">~4 h</option>
+            <option value="360">~6 h</option>
+          </select>
         </div>
       </div>
       <div class="route-actions">
@@ -647,6 +663,7 @@ function applyStaticI18n(){
     ["#rt-o","ph","📍 Ponto de partida"], ["#rt-d","ph","🏁 Para onde vais?"],
     ['label[for="rt-o"]',"txt","Origem"], ['label[for="rt-d"]',"txt","Destino"],
     ['label[for="rt-when"]',"txt","Hora de partida"],
+    ['label[for="rt-stay"]',"txt","Tempo no destino"],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
     ["#lang-title","txt","Idioma"],
   ];
@@ -665,6 +682,10 @@ function applyStaticI18n(){
     const s=el("span","muted",`(${t("até 4")})`); s.style.fontWeight="400"; stopsLab.appendChild(s); }
   $$("#stop-pause option").forEach(o=>{ const v=+o.value;
     o.textContent=v===0?t("fico 0 min"):v===60?t("fico 1 h"):t("fico {n} min",{n:v}); });
+  $$("#rt-stay option").forEach(o=>{ const v=+o.value;
+    if(v===-1) o.textContent=t("o resto do dia");
+    else if(v===0) o.textContent=t("só passo lá");
+    else o.textContent=v<60?`~${v} min`:`~${v/60} h`; });
   $$(".chip.click[data-dep]").forEach(c=>{ const m=+c.dataset.dep;
     c.textContent=m===0?t("Agora"):`+${m/60} h`; });
   // legenda do mapa
@@ -1207,6 +1228,25 @@ Object.assign(I18N.en,{
 "Guardar destino":"Save place","Guardar rota":"Save route","Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Name it (e.g. Home, Work, John's place)",
 "Nome da rota?":"Route name?","Guardado: {p} ⭐":"Saved: {p} ⭐","Apagado: {p}":"Deleted: {p}","Apagar":"Delete",
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Plan manually (stops, departure time)",
+"🔄 Saíste da rota — a recalcular…":"🔄 Off route — recalculating…","um instante…":"one moment…","A tua posição":"Your position",
+"Rota recalculada.":"Route recalculated.","🔄 Rota recalculada a partir da tua posição.":"🔄 Route recalculated from your position.",
+"não consegui recalcular — verifica a ligação; volto a tentar":"couldn't recalculate — check your connection; I'll retry",
+"estás a {d} km da rota — vou recalcular":"you're {d} km off route — recalculating",
+"🏍️ A moto pode ficar cá fora":"🏍️ Your bike can stay outside","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ No rain expected {w}. Feel free to leave it out.",
+"🌧️ Abriga a moto":"🌧️ Put the bike under cover","Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.":"Rain expected around {h}. If you can, park the bike under cover.",
+"🌧️ Vai começar a chover":"🌧️ Rain is about to start","Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Rain around {h} — if the bike is outside, put it away now.",
+"nas próximas {n} horas":"in the next {n} hours","até à tua próxima viagem ({h})":"until your next trip ({h})",
+"Tempo no destino":"Time at destination","o resto do dia":"the rest of the day","só passo lá":"just passing by",
+"até ao fim do dia":"until the end of the day","seco":"dry","chuvisco":"drizzle","🌧️ chuva":"🌧️ rain","⛈️ chuva forte":"⛈️ heavy rain",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ In {p} after you arrive: dry {d} — easy ride home.",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ In {p} after you arrive: {x}",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Over in {p}: rain around {h}. If you stay a while, the ride home would be wet — decide now if the car makes more sense, or take the rain suit and I'll warn you ~40 min before it turns.",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Over in {p}: possible drizzle through the day — pack the waterproof and you're set.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Over in {p}: dry {x} — easy ride home.",
+"durante a tua estadia":"during your stay",
+"Ida seca — mas vai chover em {p} depois de chegares":"Dry ride there — but it will rain in {p} after you arrive",
+"🌧️ O tempo vai mudar em {p}":"🌧️ Weather is about to turn in {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Rain around {h} where you are/will be. If you're still out there, plan the ride home or get the bike under cover.",
 });
 Object.assign(I18N.es,{
 "Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
@@ -1219,6 +1259,25 @@ Object.assign(I18N.es,{
 "Guardar destino":"Guardar sitio","Guardar rota":"Guardar ruta","Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"¿Nombre? (ej.: Casa, Trabajo, Casa de Juan)",
 "Nome da rota?":"¿Nombre de la ruta?","Guardado: {p} ⭐":"Guardado: {p} ⭐","Apagado: {p}":"Borrado: {p}","Apagar":"Borrar",
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Planificar manualmente (paradas, hora de salida)",
+"🔄 Saíste da rota — a recalcular…":"🔄 Saliste de la ruta — recalculando…","um instante…":"un momento…","A tua posição":"Tu posición",
+"Rota recalculada.":"Ruta recalculada.","🔄 Rota recalculada a partir da tua posição.":"🔄 Ruta recalculada desde tu posición.",
+"não consegui recalcular — verifica a ligação; volto a tentar":"no pude recalcular — revisa la conexión; volveré a intentar",
+"estás a {d} km da rota — vou recalcular":"estás a {d} km de la ruta — voy a recalcular",
+"🏍️ A moto pode ficar cá fora":"🏍️ La moto puede quedarse fuera","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ Sin lluvia prevista {w}. Puedes dejarla fuera tranquilo.",
+"🌧️ Abriga a moto":"🌧️ Resguarda la moto","Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.":"Lluvia prevista hacia las {h}. Si puedes, déjala a cubierto.",
+"🌧️ Vai começar a chover":"🌧️ Va a empezar a llover","Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Lluvia hacia las {h} — si la moto está fuera, guárdala ahora.",
+"nas próximas {n} horas":"en las próximas {n} horas","até à tua próxima viagem ({h})":"hasta tu próximo viaje ({h})",
+"Tempo no destino":"Tiempo en el destino","o resto do dia":"el resto del día","só passo lá":"solo paso por allí",
+"até ao fim do dia":"hasta el final del día","seco":"seco","chuvisco":"llovizna","🌧️ chuva":"🌧️ lluvia","⛈️ chuva forte":"⛈️ lluvia fuerte",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ En {p} tras llegar: seco {d} — vuelta tranquila.",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ En {p} tras llegar: {x}",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Allí en {p}: lluvia hacia las {h}. Si te entretienes, la vuelta sería mojada — decide ya si compensa el coche, o lleva el traje y te aviso ~40 min antes de que cambie.",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Allí en {p}: posible llovizna durante el día — impermeable en la maleta y listo.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Allí en {p}: seco {x} — vuelta tranquila.",
+"durante a tua estadia":"durante tu estancia",
+"Ida seca — mas vai chover em {p} depois de chegares":"Ida seca — pero lloverá en {p} después de llegar",
+"🌧️ O tempo vai mudar em {p}":"🌧️ El tiempo va a cambiar en {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Lluvia hacia las {h} donde estás/estarás. Si sigues por allí, prepara la vuelta o resguarda la moto.",
 });
 Object.assign(I18N.fr,{
 "Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
@@ -1231,6 +1290,25 @@ Object.assign(I18N.fr,{
 "Guardar destino":"Enregistrer le lieu","Guardar rota":"Enregistrer le trajet","Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Un nom ? (ex. Maison, Travail, Chez Jean)",
 "Nome da rota?":"Nom du trajet ?","Guardado: {p} ⭐":"Enregistré : {p} ⭐","Apagado: {p}":"Supprimé : {p}","Apagar":"Supprimer",
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Planifier manuellement (arrêts, heure de départ)",
+"🔄 Saíste da rota — a recalcular…":"🔄 Hors itinéraire — recalcul en cours…","um instante…":"un instant…","A tua posição":"Ta position",
+"Rota recalculada.":"Itinéraire recalculé.","🔄 Rota recalculada a partir da tua posição.":"🔄 Itinéraire recalculé depuis ta position.",
+"não consegui recalcular — verifica a ligação; volto a tentar":"recalcul impossible — vérifie la connexion ; je réessaierai",
+"estás a {d} km da rota — vou recalcular":"tu es à {d} km de l'itinéraire — je recalcule",
+"🏍️ A moto pode ficar cá fora":"🏍️ La moto peut rester dehors","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ Pas de pluie prévue {w}. Tu peux la laisser dehors.",
+"🌧️ Abriga a moto":"🌧️ Mets la moto à l'abri","Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.":"Pluie prévue vers {h}. Si tu peux, gare-la à l'abri.",
+"🌧️ Vai começar a chover":"🌧️ La pluie arrive","Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Pluie vers {h} — si la moto est dehors, rentre-la maintenant.",
+"nas próximas {n} horas":"dans les {n} prochaines heures","até à tua próxima viagem ({h})":"jusqu'à ton prochain trajet ({h})",
+"Tempo no destino":"Temps sur place","o resto do dia":"le reste de la journée","só passo lá":"je ne fais que passer",
+"até ao fim do dia":"jusqu'à la fin de la journée","seco":"sec","chuvisco":"bruine","🌧️ chuva":"🌧️ pluie","⛈️ chuva forte":"⛈️ pluie forte",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ À {p} après ton arrivée : sec {d} — retour tranquille.",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ À {p} après ton arrivée : {x}",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Là-bas à {p} : pluie vers {h}. Si tu t'attardes, le retour serait mouillé — décide maintenant si la voiture vaut mieux, ou prends la combi et je te préviens ~40 min avant que ça tourne.",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Là-bas à {p} : bruine possible dans la journée — imperméable dans le top-case et c'est bon.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Là-bas à {p} : sec {x} — retour tranquille.",
+"durante a tua estadia":"pendant ton séjour",
+"Ida seca — mas vai chover em {p} depois de chegares":"Aller au sec — mais il pleuvra à {p} après ton arrivée",
+"🌧️ O tempo vai mudar em {p}":"🌧️ Le temps va changer à {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Pluie vers {h} là où tu es/seras. Si tu y es encore, prépare le retour ou mets la moto à l'abri.",
 });
 
 /* ---------------- WMO → texto/emoji ---------------- */
@@ -2265,6 +2343,7 @@ async function computeRoute(){
     if(!isFinite(dep)) dep=Date.now()/1000;
     dep=Math.max(dep, Date.now()/1000-300);
     const pauseSec=(+$("#stop-pause").value||0)*60;
+    const stayMin=parseInt($("#rt-stay")?.value??"-1",10)||0; // -1 = resto do dia
 
     const pts=[o,...stops,d];
     const {routes,waypoints}=await osrmRoute(pts).catch(()=>{throw new Error(t("Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada."));});
@@ -2278,24 +2357,26 @@ async function computeRoute(){
     const allSamples=variants.flatMap(v=>v.samples);
     const maxTravel=Math.max(...variants.map(v=>v.travelTotal));
     const wStart=Math.min(dep,Date.now()/1000)-7200;
-    const wEnd=dep+maxTravel+(pts.length-2)*pauseSec+9*3600;
+    // cobre também o resto do dia no destino (estadia + regresso)
+    const wEnd=Math.max(dep+maxTravel+(pts.length-2)*pauseSec+9*3600, dep+26*3600);
     const wxs=await fetchRouteWx(allSamples, wStart, wEnd);
     allSamples.forEach((s,i)=>{ s.wx=wxs[Math.min(i,wxs.length-1)]; });
 
     const v0=variants[0];
-    state.route={o,d,pts,stops,dep,pauseSec,shift:0,variants,active:0,
+    state.route={o,d,pts,stops,dep,pauseSec,stayMin,shift:0,variants,active:0,
       coords:v0.coords,cum:v0.cum,geomKm:v0.geomKm,totalKm:v0.totalKm,
       travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples};
     applyShift(0,true);
     renderDepartures();
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
+    scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
     autoT.used=false;
     if(state._resumeTravel&&!travel.active){ state._resumeTravel=false; setTimeout(startTravel,600); }
     else maybeAutoTravel(); // liga o Modo Viagem sozinho se detetar movimento
     if($("#rt-radar-toggle").checked) toggleRouteRadar(true);
     try{ history.replaceState(null,"",
       "#r2="+pts.map(p=>`${p.lat.toFixed(4)},${p.lon.toFixed(4)},${encodeURIComponent(p.name)}`).join("~")
-      +`|${Math.round(dep)}|${Math.round(pauseSec/60)}`);}catch(e){}
+      +`|${Math.round(dep)}|${Math.round(pauseSec/60)}|${stayMin}`);}catch(e){}
     return true;
   }catch(e){
     routeError(e.message||t("Algo correu mal. Tenta novamente."));
@@ -2412,6 +2493,73 @@ function drawRoute(fit){
   if(fit){ state.maps.route.fitBounds(L.latLngBounds(all),{padding:[26,26]}); }
 }
 
+/* ------- estadia no destino: como fica o tempo depois de chegares ------- */
+function stayInfo(R){
+  if(!R||R.stayMin===0) return null;
+  const last=R.samples?.[R.samples.length-1]; const H=last?.wx?.hourly;
+  if(!H?.time?.length) return null;
+  const dep=R.dep+(R.shift||0)*60;
+  const nStops=(R.pts?.length||2)-2;
+  const arr=dep+R.travelTotal+nStops*(R.pauseSec||0);
+  let end;
+  if(R.stayMin>0) end=arr+R.stayMin*60;
+  else { // resto do dia (até à meia-noite local, mínimo 3 h)
+    const d=new Date(arr*1000); d.setHours(23,59,0,0);
+    end=Math.max(d.getTime()/1000, arr+3*3600);
+  }
+  const prof=PROFILES[state.profile];
+  const pts=[];
+  for(let k=0;k<H.time.length;k++){
+    const tt=H.time[k];
+    if(tt<arr-1800||tt>end+1800) continue;
+    pts.push({t:tt, lvl:rainLevel(H.precipitation?.[k]??0,H.precipitation_probability?.[k]??0,H.weather_code?.[k]??0,prof)});
+  }
+  if(!pts.length) return null;
+  // segmentos contínuos do mesmo nível
+  const segs=[]; let cur={a:Math.max(pts[0].t,arr), b:pts[0].t+3600, lvl:pts[0].lvl};
+  for(let i=1;i<pts.length;i++){
+    if(pts[i].lvl===cur.lvl) cur.b=pts[i].t+3600;
+    else { segs.push(cur); cur={a:pts[i].t, b:pts[i].t+3600, lvl:pts[i].lvl}; }
+  }
+  segs.push(cur); segs[segs.length-1].b=Math.min(segs[segs.length-1].b,end);
+  const worst=Math.max(...segs.map(s=>s.lvl));
+  const firstRain=segs.find(s=>s.lvl>=2)?.a??null;
+  return {arr,end,segs,worst,firstRain,rest:R.stayMin<0};
+}
+function stayText(info,dest){
+  const durTxt=info.rest?t("até ao fim do dia"):fmtDur(info.end-info.arr);
+  if(info.worst===0) return t("🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.",{p:dest,d:durTxt});
+  const parts=info.segs.map(s=>{
+    const lab=s.lvl===0?t("seco"):s.lvl===1?t("chuvisco"):s.lvl===2?t("🌧️ chuva"):t("⛈️ chuva forte");
+    return `${lab} ${fmtHM(s.a)}–${fmtHM(s.b)}`;
+  }).join(" → ");
+  return t("🅿️ Em {p} depois de chegares: {x}",{p:dest,x:parts});
+}
+/* notificação: o tempo muda no destino enquanto lá estás → aviso ~40 min antes */
+const motoStay={timer:null};
+function scheduleStayAlerts(R){
+  try{
+    if(motoStay.timer){ clearTimeout(motoStay.timer); motoStay.timer=null; }
+    const info=stayInfo(R); const now=Date.now()/1000;
+    if(!info||info.firstRain==null){ scheduleNativeAlerts([],9110,10); return; }
+    const fireAt=info.firstRain-40*60;
+    if(fireAt<=now+120||info.firstRain<info.arr) { scheduleNativeAlerts([],9110,10); return; }
+    const title=t("🌧️ O tempo vai mudar em {p}",{p:R.d.name});
+    const body=t("Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.",{h:fmtHM(info.firstRain)});
+    motoStay.timer=setTimeout(()=>{
+      toast(title+" — "+body, 9000); buzz([200,90,200]); speak(body);
+      try{
+        if("Notification" in window&&Notification.permission==="granted"){
+          if(navigator.serviceWorker&&navigator.serviceWorker.controller)
+            navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"vdm-stay",renotify:true})).catch(()=>{});
+          else new Notification(title,{body,tag:"vdm-stay"});
+        }
+      }catch(e){}
+    },(fireAt-now)*1000);
+    scheduleNativeAlerts([{at:fireAt,title,body}],9110,10);
+  }catch(e){}
+}
+
 function renderRouteSummary(){
   const R=state.route, box=$("#route-summary"); if(!R){box.textContent="";return;}
   box.textContent="";
@@ -2484,6 +2632,12 @@ function renderRouteSummary(){
   const sunset=state.wx?.daily?.sunset?.find(s=>isSameDay(s,dep));
   if(sunset&&arrive>sunset) mk(t("🌙 chegada depois do pôr-do-sol"));
   main.appendChild(chips);
+  // estadia: como fica o tempo no destino depois de chegares
+  const sInfo=stayInfo(R);
+  if(sInfo){
+    const sl=el("div","stay-line lvl"+sInfo.worst, stayText(sInfo,R.d.name));
+    main.appendChild(sl);
+  }
   // comparação de trajetos alternativos (mudar de caminho para fugir à chuva)
   if(R.variants&&R.variants.length>1){
     const vrow=el("div","chips"); vrow.style.marginTop="10px";
@@ -2906,6 +3060,18 @@ function buildRecommendation(cand){
   // noite
   const sunset=state.wx?.daily?.sunset?.find(x=>isSameDay(x,R.dep+R.shift*60));
   if(sunset&&(R.arrive??0)>sunset) A("🌙",t("Chegas depois do pôr-do-sol — luzes verificadas e algo refletor."));
+  // estadia: o que te espera no destino (mesmo sem saberes quanto tempo ficas)
+  const sInfo=stayInfo(R);
+  if(sInfo){
+    if(sInfo.worst>=2){
+      A("🅿️",t("Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.",{p:cand.name,h:fmtHM(sInfo.firstRain||sInfo.arr)}));
+      if(lvl===0){ lvl=1; emoji="🅿️"; title=t("Ida seca — mas vai chover em {p} depois de chegares",{p:cand.name}); }
+    } else if(sInfo.worst===1){
+      A("🅿️",t("Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.",{p:cand.name}));
+    } else {
+      A("🅿️",t("Lá em {p}: seco {x} — regresso tranquilo.",{p:cand.name,x:sInfo.rest?t("até ao fim do dia"):t("durante a tua estadia")}));
+    }
+  }
   // linha do tempo da viagem
   const tr=tripTransitions(R);
   if(tr.length>1){
@@ -2943,7 +3109,8 @@ function buildRecommendation(cand){
    MODO VIAGEM — geofencing de chuva em tempo real (com a app aberta)
    ===================================================================== */
 const travel={active:false, watch:null, marker:null, wakeLock:null, alerted:new Set(),
-  lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0};
+  lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0,
+  offHits:0, rerouting:false, lastReroute:0};
 
 /* posição exata ao longo da geometria da rota (para o cinzento e distâncias precisas) */
 function travelProject(pos){
@@ -2952,6 +3119,57 @@ function travelProject(pos){
   let bi=0,bd=1e12;
   for(let i=0;i<C.length;i+=stride){ const d=haversine(pos,C[i]); if(d<bd){bd=d;bi=i;} }
   return {idx:bi, off:bd, km:(R.cum[bi]/R.geomKm)*R.totalKm};
+}
+/* saíste do caminho? recalcula a rota a partir de onde estás (estilo Google Maps) */
+async function rerouteFromHere(pos){
+  if(travel.rerouting||!state.route) return;
+  travel.rerouting=true; travel.offHits=0;
+  const R=state.route;
+  $("#tb-next").textContent=t("🔄 Saíste da rota — a recalcular…");
+  $("#tb-sub").textContent=t("um instante…");
+  travel.lastNotif=0; travelNotify();
+  buzz([90,50,90]);
+  try{
+    const kmNow=travel.kmDone||0;
+    // paragens ainda por visitar (as que ficam à frente do ponto onde saíste da rota)
+    const remStops=(R.stops||[]).filter((st,si)=>{
+      const smp=(R.samples||[]).find(s=>s.stop===si+1);
+      return smp?smp.km>kmNow+0.15:true;
+    });
+    const cur={lat:pos.lat, lon:pos.lon, name:t("A tua posição")};
+    const pts=[cur,...remStops,R.d];
+    const {routes,waypoints}=await osrmRoute(pts);
+    const v=buildVariant(routes[0],pts,waypoints,R.pauseSec||0,true);
+    if(!v||v.coords.length<2) throw new Error("curta");
+    const now=Date.now()/1000;
+    const wEnd=Math.max(now+v.travelTotal+Math.max(0,pts.length-2)*(R.pauseSec||0)+9*3600, now+26*3600);
+    const wxs=await fetchRouteWx(v.samples, now-7200, wEnd);
+    v.samples.forEach((s,i)=>{ s.wx=wxs[Math.min(i,wxs.length-1)]; });
+    state.route={...R, o:cur, pts, stops:remStops, dep:now, shift:0,
+      variants:[v], active:0, coords:v.coords, cum:v.cum, geomKm:v.geomKm,
+      totalKm:v.totalKm, travelTotal:v.travelTotal, totalSec:v.travelTotal,
+      samples:v.samples, cameras:[], camerasError:false};
+    travel.geomIdx=0; travel.kmDone=0; travel.alerted.clear();
+    travel.lastRecalc=now; travel.lastPaint=0;
+    applyShift(0,false);
+    renderDepartures();
+    renderCameras(); loadRouteCameras();
+    scheduleStayAlerts(state.route);
+    try{ history.replaceState(null,"",
+      "#r2="+pts.map(q=>`${q.lat.toFixed(4)},${q.lon.toFixed(4)},${encodeURIComponent(q.name)}`).join("~")
+      +`|${Math.round(now)}|${Math.round((R.pauseSec||0)/60)}`);}catch(e){}
+    store.set("travel",{hash:location.hash||"", at:Date.now()});
+    speak(t("Rota recalculada."));
+    toast(t("🔄 Rota recalculada a partir da tua posição."));
+    buzz([120,60,120]);
+    travel.lastNotif=0; travelNotify();
+  }catch(e){
+    $("#tb-next").textContent=t("🧭 Modo viagem ligado");
+    $("#tb-sub").textContent=t("não consegui recalcular — verifica a ligação; volto a tentar");
+  }finally{
+    travel.rerouting=false;
+    travel.lastReroute=Date.now()/1000;
+  }
 }
 /* notificação de progresso (barra de notificações) durante a viagem */
 function travelNotify(){
@@ -2968,6 +3186,125 @@ function travelNotify(){
 function travelNotifyClose(){
   try{ navigator.serviceWorker?.ready?.then(r=>r.getNotifications({tag:"vdm-travel"})
     .then(ns=>ns.forEach(n=>n.close()))).catch(()=>{}); }catch(e){}
+}
+
+/* =====================================================================
+   GUARDA DA MOTO — quando paras num alojamento (casa, prédio, hotel…),
+   diz-te se a moto pode ficar cá fora (chuva até à próxima viagem) e
+   avisa ~45 min antes de a chuva começar
+   ===================================================================== */
+const motoGuard={lastAt:0, lastPos:null, lastNo:null, lastFetch:0, rainAt:null, timer:null, stat:0};
+window.__vdmT={travel, motoGuard}; // para testes
+const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
+function isLodgingType(key,val){
+  if(!key) return false;
+  key=String(key); val=String(val||"");
+  if(key==="building") return !["commercial","industrial","retail","warehouse","office","church","chapel","school","university","college","hospital","garage","garages","shed","service","supermarket","kiosk","stadium","train_station","transportation","public","civic","government","greenhouse","barn","hangar","hut","roof","ruins","construction"].includes(val);
+  if(key==="place") return ["house","apartment","apartments"].includes(val);
+  if(key==="tourism") return ["hotel","guest_house","apartment","hostel","motel","chalet","alpine_hut"].includes(val);
+  if(key==="landuse") return val==="residential";
+  return false;
+}
+async function isLodgingHere(pos){
+  const H=store.get("home");
+  if(H&&isFinite(H.lat)&&haversine(pos,H)<0.15) return true;
+  const fv=getFavs().find(f=>isFinite(f.lat)&&haversine(pos,f)<0.12&&/cas|home|hous|maison|apart|morad|pr[ée]d|hotel|hostel/i.test(f.name||""));
+  if(fv) return true;
+  try{
+    const u=new URL("https://photon.komoot.io/reverse");
+    u.search=new URLSearchParams({lat:pos.lat.toFixed(6), lon:pos.lon.toFixed(6), limit:"3"}).toString();
+    const j=await jfetch(u.toString(), 8000);
+    for(const f of (j.features||[])){
+      const pr=f.properties||{};
+      if(isLodgingType(pr.osm_key,pr.osm_value)) return true;
+    }
+  }catch(e){}
+  try{
+    const u=new URL("https://nominatim.openstreetmap.org/reverse");
+    u.search=new URLSearchParams({lat:pos.lat.toFixed(6), lon:pos.lon.toFixed(6), format:"jsonv2", zoom:"18", "accept-language":"pt"}).toString();
+    const j=await nomFetch(u.toString());
+    if(j){
+      if(isLodgingType(j.category,j.type)) return true;
+      if(["house","building","residential","apartments"].includes(j.addresstype||"")) return true;
+    }
+  }catch(e){}
+  return false;
+}
+function findNextRain(wx, from, until){
+  const H=wx?.hourly; if(!H?.time?.length) return null;
+  for(let k=0;k<H.time.length;k++){
+    const tt=H.time[k];
+    if(tt<from-1800||tt>until) continue;
+    if((H.precipitation?.[k]??0)>=0.2||(H.precipitation_probability?.[k]??0)>=65||GUARD_WET.includes(H.weather_code?.[k]))
+      return Math.max(tt,from);
+  }
+  return null;
+}
+function motoNotify(title,body){
+  toast(title+" — "+body, 9000);
+  buzz([200,90,200]);
+  try{ speak(title.replace(/[^\p{L}\p{N} ,.!?…—-]/gu,"").trim()+". "+body); }catch(e){}
+  try{
+    if(!("Notification" in window)||Notification.permission!=="granted") return;
+    if(navigator.serviceWorker&&navigator.serviceWorker.controller)
+      navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"vdm-guard",renotify:true})).catch(()=>{});
+    else new Notification(title,{body,tag:"vdm-guard"});
+  }catch(e){}
+}
+function guardWindow(){
+  const now=Date.now()/1000;
+  const R=state.route;
+  const dep=R?R.dep+(R.shift||0)*60:0;
+  if(R&&dep>now+600&&!travel.active) return {until:dep, why:t("até à tua próxima viagem ({h})",{h:fmtHM(dep)})};
+  return {until:now+12*3600, why:t("nas próximas {n} horas",{n:12})};
+}
+function scheduleMotoReminder(rainAt){
+  if(motoGuard.timer){ clearTimeout(motoGuard.timer); motoGuard.timer=null; }
+  motoGuard.rainAt=rainAt;
+  if(rainAt==null){ scheduleNativeAlerts([],9100,10); return; }
+  const now=Date.now()/1000;
+  const lead=Math.min(45*60,(rainAt-now)*0.5);
+  const fireAt=rainAt-lead;
+  const title=t("🌧️ Vai começar a chover");
+  const body=t("Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.",{h:fmtHM(rainAt)});
+  if(fireAt>now+60){
+    motoGuard.timer=setTimeout(()=>motoNotify(title,body),(fireAt-now)*1000);
+    scheduleNativeAlerts([{at:fireAt,title,body}],9100,10);
+  }
+}
+async function motoGuardCheck(pos,force){
+  try{
+    if(!pos||!isFinite(pos.lat)||!isFinite(pos.lon)) return;
+    const now=Date.now()/1000;
+    if(!force&&motoGuard.lastPos&&haversine(pos,motoGuard.lastPos)<0.25&&now-motoGuard.lastAt<3*3600) return;
+    if(!force&&motoGuard.lastNo&&haversine(pos,motoGuard.lastNo)<0.25&&now-motoGuard.lastNo.at<3600) return;
+    if(!(await isLodgingHere(pos))){ motoGuard.lastNo={lat:pos.lat,lon:pos.lon,at:now}; return; }
+    motoGuard.lastAt=now; motoGuard.lastPos={lat:pos.lat,lon:pos.lon}; motoGuard.lastFetch=now;
+    const {until,why}=guardWindow();
+    const wxs=await fetchRouteWx([pos], now-3600, until+3600);
+    const rainAt=findNextRain(wxs&&wxs[0], now, until);
+    if(rainAt==null) motoNotify(t("🏍️ A moto pode ficar cá fora"), t("✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.",{w:why}));
+    else motoNotify(t("🌧️ Abriga a moto"), t("Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.",{h:fmtHM(rainAt)}));
+    scheduleMotoReminder(rainAt);
+  }catch(e){}
+}
+/* previsão muda? re-verifica o sítio onde a moto ficou (chamado pela sentinela) */
+async function motoGuardRefresh(){
+  try{
+    const now=Date.now()/1000;
+    if(!motoGuard.lastPos||now-motoGuard.lastFetch<900||now-motoGuard.lastAt>10*3600) return;
+    motoGuard.lastFetch=now;
+    const {until}=guardWindow();
+    const wxs=await fetchRouteWx([motoGuard.lastPos], now-3600, until+3600);
+    const rainAt=findNextRain(wxs&&wxs[0], now, until);
+    const changed=(rainAt==null)!==(motoGuard.rainAt==null)||
+      (rainAt!=null&&motoGuard.rainAt!=null&&Math.abs(rainAt-motoGuard.rainAt)>1200);
+    if(changed){
+      if(rainAt!=null&&(motoGuard.rainAt==null||rainAt<motoGuard.rainAt-1200)&&rainAt-now<5400)
+        motoNotify(t("🌧️ Abriga a moto"), t("Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.",{h:fmtHM(rainAt)}));
+      scheduleMotoReminder(rainAt);
+    }
+  }catch(e){}
 }
 /* arranque automático: se a app detetar que já estás em andamento, liga o Modo Viagem */
 const autoT={watch:null, hits:0, used:false};
@@ -2999,6 +3336,7 @@ async function startTravel(){
   if(!navigator.geolocation){ toast(t("Este dispositivo não dá acesso ao GPS.")); return; }
   travel.active=true; travel.alerted.clear(); travel.lastRecalc=0; travel.lastPaint=0;
   travel.geomIdx=0; travel.kmDone=0; travel.lastNotif=0;
+  travel.offHits=0; travel.rerouting=false; travel.lastReroute=0;
   stopAutoTravel();
   document.body.classList.add("traveling");
   $("#travel-bar").style.display="flex";
@@ -3016,6 +3354,8 @@ async function startTravel(){
 }
 function stopTravel(msg){
   travel.active=false;
+  let lastPos=null;
+  try{ if(travel.marker){ const ll=travel.marker.getLatLng(); lastPos={lat:ll.lat, lon:ll.lng}; } }catch(e){}
   if(travel.watch!=null){ try{navigator.geolocation.clearWatch(travel.watch);}catch(e){} travel.watch=null; }
   try{ travel.wakeLock?.release?.(); }catch(e){} travel.wakeLock=null;
   if(travel.marker&&state.maps.route){ state.maps.route.removeLayer(travel.marker); travel.marker=null; }
@@ -3028,6 +3368,7 @@ function stopTravel(msg){
   if(state.route&&state.maps.route) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
   updateTravelButtons();
+  if(lastPos) motoGuardCheck(lastPos); // paraste num alojamento? digo-te se a moto pode ficar fora
 }
 function updateTravelButtons(){
   const b=$("#btn-travel");
@@ -3058,10 +3399,21 @@ function onTravelPos(p){
   }
   const {i:idx, off}=nearestSampleIdx(pos);
   const here=R.samples[idx];
-  if(off>4){ $("#tb-sub").textContent=t("estás a {d} km da rota traçada — recalcula se mudaste de caminho",{d:fmtN(off,1)}); return; }
-  // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
+  // paragem prolongada? (ex.: chegaste a casa ou a um hotel) → guarda da moto
+  const spd=p.coords.speed;
+  if(spd!=null&&spd<0.7) motoGuard.stat=(motoGuard.stat||0)+1; else motoGuard.stat=0;
+  if(motoGuard.stat===8) motoGuardCheck(pos);
+  // deteção de desvio (estilo Google Maps): 3 leituras seguidas fora da rota → recalcula
   const pj=travelProject(pos);
-  travel.geomIdx=pj.idx; travel.kmDone=pj.km;
+  const accKm=(p.coords.accuracy||0)/1000;
+  const offTh=Math.max(0.06, accKm*1.5+0.02);
+  const moving=spd==null||spd>0.8;
+  if(pj.off>offTh&&moving) travel.offHits=(travel.offHits||0)+1; else travel.offHits=0;
+  if(travel.offHits>=3&&!travel.rerouting&&now-(travel.lastReroute||0)>20){ rerouteFromHere(pos); return; }
+  if(travel.rerouting){ travelNotify(); return; }
+  if(off>4){ $("#tb-sub").textContent=t("estás a {d} km da rota — vou recalcular",{d:fmtN(off,1)}); travelNotify(); return; }
+  // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
+  if(pj.off<=offTh){ travel.geomIdx=pj.idx; travel.kmDone=pj.km; }
   if(now-travel.lastPaint>5){ travel.lastPaint=now; drawRoute(false); }
   // recalibra as previsões ao tempo real (a cada 30 s)
   if(now-travel.lastRecalc>30){
@@ -3196,6 +3548,7 @@ async function sentinelCheck(){
     if(gust>=45&&(sentinel.last?.gust??0)<gust-8)
       sentinelAlert("gust-"+Math.round(gust/10),t("O vento subiu: rajadas de {g} quilómetros por hora.",{g:Math.round(gust)}));
     sentinel.last={gust, curWet};
+    motoGuardRefresh(); // a moto ficou cá fora? re-verifica a chuva no sítio dela
     let st;
     if(curWet) st=stopIdx>=0?t("🌧️ A chover agora — deve parar ~{h}.",{h:fmtHM(times[stopIdx])}):t("🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.");
     else if(startIdx>=0) st=t("☁️ Chuva a caminho: ~{h}.",{h:fmtHM(times[startIdx])});
@@ -3225,17 +3578,17 @@ async function toggleSentinel(){
 /* =====================================================================
    ALARMES NATIVOS (Capacitor) — notificações locais com a app fechada
    ===================================================================== */
-async function scheduleNativeAlerts(events){
+async function scheduleNativeAlerts(events, base=9000, span=100){
   try{
     const C=window.Capacitor; if(!C?.isNativePlatform?.()) return;
     const LN=C.Plugins?.LocalNotifications; if(!LN) return;
     try{ const p=await LN.checkPermissions?.();
       if(p?.display!=="granted") await LN.requestPermissions?.(); }catch(e){}
     try{ const pend=await LN.getPending?.();
-      const mine=(pend?.notifications||[]).filter(n=>n.id>=9000&&n.id<9100);
+      const mine=(pend?.notifications||[]).filter(n=>n.id>=base&&n.id<base+span);
       if(mine.length) await LN.cancel({notifications:mine.map(n=>({id:n.id}))}); }catch(e){}
     const notifications=events.slice(0,8).map((ev,i)=>({
-      id:9000+i, title:ev.title, body:ev.body,
+      id:base+i, title:ev.title, body:ev.body,
       schedule:{at:new Date(ev.at*1000), allowWhileIdle:true},
       smallIcon:"ic_stat_icon_config_sample", sound:null,
     }));
@@ -3442,7 +3795,7 @@ function init(){
   // restaurar rota (URL #r2=… ou memória da última viagem — nada se perde ao fechar)
   const tryRestore=(hstr)=>{
     try{
-      const h=(hstr||"").match(/^#r2=([^|]+)\|(\d+)\|(\d+)$/);
+      const h=(hstr||"").match(/^#r2=([^|]+)\|(\d+)\|(\d+)(?:\|(-?\d+))?$/);
       if(!h) return false;
       const pts=h[1].split("~").map(s=>{ const p=s.split(",");
         return {lat:+p[0], lon:+p[1], name:decodeURIComponent(p.slice(2).join(",")||"ponto"), sub:""}; });
@@ -3453,6 +3806,8 @@ function init(){
       pts.slice(1,-1).forEach(p=>addStopRow(p));
       const pauseMin=String(+h[3]||0), sel=$("#stop-pause");
       if([...sel.options].some(op=>op.value===pauseMin)) sel.value=pauseMin;
+      if(h[4]!=null){ const ss=$("#rt-stay"), sv=String(+h[4]);
+        if(ss&&[...ss.options].some(op=>op.value===sv)) ss.value=sv; }
       const dep=+h[2];
       if(dep*1000>Date.now()) when.value=localDT(new Date(dep*1000));
       $("#plan-card").classList.add("open");
