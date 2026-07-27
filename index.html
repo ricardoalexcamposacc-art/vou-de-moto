@@ -318,6 +318,19 @@ a{color:var(--accent)}
 .me-pin::after{content:"";position:absolute;inset:-9px;border-radius:50%;
   border:2px solid rgba(26,115,232,.5);animation:mepulse 1.6s ease-out infinite}
 @keyframes mepulse{from{transform:scale(.55);opacity:1}to{transform:scale(1.3);opacity:0}}
+/* seta de navegação (aponta para onde vais, como no Google Maps) */
+.me-nav{width:40px;height:40px;position:relative;transform-origin:50% 50%;
+  transition:transform .28s cubic-bezier(.22,.61,.36,1);will-change:transform}
+.me-nav svg{position:absolute;inset:0;width:40px;height:40px;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.45))}
+.me-nav::before{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;
+  border-radius:50%;border:2px solid rgba(26,115,232,.45);animation:mepulse 1.8s ease-out infinite}
+/* modo offline */
+.off-banner{background:var(--warn-soft);border:1px solid rgba(250,178,25,.5)}
+#tb-off{flex:none;display:none;align-items:center;gap:5px;font-size:11.5px;font-weight:750;
+  padding:5px 9px;border-radius:999px;background:var(--warn-soft);color:var(--ink);
+  border:1px solid rgba(250,178,25,.55);white-space:nowrap}
+body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset:-2px;border-radius:14px}
 /* assistente */
 .ai-row{display:flex;gap:8px;align-items:flex-start}
 .ai-mic{height:41px;width:41px;font-size:17px}
@@ -514,6 +527,10 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
     <button class="tab" role="tab" id="tab-radar" aria-selected="false" data-view="radar">🛰️ Radar</button>
   </nav>
 
+  <div id="offline-banner" style="display:none" class="banner off-banner">
+    <span>📴</span><span id="offline-txt"><b>Sem internet.</b> O mapa guardado, a rota e o GPS continuam a funcionar — a meteorologia é a da última atualização.</span>
+  </div>
+
   <div id="net-banner" style="display:none" class="banner warn">
     <span>📡</span><span>Não estou a conseguir contactar os serviços meteorológicos. Se estiveres a ver a app na barra lateral do Claude, <b>abre o ficheiro <i>vou-de-moto.html</i> diretamente no teu browser</b> (Chrome/Safari/Firefox) — aí funciona a 100%. Caso contrário, verifica a tua ligação e tenta de novo.</span>
   </div>
@@ -683,6 +700,7 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
     <b id="tb-next">🧭 Modo viagem ligado</b>
     <span id="tb-sub">à espera de sinal GPS…</span>
   </div>
+  <span id="tb-off" style="display:none">📴 <span id="tb-off-t">offline</span></span>
   <button class="icon-btn" id="tb-mute" title="Silenciar/ligar a voz" aria-label="Silenciar ou ligar a voz">🔊</button>
   <button class="btn" id="tb-stop">🛑 Terminar</button>
 </div>
@@ -768,6 +786,7 @@ function applyStaticI18n(){
     ['label[for="rt-o"]',"txt","Origem"], ['label[for="rt-d"]',"txt","Destino"],
     ['label[for="rt-when"]',"txt","Hora de partida"],
     ['label[for="rt-stay"]',"txt","Tempo no destino"],
+    ["#tb-off-t","txt","offline"],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
     ["#lang-title","txt","Idioma"],
   ];
@@ -1378,6 +1397,11 @@ Object.assign(I18N.en,{
 "⏱️ Para chegares às {h}, parte às {d}.":"⏱️ To arrive by {h}, leave at {d}.",
 "🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voice muted — you still get vibration and notifications.",
 "🔊 Voz ligada.":"🔊 Voice on.",
+"offline":"offline",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 No internet — your saved map and route keep working. GPS needs no signal.",
+"Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.":"You lost your internet connection. The saved map and navigation keep working.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet is back — refreshing the weather.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Route map saved ({n} tiles) — works with no internet at all.",
 });
 Object.assign(I18N.es,{
 "Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
@@ -1433,6 +1457,11 @@ Object.assign(I18N.es,{
 "⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Para llegar a las {h}, sal a las {d}.",
 "🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voz silenciada — sigues recibiendo vibración y notificaciones.",
 "🔊 Voz ligada.":"🔊 Voz activada.",
+"offline":"sin conexión",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Sin internet — el mapa y la ruta guardados siguen funcionando. El GPS no necesita cobertura.",
+"Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.":"Has perdido la conexión a internet. El mapa guardado y la navegación siguen funcionando.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet de vuelta — actualizando la meteorología.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Mapa de la ruta guardado ({n} piezas) — funciona sin internet.",
 });
 Object.assign(I18N.fr,{
 "Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
@@ -1488,6 +1517,11 @@ Object.assign(I18N.fr,{
 "⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Pour arriver à {h}, pars à {d}.",
 "🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voix coupée — tu reçois toujours vibrations et notifications.",
 "🔊 Voz ligada.":"🔊 Voix activée.",
+"offline":"hors ligne",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Pas d'internet — la carte et l'itinéraire enregistrés fonctionnent toujours. Le GPS n'a pas besoin de réseau.",
+"Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.":"Tu as perdu la connexion internet. La carte enregistrée et la navigation continuent de fonctionner.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet de retour — mise à jour de la météo.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Carte du trajet enregistrée ({n} tuiles) — fonctionne sans internet.",
 });
 
 /* ---------------- WMO → texto/emoji ---------------- */
@@ -2358,6 +2392,68 @@ function cartoLayer(){
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
     subdomains:"abcd", maxZoom:19});
 }
+/* =====================================================================
+   MAPA OFFLINE — guarda os tiles do corredor da rota para a viagem
+   nunca ficar às escuras se a rede falhar (fronteiras, túneis, serra)
+   ===================================================================== */
+const TILE_ZOOMS=[12,13,14,15];      // do "onde estou" ao detalhe de rua
+const TILE_PAD=1;                    // anel de tiles à volta da rota (não fica colada à borda)
+function tileTemplate(){
+  const style=document.documentElement.dataset.theme==="dark"?"dark_all":"light_all";
+  const r=(window.devicePixelRatio||1)>1.3?"@2x":"";
+  return `https://a.basemaps.cartocdn.com/${style}/{z}/{x}/{y}${r}.png`;
+}
+const lon2x=(lon,z)=>Math.floor((lon+180)/360*Math.pow(2,z));
+const lat2y=(lat,z)=>{ const r=lat*Math.PI/180;
+  return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,z)); };
+function routeTileUrls(coords){
+  const tpl=tileTemplate(), seen=new Set(), out=[];
+  const step=Math.max(1,Math.floor(coords.length/900));
+  for(const z of TILE_ZOOMS){
+    const n=Math.pow(2,z);
+    for(let i=0;i<coords.length;i+=step){
+      const cx=lon2x(coords[i].lon,z), cy=lat2y(coords[i].lat,z);
+      const pad=z>=15?0:TILE_PAD;              // no zoom máximo só o essencial
+      for(let dx=-pad;dx<=pad;dx++) for(let dy=-pad;dy<=pad;dy++){
+        const x=cx+dx, y=cy+dy;
+        if(x<0||y<0||x>=n||y>=n) continue;
+        const k=`${z}/${x}/${y}`;
+        if(seen.has(k)) continue; seen.add(k);
+        out.push(tpl.replace("{z}",z).replace("{x}",x).replace("{y}",y));
+      }
+    }
+  }
+  return out;
+}
+const tileDL={running:false, done:0, total:0};
+function precacheRouteTiles(){
+  try{
+    const R=state.route; if(!R?.coords?.length) return;
+    if(!navigator.serviceWorker?.controller) return;   // só quando servida por http(s)
+    if(!navigator.onLine) return;
+    if(tileDL.running) return;
+    const urls=routeTileUrls(R.coords);
+    if(!urls.length) return;
+    tileDL.running=true; tileDL.done=0; tileDL.total=urls.length;
+    navigator.serviceWorker.controller.postMessage({type:"PRECACHE_TILES", urls});
+  }catch(e){ tileDL.running=false; }
+}
+function setOffline(off){
+  if(state.offline===off) return;
+  state.offline=off;
+  document.body.classList.toggle("is-offline",off);
+  const p=$("#tb-off"); if(p) p.style.display=off?"inline-flex":"none";
+  const b=$("#offline-banner"); if(b) b.style.display=off?"flex":"none";
+  if(off){
+    buzz([120,60,120]);
+    toast(t("📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede."),8000);
+    if(travel.active) speak(t("Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar."));
+  } else {
+    toast(t("📶 Internet de volta — a atualizar a meteorologia."),4000);
+    if(state.route&&travel.active) precacheRouteTiles();
+  }
+}
+
 function initRouteMap(){
   if(state.maps.route) return;
   if(typeof L==="undefined"){ routeError(t("Mapa indisponível — precisa de ligação à internet.")); return; }
@@ -2670,6 +2766,7 @@ async function computeRoute(){
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
     scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
     loadDrySpell(); // historial de dias secos → aviso de óleo na primeira chuva
+    setTimeout(precacheRouteTiles,1200); // mapa offline do corredor da rota
     autoT.used=false;
     if(state._resumeTravel&&!travel.active){ state._resumeTravel=false; setTimeout(startTravel,600); }
     else maybeAutoTravel(); // liga o Modo Viagem sozinho se detetar movimento
@@ -3676,7 +3773,8 @@ function buildRecommendation(cand){
    ===================================================================== */
 const travel={active:false, watch:null, marker:null, wakeLock:null, alerted:new Set(),
   lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0,
-  offHits:0, rerouting:false, lastReroute:0};
+  offHits:0, rerouting:false, lastReroute:0,
+  heading:null, prevPos:null, courseUp:true};
 
 /* posição exata ao longo da geometria da rota (para o cinzento e distâncias precisas) */
 function travelProject(pos){
@@ -3970,6 +4068,8 @@ async function startTravel(){
   travel.active=true; travel.alerted.clear(); travel.lastRecalc=0; travel.lastPaint=0;
   travel.geomIdx=0; travel.kmDone=0; travel.lastNotif=0;
   travel.offHits=0; travel.rerouting=false; travel.lastReroute=0;
+  travel.heading=null; travel.prevPos=null;
+  precacheRouteTiles(); // guarda o mapa do trajeto antes de arrancar
   stopAutoTravel();
   document.body.classList.add("traveling");
   $("#travel-bar").style.display="flex";
@@ -4018,17 +4118,39 @@ function onTravelPos(p){
   const pos={lat:p.coords.latitude, lon:p.coords.longitude};
   const now=Date.now()/1000;
   // pino azul pulsante — SEMPRE por cima da linha (camada de marcadores DOM)
+  // direção: GPS quando existe; senão calculada entre posições (Android nem sempre dá heading)
+  let hd=p.coords.heading;
+  if(hd==null||isNaN(hd)){
+    if(travel.prevPos&&haversine(travel.prevPos,pos)>0.008) hd=bearing(travel.prevPos,pos);
+    else hd=travel.heading;
+  }
+  if(hd!=null&&!isNaN(hd)) travel.heading=hd;
+  if(!travel.prevPos||haversine(travel.prevPos,pos)>0.008) travel.prevPos={lat:pos.lat,lon:pos.lon};
+
   if(state.maps.route){
+    const M=state.maps.route;
     if(!travel.marker){
       travel.marker=L.marker([pos.lat,pos.lon],{zIndexOffset:9000, interactive:false,
-        icon:L.divIcon({className:"", html:'<div class="me-pin"></div>', iconSize:[22,22], iconAnchor:[11,11]})})
-        .addTo(state.maps.route);
+        icon:L.divIcon({className:"", iconSize:[40,40], iconAnchor:[20,20], html:
+          '<div class="me-nav"><svg viewBox="0 0 40 40">'+
+          '<circle cx="20" cy="20" r="13" fill="#1a73e8" stroke="#fff" stroke-width="3"/>'+
+          '<path d="M20 9.5 L26.6 25.5 L20 21.6 L13.4 25.5 Z" fill="#fff"/>'+
+          '</svg></div>'})})
+        .addTo(M);
     } else travel.marker.setLatLng([pos.lat,pos.lon]);
-    try{ if(travel.follow!==false&&!state.maps.route.getBounds().pad(-0.25).contains([pos.lat,pos.lon])) state.maps.route.panTo([pos.lat,pos.lon]); }catch(e){}
-    // course-up: roda o mapa para a tua direção (como o Google Maps)
-    try{ const hd=p.coords.heading;
-      if(state.maps.route.setBearing&&hd!=null&&!isNaN(hd)&&(p.coords.speed||0)>2) state.maps.route.setBearing(-hd);
+    // course-up: o mapa roda para o teu sentido de marcha (como o Google Maps)
+    let brg=0;
+    try{
+      if(M.setBearing&&travel.courseUp!==false&&travel.heading!=null&&(p.coords.speed==null||p.coords.speed>1.4)){
+        M.setBearing(-travel.heading); brg=-travel.heading;
+      } else if(M.getBearing) brg=M.getBearing()||0;
     }catch(e){}
+    // a seta aponta sempre para onde vais, seja o mapa norte-acima ou virado
+    try{
+      const el=travel.marker.getElement?.()?.querySelector(".me-nav");
+      if(el&&travel.heading!=null) el.style.transform=`rotate(${(travel.heading+brg).toFixed(1)}deg)`;
+    }catch(e){}
+    try{ if(travel.follow!==false&&!M.getBounds().pad(-0.25).contains([pos.lat,pos.lon])) M.panTo([pos.lat,pos.lon]); }catch(e){}
   }
   const {i:idx, off}=nearestSampleIdx(pos);
   const here=R.samples[idx];
@@ -4367,6 +4489,19 @@ function init(){
 
   // definições
   const pop=$("#settings-pop");
+  // rede: avisa em grande quando cai (e quando volta) — o mapa guardado continua a servir
+  state.offline=!navigator.onLine;
+  if(state.offline) setTimeout(()=>{ state.offline=false; setOffline(true); },1500);
+  addEventListener("offline",()=>setOffline(true));
+  addEventListener("online",()=>setOffline(false));
+  // progresso da descarga do mapa offline
+  navigator.serviceWorker?.addEventListener?.("message",(ev)=>{
+    const d=ev.data||{};
+    if(d.type==="PRECACHE_DONE"){
+      tileDL.running=false;
+      if(d.saved>30) toast(t("🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.",{n:d.saved}),6000);
+    } else if(d.type==="PRECACHE_PROGRESS"){ tileDL.done=d.done; }
+  });
   $("#btn-trips").addEventListener("click",openTrips);
   $("#trips-close").addEventListener("click",closeTrips);
   $("#trips-bg").addEventListener("click",closeTrips);
