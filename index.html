@@ -482,6 +482,131 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .locate-btn{width:34px;height:34px;border-radius:9px;border:2px solid rgba(0,0,0,.2);background:var(--surface);
   color:var(--ink);font-size:17px;cursor:pointer;line-height:1;box-shadow:0 1px 5px rgba(0,0,0,.25)}
 .locate-btn:hover{background:var(--surface2)}
+
+/* ============================================================
+   CORREÇÕES DE LEGIBILIDADE E SOBREPOSIÇÃO
+   ============================================================ */
+/* 1. menus nativos (<select>): no tema escuro as opções ficavam brancas sobre branco */
+select{color-scheme:light}
+html[data-theme="dark"] select{color-scheme:dark}
+select option{background:var(--surface-solid);color:var(--ink)}
+html[data-theme="dark"] select option{background:#16203a;color:#f2f5fb}
+.sel{background:var(--surface-solid);font-weight:600}
+
+/* 2. sugestões: fundo OPACO (o texto de trás já não atravessa) e sempre por cima */
+.ac-list{background:var(--surface-solid);backdrop-filter:none;-webkit-backdrop-filter:none;
+  z-index:4600;box-shadow:0 18px 46px -14px rgba(0,0,0,.55),0 0 0 1px var(--border)}
+html[data-theme="dark"] .ac-list{background:#111a2c}
+.ac-item{border-bottom:1px solid var(--border)}
+.ac-item:last-child{border-bottom:0}
+.ac-item.fav-hit{background:linear-gradient(90deg,var(--accent-soft),transparent 70%)}
+/* o cartão que tem uma lista aberta sobe acima dos vizinhos (o blur cria contexto próprio) */
+.card{position:relative}
+.card:has(.ac-list.open){z-index:4500}
+.locbar:has(.ac-list.open),.field:has(.ac-list.open),.stop-row:has(.ac-list.open){z-index:4500}
+
+/* 3. definições: opaco, acima das tabs, e com altura limitada no telemóvel */
+.head-actions{position:relative;z-index:5200}
+.pop{z-index:5200;background:var(--surface-solid);backdrop-filter:none;-webkit-backdrop-filter:none;
+  max-height:min(74vh,560px);overflow-y:auto;box-shadow:0 22px 56px -16px rgba(0,0,0,.6),0 0 0 1px var(--border)}
+html[data-theme="dark"] .pop{background:#111a2c}
+
+/* 4. balão do pin no mapa: texto legível nos dois temas */
+.leaflet-popup-content-wrapper{background:var(--surface-solid);color:var(--ink);border-radius:14px}
+html[data-theme="dark"] .leaflet-popup-content-wrapper{background:#111a2c}
+.leaflet-popup-tip{background:var(--surface-solid)}
+html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
+.leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+.pin-pop b{color:var(--ink)}
+.pin-sub{color:var(--muted)}
+.pin-actions button{background:var(--surface2);color:var(--ink);border:1px solid var(--border);font-weight:650}
+.pin-actions button:hover{background:var(--accent-soft);border-color:var(--accent)}
+
+/* 5. respiração entre blocos do resumo da rota */
+.hero .chips{margin-top:12px}
+.stay-line{margin-top:12px}
+.route-actions{margin-top:14px;gap:8px}
+.legs{margin-top:12px}
+.hz-row{margin-top:10px}
+
+/* ============================================================
+   TELEMÓVEL — mesma qualidade do desktop
+   ============================================================ */
+@media (max-width:720px){
+  body{font-size:15.5px}
+  .wrap{padding:0 12px calc(58px + env(safe-area-inset-bottom,0px))}
+  .app-head{padding:14px 0 10px;gap:10px}
+  .brand-tile{width:42px;height:42px;border-radius:13px}
+  .brand-name{font-size:18.5px;letter-spacing:-.03em}
+  .head-actions{gap:6px}
+  .icon-btn{width:38px;height:38px;border-radius:12px;font-size:15px}
+  #btn-install{padding:8px 11px;font-size:12.5px}
+
+  /* tabs: alvos maiores e sempre acessíveis */
+  .tabs{top:6px;padding:4px;border-radius:15px;margin:4px 0 14px}
+  .tab{padding:11px 6px;font-size:13.5px;gap:5px;border-radius:11px}
+
+  .card{padding:15px 14px;border-radius:17px;margin-bottom:11px}
+  .card h2{font-size:15px}
+  .card .h-sub{font-size:12.5px;line-height:1.45}
+
+  /* veredicto: número e frase equilibrados, sem aperto */
+  .hero{gap:14px;align-items:flex-start}
+  .score-ring{width:80px;height:80px}
+  .score-num{font-size:26px}
+  .score-lab{font-size:7.5px;letter-spacing:.04em}
+  .hero-title{font-size:18.5px;line-height:1.2;gap:8px}
+  .hero-tag{font-size:9.5px;padding:3px 7px}
+  .hero-sub{font-size:12.5px;line-height:1.45}
+
+  /* chips e botões: legíveis e fáceis de acertar com luva */
+  .chip{font-size:12px;padding:6px 10px}
+  .btn{padding:11px 14px;font-size:13.5px}
+  .route-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .route-actions .btn{width:100%;justify-content:center;font-size:12.5px;padding:11px 8px}
+  .route-actions .btn.primary{grid-column:1 / -1}
+
+  /* campos do plano: um por linha, com espaço a respirar */
+  .route-extra{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+  .route-extra > .field{width:100%;align-self:stretch}
+  .field label{font-size:12.5px;margin-bottom:6px}
+  .field input,.sel{font-size:16px;padding:12px 13px}  /* 16px evita o zoom automático do iOS */
+  .ac-item{padding:11px 12px}
+  .ac-item b{font-size:14.5px}
+
+  /* perigos e troços */
+  .hz-txt{font-size:13px}
+  .hz-ico{font-size:17px}
+  .stay-line{font-size:13px;padding:10px 12px}
+
+  /* barra de viagem: não tapa o conteúdo e é confortável */
+  #travel-bar{left:8px;right:8px;bottom:8px;padding:11px 12px calc(11px + env(safe-area-inset-bottom,0px))}
+  #travel-bar b{font-size:14px}
+  #travel-bar span{font-size:11.5px}
+  body.traveling .wrap{padding-bottom:132px}
+
+  /* definições ocupam a largura útil em vez de uma coluna estreita */
+  .pop{width:min(320px,calc(100vw - 24px));right:-2px}
+  .radio-row label{padding:10px 11px;font-size:13px}
+
+  #map-route,#map-radar{height:320px;border-radius:14px}
+  .drawer{width:min(340px,92vw)}
+}
+/* linha "Partir às / hora": não pode transbordar do cartão */
+.time-row{display:flex;gap:8px;align-items:center;min-width:0}
+.time-row #rt-timemode{flex:0 0 auto;max-width:46%}
+.time-row #rt-when{flex:1 1 auto;min-width:0}
+.route-extra .field{min-width:0}
+@media (max-width:720px){
+  .time-row{flex-wrap:wrap}
+  .time-row #rt-timemode,.time-row #rt-when{flex:1 1 100%;max-width:100%;width:100%}
+}
+@media (max-width:380px){
+  .tab{font-size:12.5px;padding:10px 4px}
+  .hero-title{font-size:17px}
+  .score-ring{width:72px;height:72px}.score-num{font-size:23px}
+  .route-actions{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -595,9 +720,10 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
       <div class="route-extra">
         <div class="field">
           <label>Paragens no caminho <span class="muted" style="font-weight:400">(até 4)</span></label>
-          <div style="display:flex;gap:8px">
-            <button class="btn" id="btn-add-stop" style="flex:1;justify-content:center">➕ Adicionar paragem</button>
-            <select id="stop-pause" class="sel" title="Quanto tempo ficas em cada paragem" aria-label="Tempo em cada paragem">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" id="btn-add-stop" style="flex:1 1 150px;justify-content:center">➕ Adicionar paragem</button>
+            <label for="stop-pause" id="pause-lab" style="flex:1 1 130px;font-size:11.5px;font-weight:600;color:var(--muted);margin:0">Tempo em cada paragem
+            <select id="stop-pause" class="sel" style="width:100%;margin-top:4px" title="Quanto tempo ficas em cada paragem" aria-label="Tempo em cada paragem">
               <option value="0">fico 0 min</option>
               <option value="10">fico 10 min</option>
               <option value="15" selected>fico 15 min</option>
@@ -605,11 +731,12 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
               <option value="45">fico 45 min</option>
               <option value="60">fico 1 h</option>
             </select>
+            </label>
           </div>
         </div>
         <div class="field">
           <label for="rt-when">Hora de partida</label>
-          <div style="display:flex;gap:8px">
+          <div class="time-row">
             <select id="rt-timemode" class="sel" style="flex:0 0 auto" aria-label="Partir ou chegar a uma hora">
               <option value="dep" selected>Partir às</option>
               <option value="arr">Chegar às</option>
@@ -803,6 +930,8 @@ function applyStaticI18n(){
   const stopsLab=$$("#view-rota .route-extra label")[0];
   if(stopsLab){ stopsLab.textContent=""; stopsLab.append(document.createTextNode(t("Paragens no caminho")+" "));
     const s=el("span","muted",`(${t("até 4")})`); s.style.fontWeight="400"; stopsLab.appendChild(s); }
+  const pl=$("#pause-lab");
+  if(pl&&pl.firstChild) pl.firstChild.textContent=t("Tempo em cada paragem");
   $$("#stop-pause option").forEach(o=>{ const v=+o.value;
     o.textContent=v===0?t("fico 0 min"):v===60?t("fico 1 h"):t("fico {n} min",{n:v}); });
   $$("#rt-stay option").forEach(o=>{ const v=+o.value;
@@ -1402,6 +1531,8 @@ Object.assign(I18N.en,{
 "Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.":"You lost your internet connection. The saved map and navigation keep working.",
 "📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet is back — refreshing the weather.",
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Route map saved ({n} tiles) — works with no internet at all.",
+"⭐ guardado por ti":"⭐ saved by you","sem nome":"unnamed","Tempo em cada paragem":"Time at each stop",
+"⚠️ Perigo no teu trajeto":"⚠️ Hazard on your route",
 });
 Object.assign(I18N.es,{
 "Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
@@ -1462,6 +1593,8 @@ Object.assign(I18N.es,{
 "Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.":"Has perdido la conexión a internet. El mapa guardado y la navegación siguen funcionando.",
 "📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet de vuelta — actualizando la meteorología.",
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Mapa de la ruta guardado ({n} piezas) — funciona sin internet.",
+"⭐ guardado por ti":"⭐ guardado por ti","sem nome":"sin nombre","Tempo em cada paragem":"Tiempo en cada parada",
+"⚠️ Perigo no teu trajeto":"⚠️ Peligro en tu ruta",
 });
 Object.assign(I18N.fr,{
 "Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
@@ -1522,6 +1655,8 @@ Object.assign(I18N.fr,{
 "Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.":"Tu as perdu la connexion internet. La carte enregistrée et la navigation continuent de fonctionner.",
 "📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet de retour — mise à jour de la météo.",
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Carte du trajet enregistrée ({n} tuiles) — fonctionne sans internet.",
+"⭐ guardado por ti":"⭐ enregistré par toi","sem nome":"sans nom","Tempo em cada paragem":"Temps à chaque arrêt",
+"⚠️ Perigo no teu trajeto":"⚠️ Danger sur ton trajet",
 });
 
 /* ---------------- WMO → texto/emoji ---------------- */
@@ -1699,6 +1834,67 @@ async function photonSearch(q,pos,limit=7){
       if(seen.has(k)) return false; seen.add(k); return true; });
 }
 
+/* --- pesquisa por CATEGORIA ("igreja ortodoxa", "bomba de gasolina"…) ---
+   Escrever "orthodox church" nunca encontraria a igreja certa, porque o nome dela
+   é "H. Johannes Chrysostomos en Servatios" — não contém a palavra "orthodox".
+   Por isso, quando reconheço uma categoria, procuro POIs desse tipo À TUA VOLTA,
+   ordenados por distância, em vez de procurar por texto. */
+const POI_CATS=[
+  {re:/\b(igreja|church|kerk|capela|chapel|catedral|cathedral|templo|mosteiro|orthodox|ortodox|cat[óo]lic|cathol|protestant|evang[ée]lic)\b/i,
+   tag:'"amenity"="place_of_worship"', label:"igreja"},
+  {re:/\b(mesquita|mosque|moskee)\b/i, tag:'"amenity"="place_of_worship"]["religion"="muslim"', label:"mesquita"},
+  {re:/\b(sinagoga|synagog)\b/i, tag:'"amenity"="place_of_worship"]["religion"="jewish"', label:"sinagoga"},
+  {re:/\b(bomba de gasolina|gasolina|combust[íi]vel|posto|gas station|petrol|tankstation|fuel|benzine)\b/i,
+   tag:'"amenity"="fuel"', label:"combustível"},
+  {re:/\b(supermercado|supermarket|supermarkt|mercearia|grocery|hipermercado)\b/i, tag:'"shop"="supermarket"', label:"supermercado"},
+  {re:/\b(farm[áa]cia|pharmacy|apotheek|apotheke)\b/i, tag:'"amenity"="pharmacy"', label:"farmácia"},
+  {re:/\b(hospital|urg[êe]ncias?|ziekenhuis|emergency room)\b/i, tag:'"amenity"="hospital"', label:"hospital"},
+  {re:/\b(restaurante|restaurant|comer|almo[çc]ar|jantar|eten)\b/i, tag:'"amenity"="restaurant"', label:"restaurante"},
+  {re:/\b(caf[ée]|coffee|koffie|pastelaria)\b/i, tag:'"amenity"="cafe"', label:"café"},
+  {re:/\b(hotel|hostel|pousada|aloja|overnachting)\b/i, tag:'"tourism"~"hotel|hostel|guest_house|motel"', label:"alojamento"},
+  {re:/\b(multibanco|atm|caixa autom[áa]tic|geldautomaat)\b/i, tag:'"amenity"="atm"', label:"multibanco"},
+  {re:/\b(estacionamento|parking|parqueamento|parkeer)\b/i, tag:'"amenity"="parking"', label:"estacionamento"},
+  {re:/\b(oficina|mec[âa]nic|motorcycle|garagem|motoren|pneus|tyres)\b/i, tag:'"shop"~"motorcycle|car_repair|tyres"', label:"oficina"},
+];
+/* refinamentos que apuram a categoria (ex.: ortodoxa vs católica) */
+const POI_DENOM=[
+  {re:/\b(orthodox|ortodox)\b/i, extra:'["denomination"~"orthodox"]'},
+  {re:/\b(cat[óo]lic|cathol|rooms-kathol)\b/i, extra:'["denomination"~"catholic"]'},
+  {re:/\b(protestant|luteran|lutheran|anglican)\b/i, extra:'["denomination"~"protestant|lutheran|anglican"]'},
+];
+function detectPoiCat(q){
+  const cat=POI_CATS.find(c=>c.re.test(q)); if(!cat) return null;
+  const den=POI_DENOM.find(d=>d.re.test(q));
+  return {tag:cat.tag, extra:den?den.extra:"", label:cat.label};
+}
+async function poiNear(cat,pos,radiusM=30000){
+  const body=`[out:json][timeout:20];(`+
+    ["node","way"].map(k=>`${k}(around:${radiusM},${pos.lat.toFixed(5)},${pos.lon.toFixed(5)})[${cat.tag}]${cat.extra};`).join("")+
+    `);out center 40;`;
+  for(const ep of OVERPASS_EPS){
+    try{
+      const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(body),
+        headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+      if(!r.ok) continue;
+      const j=await r.json();
+      const out=(j.elements||[]).map(e=>{
+        const lat=e.lat??e.center?.lat, lon=e.lon??e.center?.lon, tg=e.tags||{};
+        if(!isFinite(lat)||!isFinite(lon)) return null;
+        const name=tg.name||tg["name:pt"]||tg.operator||tg.brand||t("sem nome");
+        const sub=[tg["addr:street"]?`${tg["addr:street"]} ${tg["addr:housenumber"]||""}`.trim():null,
+                   tg["addr:city"]||tg["addr:place"]||null].filter(Boolean).join(", ");
+        return {name, sub, lat, lon, _poi:true};
+      }).filter(Boolean);
+      out.forEach(o=>{ o._d=haversine(pos,o); });
+      out.sort((a,b)=>a._d-b._d);
+      // sem nome só entra se não houver melhor
+      const named=out.filter(o=>o.name!==t("sem nome"));
+      return (named.length?named:out).slice(0,8);
+    }catch(e){}
+  }
+  return [];
+}
+
 const geoCache=new Map();
 async function geocode(q){
   const key=q.trim().toLowerCase();
@@ -1706,25 +1902,47 @@ async function geocode(q){
   const m=q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;]\s*(-?\d{1,3}[.,]\d+)\s*$/);
   if(m){ const lat=parseFloat(m[1].replace(",",".")), lon=parseFloat(m[2].replace(",","."));
     return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:t("coordenadas"), lat, lon}]; }
-  // 1º Photon (rápido, aguenta escrita contínua), com viés para a tua zona
-  let out=await photonSearch(q, state.home).catch(()=>[]);
-  // reserva: Nominatim (com fila)
-  if(!out.length){
-    try{
-      const u=new URL("https://nominatim.openstreetmap.org/search");
-      u.search=new URLSearchParams({q, format:"jsonv2", limit:"6", addressdetails:"1",
-        "accept-language":"pt", dedupe:"1"}).toString();
-      const j=await nomFetch(u.toString());
-      out=(j||[]).map(r=>{
-        const a=r.address||{};
-        const name=r.name||a.road||a.city||a.town||a.village||(r.display_name||"").split(",")[0];
-        const sub=(r.display_name||"").split(",").slice(1,4).join(",").trim();
-        return {name, sub, lat:+r.lat, lon:+r.lon};
-      });
-    }catch(e){}
+
+  const here=state.home;
+  const out=[];
+  const seen=new Set();
+  const add=(arr)=>{ for(const r of (arr||[])){
+    if(!isFinite(r.lat)||!isFinite(r.lon)) continue;
+    const k=`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
+    if(seen.has(k)) continue; seen.add(k); out.push(r);
+  }};
+
+  // 1) OS TEUS FAVORITOS primeiro — escreves "casa" e aparece a tua casa
+  const nq=normTxt(q);
+  const favs=getFavs().filter(f=>isFinite(f.lat)&&normTxt(f.name).includes(nq))
+    .map(f=>({...f, sub:f.sub||t("⭐ guardado por ti"), _fav:true}));
+  add(favs);
+
+  // 2) categoria reconhecida → os mais PRÓXIMOS desse tipo (não por texto)
+  const cat=here?detectPoiCat(q):null;
+  if(cat) add(await poiNear(cat,here).catch(()=>[]));
+
+  // 3) pesquisa por texto, com viés forte para a tua zona
+  add(await photonSearch(q, here).catch(()=>[]));
+
+  // 4) nada? tenta com menos palavras (nomes longos falham inteiros)
+  if(out.length<2){
+    const words=q.trim().split(/\s+/);
+    for(let n=words.length-1;n>=2&&out.length<4;n--)
+      add(await photonSearch(words.slice(0,n).join(" "), here).catch(()=>[]));
   }
-  if(out.length) geoCache.set(key,out);
-  return out;
+
+  // 5) ordenar: favoritos > proximidade (um resultado a 1500 km não serve de nada)
+  if(here){
+    out.forEach((r,i)=>{
+      r._d=isFinite(r._d)?r._d:haversine(here,r);
+      r._score=(r._fav?-1e6:0)+(r._poi?-500:0)+i*8+Math.min(r._d,4000)*(r._d>120?3:1);
+    });
+    out.sort((a,b)=>a._score-b._score);
+  }
+  const res=out.slice(0,8);
+  if(res.length) geoCache.set(key,res);
+  return res;
 }
 
 const revCache=new Map();
@@ -2011,10 +2229,10 @@ function attachAC(input, list, onPick){
     list.textContent="";
     if(!items.length){ const d=el("div","ac-empty",t('Sem resultados — tenta "cidade, país"')); list.appendChild(d); }
     items.forEach((it,i)=>{
-      const d=el("div","ac-item"+(i===active?" active":""));
+      const d=el("div","ac-item"+(i===active?" active":"")+(it._fav?" fav-hit":""));
       d.setAttribute("role","option");
       const mainCol=el("div","ac-main");
-      mainCol.appendChild(el("b",null,it.name));
+      mainCol.appendChild(el("b",null,(it._fav?"⭐ ":"")+it.name));
       if(it.sub) mainCol.appendChild(el("span",null,it.sub));
       d.appendChild(mainCol);
       if(state.home&&isFinite(it.lat)) d.appendChild(el("span","ac-dist",fmtN(haversine(state.home,it),1)+" km"));
@@ -3293,7 +3511,32 @@ function renderHazards(){
     card.appendChild(row);
   });
   box.appendChild(card);
+  notifyHazards(list);
 }
+/* os perigos graves também chegam por notificação (antes de saíres) e por voz (na estrada) */
+function notifyHazards(list){
+  try{
+    const R=state.route; if(!R) return;
+    const bad=list.filter(h=>h.sev>=3);
+    if(!bad.length){ scheduleNativeAlerts([],9130,10); return; }
+    const now=Date.now()/1000, dep=R.dep+(R.shift||0)*60;
+    const title=t("⚠️ Perigo no teu trajeto");
+    const body=bad.slice(0,2).map(h=>h.txt.split(".")[0]+".").join(" ");
+    if(dep>now+1800){                       // ainda vais sair: avisa 30 min antes
+      scheduleNativeAlerts([{at:dep-1800,title,body}],9130,10);
+    } else if(!travel.active&&!hzNotified.has(R.d?.name+bad[0].kind)){
+      hzNotified.add(R.d?.name+bad[0].kind);
+      try{
+        if("Notification" in window&&Notification.permission==="granted"){
+          if(navigator.serviceWorker?.controller)
+            navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"vdm-hz",renotify:true})).catch(()=>{});
+          else new Notification(title,{body,tag:"vdm-hz"});
+        }
+      }catch(e){}
+    }
+  }catch(e){}
+}
+const hzNotified=new Set();
 
 /* troços contíguos com chuva */
 function currentStretches(){
@@ -4198,6 +4441,20 @@ function onTravelPos(p){
         travel.alerted.add(kf);
         const Lg=NAV_LANG[state.lang]||NAV_LANG.pt;
         speak(Lg.dist(Math.round(dm/50)*50)+phr);
+      }
+    }
+  }
+  // perigos à frente (vento lateral, gelo, nevoeiro, sol baixo) — voz a ~1,5 km
+  if(R.hazards?.length){
+    for(const h of R.hazards){
+      const d=h.km0-kmNow;
+      const k=`hz-${h.kind}-${h.km0.toFixed(1)}`;
+      if(d<=1.5&&d>-0.2&&!travel.alerted.has(k)){
+        travel.alerted.add(k);
+        buzz(h.sev>=3?[280,110,280]:[180,80,180]);
+        speak(h.txt.split("—")[0].split(".")[0]);
+        const bar=$("#travel-bar"); bar.classList.remove("alert"); void bar.offsetWidth; bar.classList.add("alert");
+        break;
       }
     }
   }
