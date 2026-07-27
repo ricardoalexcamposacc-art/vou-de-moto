@@ -1,5 +1,5 @@
-/* Vou de Moto? — service worker v4: app atualiza sempre que há rede; offline usa a cache */
-const V = "vdm-v4";
+/* Vou de Moto? — service worker v5: app atualiza sempre que há rede; offline usa a cache */
+const V = "vdm-v5";
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
