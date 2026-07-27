@@ -1710,7 +1710,7 @@ async function toggleRouteRadar(on){
     const fr=state.radar.frames.filter(f=>!f.now).slice(-1)[0]||state.radar.frames[0];
     if(!fr) return;
     routeRadarLayer=L.tileLayer(`${state.radar.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`,
-      {opacity:.65, maxNativeZoom:9, maxZoom:19, attribution:"RainViewer"});
+      {opacity:.65, maxNativeZoom:7, maxZoom:19, attribution:"RainViewer"});
     routeRadarLayer.addTo(m);
   }catch(e){ toast("Radar indisponível de momento."); $("#rt-radar-toggle").checked=false; }
 }
@@ -2153,7 +2153,7 @@ function showRadarFrame(idx){
   const fr=R.frames[idx];
   if(!R.layers[idx]){
     R.layers[idx]=L.tileLayer(`${R.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`,
-      {opacity:.7, maxNativeZoom:9, maxZoom:19, attribution:"© RainViewer"});
+      {opacity:.7, maxNativeZoom:7, maxZoom:19, attribution:"© RainViewer"});
   }
   const prev=R.idx;
   R.layers[idx].addTo(m);
