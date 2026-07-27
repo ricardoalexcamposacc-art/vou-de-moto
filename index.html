@@ -261,6 +261,11 @@ a{color:var(--accent)}
   font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .cam-pin{background:#fff;border:2px solid #d03b3b;border-radius:50%;width:22px;height:22px;
   display:grid;place-items:center;font-size:11px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.me-pin{width:22px;height:22px;border-radius:50%;background:#1a73e8;border:3px solid #fff;
+  box-shadow:0 0 0 2px rgba(26,115,232,.35),0 1px 6px rgba(0,0,0,.4);position:relative}
+.me-pin::after{content:"";position:absolute;inset:-9px;border-radius:50%;
+  border:2px solid rgba(26,115,232,.5);animation:mepulse 1.6s ease-out infinite}
+@keyframes mepulse{from{transform:scale(.55);opacity:1}to{transform:scale(1.3);opacity:0}}
 /* assistente */
 .ai-row{display:flex;gap:8px;align-items:flex-start}
 .ai-mic{height:41px;width:41px;font-size:17px}
@@ -526,6 +531,13 @@ const state = {
   netFails:0,
 };
 window.__vdm=state; // para depuração/testes
+
+/* memória persistente (com proteção: em ambientes sem storage funciona em memória) */
+const store={
+  get(k){ try{ return JSON.parse(localStorage.getItem("vdm-"+k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem("vdm-"+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem("vdm-"+k); }catch(e){} },
+};
 
 /* ---------------- WMO → texto/emoji ---------------- */
 const WMO = {
@@ -1081,6 +1093,7 @@ function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomp
    ===================================================================== */
 function setHome(loc, {silent=false}={}){
   state.home=loc;
+  store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon});
   const box=$("#agora-content");
   if(!silent){ box.textContent="";
     box.appendChild(el("div","skel")); box.lastChild.style.height="150px"; box.lastChild.style.marginBottom="14px";
@@ -1105,8 +1118,9 @@ function useGPS(fromRoute){
     if(fromRoute){ const o=$("#rt-o"); o.value=`📍 ${n.name}`; o._picked=loc; toast(`Origem: ${n.name}`); }
     else { setHome(loc); toast(`Localização: ${n.name}`); }
   },err=>{
-    toast(fromRoute?"Sem acesso ao GPS — escreve a origem.":"Sem acesso ao GPS — a usar "+DEFAULT_LOC.name+". Pesquisa a tua cidade acima.");
-    if(!fromRoute && !state.wx) setHome(DEFAULT_LOC);
+    const fb=store.get("home")||DEFAULT_LOC;
+    toast(fromRoute?"Sem acesso ao GPS — escreve a origem.":"Sem acesso ao GPS — a usar "+fb.name+". Pesquisa a tua cidade acima.");
+    if(!fromRoute && !state.wx) setHome(fb);
   },{enableHighAccuracy:false, timeout:9000, maximumAge:300000});
 }
 
@@ -1561,6 +1575,9 @@ async function computeRoute(){
     applyShift(0,true);
     renderDepartures();
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
+    autoT.used=false;
+    if(state._resumeTravel&&!travel.active){ state._resumeTravel=false; setTimeout(startTravel,600); }
+    else maybeAutoTravel(); // liga o Modo Viagem sozinho se detetar movimento
     if($("#rt-radar-toggle").checked) toggleRouteRadar(true);
     try{ history.replaceState(null,"",
       "#r2="+pts.map(p=>`${p.lat.toFixed(4)},${p.lon.toFixed(4)},${encodeURIComponent(p.name)}`).join("~")
@@ -1628,6 +1645,11 @@ function drawRoute(fit){
     const seg=R.coords.slice(a.idx,b.idx+1).map(c=>[c.lat,c.lon]);
     if(seg.length<2) continue;
     L.polyline(seg,{color:lvlColor(lvl),weight:5,opacity:.95,lineJoin:"round"}).addTo(g);
+  }
+  // já percorrido: fica cinzento (estilo Google Maps)
+  if(travel.active&&travel.geomIdx>1){
+    L.polyline(R.coords.slice(0,travel.geomIdx+1).map(c=>[c.lat,c.lon]),
+      {color:"#8b9099",weight:5,opacity:.95,lineJoin:"round"}).addTo(g);
   }
   // marcadores nas amostras (paragens com pin numerado)
   R.samples.forEach((s,i)=>{
@@ -2101,7 +2123,53 @@ function buildRecommendation(cand){
 /* =====================================================================
    MODO VIAGEM — geofencing de chuva em tempo real (com a app aberta)
    ===================================================================== */
-const travel={active:false, watch:null, marker:null, wakeLock:null, alerted:new Set(), lastRecalc:0};
+const travel={active:false, watch:null, marker:null, wakeLock:null, alerted:new Set(),
+  lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0};
+
+/* posição exata ao longo da geometria da rota (para o cinzento e distâncias precisas) */
+function travelProject(pos){
+  const R=state.route, C=R.coords;
+  const stride=Math.max(1,Math.floor(C.length/1500));
+  let bi=0,bd=1e12;
+  for(let i=0;i<C.length;i+=stride){ const d=haversine(pos,C[i]); if(d<bd){bd=d;bi=i;} }
+  return {idx:bi, off:bd, km:(R.cum[bi]/R.geomKm)*R.totalKm};
+}
+/* notificação de progresso (barra de notificações) durante a viagem */
+function travelNotify(){
+  try{
+    if(!("Notification" in window)||Notification.permission!=="granted") return;
+    const now=Date.now(); if(now-travel.lastNotif<25000) return; travel.lastNotif=now;
+    const opts={body:`${$("#tb-next").textContent}\n${$("#tb-sub").textContent}`,
+      tag:"vdm-travel", silent:true};
+    if(navigator.serviceWorker&&navigator.serviceWorker.controller){
+      navigator.serviceWorker.ready.then(r=>r.showNotification("🏍️ Vou de Moto — em viagem",opts)).catch(()=>{});
+    } else { try{ new Notification("🏍️ Vou de Moto — em viagem",opts); }catch(e){} }
+  }catch(e){}
+}
+function travelNotifyClose(){
+  try{ navigator.serviceWorker?.ready?.then(r=>r.getNotifications({tag:"vdm-travel"})
+    .then(ns=>ns.forEach(n=>n.close()))).catch(()=>{}); }catch(e){}
+}
+/* arranque automático: se a app detetar que já estás em andamento, liga o Modo Viagem */
+const autoT={watch:null, hits:0, used:false};
+function stopAutoTravel(){
+  if(autoT.watch!=null){ try{navigator.geolocation.clearWatch(autoT.watch);}catch(e){} autoT.watch=null; }
+}
+function maybeAutoTravel(){
+  if(travel.active||autoT.used||autoT.watch!=null||!navigator.geolocation||!state.route) return;
+  autoT.hits=0;
+  autoT.watch=navigator.geolocation.watchPosition(p=>{
+    if(travel.active||!state.route){ stopAutoTravel(); return; }
+    const sp=p.coords.speed;
+    if(sp!=null&&sp>3.5) autoT.hits++; else if(sp!=null) autoT.hits=0;
+    if(autoT.hits>=2){
+      stopAutoTravel(); autoT.used=true;
+      toast("🏍️ Detetei que estás em andamento — Modo Viagem ligado.");
+      startTravel();
+    }
+  },()=>stopAutoTravel(),{enableHighAccuracy:false, maximumAge:5000, timeout:30000});
+  setTimeout(stopAutoTravel, 10*60000);
+}
 function speak(txt){ try{ if(!("speechSynthesis" in window)) return;
   const u=new SpeechSynthesisUtterance(txt); u.lang="pt-PT"; u.rate=1.03; speechSynthesis.speak(u); }catch(e){} }
 function buzz(pat){ try{ navigator.vibrate&&navigator.vibrate(pat); }catch(e){} }
@@ -2110,12 +2178,16 @@ async function startTravel(){
   const R=state.route;
   if(!R){ toast("Calcula primeiro uma rota."); return; }
   if(!navigator.geolocation){ toast("Este dispositivo não dá acesso ao GPS."); return; }
-  travel.active=true; travel.alerted.clear(); travel.lastRecalc=0;
+  travel.active=true; travel.alerted.clear(); travel.lastRecalc=0; travel.lastPaint=0;
+  travel.geomIdx=0; travel.kmDone=0; travel.lastNotif=0;
+  stopAutoTravel();
   document.body.classList.add("traveling");
   $("#travel-bar").style.display="flex";
   $("#tb-next").textContent="🧭 Modo viagem ligado";
   $("#tb-sub").textContent="à procura do teu GPS…";
   try{ travel.wakeLock=await navigator.wakeLock?.request?.("screen"); }catch(e){}
+  try{ if("Notification" in window&&Notification.permission==="default") Notification.requestPermission(); }catch(e){}
+  store.set("travel",{hash:location.hash||"", at:Date.now()});
   travel.watch=navigator.geolocation.watchPosition(onTravelPos,
     ()=>{ $("#tb-sub").textContent="sem sinal GPS — continuo a tentar…"; },
     {enableHighAccuracy:true, maximumAge:3000, timeout:20000});
@@ -2128,8 +2200,12 @@ function stopTravel(msg){
   if(travel.watch!=null){ try{navigator.geolocation.clearWatch(travel.watch);}catch(e){} travel.watch=null; }
   try{ travel.wakeLock?.release?.(); }catch(e){} travel.wakeLock=null;
   if(travel.marker&&state.maps.route){ state.maps.route.removeLayer(travel.marker); travel.marker=null; }
+  travel.geomIdx=0;
   document.body.classList.remove("traveling");
   $("#travel-bar").style.display="none";
+  store.del("travel");
+  travelNotifyClose();
+  if(state.route&&state.maps.route) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
   updateTravelButtons();
 }
@@ -2147,16 +2223,22 @@ function onTravelPos(p){
   const R=state.route;
   const pos={lat:p.coords.latitude, lon:p.coords.longitude};
   const now=Date.now()/1000;
+  // pino azul pulsante — SEMPRE por cima da linha (camada de marcadores DOM)
   if(state.maps.route){
     if(!travel.marker){
-      travel.marker=L.circleMarker([pos.lat,pos.lon],{radius:9,color:"#ffffff",weight:3,
-        fillColor:getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()||"#3987e5",
-        fillOpacity:1}).addTo(state.maps.route);
+      travel.marker=L.marker([pos.lat,pos.lon],{zIndexOffset:9000, interactive:false,
+        icon:L.divIcon({className:"", html:'<div class="me-pin"></div>', iconSize:[22,22], iconAnchor:[11,11]})})
+        .addTo(state.maps.route);
     } else travel.marker.setLatLng([pos.lat,pos.lon]);
+    try{ if(!state.maps.route.getBounds().contains([pos.lat,pos.lon])) state.maps.route.panTo([pos.lat,pos.lon]); }catch(e){}
   }
   const {i:idx, off}=nearestSampleIdx(pos);
   const here=R.samples[idx];
   if(off>4){ $("#tb-sub").textContent=`estás a ${fmtN(off,1)} km da rota traçada — recalcula se mudaste de caminho`; return; }
+  // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
+  const pj=travelProject(pos);
+  travel.geomIdx=pj.idx; travel.kmDone=pj.km;
+  if(now-travel.lastPaint>5){ travel.lastPaint=now; drawRoute(false); }
   // recalibra as previsões ao tempo real (a cada 30 s)
   if(now-travel.lastRecalc>30){
     travel.lastRecalc=now;
@@ -2167,11 +2249,12 @@ function onTravelPos(p){
     drawRoute(false);
     if(travel.marker) travel.marker.addTo(state.maps.route);
   }
+  const kmNow=travel.kmDone||here.km;
   // radares à frente — aviso por voz a ~1 km e a ~400 m
   if(R.cameras?.length){
-    const nextCam=R.cameras.find(c=>c.km>here.km-0.05);
+    const nextCam=R.cameras.find(c=>c.km>kmNow-0.05);
     if(nextCam){
-      const dc=nextCam.km-here.km;
+      const dc=nextCam.km-kmNow;
       for(const [th,lab] of [[1.0,"1 quilómetro"],[0.4,"400 metros"]]){
         const key=`cam${nextCam.km.toFixed(1)}-${th}`;
         if(dc<=th&&dc>-0.05&&!travel.alerted.has(key)){
@@ -2185,7 +2268,7 @@ function onTravelPos(p){
   }
   // chegada
   const last=R.samples[R.samples.length-1];
-  const remKm=Math.max(0,last.km-here.km);
+  const remKm=Math.max(0,last.km-kmNow);
   const etaArr=now+Math.max(0,last.travelSec-here.travelSec);
   if(haversine(pos,last)<0.35&&idx>=R.samples.length-2){
     speak("Chegaste ao destino. Boa!"); buzz([120,60,120]);
@@ -2201,7 +2284,7 @@ function onTravelPos(p){
     const key="in-"+Math.floor(here.km/3);
     if(!travel.alerted.has(key)){ travel.alerted.add(key); buzz([250,100,250]); }
   } else if(next){
-    const dist=Math.max(0,next.km-here.km);
+    const dist=Math.max(0,next.km-kmNow);
     const mins=Math.max(0,Math.round((next.travelSec-here.travelSec)/60));
     $("#tb-next").textContent=`🌧️ Chuva dentro de ~${mins} min (${fmtN(dist,1)} km)`;
     $("#tb-sub").textContent=`por volta das ${fmtHM(next.eta)} · faltam ${fmtN(remKm,1)} km até ao destino`;
@@ -2223,12 +2306,13 @@ function onTravelPos(p){
     else if(mins<=5) fire(zone+"-m5",`Atenção: chuva dentro de cerca de ${Math.max(1,mins)} minutos. ${tip||"Última oportunidade para parar num sítio seco."}`);
     else if(mins<=12) fire(zone+"-m12",`Aviso antecipado: chuva dentro de cerca de ${mins} minutos, a ${Math.round(dist)} quilómetros. ${tip||"Tens tempo para parar ou mudar de caminho na aplicação."}`);
   } else if(nextWarn){
-    $("#tb-next").textContent=`⚠️ Possível chuvisco dentro de ${fmtN(Math.max(0,nextWarn.km-here.km),1)} km`;
+    $("#tb-next").textContent=`⚠️ Possível chuvisco dentro de ${fmtN(Math.max(0,nextWarn.km-kmNow),1)} km`;
     $("#tb-sub").textContent=`faltam ${fmtN(remKm,1)} km · chegada ~${fmtHM(etaArr)}`;
   } else {
     $("#tb-next").textContent="✅ Caminho seco daqui até ao destino";
     $("#tb-sub").textContent=`faltam ${fmtN(remKm,1)} km · chegada ~${fmtHM(etaArr)}`;
   }
+  travelNotify(); // progresso na barra de notificações
 }
 
 /* =====================================================================
@@ -2436,8 +2520,9 @@ function setTheme(t){
 }
 
 function init(){
-  // tema segue o sistema por defeito, escuro como base
+  // tema: sistema por defeito; a tua escolha fica memorizada
   if(matchMedia&&matchMedia("(prefers-color-scheme: light)").matches) setTheme("light");
+  const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth);
   $("#btn-theme").addEventListener("click",()=>setTheme(state.theme==="dark"?"light":"dark"));
 
   // definições
@@ -2445,8 +2530,11 @@ function init(){
   $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open"); });
   document.addEventListener("click",(e)=>{ if(!pop.contains(e.target)&&e.target.id!=="btn-settings") pop.classList.remove("open"); });
   document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") pop.classList.remove("open"); });
+  const sp=store.get("profile");
+  if(sp&&PROFILES[sp]){ state.profile=sp; const rr=$(`#profile-radios input[value="${sp}"]`); if(rr) rr.checked=true; }
   $$("#profile-radios input").forEach(r=>r.addEventListener("change",()=>{
     state.profile=r.value;
+    store.set("profile",r.value);
     toast(`Perfil: ${r.value} ✔`);
     if(state.wx) renderDashboard();
     if(state.route){ applyShift(state.route.shift); renderDepartures(); }
@@ -2519,37 +2607,44 @@ function init(){
     setTimeout(()=>toast("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.",7000),4000);
   }
 
-  // restaurar rota guardada no URL (#r2=pt~pt~…|epoch|pausaMin)
-  let restored=false;
-  try{
-    const h=location.hash.match(/^#r2=([^|]+)\|(\d+)\|(\d+)$/);
-    if(h){
+  // restaurar rota (URL #r2=… ou memória da última viagem — nada se perde ao fechar)
+  const tryRestore=(hstr)=>{
+    try{
+      const h=(hstr||"").match(/^#r2=([^|]+)\|(\d+)\|(\d+)$/);
+      if(!h) return false;
       const pts=h[1].split("~").map(s=>{ const p=s.split(",");
         return {lat:+p[0], lon:+p[1], name:decodeURIComponent(p.slice(2).join(",")||"ponto"), sub:""}; });
-      if(pts.length>=2&&pts.every(p=>isFinite(p.lat)&&isFinite(p.lon))){
-        const o=pts[0], d=pts[pts.length-1];
-        $("#rt-o").value=o.name; $("#rt-o")._picked=o;
-        $("#rt-d").value=d.name; $("#rt-d")._picked=d;
-        pts.slice(1,-1).forEach(p=>addStopRow(p));
-        const pauseMin=String(+h[3]||0), sel=$("#stop-pause");
-        if([...sel.options].some(op=>op.value===pauseMin)) sel.value=pauseMin;
-        const dep=+h[2];
-        if(dep*1000>Date.now()) when.value=localDT(new Date(dep*1000));
-        restored=true;
-        switchTab("rota");
-        setTimeout(computeRoute,300);
-      }
-    }
-  }catch(e){}
+      if(pts.length<2||!pts.every(p=>isFinite(p.lat)&&isFinite(p.lon))) return false;
+      const o=pts[0], d=pts[pts.length-1];
+      $("#rt-o").value=o.name; $("#rt-o")._picked=o;
+      $("#rt-d").value=d.name; $("#rt-d")._picked=d;
+      pts.slice(1,-1).forEach(p=>addStopRow(p));
+      const pauseMin=String(+h[3]||0), sel=$("#stop-pause");
+      if([...sel.options].some(op=>op.value===pauseMin)) sel.value=pauseMin;
+      const dep=+h[2];
+      if(dep*1000>Date.now()) when.value=localDT(new Date(dep*1000));
+      switchTab("rota");
+      setTimeout(computeRoute,300);
+      return true;
+    }catch(e){ return false; }
+  };
+  let restored=tryRestore(location.hash);
+  const tv=store.get("travel");
+  if(tv&&Date.now()-(tv.at||0)>12*3600*1000){ store.del("travel"); }
+  else if(tv&&tv.hash){
+    if(restored&&tv.hash===location.hash) state._resumeTravel=true;
+    else if(!restored){ restored=tryRestore(tv.hash); if(restored) state._resumeTravel=true; }
+  }
 
   // localização inicial
+  const HOME0=store.get("home")||DEFAULT_LOC;
   if(AUTO_GPS&&navigator.geolocation&&!restored){
     useGPS(false);
-    setTimeout(()=>{ if(!state.home) setHome(DEFAULT_LOC); },11000);
+    setTimeout(()=>{ if(!state.home) setHome(HOME0); },11000);
   } else if(!state.home){
-    setHome(DEFAULT_LOC);
+    setHome(HOME0);
   }
-  if(restored&&!state.home){ state.home={...DEFAULT_LOC}; setHome(DEFAULT_LOC,{silent:false}); }
+  if(restored&&!state.home){ setHome(HOME0,{silent:false}); }
 }
 
 if(typeof L==="undefined"){
