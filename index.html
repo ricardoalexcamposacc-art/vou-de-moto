@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" id="meta-theme" content="#1a1a19">
+<meta name="theme-color" id="meta-theme" content="#0a1120">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,28 +17,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-/* ================= TOKENS ================= */
+/* ================= TOKENS — "Aurora Navy" ================= */
 :root{
-  --page:#f9f9f7; --surface:#fcfcfb; --surface2:#f3f2ee;
-  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-  --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,.10);
-  --accent:#2a78d6; --accent-soft:rgba(42,120,214,.12); --accent-ink:#ffffff;
+  --page:#eef1f8;
+  --page-grad:radial-gradient(900px 520px at 12% -8%, rgba(37,99,235,.10), transparent 60%),
+              radial-gradient(820px 480px at 105% 8%, rgba(6,182,212,.10), transparent 55%),
+              linear-gradient(180deg,#f2f5fb 0%,#e9edf6 100%);
+  --surface:rgba(255,255,255,.78); --surface-solid:#ffffff; --surface2:rgba(15,32,68,.055);
+  --ink:#0c1424; --ink2:#43516b; --muted:#7a869e;
+  --grid:#e1e5ef; --baseline:#c4cbdb; --border:rgba(12,20,36,.09);
+  --accent:#2563eb; --accent2:#06b6d4;
+  --acc-grad:linear-gradient(135deg,#2563eb 0%,#0ea5e9 62%,#06b6d4 100%);
+  --accent-soft:rgba(37,99,235,.10); --accent-ink:#ffffff;
+  --glow:0 6px 22px -6px rgba(37,99,235,.42);
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
   --good-soft:rgba(12,163,12,.13); --warn-soft:rgba(250,178,25,.16);
   --serious-soft:rgba(236,131,90,.16); --crit-soft:rgba(208,59,59,.14);
   --seq100:#cde2fb; --seq250:#86b6ef; --seq400:#3987e5; --seq550:#1c5cab; --seq700:#0d366b;
-  --shadow:0 1px 2px rgba(11,11,11,.05),0 6px 22px -12px rgba(11,11,11,.18);
+  --shadow:0 1px 2px rgba(12,20,36,.05),0 12px 32px -14px rgba(12,20,36,.16);
+  --shadow-lift:0 2px 4px rgba(12,20,36,.06),0 18px 44px -16px rgba(12,20,36,.22);
+  --card-top:inset 0 1px 0 rgba(255,255,255,.85);
+  --blur:saturate(1.35) blur(14px);
   color-scheme:light;
 }
 html[data-theme="dark"]{
-  --page:#0d0d0d; --surface:#1a1a19; --surface2:#222220;
-  --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,.10);
-  --accent:#3987e5; --accent-soft:rgba(57,135,229,.16); --accent-ink:#ffffff;
+  --page:#070c16;
+  --page-grad:radial-gradient(1000px 560px at 10% -10%, rgba(59,130,246,.16), transparent 60%),
+              radial-gradient(860px 520px at 108% 6%, rgba(6,182,212,.12), transparent 55%),
+              radial-gradient(700px 700px at 50% 120%, rgba(30,58,138,.22), transparent 60%),
+              linear-gradient(180deg,#0a1120 0%,#070c16 100%);
+  --surface:rgba(17,26,44,.72); --surface-solid:#111a2c; --surface2:rgba(148,178,255,.07);
+  --ink:#f2f5fb; --ink2:#b8c2d9; --muted:#7f8aa3;
+  --grid:#20293d; --baseline:#2c3650; --border:rgba(148,178,255,.13);
+  --accent:#3b82f6; --accent2:#22d3ee;
+  --acc-grad:linear-gradient(135deg,#3b82f6 0%,#0ea5e9 62%,#22d3ee 100%);
+  --accent-soft:rgba(59,130,246,.16); --accent-ink:#ffffff;
+  --glow:0 8px 26px -6px rgba(34,211,238,.35);
   --good-soft:rgba(12,163,12,.18); --warn-soft:rgba(250,178,25,.14);
   --serious-soft:rgba(236,131,90,.14); --crit-soft:rgba(208,59,59,.18);
   --seq700:#86b6ef;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 26px -14px rgba(0,0,0,.6);
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 14px 36px -14px rgba(0,0,0,.6);
+  --shadow-lift:0 2px 6px rgba(0,0,0,.5),0 22px 52px -18px rgba(0,0,0,.7);
+  --card-top:inset 0 1px 0 rgba(255,255,255,.06);
   color-scheme:dark;
 }
 /* ================= BASE ================= */
@@ -46,41 +66,58 @@ html[data-theme="dark"]{
 html,body{margin:0;padding:0}
 body{
   background:var(--page); color:var(--ink);
-  font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased; min-height:100vh;
 }
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--page-grad);background-attachment:fixed}
 button,input,select{font:inherit;color:inherit}
 .wrap{max-width:1060px;margin:0 auto;padding:0 16px 56px}
 a{color:var(--accent)}
 ::placeholder{color:var(--muted)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(127,138,163,.35);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* ================= HEADER ================= */
-.app-head{display:flex;align-items:center;gap:12px;padding:16px 0 10px}
-.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.app-head{display:flex;align-items:center;gap:12px;padding:18px 0 12px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
 .brand svg{flex:none}
-.brand-name{font-size:20px;font-weight:750;letter-spacing:-.02em;white-space:nowrap}
-.brand-sub{font-size:12px;color:var(--muted);margin-top:-3px;white-space:nowrap}
+.brand-name{font-size:21px;font-weight:800;letter-spacing:-.025em;white-space:nowrap;
+  background:linear-gradient(120deg,var(--ink) 30%,var(--accent) 78%,var(--accent2) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:-2px;white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.09em;font-weight:600}
 .head-actions{margin-left:auto;display:flex;gap:8px}
 .icon-btn{
-  width:38px;height:38px;border-radius:11px;border:1px solid var(--border);
-  background:var(--surface);cursor:pointer;display:grid;place-items:center;font-size:16px;
-  transition:background .15s;
+  width:40px;height:40px;border-radius:13px;border:1px solid var(--border);
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  cursor:pointer;display:grid;place-items:center;font-size:16px;box-shadow:var(--shadow);
+  transition:transform .16s,box-shadow .16s,background .16s;
 }
-.icon-btn:hover{background:var(--surface2)}
+.icon-btn:hover{background:var(--surface2);transform:translateY(-1px)}
+.icon-btn:active{transform:scale(.94)}
 /* ================= TABS ================= */
-.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);
-  border-radius:13px;padding:4px;margin:6px 0 16px;box-shadow:var(--shadow)}
-.tab{flex:1;padding:9px 8px;border:0;border-radius:9px;background:transparent;cursor:pointer;
-  font-weight:600;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:7px;
-  transition:background .15s,color .15s}
-.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs{display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-radius:16px;padding:5px;margin:6px 0 18px;box-shadow:var(--shadow),var(--card-top);
+  position:sticky;top:10px;z-index:1500}
+.tab{flex:1;padding:10px 8px;border:0;border-radius:12px;background:transparent;cursor:pointer;
+  font-weight:650;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:background .18s,color .18s,box-shadow .18s,transform .12s}
+.tab[aria-selected="true"]{background:var(--acc-grad);color:var(--accent-ink);box-shadow:var(--glow)}
 .tab:not([aria-selected="true"]):hover{background:var(--surface2)}
+.tab:active{transform:scale(.97)}
 .view{display:none}
-.view.active{display:block}
+.view.active{display:block;animation:viewIn .26s ease-out}
 /* ================= CARDS ================= */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
-.card h2{margin:0 0 4px;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  padding:18px;margin-bottom:16px;box-shadow:var(--shadow),var(--card-top);
+  animation:cardIn .32s ease-out both}
+.card h2{margin:0 0 4px;font-size:15.5px;font-weight:750;letter-spacing:-.015em}
 .card .h-sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
 .card-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .card-head .spacer{flex:1}
@@ -93,10 +130,10 @@ a{color:var(--accent)}
 /* ================= INPUTS / AUTOCOMPLETE ================= */
 .field{position:relative}
 .field input[type="text"],.field input[type="search"],.field input[type="datetime-local"]{
-  width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--ink);
+  width:100%;padding:11px 13px;border-radius:13px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--ink);transition:border-color .15s,box-shadow .15s;
 }
-.field input:focus{border-color:var(--accent);outline:none}
+.field input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:0 0 5px}
 .ac-list{position:absolute;z-index:1200;left:0;right:0;top:calc(100% + 4px);
   background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;
@@ -108,24 +145,33 @@ a{color:var(--accent)}
 .ac-item span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ac-empty{padding:10px 12px;font-size:13px;color:var(--muted)}
 /* ================= BUTTONS / CHIPS ================= */
-.btn{padding:10px 16px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);
-  cursor:pointer;font-weight:650;font-size:14px;display:inline-flex;align-items:center;gap:8px;transition:filter .15s}
+.btn{padding:10px 16px;border-radius:13px;border:1px solid var(--border);background:var(--surface2);
+  cursor:pointer;font-weight:650;font-size:14px;display:inline-flex;align-items:center;gap:8px;
+  transition:filter .15s,transform .12s,box-shadow .18s}
 .btn:hover{filter:brightness(1.06)}
-.btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-ink)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--acc-grad);border-color:transparent;color:var(--accent-ink);box-shadow:var(--glow)}
+.btn.primary:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.55;cursor:default}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
-  border:1px solid var(--border);background:var(--surface2);font-size:12.5px;font-weight:550;color:var(--ink2)}
-.chip b{color:var(--ink);font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface2);font-size:12.5px;font-weight:570;color:var(--ink2);
+  transition:border-color .15s,background .15s,transform .12s}
+.chip b{color:var(--ink);font-weight:720}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip.sel{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.chip.sel{background:var(--acc-grad);color:var(--accent-ink);border-color:transparent;box-shadow:var(--glow)}
 .chip.sel b{color:var(--accent-ink)}
 .chip.click{cursor:pointer}
 .chip.click:hover{border-color:var(--accent)}
+.chip.click:active{transform:scale(.95)}
 /* ================= HERO VERDICT ================= */
 .hero{display:flex;gap:18px;align-items:center;position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--lvl-c,var(--accent))}
+.hero::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;
+  background:linear-gradient(180deg,var(--lvl-c,var(--accent)),transparent 140%)}
+.hero::after{content:"";position:absolute;width:340px;height:340px;right:-120px;top:-160px;border-radius:50%;
+  background:radial-gradient(circle, color-mix(in srgb, var(--lvl-c,var(--accent)) 14%, transparent) 0%, transparent 70%);pointer-events:none}
 .score-wrap{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
-.score-ring{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;position:relative}
+.score-ring{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;position:relative;
+  filter:drop-shadow(0 4px 14px color-mix(in srgb, var(--lvl-c,var(--accent)) 38%, transparent))}
 .score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .score-in{display:flex;flex-direction:column;align-items:center;line-height:1}
 .score-num{font-size:34px;font-weight:800;letter-spacing:-.03em}
@@ -228,12 +274,16 @@ a{color:var(--accent)}
   animation:sh 1.2s infinite}
 @keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 .muted{color:var(--muted)} .small{font-size:12px}
-.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--page);
-  padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;z-index:6000;opacity:0;
-  transition:opacity .25s;pointer-events:none;max-width:88vw;text-align:center}
-.toast.show{opacity:.96}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(6px);
+  background:rgba(12,20,36,.92);color:#f2f5fb;border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:11px 19px;border-radius:16px;font-size:13.5px;font-weight:600;z-index:6000;opacity:0;
+  transition:opacity .25s,transform .25s;pointer-events:none;max-width:88vw;text-align:center;
+  box-shadow:0 14px 40px -12px rgba(0,0,0,.5)}
+.toast.show{opacity:.98;transform:translateX(-50%) translateY(0)}
 .pop{position:absolute;right:0;top:calc(100% + 8px);z-index:1500;background:var(--surface);
-  border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;width:290px;display:none}
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lift);padding:14px;width:290px;display:none}
 .pop.open{display:block}
 .pop h3{margin:0 0 8px;font-size:13.5px}
 .radio-row{display:flex;flex-direction:column;gap:6px}
@@ -291,9 +341,11 @@ a{color:var(--accent)}
 .tl-wind i{font-style:normal;display:block;font-variant-numeric:tabular-nums}
 .tl-wind .w-strong i{font-weight:750;color:var(--ink)}
 /* modo viagem */
-#travel-bar{position:fixed;left:0;right:0;bottom:0;z-index:4000;display:flex;gap:12px;align-items:center;
-  background:var(--surface);border-top:2px solid var(--accent);
-  padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 24px rgba(0,0,0,.25)}
+#travel-bar{position:fixed;left:10px;right:10px;bottom:10px;z-index:4000;display:flex;gap:10px;align-items:center;
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);border-radius:18px;
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -4px 30px rgba(0,0,0,.28),var(--glow);border-top:2px solid var(--accent)}
 #travel-bar .tb-main{flex:1;min-width:0}
 #travel-bar b{display:block;font-size:15px}
 #travel-bar span{display:block;font-size:12.5px;color:var(--ink2)}
@@ -324,7 +376,8 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
 
 /* ================= POLIMENTO (nível loja) ================= */
 body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.brand-tile{width:42px;height:42px;border-radius:13px;object-fit:cover;display:block;background:linear-gradient(140deg,#2a78d6,#0d366b);
+.brand-tile{width:46px;height:46px;border-radius:14px;object-fit:cover;display:block;
+  box-shadow:0 4px 14px -4px rgba(12,20,36,.4),0 0 0 1px var(--border);background:linear-gradient(140deg,#2a78d6,#0d366b);
   display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 4px 14px -6px rgba(26,90,180,.55)}
 .brand-name{font-size:19px;font-weight:800}
 .card{border-radius:18px;padding:18px;margin-bottom:12px}
@@ -368,6 +421,33 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   footer{font-size:11px}
 }
 .legs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+/* drawer de viagens planeadas */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2900}
+.drawer-bg.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,90vw);background:var(--surface);z-index:3000;
+  transform:translateX(105%);transition:transform .22s ease;box-shadow:-8px 0 30px rgba(0,0,0,.25);
+  display:flex;flex-direction:column;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;position:sticky;top:0;background:var(--surface);z-index:1}
+.drawer-head h2{margin:0;font-size:16px}
+#trips-list{padding:0 12px 8px;display:flex;flex-direction:column;gap:6px}
+.trip-day{font-size:12px;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 4px 2px}
+.trip-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);cursor:pointer}
+.trip-row:hover{border-color:var(--accent)}
+.trip-when{font-weight:800;font-size:14px;flex:none;min-width:46px}
+.trip-main{flex:1;min-width:0}
+.trip-name{font-size:13.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trip-sub{font-size:11.5px;color:var(--muted)}
+.trip-wx{flex:none;font-size:17px}
+.trip-del{flex:none;border:0;background:none;cursor:pointer;font-size:14px;opacity:.6;padding:6px}
+.trip-del:hover{opacity:1}
+.drop-pin{font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+.pin-pop{display:flex;flex-direction:column;gap:3px;min-width:200px}
+.pin-pop b{font-size:14px;line-height:1.3}
+.pin-sub{font-size:11.5px;color:#6b6b66}
+.pin-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.pin-actions button{padding:9px 11px;border-radius:9px;border:1px solid rgba(0,0,0,.14);background:#f4f4f1;cursor:pointer;font-weight:650;font-size:13px;text-align:left}
+.pin-actions button:hover{background:#e9edf5}
 .hz-row{display:flex;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface2);margin-top:8px;border-left:3px solid var(--warn,#fab219);align-items:flex-start}
 .hz-row.lvl3{border-left-color:#d03b3b}
 .hz-row.lvl2{border-left-color:#ec835a}
@@ -403,6 +483,7 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
     </div>
     <div class="head-actions" style="position:relative">
       <button class="btn primary" id="btn-install" style="display:none;padding:8px 13px" title="Instalar como app">📲 Instalar</button>
+      <button class="icon-btn" id="btn-trips" title="Viagens planeadas" aria-label="Viagens planeadas">🗓️</button>
       <button class="icon-btn" id="btn-theme" title="Alternar tema claro/escuro" aria-label="Alternar tema">🌙</button>
       <button class="icon-btn" id="btn-settings" title="Definições" aria-label="Definições">⚙️</button>
       <div class="pop" id="settings-pop" role="dialog" aria-label="Definições">
@@ -511,7 +592,13 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
         </div>
         <div class="field">
           <label for="rt-when">Hora de partida</label>
-          <input type="datetime-local" id="rt-when">
+          <div style="display:flex;gap:8px">
+            <select id="rt-timemode" class="sel" style="flex:0 0 auto" aria-label="Partir ou chegar a uma hora">
+              <option value="dep" selected>Partir às</option>
+              <option value="arr">Chegar às</option>
+            </select>
+            <input type="datetime-local" id="rt-when" style="flex:1;min-width:0">
+          </div>
         </div>
         <div class="field">
           <label for="rt-stay">Tempo no destino</label>
@@ -582,11 +669,21 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 <div class="toast" id="toast" role="status"></div>
 
 <!-- barra do modo viagem -->
+<div class="drawer-bg" id="trips-bg"></div>
+<aside class="drawer" id="trips-drawer" role="dialog" aria-label="Viagens planeadas">
+  <div class="drawer-head">
+    <h2 id="trips-title">🗓️ Viagens planeadas</h2>
+    <button class="icon-btn" id="trips-close" aria-label="Fechar">✕</button>
+  </div>
+  <div id="trips-list"></div>
+  <p class="h-sub" id="trips-hint" style="padding:0 16px 16px">Calcula uma rota com hora futura e toca em "🗓️ Agendar viagem" para ela aparecer aqui, com o tempo previsto.</p>
+</aside>
 <div id="travel-bar" style="display:none" role="status" aria-live="assertive">
   <div class="tb-main">
     <b id="tb-next">🧭 Modo viagem ligado</b>
     <span id="tb-sub">à espera de sinal GPS…</span>
   </div>
+  <button class="icon-btn" id="tb-mute" title="Silenciar/ligar a voz" aria-label="Silenciar ou ligar a voz">🔊</button>
   <button class="btn" id="tb-stop">🛑 Terminar</button>
 </div>
 
@@ -695,6 +792,9 @@ function applyStaticI18n(){
     else o.textContent=v<60?`~${v} min`:`~${v/60} h`; });
   $$(".chip.click[data-dep]").forEach(c=>{ const m=+c.dataset.dep;
     c.textContent=m===0?t("Agora"):`+${m/60} h`; });
+  $$("#rt-timemode option").forEach(o=>{ o.textContent=o.value==="dep"?t("Partir às"):t("Chegar às"); });
+  const tt2=$("#trips-title"); if(tt2) tt2.textContent=t("🗓️ Viagens planeadas");
+  const th2=$("#trips-hint"); if(th2) th2.textContent=t("Calcula uma rota com hora futura e toca em \"🗓️ Agendar viagem\" para ela aparecer aqui, com o tempo previsto.");
   // legenda do mapa
   const lg=$$("#view-rota .legend span");
   const legendTxt=["✔ Seco","⚠ Chuvisco / possível","🌧 Chuva","⛈ Forte / trovoada"];
@@ -1264,6 +1364,20 @@ Object.assign(I18N.en,{
 "Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Fog / visor fogging likely near km {k} (~{h}) — pinlock or visor cracked open, low beam on (never high beam) and double your following distance.",
 "Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Low sun straight ahead near km {k} (~{h}) — blinds you and the drivers behind you. Dark visor/peak, add distance, and assume cars don't see you.",
 "Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Careful: first rain after a dry spell — treacherous road surface",
+"Ponto no mapa":"Map point","Ir para aqui":"Go here","Partir daqui":"Start from here","Adicionar como paragem":"Add as a stop",
+"📍 Partida definida: {p}":"📍 Start set: {p}","➕ Paragem adicionada: {p}":"➕ Stop added: {p}","🏁 A calcular rota para {p}…":"🏁 Calculating route to {p}…",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 Don't know the place's name? Press and hold anywhere on the map (or right-click on PC) and I'll take you there.",
+"Partir às":"Leave at","Chegar às":"Arrive by","🗓️ Viagens planeadas":"🗓️ Planned trips","Agendar viagem":"Schedule trip",
+"Calcula uma rota com hora futura e toca em \"🗓️ Agendar viagem\" para ela aparecer aqui, com o tempo previsto.":"Plan a route with a future time and tap \"🗓️ Schedule trip\" to see it here with its forecast.",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"First set a future departure (or arrival) time — then schedule it.",
+"🗓️ Agendada: {p} — vê no calendário (canto superior direito).":"🗓️ Scheduled: {p} — see the calendar (top right).",
+"🏍️ Viagem daqui a 1h30":"🏍️ Trip in 1h30","{p} às {h} — abre a app para veres o tempo antes de saíres.":"{p} at {h} — open the app to check the weather before leaving.",
+"ainda sem previsão":"no forecast yet","chuva forte/trovoada":"heavy rain/storm","chuva prevista":"rain expected","vento muito forte":"very strong wind","possível chuvisco":"possible drizzle","bom para ir":"good to go",
+"partida {h}":"departure {h}","🗓️ A abrir: {p}":"🗓️ Opening: {p}","Não consegui abrir esta viagem.":"Couldn't open this trip.",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ To arrive by {h} you should have left already — showing it from now.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ To arrive by {h}, leave at {d}.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voice muted — you still get vibration and notifications.",
+"🔊 Voz ligada.":"🔊 Voice on.",
 });
 Object.assign(I18N.es,{
 "Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
@@ -1305,6 +1419,20 @@ Object.assign(I18N.es,{
 "Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Niebla/visera empañada probable cerca del km {k} (~{h}) — pinlock o visera entreabierta, cortas encendidas (nunca largas) y el doble de distancia.",
 "Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Sol bajo de frente cerca del km {k} (~{h}) — te deslumbra a ti y a los de atrás. Visera oscura/visera pico, más distancia y asume que los coches no te ven.",
 "Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Cuidado: primera lluvia tras días secos — asfalto traicionero",
+"Ponto no mapa":"Punto en el mapa","Ir para aqui":"Ir aquí","Partir daqui":"Salir desde aquí","Adicionar como paragem":"Añadir como parada",
+"📍 Partida definida: {p}":"📍 Salida fijada: {p}","➕ Paragem adicionada: {p}":"➕ Parada añadida: {p}","🏁 A calcular rota para {p}…":"🏁 Calculando ruta a {p}…",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 ¿No sabes el nombre del sitio? Mantén el dedo en un punto del mapa (o clic derecho en el PC) y te llevo allí.",
+"Partir às":"Salir a las","Chegar às":"Llegar a las","🗓️ Viagens planeadas":"🗓️ Viajes planificados","Agendar viagem":"Programar viaje",
+"Calcula uma rota com hora futura e toca em \"🗓️ Agendar viagem\" para ela aparecer aqui, com o tempo previsto.":"Calcula una ruta con hora futura y toca \"🗓️ Programar viaje\" para verla aquí con su previsión.",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"Primero fija una hora futura de salida (o llegada) — luego prográmalo.",
+"🗓️ Agendada: {p} — vê no calendário (canto superior direito).":"🗓️ Programado: {p} — míralo en el calendario (arriba a la derecha).",
+"🏍️ Viagem daqui a 1h30":"🏍️ Viaje en 1h30","{p} às {h} — abre a app para veres o tempo antes de saíres.":"{p} a las {h} — abre la app para ver el tiempo antes de salir.",
+"ainda sem previsão":"aún sin previsión","chuva forte/trovoada":"lluvia fuerte/tormenta","chuva prevista":"lluvia prevista","vento muito forte":"viento muy fuerte","possível chuvisco":"posible llovizna","bom para ir":"bueno para ir",
+"partida {h}":"salida {h}","🗓️ A abrir: {p}":"🗓️ Abriendo: {p}","Não consegui abrir esta viagem.":"No pude abrir este viaje.",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Para llegar a las {h} ya deberías haber salido — te lo muestro desde ahora.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Para llegar a las {h}, sal a las {d}.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voz silenciada — sigues recibiendo vibración y notificaciones.",
+"🔊 Voz ligada.":"🔊 Voz activada.",
 });
 Object.assign(I18N.fr,{
 "Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
@@ -1346,6 +1474,20 @@ Object.assign(I18N.fr,{
 "Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Brouillard/visière embuée probable vers le km {k} (~{h}) — pinlock ou visière entrouverte, feux de croisement (jamais pleins phares) et double la distance.",
 "Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Soleil bas de face vers le km {k} (~{h}) — il t'éblouit toi et ceux derrière. Visière teintée/casquette, plus de distance, et pars du principe que les voitures ne te voient pas.",
 "Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Attention : première pluie après des jours secs — chaussée traître",
+"Ponto no mapa":"Point sur la carte","Ir para aqui":"Aller ici","Partir daqui":"Partir d'ici","Adicionar como paragem":"Ajouter comme arrêt",
+"📍 Partida definida: {p}":"📍 Départ défini : {p}","➕ Paragem adicionada: {p}":"➕ Arrêt ajouté : {p}","🏁 A calcular rota para {p}…":"🏁 Calcul de l'itinéraire vers {p}…",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 Tu ne connais pas le nom de l'endroit ? Garde le doigt appuyé sur la carte (ou clic droit sur PC) et je t'y emmène.",
+"Partir às":"Partir à","Chegar às":"Arriver à","🗓️ Viagens planeadas":"🗓️ Trajets planifiés","Agendar viagem":"Planifier le trajet",
+"Calcula uma rota com hora futura e toca em \"🗓️ Agendar viagem\" para ela aparecer aqui, com o tempo previsto.":"Calcule un itinéraire avec une heure future et touche \"🗓️ Planifier le trajet\" pour le voir ici avec sa météo.",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"Fixe d'abord une heure future de départ (ou d'arrivée) — ensuite planifie.",
+"🗓️ Agendada: {p} — vê no calendário (canto superior direito).":"🗓️ Planifié : {p} — regarde le calendrier (en haut à droite).",
+"🏍️ Viagem daqui a 1h30":"🏍️ Trajet dans 1h30","{p} às {h} — abre a app para veres o tempo antes de saíres.":"{p} à {h} — ouvre l'app pour vérifier la météo avant de partir.",
+"ainda sem previsão":"pas encore de prévision","chuva forte/trovoada":"pluie forte/orage","chuva prevista":"pluie prévue","vento muito forte":"vent très fort","possível chuvisco":"bruine possible","bom para ir":"bon pour rouler",
+"partida {h}":"départ {h}","🗓️ A abrir: {p}":"🗓️ Ouverture : {p}","Não consegui abrir esta viagem.":"Impossible d'ouvrir ce trajet.",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Pour arriver à {h} tu aurais déjà dû partir — je te montre à partir de maintenant.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Pour arriver à {h}, pars à {d}.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voix coupée — tu reçois toujours vibrations et notifications.",
+"🔊 Voz ligada.":"🔊 Voix activée.",
 });
 
 /* ---------------- WMO → texto/emoji ---------------- */
@@ -1583,7 +1725,7 @@ async function revGeocode(lat,lon){
 async function osrmRoute(points){ // points: [{lat,lon},...]
   const path=points.map(p=>`${p.lon.toFixed(5)},${p.lat.toFixed(5)}`).join(";");
   const alts=points.length===2?"&alternatives=true":"";
-  const u=`https://router.project-osrm.org/route/v1/driving/${path}?overview=full&geometries=geojson&steps=false${alts}`;
+  const u=`https://router.project-osrm.org/route/v1/driving/${path}?overview=full&geometries=geojson&steps=true${alts}`;
   const j=await jfetch(u, 18000);
   if(j.code!=="Ok"||!j.routes?.length) throw new Error("Sem rota");
   return {routes:j.routes, waypoints:j.waypoints||[]};
@@ -2220,7 +2362,8 @@ function initRouteMap(){
   if(state.maps.route) return;
   if(typeof L==="undefined"){ routeError(t("Mapa indisponível — precisa de ligação à internet.")); return; }
   const rotOpts=(L.Map.prototype.setBearing&&!window.__noRotate)?{rotate:true, touchRotate:true, rotateControl:{closeOnZeroBearing:false}}:{};
-  const m=L.map("map-route",Object.assign({preferCanvas:true, zoomSnap:.5},rotOpts)).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
+  // SVG renderer: com canvas, a rota "descolava" das ruas durante o pinch-zoom (bug com leaflet-rotate)
+  const m=L.map("map-route",Object.assign({zoomSnap:.5},rotOpts)).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
   m._base=cartoLayer().addTo(m);
   state.maps.route=m;
   state.routeLayers=L.layerGroup().addTo(m);
@@ -2238,6 +2381,97 @@ function initRouteMap(){
       return b; }});
   m.addControl(new Locate());
   m.on("dragstart",()=>{ if(travel.active) travel.follow=false; });
+  // 📍 PIN: mantém o dedo (telemóvel) ou clica com o direito (PC) num ponto qualquer
+  let pinMk=null;
+  m.on("contextmenu",(ev)=>{
+    const lat=ev.latlng.lat, lon=ev.latlng.lng;
+    if(pinMk){ try{m.removeLayer(pinMk);}catch(e){} pinMk=null; }
+    pinMk=L.marker([lat,lon],{zIndexOffset:950, interactive:false,
+      icon:L.divIcon({className:"",html:'<div class="drop-pin">📍</div>',iconSize:[30,30],iconAnchor:[15,28]})}).addTo(m);
+    buzz([40]);
+    const loc={lat, lon, name:t("Ponto no mapa"), sub:""};
+    const pop=L.popup({autoPan:true})
+      .setLatLng([lat,lon])
+      .setContent(`<div class="pin-pop"><b>${t("Ponto no mapa")}</b><span class="pin-sub">${lat.toFixed(4)}, ${lon.toFixed(4)}</span>
+        <div class="pin-actions">
+        <button type="button" data-act="dest">🏁 ${t("Ir para aqui")}</button>
+        <button type="button" data-act="orig">📍 ${t("Partir daqui")}</button>
+        <button type="button" data-act="stop">➕ ${t("Adicionar como paragem")}</button>
+        </div></div>`)
+      .openOn(m);
+    const clearPin=()=>{ try{m.removeLayer(pinMk);}catch(e){} pinMk=null; };
+    pop.on&&pop.on("remove",()=>{ setTimeout(()=>{ if(pinMk) clearPin(); },400); });
+    // nome da rua em segundo plano (sem bloquear o popup)
+    revStreet(lat,lon).then(r=>{ loc.name=r.name; loc.sub=r.sub||"";
+      const root=pop.getElement&&pop.getElement(); if(!root) return;
+      const b=root.querySelector(".pin-pop b"), s=root.querySelector(".pin-sub");
+      if(b) b.textContent=r.name;
+      if(s) s.textContent=r.sub||`${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+    }).catch(()=>{});
+    const root=pop.getElement&&pop.getElement();
+    if(root) root.querySelectorAll(".pin-actions button").forEach(btn=>{
+      L.DomEvent.on(btn,"click",(e)=>{ L.DomEvent.stop(e);
+        m.closePopup(pop); clearPin();
+        applyPinChoice(btn.dataset.act, {...loc});
+      });
+    });
+  });
+}
+/* rua/morada de um ponto arbitrário do mapa (nível de rua, com cache) */
+const revStreetCache=new Map();
+async function revStreet(lat,lon){
+  const key=`${lat.toFixed(4)},${lon.toFixed(4)}`;
+  if(revStreetCache.has(key)) return revStreetCache.get(key);
+  let out=null;
+  try{
+    const u=new URL("https://photon.komoot.io/reverse");
+    u.search=new URLSearchParams({lat:lat.toFixed(6), lon:lon.toFixed(6)}).toString();
+    const j=await jfetch(u.toString(), 8000);
+    const p=j.features?.[0]?.properties;
+    if(p){
+      const road=[p.street||p.name, p.housenumber].filter(Boolean).join(" ");
+      const cty=p.city||p.town||p.village||p.district||"";
+      if(road||cty) out={name:road||cty, sub:[road?cty:null, p.state].filter(Boolean).join(", ")};
+    }
+  }catch(e){}
+  if(!out){
+    try{
+      const u=new URL("https://nominatim.openstreetmap.org/reverse");
+      u.search=new URLSearchParams({lat:lat.toFixed(6), lon:lon.toFixed(6), format:"jsonv2", zoom:"17", "accept-language":"pt"}).toString();
+      const j=await nomFetch(u.toString());
+      const a=j?.address||{};
+      const road=[a.road, a.house_number].filter(Boolean).join(" ")||j?.name||a.suburb||a.village||a.town||a.city;
+      if(road) out={name:road, sub:[a.village||a.town||a.city, a.state].filter(x=>x&&x!==road).join(", ")};
+    }catch(e){}
+  }
+  if(!out) out={name:t("Ponto no mapa"), sub:`${lat.toFixed(4)}, ${lon.toFixed(4)}`};
+  revStreetCache.set(key,out);
+  return out;
+}
+/* o que fazer com o ponto marcado */
+async function applyPinChoice(act,loc){
+  if(act==="orig"){
+    $("#rt-o").value=loc.name; $("#rt-o")._picked=loc;
+    toast(t("📍 Partida definida: {p}",{p:loc.name}));
+    if($("#rt-d")._picked||$("#rt-d").value.trim().length>=3) computeRoute();
+    else $("#plan-card").classList.add("open");
+    return;
+  }
+  if(act==="stop"){
+    addStopRow(loc);
+    toast(t("➕ Paragem adicionada: {p}",{p:loc.name}));
+    if($("#rt-d")._picked||$("#rt-d").value.trim().length>=3) computeRoute();
+    else $("#plan-card").classList.add("open");
+    return;
+  }
+  // destino
+  $("#rt-d").value=loc.name; $("#rt-d")._picked=loc;
+  if(!$("#rt-o")._picked&&$("#rt-o").value.trim().length<3){
+    const pos=await freshPos();
+    if(pos){ $("#rt-o").value=pos.name; $("#rt-o")._picked=pos; }
+  }
+  toast(t("🏁 A calcular rota para {p}…",{p:loc.name}));
+  computeRoute();
 }
 function surfaceColor(){ return getComputedStyle(document.documentElement).getPropertyValue("--surface").trim()||"#fff"; }
 
@@ -2299,6 +2533,20 @@ async function collectStops(){
 function buildVariant(route,pts,waypoints,pauseSec,dense){
   const coords=route.geometry.coordinates.map(c=>({lat:c[1],lon:c[0]}));
   const totalKm=route.distance/1000;
+  // manobras (para as indicações de condução por voz): km acumulado ao longo de todas as pernas
+  const maneuvers=[];
+  {
+    let mkm=0;
+    (route.legs||[]).forEach((leg,li,arr)=>{
+      (leg.steps||[]).forEach(st=>{
+        const mv=st.maneuver||{};
+        const isFinalArrive=mv.type==="arrive"&&li===arr.length-1;
+        if(mv.type&&!isFinalArrive)
+          maneuvers.push({km:mkm, type:mv.type, mod:mv.modifier||"", exit:mv.exit||0, road:st.name||st.ref||""});
+        mkm+=(st.distance||0)/1000;
+      });
+    });
+  }
   const legs=(route.legs&&route.legs.length===pts.length-1)?route.legs
     :[{duration:route.duration,distance:route.distance}];
   const travelTotal=legs.reduce((a,l)=>a+(l.duration||0),0)||route.duration;
@@ -2340,7 +2588,7 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
     samples.push({ ...coords[idx], idx, D:tg.D, stop:tg.stop,
       km:tg.D/geomKm*totalKm, travelSec:tm.travel, pauseOffset:tm.pause });
   }
-  return {coords,cum,geomKm,totalKm,legs,travelTotal,samples};
+  return {coords,cum,geomKm,totalKm,legs,travelTotal,samples,maneuvers};
 }
 
 /* peso de chuva de um trajeto para uma dada hora de partida */
@@ -2360,7 +2608,7 @@ function switchVariant(i){
   const R=state.route; if(!R||!R.variants?.[i]||i===R.active) return;
   const v=R.variants[i];
   Object.assign(R,{active:i, coords:v.coords, cum:v.cum, geomKm:v.geomKm, totalKm:v.totalKm,
-    travelTotal:v.travelTotal, totalSec:v.travelTotal, samples:v.samples});
+    travelTotal:v.travelTotal, totalSec:v.travelTotal, samples:v.samples, maneuvers:v.maneuvers});
   R.cameras=null;
   applyShift(R.shift);
   renderDepartures();
@@ -2390,6 +2638,20 @@ async function computeRoute(){
     const variants=list.map((rt,vi)=>buildVariant(rt,pts,waypoints,pauseSec,vi===0));
     if(!variants.length||variants[0].coords.length<2) throw new Error(t("Rota demasiado curta."));
 
+    // modo "Chegar às": recua a partida = chegada alvo − duração − pausas
+    if(($("#rt-timemode")?.value||"dep")==="arr"&&whenVal){
+      const arrTarget=new Date(whenVal).getTime()/1000;
+      const est=variants[0].travelTotal+(pts.length-2)*pauseSec;
+      let newDep=arrTarget-est;
+      const nowS=Date.now()/1000;
+      if(isFinite(newDep)){
+        if(newDep<nowS-60){ dep=nowS;
+          toast(t("⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.",{h:fmtHM(arrTarget)}),7000); }
+        else { dep=newDep;
+          toast(t("⏱️ Para chegares às {h}, parte às {d}.",{h:fmtHM(arrTarget),d:fmtHM(dep)}),7000); }
+      }
+    }
+
     // meteo: UMA chamada multi-localização para os pontos de todos os trajetos
     const allSamples=variants.flatMap(v=>v.samples);
     const maxTravel=Math.max(...variants.map(v=>v.travelTotal));
@@ -2402,7 +2664,7 @@ async function computeRoute(){
     const v0=variants[0];
     state.route={o,d,pts,stops,dep,pauseSec,stayMin,shift:0,variants,active:0,
       coords:v0.coords,cum:v0.cum,geomKm:v0.geomKm,totalKm:v0.totalKm,
-      travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples};
+      travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples,maneuvers:v0.maneuvers};
     applyShift(0,true);
     renderDepartures();
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
@@ -2726,7 +2988,14 @@ function renderRouteSummary(){
     if(lab===null) return; lab=(lab||`${R.o.name} → ${R.d.name}`).trim();
     saveFavRoute(lab, location.hash); toast(t("Guardado: {p} ⭐",{p:lab}));
   });
-  acts.append(trv,share,favD,favR2);
+  const agd=el("button","btn","🗓️ "+t("Agendar viagem"));
+  agd.addEventListener("click",()=>{
+    const depT=R.dep+R.shift*60;
+    if(depT<Date.now()/1000+15*60){ toast(t("Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.")); $("#plan-card").classList.add("open"); return; }
+    saveTrip({name:`${R.o.name} → ${R.d.name}`, hash:location.hash, dep:depT});
+    toast(t("🗓️ Agendada: {p} — vê no calendário (canto superior direito).",{p:`${R.o.name} → ${R.d.name}`}));
+  });
+  acts.append(trv,share,favD,favR2,agd);
   main.appendChild(acts);
   card.appendChild(main);
   box.appendChild(card);
@@ -3092,6 +3361,80 @@ function saveFav(place,label){
   favs.unshift({label, name:place.name, sub:place.sub||"", lat:place.lat, lon:place.lon});
   store.set("favs",favs.slice(0,20)); renderFavRow();
 }
+/* =====================================================================
+   VIAGENS PLANEADAS — calendário no menu lateral (🗓️ no topo)
+   ===================================================================== */
+function getTrips(){ return (store.get("trips")||[]).filter(x=>x&&x.dep>Date.now()/1000-2*3600).sort((a,b)=>a.dep-b.dep); }
+function saveTrip(tr){
+  const list=getTrips().filter(x=>x.hash!==tr.hash||Math.abs(x.dep-tr.dep)>600);
+  list.push({id:Date.now().toString(36), ...tr});
+  store.set("trips", list.slice(0,20));
+  planTripAlerts();
+}
+function delTrip(id){
+  store.set("trips", getTrips().filter(x=>x.id!==id));
+  planTripAlerts(); renderTrips();
+}
+function planTripAlerts(){
+  const evs=getTrips().filter(x=>x.dep>Date.now()/1000+5400).slice(0,8).map(x=>({
+    at:x.dep-5400, title:t("🏍️ Viagem daqui a 1h30"),
+    body:t("{p} às {h} — abre a app para veres o tempo antes de saíres.",{p:x.name,h:fmtHM(x.dep)})}));
+  scheduleNativeAlerts(evs,9120,20);
+}
+const tripWx=new Map();
+async function tripVerdict(tr){
+  const now=Date.now()/1000;
+  if(tr.dep>now+7*86400) return {ico:"📅", txt:t("ainda sem previsão")};
+  const cached=tripWx.get(tr.id);
+  if(cached&&now-cached.at<1800) return cached.v;
+  try{
+    const m=(tr.hash||"").match(/^#r2=([^|]+)\|/);
+    const last=m?m[1].split("~").pop().split(","):null;
+    const lat=+last?.[0], lon=+last?.[1];
+    if(!isFinite(lat)) throw 0;
+    const wxs=await fetchRouteWx([{lat,lon}], tr.dep-7200, tr.dep+4*3600);
+    const H=wxs?.[0]?.hourly;
+    let i=H?.time?.findIndex(tt=>tt>tr.dep)??-1; if(i<1) i=Math.max(1,(H?.time?.length||1)-1);
+    const lvl=rainLevel(H?.precipitation?.[i-1]??0,H?.precipitation_probability?.[i-1]??0,H?.weather_code?.[i-1]??0,PROFILES[state.profile]);
+    const gust=H?.wind_gusts_10m?.[i-1]??0;
+    const v=lvl>=3?{ico:"🔴",txt:t("chuva forte/trovoada")}:lvl===2?{ico:"🟠",txt:t("chuva prevista")}
+      :gust>=60?{ico:"💨",txt:t("vento muito forte")}:lvl===1?{ico:"🟡",txt:t("possível chuvisco")}:{ico:"🟢",txt:t("bom para ir")};
+    tripWx.set(tr.id,{at:now,v});
+    return v;
+  }catch(e){ return {ico:"❔", txt:""}; }
+}
+function renderTrips(){
+  const box=$("#trips-list"); if(!box) return;
+  box.textContent="";
+  const list=getTrips();
+  store.set("trips", list); // limpa as passadas
+  $("#trips-hint").style.display=list.length?"none":"block";
+  let lastDay="";
+  list.forEach(tr=>{
+    const dl=dayLabel(tr.dep);
+    if(dl!==lastDay){ lastDay=dl; box.appendChild(el("div","trip-day",dl)); }
+    const row=el("div","trip-row");
+    const wx=el("span","trip-wx","…");
+    tripVerdict(tr).then(v=>{ wx.textContent=v.ico; if(v.txt) wx.title=v.txt; sub.textContent=[fmtDurTxt(tr),v.txt].filter(Boolean).join(" · "); });
+    const main=el("div","trip-main");
+    const sub=el("div","trip-sub",fmtDurTxt(tr));
+    main.append(el("div","trip-name",tr.name), sub);
+    const del=el("button","trip-del","🗑");
+    del.title=t("Apagar");
+    del.addEventListener("click",(e)=>{ e.stopPropagation(); delTrip(tr.id); });
+    row.append(el("span","trip-when",fmtHM(tr.dep)), main, wx, del);
+    row.addEventListener("click",()=>{
+      closeTrips();
+      if(state._restore&&state._restore(tr.hash)) toast(t("🗓️ A abrir: {p}",{p:tr.name}));
+      else toast(t("Não consegui abrir esta viagem."));
+    });
+    box.appendChild(row);
+  });
+}
+function fmtDurTxt(tr){ const m=(tr.hash||"").match(/\|(\d+)\|/); return t("partida {h}",{h:fmtHM(tr.dep)}); }
+function openTrips(){ renderTrips(); $("#trips-drawer").classList.add("open"); $("#trips-bg").classList.add("open"); }
+function closeTrips(){ $("#trips-drawer").classList.remove("open"); $("#trips-bg").classList.remove("open"); }
+
 function saveFavRoute(name,hash){
   const rs=getFavRoutes().filter(r=>r.hash!==hash&&normTxt(r.name)!==normTxt(name));
   rs.unshift({name,hash}); store.set("favRoutes",rs.slice(0,12)); renderFavRow();
@@ -3371,7 +3714,7 @@ async function rerouteFromHere(pos){
     state.route={...R, o:cur, pts, stops:remStops, dep:now, shift:0,
       variants:[v], active:0, coords:v.coords, cum:v.cum, geomKm:v.geomKm,
       totalKm:v.totalKm, travelTotal:v.travelTotal, totalSec:v.travelTotal,
-      samples:v.samples, cameras:[], camerasError:false};
+      samples:v.samples, maneuvers:v.maneuvers, cameras:[], camerasError:false};
     travel.geomIdx=0; travel.kmDone=0; travel.alerted.clear();
     travel.lastRecalc=now; travel.lastPaint=0;
     applyShift(0,false);
@@ -3550,8 +3893,74 @@ function maybeAutoTravel(){
   },()=>stopAutoTravel(),{enableHighAccuracy:false, maximumAge:5000, timeout:30000});
   setTimeout(stopAutoTravel, 10*60000);
 }
-function speak(txt){ try{ if(!("speechSynthesis" in window)) return;
+function speak(txt){ try{ if(state.muted) return; if(!("speechSynthesis" in window)) return;
   const u=new SpeechSynthesisUtterance(txt); u.lang=SPEECH_LANGS[state.lang]||"pt-PT"; u.rate=1.03; speechSynthesis.speak(u); }catch(e){} }
+
+/* =====================================================================
+   INDICAÇÕES DE CONDUÇÃO POR VOZ — frases por idioma (estilo Google Maps)
+   ===================================================================== */
+const NAV_LANG={
+  pt:{left:"à esquerda",right:"à direita",sleft:"ligeiramente à esquerda",sright:"ligeiramente à direita",
+    shleft:"bem à esquerda",shright:"bem à direita",straight:"em frente",
+    turn:(d,r)=>`Vira ${d}${r}`, cont:(r)=>`Continua em frente${r}`, merge:(r)=>`Entra${r}`,
+    onramp:(r)=>`Apanha o acesso${r}`, offramp:(r)=>`Sai na próxima saída${r}`,
+    fork:(d)=>`Na bifurcação, mantém-te ${d}`, eor:(d)=>`No fim da estrada, vira ${d}`,
+    rb:(n)=>`Na rotunda, sai na ${n}ª saída`, uturn:"Inverte o sentido assim que puderes",
+    depart:(r)=>`Segue${r}`, arrive:"Estás a chegar ao teu ponto de paragem",
+    road:(n)=>` para ${n}`, dist:(m)=>m>=950?`Em ${String((m/1000).toFixed(1)).replace(".",",")} quilómetros, `:`Em ${m} metros, `},
+  en:{left:"left",right:"right",sleft:"slightly left",sright:"slightly right",
+    shleft:"sharp left",shright:"sharp right",straight:"straight on",
+    turn:(d,r)=>`Turn ${d}${r}`, cont:(r)=>`Continue straight${r}`, merge:(r)=>`Merge${r}`,
+    onramp:(r)=>`Take the ramp${r}`, offramp:(r)=>`Take the next exit${r}`,
+    fork:(d)=>`At the fork, keep ${d}`, eor:(d)=>`At the end of the road, turn ${d}`,
+    rb:(n)=>`At the roundabout, take exit ${n}`, uturn:"Make a U-turn when possible",
+    depart:(r)=>`Head out${r}`, arrive:"You are arriving at your stop",
+    road:(n)=>` onto ${n}`, dist:(m)=>m>=950?`In ${(m/1000).toFixed(1)} kilometres, `:`In ${m} metres, `},
+  es:{left:"a la izquierda",right:"a la derecha",sleft:"ligeramente a la izquierda",sright:"ligeramente a la derecha",
+    shleft:"muy a la izquierda",shright:"muy a la derecha",straight:"de frente",
+    turn:(d,r)=>`Gira ${d}${r}`, cont:(r)=>`Sigue de frente${r}`, merge:(r)=>`Incorpórate${r}`,
+    onramp:(r)=>`Toma el acceso${r}`, offramp:(r)=>`Toma la próxima salida${r}`,
+    fork:(d)=>`En la bifurcación, mantente ${d}`, eor:(d)=>`Al final de la calle, gira ${d}`,
+    rb:(n)=>`En la rotonda, toma la ${n}ª salida`, uturn:"Cambia de sentido cuando puedas",
+    depart:(r)=>`Sigue${r}`, arrive:"Estás llegando a tu parada",
+    road:(n)=>` hacia ${n}`, dist:(m)=>m>=950?`En ${(m/1000).toFixed(1).replace(".",",")} kilómetros, `:`En ${m} metros, `},
+  fr:{left:"à gauche",right:"à droite",sleft:"légèrement à gauche",sright:"légèrement à droite",
+    shleft:"franchement à gauche",shright:"franchement à droite",straight:"tout droit",
+    turn:(d,r)=>`Tourne ${d}${r}`, cont:(r)=>`Continue tout droit${r}`, merge:(r)=>`Insère-toi${r}`,
+    onramp:(r)=>`Prends la bretelle${r}`, offramp:(r)=>`Prends la prochaine sortie${r}`,
+    fork:(d)=>`À la bifurcation, reste ${d}`, eor:(d)=>`Au bout de la route, tourne ${d}`,
+    rb:(n)=>`Au rond-point, prends la ${n}${n===1?"re":"e"} sortie`, uturn:"Fais demi-tour dès que possible",
+    depart:(r)=>`Suis${r}`, arrive:"Tu arrives à ton arrêt",
+    road:(n)=>` vers ${n}`, dist:(m)=>m>=950?`Dans ${(m/1000).toFixed(1).replace(".",",")} kilomètres, `:`Dans ${m} mètres, `},
+};
+function navPhrase(mv){
+  const Lg=NAV_LANG[state.lang]||NAV_LANG.pt;
+  const road=mv.road?Lg.road(mv.road):"";
+  const dir=({left:Lg.left,right:Lg.right,"slight left":Lg.sleft,"slight right":Lg.sright,
+    "sharp left":Lg.shleft,"sharp right":Lg.shright,straight:Lg.straight})[mv.mod]||Lg.straight;
+  switch(mv.type){
+    case "turn": return mv.mod==="straight"?Lg.cont(road):Lg.turn(dir,road);
+    case "end of road": return Lg.eor(dir);
+    case "roundabout": case "rotary": return Lg.rb(mv.exit||1);
+    case "roundabout turn": case "exit roundabout": case "exit rotary": return Lg.cont(road);
+    case "fork": return Lg.fork(dir);
+    case "merge": return Lg.merge(road);
+    case "on ramp": return Lg.onramp(road);
+    case "off ramp": return Lg.offramp(road);
+    case "uturn": return Lg.uturn;
+    case "depart": return Lg.depart(road);
+    case "arrive": return Lg.arrive;
+    case "new name": case "continue": default:
+      return mv.mod&&mv.mod!=="straight"?Lg.turn(dir,road):Lg.cont(road);
+  }
+}
+function setMuted(m){
+  state.muted=!!m;
+  store.set("muted", state.muted?1:0);
+  const b=$("#tb-mute"); if(b) b.textContent=state.muted?"🔇":"🔊";
+  try{ if(state.muted) speechSynthesis.cancel(); }catch(e){}
+  toast(state.muted?t("🔇 Voz silenciada — continuas a receber vibração e notificações."):t("🔊 Voz ligada."));
+}
 function buzz(pat){ try{ navigator.vibrate&&navigator.vibrate(pat); }catch(e){} }
 
 async function startTravel(){
@@ -3633,7 +4042,9 @@ function onTravelPos(p){
   const offTh=Math.max(0.06, accKm*1.5+0.02);
   const moving=spd==null||spd>0.8;
   if(pj.off>offTh&&moving) travel.offHits=(travel.offHits||0)+1; else travel.offHits=0;
-  if(travel.offHits>=3&&!travel.rerouting&&now-(travel.lastReroute||0)>20){ rerouteFromHere(pos); return; }
+  // desvio inequívoco (3× o limiar) → recalcula logo à 2ª leitura; marginal → à 3ª
+  const needHits=pj.off>offTh*3?2:3;
+  if(travel.offHits>=needHits&&!travel.rerouting&&now-(travel.lastReroute||0)>12){ rerouteFromHere(pos); return; }
   if(travel.rerouting){ travelNotify(); return; }
   if(off>4){ $("#tb-sub").textContent=t("estás a {d} km da rota — vou recalcular",{d:fmtN(off,1)}); travelNotify(); return; }
   // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
@@ -3650,6 +4061,24 @@ function onTravelPos(p){
     if(travel.marker) travel.marker.addTo(state.maps.route);
   }
   const kmNow=travel.kmDone||here.km;
+  // 🗣️ indicações de condução (como o Google Maps): aviso a ~500 m e à chegada da manobra
+  if(R.maneuvers?.length){
+    const mi=R.maneuvers.findIndex(mv=>mv.km>kmNow+0.015&&mv.type!=="depart");
+    if(mi>=0){
+      const mv=R.maneuvers[mi];
+      const dm=Math.round((mv.km-kmNow)*1000);
+      const phr=navPhrase(mv);
+      const kf=`nav${mi}-f`, kn=`nav${mi}-n`;
+      if(dm<=95&&!travel.alerted.has(kn)){
+        travel.alerted.add(kn); travel.alerted.add(kf);
+        speak(phr);
+      } else if(dm<=550&&dm>95&&!travel.alerted.has(kf)){
+        travel.alerted.add(kf);
+        const Lg=NAV_LANG[state.lang]||NAV_LANG.pt;
+        speak(Lg.dist(Math.round(dm/50)*50)+phr);
+      }
+    }
+  }
   // radares à frente — aviso por voz a ~1 km e a ~400 m
   if(R.cameras?.length){
     const nextCam=R.cameras.find(c=>c.km>kmNow-0.05);
@@ -3904,7 +4333,9 @@ function switchTab(name){
   $$(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));
   tipHide();
   if(name==="rota"){ initRouteMap(); setTimeout(()=>state.maps.route?.invalidateSize(),60);
-    if(state.route) setTimeout(()=>drawRoute(false),80); }
+    if(state.route) setTimeout(()=>drawRoute(false),80);
+    if(!store.get("pin-tip")){ store.set("pin-tip",1);
+      setTimeout(()=>toast(t("💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá."),8000),900); } }
   if(name==="radar"){ initRadar(); setTimeout(()=>state.maps.radar?.invalidateSize(),60); }
 }
 
@@ -3912,7 +4343,7 @@ function setTheme(t){
   state.theme=t;
   document.documentElement.dataset.theme=t;
   $("#btn-theme").textContent=t==="dark"?"🌙":"☀️";
-  const mt=$("#meta-theme"); if(mt) mt.content=t==="dark"?"#1a1a19":"#fcfcfb";
+  const mt=$("#meta-theme"); if(mt) mt.content=t==="dark"?"#0a1120":"#f2f5fb";
   for(const key of ["route","radar"]){
     const m=state.maps[key];
     if(m&&m._base){ m.removeLayer(m._base); m._base=cartoLayer().addTo(m); }
@@ -3936,6 +4367,10 @@ function init(){
 
   // definições
   const pop=$("#settings-pop");
+  $("#btn-trips").addEventListener("click",openTrips);
+  $("#trips-close").addEventListener("click",closeTrips);
+  $("#trips-bg").addEventListener("click",closeTrips);
+  planTripAlerts();
   $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open"); });
   document.addEventListener("click",(e)=>{ if(!pop.contains(e.target)&&e.target.id!=="btn-settings") pop.classList.remove("open"); });
   document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") pop.classList.remove("open"); });
@@ -3982,6 +4417,7 @@ function init(){
     [o._picked,d._picked]=[d._picked,o._picked];
   });
   $$(".chip.click[data-dep]").forEach(c=>c.addEventListener("click",()=>{
+    const tm=$("#rt-timemode"); if(tm) tm.value="dep"; // os atalhos são sempre hora de PARTIDA
     $("#rt-when").value=localDT(new Date(Date.now()+(+c.dataset.dep)*60000));
   }));
   const when=$("#rt-when");
@@ -3994,6 +4430,8 @@ function init(){
   $("#radar-slider").addEventListener("input",(e)=>{ radarPlay(false); showRadarFrame(+e.target.value); });
 
   // modo viagem + sentinela
+  state.muted=store.get("muted")===1;
+  const mb=$("#tb-mute"); if(mb){ mb.textContent=state.muted?"🔇":"🔊"; mb.addEventListener("click",()=>setMuted(!state.muted)); }
   $("#tb-stop").addEventListener("click",()=>stopTravel("Modo viagem terminado."));
   $("#btn-sentinel").addEventListener("click",toggleSentinel);
 
