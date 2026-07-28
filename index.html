@@ -461,6 +461,9 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .pin-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .pin-actions button{padding:9px 11px;border-radius:9px;border:1px solid rgba(0,0,0,.14);background:#f4f4f1;cursor:pointer;font-weight:650;font-size:13px;text-align:left}
 .pin-actions button:hover{background:#e9edf5}
+.foot-links{margin-top:8px}
+.foot-links a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--border)}
+.foot-links a:hover{border-bottom-color:var(--accent)}
 .chk-row{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border:1px solid var(--border);
   border-radius:11px;cursor:pointer;font-size:13px}
 .chk-row:has(input:checked){border-color:var(--warn);background:var(--warn-soft)}
@@ -645,6 +648,12 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
             <span><b>Tolerante</b><span>Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.</span></span></label>
         </div>
         <p class="small muted" style="margin:10px 0 0">Trovoada, gelo e neve dão sempre vermelho, por segurança.</p>
+        <h3 style="margin-top:14px">📏 <span id="unit-title">Unidades</span></h3>
+        <div class="chips" id="unit-row">
+          <button class="chip click" data-units="metric">km · °C</button>
+          <button class="chip click" data-units="imperial">mi · °F</button>
+          <button class="chip click" data-units="uk">mi · °C</button>
+        </div>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
         <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.</p>
         <label class="chk-row" for="cam-de"><input type="checkbox" id="cam-de">
@@ -896,7 +905,7 @@ function LOC(){ return LOCALES[state.lang]||"pt-PT"; }
 function t(s,vars){
   let out=(state.lang!=="pt"&&I18N[state.lang]&&I18N[state.lang][s])||s;
   if(vars) for(const k in vars) out=out.split("{"+k+"}").join(vars[k]);
-  return out;
+  return typeof uconv==="function"?uconv(out):out;
 }
 function setLang(l){
   if(!LOCALES[l]) return;
@@ -928,6 +937,7 @@ function applyStaticI18n(){
     ['label[for="rt-when"]',"txt","Hora de partida"],
     ['label[for="rt-stay"]',"txt","Tempo no destino"],
     ["#tb-off-t","txt","offline"],
+    ["#unit-title","txt","Unidades"],
     ["#cam-title","txt","Avisos de radar"],
     ["#cam-law-txt","txt","A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo."],
     ["#cam-de-b","txt","Ligar também na Alemanha"],
@@ -992,8 +1002,14 @@ function applyStaticI18n(){
   if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
   const ft=$("footer");
   if(ft){ ft.textContent="";
-    ft.append(document.createTextNode(t("Dados gratuitos:")+" Open-Meteo · OSRM & OpenStreetMap · RainViewer · CARTO — "));
-    ft.append(document.createTextNode(t("Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️"));
+    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM & OpenStreetMap · RainViewer · CARTO — "));
+    ft.append(document.createTextNode(t("Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️ "));
+    const mkLink=(href,txt)=>{ const a=document.createElement("a"); a.href=href; a.target="_blank";
+      a.rel="noopener"; a.textContent=t(txt); return a; };
+    const nav=el("div","foot-links");
+    nav.append(mkLink("./privacidade.html","Privacidade"), document.createTextNode(" · "),
+               mkLink("./termos.html","Termos de utilização"));
+    ft.append(nav);
   }
   const tbStop=$("#tb-stop"); if(tbStop) tbStop.textContent=t("🛑 Terminar");
   updateTravelButtons();
@@ -1551,6 +1567,14 @@ Object.assign(I18N.en,{
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Route map saved ({n} tiles) — works with no internet at all.",
 "⭐ guardado por ti":"⭐ saved by you","sem nome":"unnamed","Tempo em cada paragem":"Time at each stop",
 "⚠️ Perigo no teu trajeto":"⚠️ Hazard on your route",
+"Unidades":"Units",
+"Dados:":"Data:",
+"Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no tracking: nothing you do leaves this phone. Ride smart: on a red warning, stay home.",
+"Privacidade":"Privacy",
+"Termos de utilização":"Terms of use",
+
+"Unidades alteradas para {u}.":"Units changed to {u}.",
+
 "Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"In Belgium, warning about speed cameras has been illegal since 2015 (fines of €150–3,000 and confiscation).",
 "Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"In Switzerland, speed camera warnings are illegal, with confiscation and possible criminal charges.",
 "Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"In France it is illegal to show a camera's exact location — I show wider danger zones, like the big navigation apps do.",
@@ -1632,6 +1656,14 @@ Object.assign(I18N.es,{
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Mapa de la ruta guardado ({n} piezas) — funciona sin internet.",
 "⭐ guardado por ti":"⭐ guardado por ti","sem nome":"sin nombre","Tempo em cada paragem":"Tiempo en cada parada",
 "⚠️ Perigo no teu trajeto":"⚠️ Peligro en tu ruta",
+"Unidades":"Unidades",
+"Dados:":"Datos:",
+"Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas ni registros: nada de lo que haces sale de este móvil. Conduce con cabeza: con aviso rojo, quédate en casa.",
+"Privacidade":"Privacidad",
+"Termos de utilização":"Términos de uso",
+
+"Unidades alteradas para {u}.":"Unidades cambiadas a {u}.",
+
 "Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"En Bélgica avisar de radares es ilegal desde 2015 (multas de 150 a 3000 € y confiscación).",
 "Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"En Suiza avisar de radares es ilegal, con confiscación y posible proceso penal.",
 "Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"En Francia es ilegal indicar el punto exacto de un radar — muestro zonas de peligro amplias, como las grandes apps de navegación.",
@@ -1713,6 +1745,14 @@ Object.assign(I18N.fr,{
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Carte du trajet enregistrée ({n} tuiles) — fonctionne sans internet.",
 "⭐ guardado por ti":"⭐ enregistré par toi","sem nome":"sans nom","Tempo em cada paragem":"Temps à chaque arrêt",
 "⚠️ Perigo no teu trajeto":"⚠️ Danger sur ton trajet",
+"Unidades":"Unités",
+"Dados:":"Données :",
+"Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans compte ni traçage : rien de ce que tu fais ne quitte ce téléphone. Roule prudemment : en alerte rouge, reste à la maison.",
+"Privacidade":"Confidentialité",
+"Termos de utilização":"Conditions d'utilisation",
+
+"Unidades alteradas para {u}.":"Unités changées en {u}.",
+
 "Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"En Belgique, signaler les radars est interdit depuis 2015 (amendes de 150 à 3000 € et confiscation).",
 "Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"En Suisse, signaler les radars est interdit, avec confiscation et poursuites pénales possibles.",
 "Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"En France, il est interdit d'indiquer l'emplacement exact d'un radar — j'affiche des zones de danger élargies, comme les grandes applis de navigation.",
@@ -1754,11 +1794,62 @@ const THUNDER=[95,96,99], FREEZING=[56,57,66,67], SNOW=[71,73,75,77,85,86], FOG=
 /* ---------------- helpers ---------------- */
 const $  = (s,el=document)=>el.querySelector(s);
 const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
-function el(tag, cls, txt){ const n=document.createElement(tag); if(cls)n.className=cls; if(txt!=null)n.textContent=txt; return n; }
+function el(tag, cls, txt){ const n=document.createElement(tag); if(cls)n.className=cls;
+  if(txt!=null)n.textContent=(typeof txt==="string"&&typeof uconv==="function")?uconv(txt):txt; return n; }
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const lerp=(a,b,f)=>a+(b-a)*f;
 const rnd=(v,d=0)=>{ const p=10**d; return Math.round(v*p)/p; };
 const fmtN=(v,d=0)=>Number(v).toLocaleString(LOC(),{minimumFractionDigits:d,maximumFractionDigits:d});
+
+/* =====================================================================
+   UNIDADES — a app calcula sempre em métrico e converte só na apresentação.
+   "metric"   → km, °C, km/h, mm      (Europa continental, resto do mundo)
+   "imperial" → milhas, °F, mph, pol. (Estados Unidos)
+   "uk"       → milhas e mph, mas °C  (Reino Unido: sinais em milhas, tempo em Celsius)
+   ===================================================================== */
+const UNIT_SYS={metric:0, imperial:1, uk:2};
+function detectUnits(){
+  const l=(navigator.languages||[navigator.language||""]).join(",").toUpperCase();
+  if(/\b(EN-US|ES-US|US)\b/.test(l)||/-(US|LR|MM)\b/.test(l)) return "imperial";
+  if(/-GB\b/.test(l)) return "uk";
+  return "metric";
+}
+const milesOn=()=>state.units==="imperial"||state.units==="uk";
+const fahrenheitOn=()=>state.units==="imperial";
+function unitNum(v,d){ // arredondamento sensato: sem casas decimais em números grandes
+  const dec=Math.abs(v)>=100?0:(Math.abs(v)>=10?(d>0?1:0):d);
+  return fmtN(v,dec);
+}
+/* converte uma frase já montada (é aqui que tudo passa: ecrã, voz e notificações) */
+function uconv(s){
+  if(!s||typeof s!=="string") return s;
+  if(state.units==="metric"||!state.units) return s;
+  const num=(m)=>parseFloat(String(m).replace(/\s/g,"").replace(",","."));
+  let out=s;
+  if(milesOn()){
+    // forma "km 5 – 7" e "km 15" (usada nos troços e nos radares)
+    out=out.replace(/\bkm\s+(-?\d+(?:[.,]\d+)?)\s*([–-])\s*(-?\d+(?:[.,]\d+)?)/g,
+      (_,a,dash,b)=>`${unitNum(num(a)*0.621371,1)} ${dash} ${unitNum(num(b)*0.621371,1)} mi`);
+    out=out.replace(/\bkm\s+(-?\d+(?:[.,]\d+)?)/g,(_,n)=>`${unitNum(num(n)*0.621371,1)} mi`);
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*km\/h/g,(_,n)=>`${unitNum(num(n)*0.621371,0)} mph`);
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*km(?![\/\w])/g,(_,n)=>`${unitNum(num(n)*0.621371,1)} mi`);
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*m(?![\/\w°])/g,(_,n)=>`${unitNum(num(n)*3.28084,0)} ft`);
+    out=out.replace(/\bquilómetros\b/g,"milhas").replace(/\bquilómetro\b/g,"milha")
+           .replace(/\bkilometres\b/g,"miles").replace(/\bkilometre\b/g,"mile")
+           .replace(/\bkilómetros\b/g,"millas").replace(/\bkilómetro\b/g,"milla")
+           .replace(/\bkilomètres\b/g,"miles").replace(/\bkilomètre\b/g,"mile");
+    out=out.replace(/(\d+)\s*(metros|metres|mètres|meters)\b/g,(_,n,w)=>{
+      const ft=Math.round(num(n)*3.28084/50)*50;
+      return `${ft} ${/metros/.test(w)?"pés":"feet"}`;
+    });
+  }
+  if(fahrenheitOn()){
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*mm\/h/g,(_,n)=>`${fmtN(num(n)*0.0393701,2)} in/h`);
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*mm(?![\/\w])/g,(_,n)=>`${fmtN(num(n)*0.0393701,2)} in`);
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*°/g,(_,n)=>`${unitNum(num(n)*9/5+32,0)}°`);
+  }
+  return out;
+}
 const fmtHM=(epoch)=>new Date(epoch*1000).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"});
 const fmtH=(epoch)=>new Date(epoch*1000).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"}).replace(":00","h");
 const fmtDow=(epoch)=>new Date(epoch*1000).toLocaleDateString(LOC(),{weekday:"short"}).replace(".","");
@@ -4933,6 +5024,18 @@ function init(){
   applyStaticI18n();
   $$("#lang-row .chip").forEach(c=>{ c.classList.toggle("sel",c.dataset.lang===state.lang);
     c.addEventListener("click",()=>setLang(c.dataset.lang)); });
+  // unidades: métrico, imperial ou o híbrido britânico (milhas com Celsius)
+  state.units=store.get("units")||detectUnits();
+  const paintUnits=()=>$$("#unit-row .chip").forEach(c=>c.classList.toggle("sel",c.dataset.units===state.units));
+  paintUnits();
+  $$("#unit-row .chip").forEach(c=>c.addEventListener("click",()=>{
+    state.units=c.dataset.units; store.set("units",state.units); paintUnits();
+    applyStaticI18n();
+    if(state.wx) renderDashboard();
+    if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); renderHazards(); }
+    renderFavRow();
+    toast(t("Unidades alteradas para {u}.",{u:c.textContent}));
+  }));
   renderFavRow();
   $("#btn-plan-toggle").addEventListener("click",()=>$("#plan-card").classList.toggle("open"));
 
