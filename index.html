@@ -940,6 +940,8 @@ function t(s,vars){
 }
 function setLang(l){
   if(!LOCALES[l]) return;
+  voz.avisado=false;                 // idioma novo, aviso novo se faltar voz
+  if(typeof vozEscolher==="function"){ state.lang=l; vozEscolher(); }
   state.lang=l; store.set("lang",l);
   document.documentElement.lang=l;
   applyStaticI18n();
@@ -1547,7 +1549,7 @@ Object.assign(I18N.en,{
 "Nome da rota?":"Route name?","Guardado: {p} ⭐":"Saved: {p} ⭐","Apagado: {p}":"Deleted: {p}","Apagar":"Delete",
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Plan manually (stops, departure time)",
 "🔄 Saíste da rota — a recalcular…":"🔄 Off route — recalculating…","um instante…":"one moment…","A tua posição":"Your position",
-"Rota recalculada.":"Route recalculated.","🔄 Rota recalculada a partir da tua posição.":"🔄 Route recalculated from your position.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"No {n} voice is installed on this phone. I will speak English; you can add the voice in your system settings.","Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"This device has no speech voices installed — directions will be text and vibration only.","Rota recalculada.":"Route recalculated.","🔄 Rota recalculada a partir da tua posição.":"🔄 Route recalculated from your position.",
 "não consegui recalcular — verifica a ligação; volto a tentar":"couldn't recalculate — check your connection; I'll retry",
 "estás a {d} km da rota — vou recalcular":"you're {d} km off route — recalculating",
 "🏍️ A moto pode ficar cá fora":"🏍️ Your bike can stay outside","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ No rain expected {w}. Feel free to leave it out.",
@@ -1639,7 +1641,7 @@ Object.assign(I18N.es,{
 "Nome da rota?":"¿Nombre de la ruta?","Guardado: {p} ⭐":"Guardado: {p} ⭐","Apagado: {p}":"Borrado: {p}","Apagar":"Borrar",
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Planificar manualmente (paradas, hora de salida)",
 "🔄 Saíste da rota — a recalcular…":"🔄 Saliste de la ruta — recalculando…","um instante…":"un momento…","A tua posição":"Tu posición",
-"Rota recalculada.":"Ruta recalculada.","🔄 Rota recalculada a partir da tua posição.":"🔄 Ruta recalculada desde tu posición.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"No hay voz {n} instalada en este teléfono. Hablaré en inglés; puedes añadirla en los ajustes del sistema.","Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Este dispositivo no tiene voces instaladas — las indicaciones serán solo texto y vibración.","Rota recalculada.":"Ruta recalculada.","🔄 Rota recalculada a partir da tua posição.":"🔄 Ruta recalculada desde tu posición.",
 "não consegui recalcular — verifica a ligação; volto a tentar":"no pude recalcular — revisa la conexión; volveré a intentar",
 "estás a {d} km da rota — vou recalcular":"estás a {d} km de la ruta — voy a recalcular",
 "🏍️ A moto pode ficar cá fora":"🏍️ La moto puede quedarse fuera","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ Sin lluvia prevista {w}. Puedes dejarla fuera tranquilo.",
@@ -1731,7 +1733,7 @@ Object.assign(I18N.fr,{
 "Nome da rota?":"Nom du trajet ?","Guardado: {p} ⭐":"Enregistré : {p} ⭐","Apagado: {p}":"Supprimé : {p}","Apagar":"Supprimer",
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Planifier manuellement (arrêts, heure de départ)",
 "🔄 Saíste da rota — a recalcular…":"🔄 Hors itinéraire — recalcul en cours…","um instante…":"un instant…","A tua posição":"Ta position",
-"Rota recalculada.":"Itinéraire recalculé.","🔄 Rota recalculada a partir da tua posição.":"🔄 Itinéraire recalculé depuis ta position.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"Aucune voix {n} n'est installée sur ce téléphone. Je parlerai anglais ; tu peux l'ajouter dans les réglages.","Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Cet appareil n'a aucune voix installée — les indications seront en texte et vibration seulement.","Rota recalculada.":"Itinéraire recalculé.","🔄 Rota recalculada a partir da tua posição.":"🔄 Itinéraire recalculé depuis ta position.",
 "não consegui recalcular — verifica a ligação; volto a tentar":"recalcul impossible — vérifie la connexion ; je réessaierai",
 "estás a {d} km da rota — vou recalcular":"tu es à {d} km de l'itinéraire — je recalcule",
 "🏍️ A moto pode ficar cá fora":"🏍️ La moto peut rester dehors","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ Pas de pluie prévue {w}. Tu peux la laisser dehors.",
@@ -3208,7 +3210,7 @@ function setOffline(off){
   if(off){
     buzz([120,60,120]);
     toast(t("📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede."),8000);
-    if(travel.active) speak(t("Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar."));
+    if(travel.active) speakT("Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.");
   } else {
     toast(t("📶 Internet de volta — a atualizar a meteorologia."),4000);
     if(state.route&&travel.active) precacheRouteTiles();
@@ -4626,7 +4628,7 @@ async function rerouteFromHere(pos){
       "#r2="+pts.map(q=>`${q.lat.toFixed(4)},${q.lon.toFixed(4)},${encodeURIComponent(q.name)}`).join("~")
       +`|${Math.round(now)}|${Math.round((R.pauseSec||0)/60)}`);}catch(e){}
     store.set("travel",{hash:location.hash||"", at:Date.now()});
-    speak(t("Rota recalculada."));
+    speakT("Rota recalculada.");
     toast(t("🔄 Rota recalculada a partir da tua posição."));
     buzz([120,60,120]);
     travel.lastNotif=0; travelNotify();
@@ -4794,8 +4796,78 @@ function maybeAutoTravel(){
   },()=>stopAutoTravel(),{enableHighAccuracy:false, maximumAge:5000, timeout:30000});
   setTimeout(stopAutoTravel, 10*60000);
 }
-function speak(txt){ try{ if(state.muted) return; if(!("speechSynthesis" in window)) return;
-  const u=new SpeechSynthesisUtterance(txt); u.lang=SPEECH_LANGS[state.lang]||"pt-PT"; u.rate=1.03; speechSynthesis.speak(u); }catch(e){} }
+
+/* ── VOZ — que idioma é que este telemóvel consegue mesmo falar ───────────
+   O getVoices() do Chrome chega vazio no primeiro instante e só depois
+   dispara voiceschanged, por isso ouve-se o evento em vez de perguntar uma
+   vez só. A escolha é por esta ordem: voz exata do idioma (pt-PT), voz da
+   mesma língua noutra variante (pt-BR), voz inglesa, nada.
+
+   Se cair para inglês, o TEXTO também passa a inglês — dizer uma frase
+   portuguesa com voz inglesa é exatamente o "idioma errado" que queremos
+   evitar. E o utilizador é avisado uma vez, para não achar que a app se
+   avariou.                                                                  */
+const voz={lista:[], escolhida:null, idioma:null, avisado:false, pronto:false};
+function vozCarregar(){
+  try{
+    voz.lista=(window.speechSynthesis&&speechSynthesis.getVoices())||[];
+    voz.pronto=voz.lista.length>0;
+    vozEscolher();
+  }catch(e){ voz.lista=[]; }
+}
+function vozEscolher(){
+  const alvo=(SPEECH_LANGS[state.lang]||"pt-PT").toLowerCase();
+  const base=alvo.split("-")[0];
+  const norm=(v)=>String(v.lang||"").toLowerCase().replace("_","-");
+  const exata=voz.lista.find(v=>norm(v)===alvo);
+  const mesma=voz.lista.find(v=>norm(v).split("-")[0]===base);
+  const ingles=voz.lista.find(v=>norm(v)==="en-gb")||voz.lista.find(v=>norm(v).split("-")[0]==="en");
+  const v=exata||mesma||ingles||null;
+  voz.escolhida=v;
+  voz.idioma=v?(norm(v).split("-")[0]===base?state.lang:"en"):null;
+  return v;
+}
+/* traduz para um idioma à escolha, sem mexer no idioma da interface */
+function tEm(lang,str,vars){
+  let out=(lang!=="pt"&&I18N[lang]&&I18N[lang][str])||str;
+  if(vars) for(const k in vars) out=out.split("{"+k+"}").join(vars[k]);
+  return typeof uconv==="function"?uconv(out):out;
+}
+/* o idioma em que a app CONSEGUE falar neste aparelho */
+function vozIdioma(){ return voz.idioma||state.lang; }
+function vozAvisar(){
+  if(voz.avisado||state.muted) return;
+  voz.avisado=true;
+  const nomes={pt:"portuguesa", en:"inglesa", es:"espanhola", fr:"francesa"};
+  if(!voz.escolhida)
+    toast(t("Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração."),8000);
+  else
+    toast(t("Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.",
+      {n:nomes[state.lang]||state.lang}),8000);
+}
+if(window.speechSynthesis){
+  vozCarregar();
+  speechSynthesis.addEventListener?.("voiceschanged",vozCarregar);
+}
+
+function speak(txt){
+  try{
+    if(state.muted) return;
+    if(!("speechSynthesis" in window)){ vozAvisar(); return; }
+    if(!voz.pronto) vozCarregar();
+    /* reavalia sempre: a lista de vozes do sistema chega tarde e o idioma da
+       app pode ter mudado desde a última frase. A lista tem meia dúzia de
+       entradas, custa nada. */
+    const v=vozEscolher();
+    if(!v||voz.idioma!==state.lang) vozAvisar();
+    if(!v) return;                       // sem voz nenhuma: fica o texto e a vibração
+    const u=new SpeechSynthesisUtterance(txt);
+    u.voice=v; u.lang=v.lang; u.rate=1.03;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+/* fala uma frase traduzida NO IDIOMA QUE O APARELHO SABE FALAR */
+function speakT(chave,vars){ speak(tEm(vozIdioma(),chave,vars)); }
 
 /* =====================================================================
    INDICAÇÕES DE CONDUÇÃO POR VOZ — frases por idioma (estilo Google Maps)
@@ -4835,7 +4907,7 @@ const NAV_LANG={
     road:(n)=>` vers ${n}`, dist:(m)=>`Dans ${U.falaDist(m,{km:"kilomètres",m:"mètres",mi:"miles",ft:"pieds"})}, `},
 };
 function navPhrase(mv){
-  const Lg=NAV_LANG[state.lang]||NAV_LANG.pt;
+  const Lg=NAV_LANG[vozIdioma()]||NAV_LANG.pt;
   const road=mv.road?Lg.road(mv.road):"";
   const dir=({left:Lg.left,right:Lg.right,"slight left":Lg.sleft,"slight right":Lg.sright,
     "sharp left":Lg.shleft,"sharp right":Lg.shright,straight:Lg.straight})[mv.mod]||Lg.straight;
@@ -4884,7 +4956,7 @@ async function startTravel(){
   travel.watch=navigator.geolocation.watchPosition(onTravelPos,
     ()=>{ $("#tb-sub").textContent=t("sem sinal GPS — continuo a tentar…"); },
     {enableHighAccuracy:true, maximumAge:3000, timeout:20000});
-  speak(t("Modo viagem ligado. Boa estrada."));
+  speakT("Modo viagem ligado. Boa estrada.");
   toast(t("🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso."));
   updateTravelButtons();
 }
@@ -4999,7 +5071,7 @@ function onTravelPos(p){
         speak(phr);
       } else if(dm<=550&&dm>95&&!travel.alerted.has(kf)){
         travel.alerted.add(kf);
-        const Lg=NAV_LANG[state.lang]||NAV_LANG.pt;
+        const Lg=NAV_LANG[vozIdioma()]||NAV_LANG.pt;
         speak(Lg.dist(Math.round(dm/50)*50)+phr);
       }
     }
@@ -5041,7 +5113,7 @@ function onTravelPos(p){
   const remKm=Math.max(0,last.km-kmNow);
   const etaArr=now+Math.max(0,last.travelSec-here.travelSec);
   if(haversine(pos,last)<0.35&&idx>=R.samples.length-2){
-    speak(t("Chegaste ao destino. Boa!")); buzz([120,60,120]);
+    speakT("Chegaste ao destino. Boa!"); buzz([120,60,120]);
     stopTravel(t("🎉 Chegaste! Modo viagem terminado.")); return;
   }
   // próxima zona de chuva à frente
