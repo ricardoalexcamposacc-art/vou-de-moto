@@ -668,8 +668,6 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
         </div>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
         <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.</p>
-        <label class="chk-row" for="cam-de"><input type="checkbox" id="cam-de">
-          <span><b id="cam-de-b">Ligar também na Alemanha</b><span id="cam-de-s">A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.</span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
         <div class="chips" id="lang-row">
           <button class="chip click" data-lang="pt">PT</button>
@@ -972,8 +970,6 @@ function applyStaticI18n(){
     ["#unit-title","txt","Unidades"],
     ["#cam-title","txt","Avisos de radar"],
     ["#cam-law-txt","txt","A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato."],
-    ["#cam-de-b","txt","Ligar também na Alemanha"],
-    ["#cam-de-s","txt","A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco."],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
     ["#lang-title","txt","Idioma"],
   ];
@@ -1884,6 +1880,14 @@ const U={
   alt(m){ return milesOn()?`${unitNum(m*3.28084,0)} ft`:`${unitNum(m,0)} m`; },
   /* marca de quilometragem ao longo do trajeto ("km 15") */
   kmMark(km){ return milesOn()?`mi ${unitNum(km*0.621371,0)}`:`km ${unitNum(km,0)}`; },
+  /* distância dita por voz nas indicações de condução. Recebe metros e as
+     palavras do idioma, porque quem fala português pode ter o telemóvel em
+     milhas e vice-versa. */
+  falaDist(m,w){
+    if(milesOn()){ const ft=m*3.28084;
+      return ft>=1500?`${fmtN(m*0.000621371,1)} ${w.mi}`:`${Math.round(ft/50)*50} ${w.ft}`; }
+    return m>=950?`${fmtN(m/1000,1)} ${w.km}`:`${m} ${w.m}`;
+  },
 };
 /* converte uma frase já montada (é aqui que tudo passa: ecrã, voz e notificações) */
 function uconv(s){
@@ -2277,7 +2281,7 @@ const CAM_LAW={
   CH:{mode:"off",  why:"Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade."},
   AT:{mode:"off",  why:"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada)."},
   FR:{mode:"zones",why:"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação."},
-  DE:{mode:"opt",  why:"Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições."},
+  DE:{mode:"off",  why:"Na Alemanha a proibição recai sobre o condutor que usa o aviso, não sobre quem o publica — por isso desligo, para não te expor."},
 };
 /* contornos aproximados — só usados quando não há rede para confirmar o país */
 const CC_POLY={
@@ -2324,9 +2328,7 @@ async function countryAt(lat,lon){
 }
 function camLawFor(cc){
   const law=CAM_LAW[cc];
-  if(!law) return {mode:"on"};
-  if(law.mode==="opt") return store.get("cam-de")===1?{mode:"on"}:law;
-  return law;
+  return law||{mode:"on"};
 }
 /* aplica a lei do país a cada radar do trajeto */
 async function applyCamLaw(list){
@@ -2339,7 +2341,7 @@ async function applyCamLaw(list){
   for(const c of list){
     const cc=ccs.get(ccKey(c.lat,c.lon));
     const law=camLawFor(cc);
-    if(law.mode==="off"||law.mode==="opt"){ blocked[cc]=(blocked[cc]||0)+1; continue; }
+    if(law.mode==="off"){ blocked[cc]=(blocked[cc]||0)+1; continue; }
     if(law.mode==="zones"){ c.zone=true; c.km=Math.round(c.km/2)*2; blocked[cc]=blocked[cc]||0; }
     c.cc=cc;
     out.push(c);
@@ -2573,7 +2575,7 @@ function attachAC(input, list, onPick){
       mainCol.appendChild(el("b",null,(it._fav?"⭐ ":"")+it.name));
       if(it.sub) mainCol.appendChild(el("span",null,it.sub));
       d.appendChild(mainCol);
-      if(state.home&&isFinite(it.lat)) d.appendChild(el("span","ac-dist",fmtN(haversine(state.home,it),1)+" km"));
+      if(state.home&&isFinite(it.lat)) d.appendChild(el("span","ac-dist",U.dist(haversine(state.home,it))));
       d.addEventListener("mousedown",(e)=>{ e.preventDefault(); pick(i); });
       list.appendChild(d);
     });
@@ -4596,7 +4598,7 @@ const NAV_LANG={
     fork:(d)=>`Na bifurcação, mantém-te ${d}`, eor:(d)=>`No fim da estrada, vira ${d}`,
     rb:(n)=>`Na rotunda, sai na ${n}ª saída`, uturn:"Inverte o sentido assim que puderes",
     depart:(r)=>`Segue${r}`, arrive:"Estás a chegar ao teu ponto de paragem",
-    road:(n)=>` para ${n}`, dist:(m)=>m>=950?`Em ${String((m/1000).toFixed(1)).replace(".",",")} quilómetros, `:`Em ${m} metros, `},
+    road:(n)=>` para ${n}`, dist:(m)=>`Em ${U.falaDist(m,{km:"quilómetros",m:"metros",mi:"milhas",ft:"pés"})}, `},
   en:{left:"left",right:"right",sleft:"slightly left",sright:"slightly right",
     shleft:"sharp left",shright:"sharp right",straight:"straight on",
     turn:(d,r)=>`Turn ${d}${r}`, cont:(r)=>`Continue straight${r}`, merge:(r)=>`Merge${r}`,
@@ -4604,7 +4606,7 @@ const NAV_LANG={
     fork:(d)=>`At the fork, keep ${d}`, eor:(d)=>`At the end of the road, turn ${d}`,
     rb:(n)=>`At the roundabout, take exit ${n}`, uturn:"Make a U-turn when possible",
     depart:(r)=>`Head out${r}`, arrive:"You are arriving at your stop",
-    road:(n)=>` onto ${n}`, dist:(m)=>m>=950?`In ${(m/1000).toFixed(1)} kilometres, `:`In ${m} metres, `},
+    road:(n)=>` onto ${n}`, dist:(m)=>`In ${U.falaDist(m,{km:"kilometres",m:"metres",mi:"miles",ft:"feet"})}, `},
   es:{left:"a la izquierda",right:"a la derecha",sleft:"ligeramente a la izquierda",sright:"ligeramente a la derecha",
     shleft:"muy a la izquierda",shright:"muy a la derecha",straight:"de frente",
     turn:(d,r)=>`Gira ${d}${r}`, cont:(r)=>`Sigue de frente${r}`, merge:(r)=>`Incorpórate${r}`,
@@ -4612,7 +4614,7 @@ const NAV_LANG={
     fork:(d)=>`En la bifurcación, mantente ${d}`, eor:(d)=>`Al final de la calle, gira ${d}`,
     rb:(n)=>`En la rotonda, toma la ${n}ª salida`, uturn:"Cambia de sentido cuando puedas",
     depart:(r)=>`Sigue${r}`, arrive:"Estás llegando a tu parada",
-    road:(n)=>` hacia ${n}`, dist:(m)=>m>=950?`En ${(m/1000).toFixed(1).replace(".",",")} kilómetros, `:`En ${m} metros, `},
+    road:(n)=>` hacia ${n}`, dist:(m)=>`En ${U.falaDist(m,{km:"kilómetros",m:"metros",mi:"millas",ft:"pies"})}, `},
   fr:{left:"à gauche",right:"à droite",sleft:"légèrement à gauche",sright:"légèrement à droite",
     shleft:"franchement à gauche",shright:"franchement à droite",straight:"tout droit",
     turn:(d,r)=>`Tourne ${d}${r}`, cont:(r)=>`Continue tout droit${r}`, merge:(r)=>`Insère-toi${r}`,
@@ -4620,7 +4622,7 @@ const NAV_LANG={
     fork:(d)=>`À la bifurcation, reste ${d}`, eor:(d)=>`Au bout de la route, tourne ${d}`,
     rb:(n)=>`Au rond-point, prends la ${n}${n===1?"re":"e"} sortie`, uturn:"Fais demi-tour dès que possible",
     depart:(r)=>`Suis${r}`, arrive:"Tu arrives à ton arrêt",
-    road:(n)=>` vers ${n}`, dist:(m)=>m>=950?`Dans ${(m/1000).toFixed(1).replace(".",",")} kilomètres, `:`Dans ${m} mètres, `},
+    road:(n)=>` vers ${n}`, dist:(m)=>`Dans ${U.falaDist(m,{km:"kilomètres",m:"mètres",mi:"miles",ft:"pieds"})}, `},
 };
 function navPhrase(mv){
   const Lg=NAV_LANG[state.lang]||NAV_LANG.pt;
@@ -5121,18 +5123,7 @@ function init(){
       if(d.saved>30) toast(t("🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.",{n:d.saved}),6000);
     } else if(d.type==="PRECACHE_PROGRESS"){ tileDL.done=d.done; }
   });
-  // avisos de radar na Alemanha: escolha informada do utilizador
-  const camDe=$("#cam-de");
-  if(camDe){
-    camDe.checked=store.get("cam-de")===1;
-    camDe.addEventListener("change",()=>{
-      store.set("cam-de",camDe.checked?1:0);
-      toast(camDe.checked?t("Avisos de radar ligados na Alemanha — por tua conta e risco.")
-                         :t("Avisos de radar desligados na Alemanha."));
-      const R=state.route;
-      if(R){ R.cameras=null; (R.variants||[]).forEach(v=>{ v.cameras=null; }); loadRouteCameras(); }
-    });
-  }
+
   $("#btn-trips").addEventListener("click",openTrips);
   $("#trips-close").addEventListener("click",closeTrips);
   $("#trips-bg").addEventListener("click",closeTrips);
