@@ -461,6 +461,16 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .pin-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .pin-actions button{padding:9px 11px;border-radius:9px;border:1px solid rgba(0,0,0,.14);background:#f4f4f1;cursor:pointer;font-weight:650;font-size:13px;text-align:left}
 .pin-actions button:hover{background:#e9edf5}
+.chk-row{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border:1px solid var(--border);
+  border-radius:11px;cursor:pointer;font-size:13px}
+.chk-row:has(input:checked){border-color:var(--warn);background:var(--warn-soft)}
+.chk-row input{margin-top:2px;flex:none}
+.chk-row span{display:flex;flex-direction:column;gap:2px}
+.chk-row span span{font-size:11.5px;color:var(--muted);font-weight:400}
+.law-note{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding:10px 12px;border-radius:12px;
+  background:var(--surface2);border-left:3px solid var(--muted);font-size:12.5px;line-height:1.45;color:var(--ink2)}
+.law-note p{margin:0 0 6px}
+.law-note p:last-child{margin-bottom:0}
 .hz-row{display:flex;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface2);margin-top:8px;border-left:3px solid var(--warn,#fab219);align-items:flex-start}
 .hz-row.lvl3{border-left-color:#d03b3b}
 .hz-row.lvl2{border-left-color:#ec835a}
@@ -635,6 +645,10 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
             <span><b>Tolerante</b><span>Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.</span></span></label>
         </div>
         <p class="small muted" style="margin:10px 0 0">Trovoada, gelo e neve dão sempre vermelho, por segurança.</p>
+        <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
+        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.</p>
+        <label class="chk-row" for="cam-de"><input type="checkbox" id="cam-de">
+          <span><b id="cam-de-b">Ligar também na Alemanha</b><span id="cam-de-s">A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.</span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
         <div class="chips" id="lang-row">
           <button class="chip click" data-lang="pt">PT</button>
@@ -914,6 +928,10 @@ function applyStaticI18n(){
     ['label[for="rt-when"]',"txt","Hora de partida"],
     ['label[for="rt-stay"]',"txt","Tempo no destino"],
     ["#tb-off-t","txt","offline"],
+    ["#cam-title","txt","Avisos de radar"],
+    ["#cam-law-txt","txt","A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo."],
+    ["#cam-de-b","txt","Ligar também na Alemanha"],
+    ["#cam-de-s","txt","A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco."],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
     ["#lang-title","txt","Idioma"],
   ];
@@ -1533,6 +1551,25 @@ Object.assign(I18N.en,{
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Route map saved ({n} tiles) — works with no internet at all.",
 "⭐ guardado por ti":"⭐ saved by you","sem nome":"unnamed","Tempo em cada paragem":"Time at each stop",
 "⚠️ Perigo no teu trajeto":"⚠️ Hazard on your route",
+"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"In Belgium, warning about speed cameras has been illegal since 2015 (fines of €150–3,000 and confiscation).",
+"Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"In Switzerland, speed camera warnings are illegal, with confiscation and possible criminal charges.",
+"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"In France it is illegal to show a camera's exact location — I show wider danger zones, like the big navigation apps do.",
+"Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições.":"German law forbids drivers from using speed camera warnings. You can enable it at your own risk in settings.",
+"({n} radares deste trajeto não são mostrados.)":"({n} cameras on this route are not shown.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"I'm not showing cameras on this route — see why below.",
+"zona km {a}–{b}":"zone km {a}–{b}",
+"zona de perigo":"danger zone",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Danger zone in {x}. Watch your speed.",
+"⚠️ Zona de perigo":"⚠️ Danger zone",
+"por volta do km {k}":"around km {k}",
+"Em França a lei não permite indicar o ponto exato.":"French law does not allow showing the exact location.",
+"Avisos de radar":"Speed camera warnings",
+"A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.":"The law differs by country. In Belgium and Switzerland it is illegal, so I switch it off automatically. In France I show danger zones.",
+"Ligar também na Alemanha":"Enable in Germany too",
+"A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"German law forbids drivers from using camera warnings. At your own risk.",
+"Avisos de radar ligados na Alemanha — por tua conta e risco.":"Camera warnings enabled in Germany — at your own risk.",
+"Avisos de radar desligados na Alemanha.":"Camera warnings disabled in Germany.",
+
 });
 Object.assign(I18N.es,{
 "Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)","Chuva ({n} mm/h)":"Lluvia ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
@@ -1595,6 +1632,25 @@ Object.assign(I18N.es,{
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Mapa de la ruta guardado ({n} piezas) — funciona sin internet.",
 "⭐ guardado por ti":"⭐ guardado por ti","sem nome":"sin nombre","Tempo em cada paragem":"Tiempo en cada parada",
 "⚠️ Perigo no teu trajeto":"⚠️ Peligro en tu ruta",
+"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"En Bélgica avisar de radares es ilegal desde 2015 (multas de 150 a 3000 € y confiscación).",
+"Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"En Suiza avisar de radares es ilegal, con confiscación y posible proceso penal.",
+"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"En Francia es ilegal indicar el punto exacto de un radar — muestro zonas de peligro amplias, como las grandes apps de navegación.",
+"Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições.":"La ley alemana prohíbe al conductor usar avisos de radar. Puedes activarlo bajo tu responsabilidad en ajustes.",
+"({n} radares deste trajeto não são mostrados.)":"({n} radares de esta ruta no se muestran.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"En esta ruta no muestro radares — mira abajo por qué.",
+"zona km {a}–{b}":"zona km {a}–{b}",
+"zona de perigo":"zona de peligro",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Zona de peligro en {x}. Atención a la velocidad.",
+"⚠️ Zona de perigo":"⚠️ Zona de peligro",
+"por volta do km {k}":"hacia el km {k}",
+"Em França a lei não permite indicar o ponto exato.":"La ley francesa no permite indicar el punto exacto.",
+"Avisos de radar":"Avisos de radar",
+"A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.":"La ley cambia según el país. En Bélgica y Suiza es ilegal, así que lo desactivo automáticamente. En Francia muestro zonas de peligro.",
+"Ligar também na Alemanha":"Activar también en Alemania",
+"A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"La ley alemana prohíbe al conductor usar avisos de radar. Bajo tu responsabilidad.",
+"Avisos de radar ligados na Alemanha — por tua conta e risco.":"Avisos de radar activados en Alemania — bajo tu responsabilidad.",
+"Avisos de radar desligados na Alemanha.":"Avisos de radar desactivados en Alemania.",
+
 });
 Object.assign(I18N.fr,{
 "Chuva forte ({n} mm/h)":"Pluie forte ({n} mm/h)","Chuva ({n} mm/h)":"Pluie ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
@@ -1657,6 +1713,25 @@ Object.assign(I18N.fr,{
 "🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Carte du trajet enregistrée ({n} tuiles) — fonctionne sans internet.",
 "⭐ guardado por ti":"⭐ enregistré par toi","sem nome":"sans nom","Tempo em cada paragem":"Temps à chaque arrêt",
 "⚠️ Perigo no teu trajeto":"⚠️ Danger sur ton trajet",
+"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"En Belgique, signaler les radars est interdit depuis 2015 (amendes de 150 à 3000 € et confiscation).",
+"Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"En Suisse, signaler les radars est interdit, avec confiscation et poursuites pénales possibles.",
+"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"En France, il est interdit d'indiquer l'emplacement exact d'un radar — j'affiche des zones de danger élargies, comme les grandes applis de navigation.",
+"Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições.":"La loi allemande interdit au conducteur d'utiliser des avertisseurs de radars. Tu peux l'activer à tes risques dans les réglages.",
+"({n} radares deste trajeto não são mostrados.)":"({n} radars de ce trajet ne sont pas affichés.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"Je n'affiche pas de radars sur ce trajet — voir pourquoi ci-dessous.",
+"zona km {a}–{b}":"zone km {a}–{b}",
+"zona de perigo":"zone de danger",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Zone de danger dans {x}. Attention à ta vitesse.",
+"⚠️ Zona de perigo":"⚠️ Zone de danger",
+"por volta do km {k}":"vers le km {k}",
+"Em França a lei não permite indicar o ponto exato.":"La loi française ne permet pas d'indiquer l'emplacement exact.",
+"Avisos de radar":"Avertisseurs de radars",
+"A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.":"La loi varie selon le pays. En Belgique et en Suisse c'est interdit, je le désactive donc automatiquement. En France j'affiche des zones de danger.",
+"Ligar também na Alemanha":"Activer aussi en Allemagne",
+"A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"La loi allemande interdit au conducteur d'utiliser ces avertisseurs. À tes risques.",
+"Avisos de radar ligados na Alemanha — por tua conta e risco.":"Avertisseurs activés en Allemagne — à tes risques.",
+"Avisos de radar desligados na Alemanha.":"Avertisseurs désactivés en Allemagne.",
+
 });
 
 /* ---------------- WMO → texto/emoji ---------------- */
@@ -2039,10 +2114,96 @@ async function fetchCameras(coords){
   throw lastErr||new Error("overpass indisponível");
 }
 
+/* =====================================================================
+   LEGALIDADE DOS AVISOS DE RADAR — muda de país para país.
+   Bélgica e Suíça proíbem por completo (coimas pesadas e confisco).
+   França proíbe indicar o ponto exato, mas tolera "zonas de perigo".
+   Alemanha proíbe por lei, quase nunca aplica a apps: fica à tua escolha.
+   Em tudo o resto (PT, NL, ES, IT, AT, UK…) é legal e funciona normalmente.
+   ===================================================================== */
+const CAM_LAW={
+  BE:{mode:"off",  why:"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento)."},
+  CH:{mode:"off",  why:"Na Suíça avisar de radares é proibido, com confisco e possível processo criminal."},
+  FR:{mode:"zones",why:"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação."},
+  DE:{mode:"opt",  why:"Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições."},
+};
+/* contornos aproximados — só usados quando não há rede para confirmar o país */
+const CC_POLY={
+  BE:[[51.50,3.35],[51.38,4.23],[51.45,4.53],[51.30,4.77],[51.49,5.03],[51.19,5.24],[51.05,5.80],[50.75,6.02],[50.62,6.41],[50.32,6.35],[50.17,5.79],[49.79,5.75],[49.53,5.82],[49.61,5.45],[49.79,5.30],[50.10,4.83],[50.15,4.51],[49.96,4.14],[50.35,4.20],[50.50,3.66],[50.71,3.24],[50.78,2.87],[51.09,2.54],[51.37,3.19]],
+  FR:[[51.09,2.54],[50.78,2.87],[50.35,4.20],[49.96,4.14],[49.53,5.82],[49.46,6.16],[48.96,8.23],[47.59,7.58],[46.43,6.10],[45.92,6.80],[44.36,6.90],[43.75,7.53],[43.13,6.00],[43.40,4.85],[42.86,3.03],[42.47,3.17],[42.79,0.66],[43.29,-1.79],[45.50,-1.20],[46.50,-1.80],[47.50,-2.50],[48.50,-4.80],[48.90,-1.60],[49.70,-1.94],[49.35,0.10],[50.06,1.38],[50.95,1.85]],
+  CH:[[47.59,7.58],[47.62,8.55],[47.70,9.20],[47.06,9.60],[46.85,10.47],[46.44,10.00],[46.25,8.95],[46.00,8.95],[45.83,7.85],[46.02,6.80],[46.43,6.10],[47.00,6.80],[47.35,7.00]],
+  DE:[[54.90,8.40],[54.50,9.60],[54.40,11.00],[54.10,13.80],[53.90,14.30],[52.80,14.60],[51.50,15.05],[50.90,14.80],[50.20,12.10],[48.80,13.80],[47.55,13.00],[47.55,10.20],[47.60,7.58],[48.96,8.23],[49.46,6.16],[49.79,5.75],[50.17,5.79],[50.32,6.35],[50.62,6.41],[50.75,6.02],[51.05,5.80],[51.19,5.24],[51.49,5.03],[51.83,6.00],[52.45,7.05],[53.20,7.20],[53.70,7.00]],
+  LU:[[50.18,5.75],[50.13,6.14],[49.80,6.53],[49.45,6.37],[49.45,5.79],[49.79,5.75]],
+};
+function inPoly(lat,lon,poly){
+  let inside=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const yi=poly[i][0],xi=poly[i][1],yj=poly[j][0],xj=poly[j][1];
+    if(((yi>lat)!==(yj>lat))&&(lon<(xj-xi)*(lat-yi)/((yj-yi)||1e-12)+xi)) inside=!inside;
+  }
+  return inside;
+}
+function countryOffline(lat,lon){
+  for(const cc in CC_POLY) if(inPoly(lat,lon,CC_POLY[cc])) return cc;
+  return null;
+}
+/* país de um ponto — confirmado por rede quando há, com memória entre sessões */
+const ccMem=new Map();
+function ccKey(lat,lon){ return `${lat.toFixed(2)},${lon.toFixed(2)}`; }
+(function loadCC(){ try{ const s=store.get("cc")||{}; for(const k in s) ccMem.set(k,s[k]); }catch(e){} })();
+function saveCC(){ try{ const o={}; let n=0;
+  for(const [k,v] of ccMem){ if(n++>400) break; o[k]=v; } store.set("cc",o); }catch(e){} }
+async function countryAt(lat,lon){
+  const k=ccKey(lat,lon);
+  if(ccMem.has(k)) return ccMem.get(k);
+  let cc=null;
+  if(navigator.onLine){
+    try{
+      const u=new URL("https://photon.komoot.io/reverse");
+      u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5), limit:"1"}).toString();
+      const j=await jfetch(u.toString(), 7000);
+      cc=(j.features?.[0]?.properties?.countrycode||"").toUpperCase()||null;
+    }catch(e){}
+  }
+  if(!cc) cc=countryOffline(lat,lon);
+  if(cc){ ccMem.set(k,cc); saveCC(); }
+  return cc;
+}
+function camLawFor(cc){
+  const law=CAM_LAW[cc];
+  if(!law) return {mode:"on"};
+  if(law.mode==="opt") return store.get("cam-de")===1?{mode:"on"}:law;
+  return law;
+}
+/* aplica a lei do país a cada radar do trajeto */
+async function applyCamLaw(list){
+  const blocked={};
+  const cells=new Map();
+  for(const c of list){ const k=ccKey(c.lat,c.lon); if(!cells.has(k)) cells.set(k,c); }
+  const ccs=new Map();
+  for(const [k,c] of cells) ccs.set(k, await countryAt(c.lat,c.lon));
+  const out=[];
+  for(const c of list){
+    const cc=ccs.get(ccKey(c.lat,c.lon));
+    const law=camLawFor(cc);
+    if(law.mode==="off"||law.mode==="opt"){ blocked[cc]=(blocked[cc]||0)+1; continue; }
+    if(law.mode==="zones"){ c.zone=true; c.km=Math.round(c.km/2)*2; blocked[cc]=blocked[cc]||0; }
+    c.cc=cc;
+    out.push(c);
+  }
+  // em zonas de perigo, um aviso por zona chega (funde as que se sobrepõem)
+  const dedup=[]; for(const c of out){
+    const prev=dedup[dedup.length-1];
+    if(c.zone&&prev&&prev.zone&&Math.abs(prev.km-c.km)<2.6) continue;
+    dedup.push(c);
+  }
+  return {list:dedup, blocked};
+}
+
 async function loadRouteCameras(){
   const R=state.route; if(!R) return;
   const v=R.variants?.[R.active]||R;
-  if(v.cameras){ R.cameras=v.cameras; drawRoute(false); renderRouteSummary(); renderCameras(); return; }
+  if(v.cameras){ R.cameras=v.cameras; R.camBlocked=v.camBlocked; drawRoute(false); renderRouteSummary(); renderCameras(); return; }
   try{
     const cams=await fetchCameras(v.coords);
     // projeção exata de cada radar no traçado (distância ao segmento + km ao longo da rota)
@@ -2067,7 +2228,10 @@ async function loadRouteCameras(){
     });
     const list=cams.filter(c=>c.off<=0.25).sort((a,b)=>a.km-b.km)
       .filter((c,i,arr)=>i===0||c.km-arr[i-1].km>0.12);
-    v.cameras=list; R.cameras=list; R.camerasError=false;
+    // filtro legal: em alguns países avisar de radares é proibido
+    const legal=await applyCamLaw(list);
+    v.cameras=legal.list; v.camBlocked=legal.blocked;
+    R.cameras=legal.list; R.camBlocked=legal.blocked; R.camerasError=false;
   }catch(e){ R.cameras=null; R.camerasError=true; }
   drawRoute(false); renderRouteSummary(); renderCameras();
 }
@@ -2083,8 +2247,27 @@ function renderCameras(){
     box.appendChild(card); return;
   }
   if(!R.cameras){ card.appendChild(el("p","h-sub",t("A procurar radares fixos ao longo do caminho…"))); box.appendChild(card); return; }
+  // nota legal: em que países é que a lei nos obriga a calar
+  const lawNote=()=>{
+    const b=R.camBlocked||{};
+    const ccs=Object.keys(b).filter(cc=>CAM_LAW[cc]);
+    if(!ccs.length) return null;
+    const bx=el("div","law-note");
+    bx.append(el("span",null,"⚖️"));
+    const txt=el("div");
+    ccs.forEach(cc=>{
+      const law=CAM_LAW[cc], n=b[cc];
+      const p=el("p",null,t(law.why)+(n>0?" "+t("({n} radares deste trajeto não são mostrados.)",{n}):""));
+      txt.appendChild(p);
+    });
+    bx.appendChild(txt);
+    return bx;
+  };
   if(!R.cameras.length){
-    card.appendChild(el("p","h-sub",t("Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉")));
+    const ln=lawNote();
+    card.appendChild(el("p","h-sub",ln?t("Neste trajeto não mostro radares — ver abaixo porquê."):
+      t("Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉")));
+    if(ln) card.appendChild(ln);
     box.appendChild(card); return;
   }
   card.appendChild(el("p","h-sub",t("Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.")));
@@ -2093,16 +2276,18 @@ function renderCameras(){
     const li=el("li","seg-item");
     const bar=el("span","seg-bar"); bar.style.background="var(--crit)";
     const main=el("div","seg-main");
-    main.append(el("b",null,`km ${rnd(c.km)}`));
+    main.append(el("b",null,c.zone?t("zona km {a}–{b}",{a:rnd(c.km),b:rnd(c.km)+2}):`km ${rnd(c.km)}`));
     const place=el("span",null,"…");
     main.append(place);
-    li.append(bar,main,el("span","seg-val",`📸 ${c.max?t("limite {v}",{v:String(c.max).replace("mph"," mph")}):t("radar fixo")}`));
+    li.append(bar,main,el("span","seg-val",c.zone?`⚠️ ${t("zona de perigo")}`
+      :`📸 ${c.max?t("limite {v}",{v:String(c.max).replace("mph"," mph")}):t("radar fixo")}`));
     ul.appendChild(li);
     const n=await revGeocode(c.lat,c.lon);
     place.textContent=t("perto de {p}",{p:n.name});
   });
   card.appendChild(ul);
   if(R.cameras.length>14) card.appendChild(el("p","map-note",t("+{n} radares adicionais no mapa.",{n:R.cameras.length-14})));
+  const ln=lawNote(); if(ln) card.appendChild(ln);
   box.appendChild(card);
 }
 
@@ -3095,8 +3280,18 @@ function drawRoute(fit){
       if(s.stop==null){ const n=await revGeocode(s.lat,s.lon); t4.textContent=`📍 ${t("perto de {p}",{p:n.name})}`; }
     });
   });
-  // radares fixos 📸
+  // radares fixos 📸 — em França a lei só permite zonas alargadas, não o ponto exato
   (R.cameras||[]).forEach(c=>{
+    if(c.zone){
+      const zc=L.circle([c.lat,c.lon],{radius:1400,color:"#fab219",weight:2,
+        fillColor:"#fab219",fillOpacity:.14}).addTo(g);
+      const dz=el("div");
+      const zt=el("div"); zt.style.fontWeight="700"; zt.textContent=t("⚠️ Zona de perigo");
+      dz.append(zt, el("div",null,t("por volta do km {k}",{k:rnd(c.km)})),
+        el("div","muted small",t("Em França a lei não permite indicar o ponto exato.")));
+      zc.bindPopup(dz,{maxWidth:230});
+      return;
+    }
     const mk=L.marker([c.lat,c.lon],{icon:L.divIcon({className:"",html:'<div class="cam-pin">📸</div>',
       iconSize:[22,22], iconAnchor:[11,11]})}).addTo(g);
     const div=el("div");
@@ -4468,7 +4663,9 @@ function onTravelPos(p){
         if(dc<=th&&dc>-0.05&&!travel.alerted.has(key)){
           travel.alerted.add(key);
           buzz([180,80,180]);
-          speak(t("Radar de velocidade dentro de {x}.",{x:t(lab)})+(nextCam.max?" "+t("Limite {v}.",{v:String(nextCam.max).replace(/\D/g,"")}):""));
+          speak(nextCam.zone
+            ? t("Zona de perigo dentro de {x}. Atenção à velocidade.",{x:t(lab)})
+            : t("Radar de velocidade dentro de {x}.",{x:t(lab)})+(nextCam.max?" "+t("Limite {v}.",{v:String(nextCam.max).replace(/\D/g,"")}):""));
           break;
         }
       }
@@ -4759,6 +4956,18 @@ function init(){
       if(d.saved>30) toast(t("🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.",{n:d.saved}),6000);
     } else if(d.type==="PRECACHE_PROGRESS"){ tileDL.done=d.done; }
   });
+  // avisos de radar na Alemanha: escolha informada do utilizador
+  const camDe=$("#cam-de");
+  if(camDe){
+    camDe.checked=store.get("cam-de")===1;
+    camDe.addEventListener("change",()=>{
+      store.set("cam-de",camDe.checked?1:0);
+      toast(camDe.checked?t("Avisos de radar ligados na Alemanha — por tua conta e risco.")
+                         :t("Avisos de radar desligados na Alemanha."));
+      const R=state.route;
+      if(R){ R.cameras=null; (R.variants||[]).forEach(v=>{ v.cameras=null; }); loadRouteCameras(); }
+    });
+  }
   $("#btn-trips").addEventListener("click",openTrips);
   $("#trips-close").addEventListener("click",closeTrips);
   $("#trips-bg").addEventListener("click",closeTrips);
