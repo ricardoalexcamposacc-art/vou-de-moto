@@ -666,6 +666,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
           <button class="chip click" data-units="imperial">mi · °F</button>
           <button class="chip click" data-units="uk">mi · °C</button>
         </div>
+        <p class="small muted" id="cred-line" style="margin:10px 0 0;font-variant-numeric:tabular-nums"></p>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
         <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.</p>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
@@ -1955,12 +1956,20 @@ const LVL_NAME=["Seco","Chuvisco / possível","Chuva","Forte / trovoada"];
 
 /* ---------------- fetch com timeout + aviso ---------------- */
 async function jfetch(url, timeout=14000){
+  /* tudo o que sai da app passa por aqui: é onde a cache poupa pedidos e
+     onde se conta o que teria custado créditos. */
+  const nome=typeof svcDe==="function"?svcDe(url):null;
+  const chave=nome?chaveCache(nome,url):null;
+  if(chave){ const guardado=cacheLer(chave);
+    if(guardado!==null){ contar(nome,url,true); return guardado; } }
   const ctl=new AbortController(); const th=setTimeout(()=>ctl.abort(),timeout);
   try{
     const r=await fetch(url,{signal:ctl.signal});
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const j=await r.json();
     state.netFails=0; $("#net-banner").style.display="none";
+    if(nome) contar(nome,url,false);
+    if(chave) cacheEscrever(chave,j,SERVICOS[nome].ttl);
     return j;
   }catch(e){
     state.netFails++;
@@ -2011,10 +2020,121 @@ addEventListener("scroll",tipHide,{passive:true});
   }catch(e){}
 })();
 
+
+/* =====================================================================
+   ENDEREÇOS DOS SERVIÇOS — o único sítio a mudar quando houver servidor
+   =====================================================================
+   Hoje a app fala diretamente com cada fornecedor. No dia em que existir
+   proxy (Fase B3), põe-se o domínio em SERVICOS.proxy e mais nada muda no
+   resto do ficheiro: cada chamada passa por svc("nome"), e o caminho no
+   nosso servidor está aqui ao lado do endereço público.                  */
+const SERVICOS={
+  proxy:"",   // ex.: "https://api.levante.app" — vazio = direto ao fornecedor
+  meteo:   {url:"https://api.open-meteo.com/v1/forecast",           via:"/v1/forecast", fam:"meteo",  ttl:20*60000, creditos:0},
+  rota:    {url:"https://router.project-osrm.org/route/v1/driving", via:"/v1/route",    fam:"rota",   ttl:30*60000, creditos:"pares"},
+  procura: {url:"https://photon.komoot.io/api/",                    via:"/v1/search",   fam:"texto",  ttl:0,        creditos:1},
+  inversa: {url:"https://photon.komoot.io/reverse",                 via:"/v1/reverse",  fam:"morada", ttl:0,        creditos:1},
+  inversa2:{url:"https://nominatim.openstreetmap.org/reverse",      via:"/v1/reverse",  fam:"morada", ttl:0,        creditos:1},
+  radar:   {url:"https://api.rainviewer.com/public/weather-maps.json", via:"/v1/radar", fam:"curto",  ttl:4*60000,  creditos:0},
+};
+function svc(nome){ const x=SERVICOS[nome]; return SERVICOS.proxy?SERVICOS.proxy+x.via:x.url; }
+function svcDe(url){
+  for(const k in SERVICOS){ const x=SERVICOS[k];
+    if(!x||!x.url) continue;
+    if(url.startsWith(SERVICOS.proxy?SERVICOS.proxy+x.via:x.url.replace(/\/$/,""))) return k; }
+  return null;
+}
+
+/* ── célula de cache ──────────────────────────────────────────────────────
+   Arredondar a coordenada a uma grelha de CELULA_KM quilómetros. A 1 km dois
+   motociclistas na mesma estrada caíam em células diferentes e a cache quase
+   não acertava; o tempo também não varia de forma útil a essa distância.    */
+const CELULA_KM=5;
+const KM_GRAU=111.32;
+function celula(lat,lon,km=CELULA_KM){
+  const la=+lat, lo=+lon;
+  if(!isFinite(la)||!isFinite(lo)) return null;
+  const pl=km/KM_GRAU, cLa=Math.round(la/pl)*pl;
+  const cos=Math.max(0.05,Math.cos(cLa*Math.PI/180));
+  const cLo=Math.round(lo/(km/(KM_GRAU*cos)))*(km/(KM_GRAU*cos));
+  return cLa.toFixed(3)+","+cLo.toFixed(3);
+}
+
+/* ── contador de pedidos e de créditos ────────────────────────────────────
+   Serve para responder a uma pergunta concreta: quantos utilizadores cabem
+   no plano gratuito. Fica no dispositivo, não sai daqui.                    */
+const CRED={inicio:Date.now(), pedidos:0, poupados:0, creditos:0, porServico:{}};
+function contar(nome,url,doCache){
+  const x=SERVICOS[nome]||{};
+  const r=CRED.porServico[nome]=CRED.porServico[nome]||{pedidos:0,cache:0,creditos:0};
+  if(doCache){ r.cache++; CRED.poupados++; return; }
+  r.pedidos++; CRED.pedidos++;
+  let c=x.creditos||0;
+  if(c==="pares"){ // o Geoapify cobra 1 crédito por cada par de pontos da rota
+    const m=url.match(/driving\/([^?]+)/); c=m?Math.max(1,m[1].split(";").length-1):1; }
+  r.creditos+=c; CRED.creditos+=c;
+  if(typeof pintarCreditos==="function") pintarCreditos();
+}
+
+/* ── cache local ──────────────────────────────────────────────────────────
+   memória para o que envelhece (meteo, rotas, radar) e armazenamento do
+   dispositivo para o que não envelhece (texto de pesquisa e moradas — o
+   Geoapify permite guardar, e uma bomba de gasolina só se procura uma vez). */
+const memo=new Map();
+const CACHE_TEXTO="cache-texto";
+let cacheTexto=null;
+function textoLer(){ if(!cacheTexto) cacheTexto=store.get(CACHE_TEXTO)||{}; return cacheTexto; }
+function textoGravar(){ try{ const c=textoLer(); const ks=Object.keys(c);
+  if(ks.length>600) for(const k of ks.slice(0,ks.length-500)) delete c[k];
+  store.set(CACHE_TEXTO,c); }catch(e){} }
+
+function chaveCache(nome,url){
+  const x=SERVICOS[nome]; if(!x) return null;
+  if(x.fam==="meteo"){
+    let u; try{ u=new URL(url); }catch(e){ return null; }
+    const la=(u.searchParams.get("latitude")||"").split(","), lo=(u.searchParams.get("longitude")||"").split(",");
+    if(la.length!==lo.length) return null;
+    const cel=[]; for(let i=0;i<la.length;i++){ const c=celula(la[i],lo[i]); if(!c) return null; cel.push(c); }
+    const resto=[...u.searchParams.entries()].filter(([k])=>k!=="latitude"&&k!=="longitude")
+      .sort().map(([k,v])=>k+"="+v).join("&");
+    return `meteo|${Math.floor(Date.now()/3600000)}|${cel.join(";")}|${resto}`;
+  }
+  if(x.fam==="rota"){
+    const m=url.match(/driving\/([^?]+)/); if(!m) return null;
+    const pts=m[1].split(";").map(p=>{ const [lo,la]=p.split(","); return (+la).toFixed(3)+","+(+lo).toFixed(3); });
+    return `rota|${Math.floor(Date.now()/1800000)}|${pts.join(";")}|${url.includes("alternatives=true")?"alt":""}`;
+  }
+  if(x.fam==="morada"){
+    /* a morada não muda de metro a metro. Arredondar a ~110 m transforma
+       dezenas de pedidos de geocodificação inversa durante uma viagem num
+       punhado — era o maior consumidor de créditos da sessão. */
+    let u; try{ u=new URL(url); }catch(e){ return null; }
+    const la=u.searchParams.get("lat")||u.searchParams.get("latitude");
+    const lo=u.searchParams.get("lon")||u.searchParams.get("longitude");
+    if(la==null||lo==null) return null;
+    return `texto|morada|${nome}|${(+la).toFixed(3)},${(+lo).toFixed(3)}|${u.searchParams.get("limit")||""}`;
+  }
+  if(x.fam==="texto") return "texto|"+url;
+  if(x.fam==="curto") return "curto|"+url;
+  return null;
+}
+function cacheLer(chave){
+  if(chave.startsWith("texto|")){ const v=textoLer()[chave]; return v===undefined?null:v; }
+  const v=memo.get(chave);
+  if(!v) return null;
+  if(v.exp&&Date.now()>v.exp){ memo.delete(chave); return null; }
+  return v.dados;
+}
+function cacheEscrever(chave,dados,ttl){
+  if(chave.startsWith("texto|")){ textoLer()[chave]=dados; textoGravar(); return; }
+  memo.set(chave,{dados, exp:ttl?Date.now()+ttl:0});
+  if(memo.size>400){ const it=memo.keys(); for(let i=0;i<80;i++) memo.delete(it.next().value); }
+}
+
 /* =====================================================================
    CAMADA DE APIs (todas gratuitas, sem chave)
    ===================================================================== */
-const OM_BASE="https://api.open-meteo.com/v1/forecast";
+const OM_BASE=svc("meteo");
 
 async function fetchDashboardWx(lat,lon){
   const u=new URL(OM_BASE);
@@ -2061,7 +2181,7 @@ function photonMap(f){
   return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value};
 }
 async function photonSearch(q,pos,limit=7){
-  const u=new URL("https://photon.komoot.io/api/");
+  const u=new URL(svc("procura"));
   const params={q, limit:String(limit)};
   if(pos&&isFinite(pos.lat)){ params.lat=pos.lat.toFixed(4); params.lon=pos.lon.toFixed(4); }
   u.search=new URLSearchParams(params).toString();
@@ -2157,6 +2277,11 @@ async function geocode(q){
     .map(f=>({...f, sub:f.sub||t("⭐ guardado por ti"), _fav:true}));
   add(favs);
 
+  // 1b) SÍTIOS RECENTES — procurados aqui, no telemóvel, antes de gastar um
+  // crédito. Quem vai ao mesmo sítio todas as semanas nunca mais paga por ele.
+  add(getRecentes().filter(r=>normTxt(r.name).includes(nq)||normTxt(r.sub||"").includes(nq))
+      .map(r=>({...r, sub:r.sub||t("🕘 pesquisaste isto há pouco")})));
+
   // 2) categoria reconhecida → os mais PRÓXIMOS desse tipo (não por texto)
   const cat=here?detectPoiCat(q):null;
   if(cat) add(await poiNear(cat,here).catch(()=>[]));
@@ -2190,7 +2315,7 @@ async function revGeocode(lat,lon){
   if(revCache.has(key)) return revCache.get(key);
   // 1º Photon reverse (sem limites apertados); reserva: Nominatim em fila
   try{
-    const u=new URL("https://photon.komoot.io/reverse");
+    const u=new URL(svc("inversa"));
     u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5)}).toString();
     const j=await jfetch(u.toString(), 8000);
     const p=j.features?.[0]?.properties;
@@ -2201,7 +2326,7 @@ async function revGeocode(lat,lon){
     }
   }catch(e){}
   try{
-    const u=new URL("https://nominatim.openstreetmap.org/reverse");
+    const u=new URL(svc("inversa2"));
     u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5),
       format:"jsonv2", zoom:"12", "accept-language":"pt"}).toString();
     const j=await nomFetch(u.toString());
@@ -2216,7 +2341,7 @@ async function revGeocode(lat,lon){
 async function osrmRoute(points){ // points: [{lat,lon},...]
   const path=points.map(p=>`${p.lon.toFixed(5)},${p.lat.toFixed(5)}`).join(";");
   const alts=points.length===2?"&alternatives=true":"";
-  const u=`https://router.project-osrm.org/route/v1/driving/${path}?overview=full&geometries=geojson&steps=true${alts}`;
+  const u=`${svc("rota")}/${path}?overview=full&geometries=geojson&steps=true${alts}`;
   const j=await jfetch(u, 18000);
   if(j.code!=="Ok"||!j.routes?.length) throw new Error("Sem rota");
   return {routes:j.routes, waypoints:j.waypoints||[]};
@@ -2316,7 +2441,7 @@ async function countryAt(lat,lon){
   let cc=null;
   if(navigator.onLine){
     try{
-      const u=new URL("https://photon.komoot.io/reverse");
+      const u=new URL(svc("inversa"));
       u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5), limit:"1"}).toString();
       const j=await jfetch(u.toString(), 7000);
       cc=(j.features?.[0]?.properties?.countrycode||"").toUpperCase()||null;
@@ -2447,7 +2572,7 @@ function renderCameras(){
 }
 
 async function rainviewerMeta(){
-  return jfetch("https://api.rainviewer.com/public/weather-maps.json");
+  return jfetch(svc("radar"));
 }
 
 /* =====================================================================
@@ -2583,13 +2708,13 @@ function attachAC(input, list, onPick){
   };
   const pick=(i)=>{ const it=items[i]; if(!it) return;
     input.value=it.name+(it.sub?` — ${it.sub.split(",")[0]}`:"");
-    input._picked=it; close(); onPick&&onPick(it); };
+    input._picked=it; addRecente(it); close(); onPick&&onPick(it); };
   const search=debounce(async ()=>{
     const q=input.value.trim();
     if(q.length<3){ close(); return; }
     try{ items=await geocode(q); active=items.length?0:-1; render(); }
     catch(e){ items=[]; render(); }
-  },420);
+  },350);
   input.addEventListener("input",()=>{ input._picked=null; search(); });
   input.addEventListener("keydown",(e)=>{
     if(!list.classList.contains("open")){ if(e.key==="ArrowDown") search(); return; }
@@ -3078,7 +3203,7 @@ async function revStreet(lat,lon){
   if(revStreetCache.has(key)) return revStreetCache.get(key);
   let out=null;
   try{
-    const u=new URL("https://photon.komoot.io/reverse");
+    const u=new URL(svc("inversa"));
     u.search=new URLSearchParams({lat:lat.toFixed(6), lon:lon.toFixed(6)}).toString();
     const j=await jfetch(u.toString(), 8000);
     const p=j.features?.[0]?.properties;
@@ -3090,7 +3215,7 @@ async function revStreet(lat,lon){
   }catch(e){}
   if(!out){
     try{
-      const u=new URL("https://nominatim.openstreetmap.org/reverse");
+      const u=new URL(svc("inversa2"));
       u.search=new URLSearchParams({lat:lat.toFixed(6), lon:lon.toFixed(6), format:"jsonv2", zoom:"17", "accept-language":"pt"}).toString();
       const j=await nomFetch(u.toString());
       const a=j?.address||{};
@@ -4044,6 +4169,16 @@ async function toggleRouteRadar(on){
    FAVORITOS — casa, bombas, amigos, restaurantes e rotas guardadas
    ===================================================================== */
 function getFavs(){ return store.get("favs")||[]; }
+/* sítios escolhidos recentemente: ficam no dispositivo e são procurados
+   localmente antes de qualquer pedido à rede */
+function getRecentes(){ return store.get("recentes")||[]; }
+function addRecente(it){
+  if(!it||!isFinite(it.lat)) return;
+  const k=(x)=>`${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}`;
+  const lista=getRecentes().filter(r=>k(r)!==k(it));
+  lista.unshift({name:it.name, sub:it.sub||"", lat:it.lat, lon:it.lon});
+  store.set("recentes", lista.slice(0,25));
+}
 function getFavRoutes(){ return store.get("favRoutes")||[]; }
 function normTxt(x){ return (x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 function saveFav(place,label){
@@ -4453,6 +4588,7 @@ function travelNotifyClose(){
    ===================================================================== */
 const motoGuard={lastAt:0, lastPos:null, lastNo:null, lastFetch:0, rainAt:null, timer:null, stat:0};
 window.__levT={travel, motoGuard}; // para testes
+window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
   if(!key) return false;
@@ -4469,7 +4605,7 @@ async function isLodgingHere(pos){
   const fv=getFavs().find(f=>isFinite(f.lat)&&haversine(pos,f)<0.12&&/cas|home|hous|maison|apart|morad|pr[ée]d|hotel|hostel/i.test(f.name||""));
   if(fv) return true;
   try{
-    const u=new URL("https://photon.komoot.io/reverse");
+    const u=new URL(svc("inversa"));
     u.search=new URLSearchParams({lat:pos.lat.toFixed(6), lon:pos.lon.toFixed(6), limit:"3"}).toString();
     const j=await jfetch(u.toString(), 8000);
     for(const f of (j.features||[])){
@@ -4478,7 +4614,7 @@ async function isLodgingHere(pos){
     }
   }catch(e){}
   try{
-    const u=new URL("https://nominatim.openstreetmap.org/reverse");
+    const u=new URL(svc("inversa2"));
     u.search=new URLSearchParams({lat:pos.lat.toFixed(6), lon:pos.lon.toFixed(6), format:"jsonv2", zoom:"18", "accept-language":"pt"}).toString();
     const j=await nomFetch(u.toString());
     if(j){
@@ -5090,6 +5226,17 @@ function init(){
     c.addEventListener("click",()=>setLang(c.dataset.lang)); });
   // unidades: métrico, imperial ou o híbrido britânico (milhas com Celsius)
   state.units=store.get("units")||detectUnits();
+  /* quantos pedidos esta sessão fez, e quantos a cache poupou. Serve para
+     saber quantas pessoas cabem no plano gratuito em vez de adivinhar. */
+  window.pintarCreditos=()=>{
+    const n=$("#cred-line"); if(!n) return;
+    const min=Math.max(1,Math.round((Date.now()-CRED.inicio)/60000));
+    const det=Object.entries(CRED.porServico).filter(([,v])=>v.pedidos)
+      .map(([k,v])=>`${k} ${v.pedidos}`).join(" · ");
+    n.textContent=t("Esta sessão: {p} pedidos em {m} min · {c} poupados pela cache · {k} créditos",
+      {p:CRED.pedidos, m:min, c:CRED.poupados, k:CRED.creditos})+(det?` (${det})`:"");
+  };
+  pintarCreditos();
   const paintUnits=()=>$$("#unit-row .chip").forEach(c=>c.classList.toggle("sel",c.dataset.units===state.units));
   paintUnits();
   $$("#unit-row .chip").forEach(c=>c.addEventListener("click",()=>{
