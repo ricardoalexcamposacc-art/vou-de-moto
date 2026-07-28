@@ -1,12 +1,15 @@
-/* Vou de Moto? — service worker v6
+/* Levante — service worker v7
    - app: rede primeiro (atualiza sempre que há net), cache como rede de segurança
    - MAPA: tiles guardados em cache (cache-first) para a viagem não ficar às escuras
      quando falha a rede — inclui pré-descarga do corredor da rota */
-const V = "vdm-v6";
-const TILES = "vdm-tiles-v1";
+const V = "levante-v7";
+const TILES = "levante-tiles-v1";
+/* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
+   descarregado não fica sem ele por causa de uma mudança de nome */
+const TILES_ANTIGO = "vdm-tiles-v1";
 const TILE_MAX = 2600;          // ~40 MB; acima disto apagam-se os mais antigos
 const SHELL = [
-  "./", "./index.html", "./manifest.webmanifest", "./icon.svg",
+  "./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./privacidade.html", "./termos.html",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
 ];
@@ -24,7 +27,9 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((ks) => Promise.all(ks.filter((k) => k !== V && k !== TILES).map((k) => caches.delete(k))))
+      .then((ks) => Promise.all(ks
+        .filter((k) => k !== V && k !== TILES && k !== TILES_ANTIGO)
+        .map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -40,7 +45,11 @@ async function trimTiles() {
 
 async function tileResponse(req) {
   const c = await caches.open(TILES);
-  const hit = await c.match(req, { ignoreVary: true });
+  let hit = await c.match(req, { ignoreVary: true });
+  if (!hit) {                                // cai para a cache do nome antigo
+    const velha = await caches.open(TILES_ANTIGO);
+    hit = await velha.match(req, { ignoreVary: true });
+  }
   if (hit) return hit;                       // offline-first: o que já viste, vês sempre
   try {
     const res = await fetch(req);

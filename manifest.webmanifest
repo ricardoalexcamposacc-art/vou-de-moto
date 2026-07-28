@@ -1,7 +1,7 @@
 {
-  "name": "Vou de Moto?",
-  "short_name": "Vou de Moto",
-  "description": "Meteorologia para motociclistas: sabe se deves sair de moto, onde vai chover na tua rota, vento, radar e avisos em tempo real.",
+  "name": "Levante",
+  "short_name": "Levante",
+  "description": "Meteorologia e rota para motociclistas: o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Vento, chuva, radar e avisos.",
   "lang": "pt-PT",
   "start_url": "./",
   "scope": "./",
@@ -12,6 +12,8 @@
   "categories": ["weather", "navigation", "travel"],
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }

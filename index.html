@@ -8,11 +8,23 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Vou de Moto">
+<meta name="apple-mobile-web-app-title" content="Levante">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<title>Vou de Moto? — meteo para motociclistas</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>Levante — meteorologia e rota para motociclistas</title>
+<meta name="description" content="Levante mostra o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Sabes se deves ir de mota antes de sair de casa.">
+<meta name="application-name" content="Levante">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Levante">
+<meta property="og:title" content="Levante — meteorologia e rota para motociclistas">
+<meta property="og:description" content="Levante mostra o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Sabes se deves ir de mota antes de sair de casa.">
+<meta property="og:image" content="icon-512.png">
+<meta property="og:locale" content="pt_PT">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Levante — meteorologia e rota para motociclistas">
+<meta name="twitter:description" content="Levante mostra o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Sabes se deves ir de mota antes de sair de casa.">
+<meta name="twitter:image" content="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -628,8 +640,8 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
     <div class="brand">
       <img class="brand-tile" alt="" src="data:image/jpeg;base64,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">
       <div>
-        <div class="brand-name">Vou de Moto?</div>
-        <div class="brand-sub">meteorologia para motociclistas · 100% grátis</div>
+        <div class="brand-name">Levante</div>
+        <div class="brand-sub">meteorologia para motociclistas · grátis para começar</div>
       </div>
     </div>
     <div class="head-actions" style="position:relative">
@@ -655,7 +667,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
           <button class="chip click" data-units="uk">mi · °C</button>
         </div>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
-        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.</p>
+        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.</p>
         <label class="chk-row" for="cam-de"><input type="checkbox" id="cam-de">
           <span><b id="cam-de-b">Ligar também na Alemanha</b><span id="cam-de-s">A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.</span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
@@ -680,7 +692,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
   </div>
 
   <div id="net-banner" style="display:none" class="banner warn">
-    <span>📡</span><span>Não estou a conseguir contactar os serviços meteorológicos. Se estiveres a ver a app na barra lateral do Claude, <b>abre o ficheiro <i>vou-de-moto.html</i> diretamente no teu browser</b> (Chrome/Safari/Firefox) — aí funciona a 100%. Caso contrário, verifica a tua ligação e tenta de novo.</span>
+    <span>📡</span><span><b>Sem ligação aos serviços meteorológicos.</b> Verifica a tua internet — o mapa guardado, a rota e o GPS continuam a funcionar.</span>
   </div>
 
   <!-- ============ AGORA ============ -->
@@ -860,7 +872,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
 <script>
 "use strict";
 /* =====================================================================
-   Vou de Moto? — app 100% gratuita para motociclistas
+   Levante — meteorologia e rota para motociclistas
    Dados: Open-Meteo · OSRM · Nominatim/OSM · RainViewer · CARTO
    ===================================================================== */
 
@@ -881,13 +893,33 @@ const state = {
   radar:{ frames:[], idx:0, playing:false, timer:null, layers:{}, host:"" },
   netFails:0,
 };
-window.__vdm=state; // para depuração/testes
+window.__lev=state; // para depuração/testes
 
 /* memória persistente (com proteção: em ambientes sem storage funciona em memória) */
+const LS_PREFIX="levante-", LS_ANTIGO="vdm-";
+/* O prefixo mudou com o rename. Quem já tinha a app instalada não pode perder
+   favoritos, rotas guardadas, viagens nem definições: copia-se tudo primeiro e
+   só depois se apaga o antigo. Corre uma vez e deixa marca. */
+(function migrarArmazenamento(){
+  try{
+    if(localStorage.getItem(LS_PREFIX+"migrado")) return;
+    const velhas=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && k.indexOf(LS_ANTIGO)===0) velhas.push(k);
+    }
+    for(const k of velhas){
+      const novo=LS_PREFIX+k.slice(LS_ANTIGO.length);
+      if(localStorage.getItem(novo)===null) localStorage.setItem(novo, localStorage.getItem(k));
+    }
+    for(const k of velhas) localStorage.removeItem(k);   // só depois de copiado
+    localStorage.setItem(LS_PREFIX+"migrado","1");
+  }catch(e){ /* modo privado ou storage cheio: segue sem migrar */ }
+})();
 const store={
-  get(k){ try{ return JSON.parse(localStorage.getItem("vdm-"+k)); }catch(e){ return null; } },
-  set(k,v){ try{ localStorage.setItem("vdm-"+k, JSON.stringify(v)); }catch(e){} },
-  del(k){ try{ localStorage.removeItem("vdm-"+k); }catch(e){} },
+  get(k){ try{ return JSON.parse(localStorage.getItem(LS_PREFIX+k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(LS_PREFIX+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(LS_PREFIX+k); }catch(e){} },
 };
 
 /* =====================================================================
@@ -920,7 +952,7 @@ function setLang(l){
 }
 function applyStaticI18n(){
   const map=[
-    [".brand-sub","txt","meteorologia para motociclistas · 100% grátis"],
+    [".brand-sub","txt","meteorologia para motociclistas · grátis para começar"],
     ["#tab-agora","txt2","🏍️ ","Agora"], ["#tab-rota","txt2","🗺️ ","Rota"], ["#tab-radar","txt2","🛰️ ","Radar"],
     ["#loc-search","ph","Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)"],
     ["#btn-install","txt","📲 Instalar"],
@@ -939,7 +971,7 @@ function applyStaticI18n(){
     ["#tb-off-t","txt","offline"],
     ["#unit-title","txt","Unidades"],
     ["#cam-title","txt","Avisos de radar"],
-    ["#cam-law-txt","txt","A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo."],
+    ["#cam-law-txt","txt","A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato."],
     ["#cam-de-b","txt","Ligar também na Alemanha"],
     ["#cam-de-s","txt","A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco."],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
@@ -1016,7 +1048,7 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
-"meteorologia para motociclistas · 100% grátis":"weather for motorcyclists · 100% free",
+"meteorologia para motociclistas · grátis para começar":"weather for motorcyclists · free to start",
 "Agora":"Now","Rota":"Route","Radar":"Radar",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Search city or address… (e.g. London, Lisbon)",
 "📲 Instalar":"📲 Install","🔔 Sentinela meteorológica":"🔔 Weather sentinel",
@@ -1159,7 +1191,7 @@ en:{
 "⚠️ Possível chuvisco dentro de {d} km":"⚠️ Possible drizzle in {d} km","✅ Caminho seco daqui até ao destino":"✅ Dry all the way to your destination",
 "Radar de velocidade dentro de {x}.":"Speed camera in {x}.","1 quilómetro":"one kilometre","400 metros":"400 metres","Limite {v}.":"Limit {v}.",
 "🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movement detected — Trip mode turned on.",
-"🏍️ Vou de Moto — em viagem":"🏍️ Vou de Moto — on the road",
+"🏍️ Levante — em viagem":"🏍️ Levante — on the road",
 "Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"On · {p} · last check {h} — {s} Current gusts: {g} km/h. Keep the app open to receive alerts.",
 "🌧️ A chover agora — deve parar ~{h}.":"🌧️ Raining now — should stop ~{h}.",
 "🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Raining now, no break in sight for ~2 h.",
@@ -1194,7 +1226,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
-"meteorologia para motociclistas · 100% grátis":"meteorología para motociclistas · 100% gratis","Agora":"Ahora","Rota":"Ruta","Radar":"Radar",
+"meteorologia para motociclistas · grátis para começar":"meteorología para motociclistas · gratis para empezar","Agora":"Ahora","Rota":"Ruta","Radar":"Radar",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Buscar ciudad o dirección… (ej.: Madrid, Lisboa)",
 "📲 Instalar":"📲 Instalar","🔔 Sentinela meteorológica":"🔔 Centinela meteorológico","✨ Assistente de viagem":"✨ Asistente de viaje",
 "Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Dime a dónde vas: encuentro el sitio más cercano, trazo la ruta y te digo si ir en moto, esperar, usar otro transporte y qué ponerte.",
@@ -1320,7 +1352,7 @@ es:{
 "Tens tempo para parar ou mudar de caminho na aplicação.":"Tienes tiempo de parar o cambiar de ruta en la app.",
 "⚠️ Possível chuvisco dentro de {d} km":"⚠️ Posible llovizna en {d} km","✅ Caminho seco daqui até ao destino":"✅ Camino seco hasta el destino",
 "Radar de velocidade dentro de {x}.":"Radar de velocidad en {x}.","1 quilómetro":"un kilómetro","400 metros":"400 metros","Limite {v}.":"Límite {v}.",
-"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movimiento detectado — Modo Viaje activado.","🏍️ Vou de Moto — em viagem":"🏍️ Vou de Moto — en ruta",
+"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movimiento detectado — Modo Viaje activado.","🏍️ Levante — em viagem":"🏍️ Levante — en ruta",
 "Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"Activado · {p} · última comprobación {h} — {s} Rachas actuales: {g} km/h. Mantén la app abierta.",
 "🌧️ A chover agora — deve parar ~{h}.":"🌧️ Lloviendo ahora — debería parar ~{h}.","🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Lloviendo ahora, sin pausa a la vista en ~2 h.",
 "☁️ Chuva a caminho: ~{h}.":"☁️ Lluvia en camino: ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ Sin lluvia a la vista en 2 horas.",
@@ -1350,7 +1382,7 @@ es:{
 "Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"No pude obtener la previsión. Revisa la conexión.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
-"meteorologia para motociclistas · 100% grátis":"météo pour motards · 100% gratuit","Agora":"Maintenant","Rota":"Itinéraire","Radar":"Radar",
+"meteorologia para motociclistas · grátis para começar":"météo pour motards · gratuit pour commencer","Agora":"Maintenant","Rota":"Itinéraire","Radar":"Radar",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Rechercher une ville ou adresse… (ex. Paris, Lyon)",
 "📲 Instalar":"📲 Installer","🔔 Sentinela meteorológica":"🔔 Sentinelle météo","✨ Assistente de viagem":"✨ Assistant de trajet",
 "Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Dis-moi où tu vas — je trouve le lieu le plus proche, trace l'itinéraire et te dis s'il faut rouler, attendre, changer de transport et quoi porter.",
@@ -1476,7 +1508,7 @@ fr:{
 "Tens tempo para parar ou mudar de caminho na aplicação.":"Tu as le temps de t'arrêter ou de changer d'itinéraire dans l'app.",
 "⚠️ Possível chuvisco dentro de {d} km":"⚠️ Bruine possible dans {d} km","✅ Caminho seco daqui até ao destino":"✅ Sec jusqu'à destination",
 "Radar de velocidade dentro de {x}.":"Radar de vitesse dans {x}.","1 quilómetro":"un kilomètre","400 metros":"400 mètres","Limite {v}.":"Limite {v}.",
-"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Mouvement détecté — Mode trajet activé.","🏍️ Vou de Moto — em viagem":"🏍️ Vou de Moto — en route",
+"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Mouvement détecté — Mode trajet activé.","🏍️ Levante — em viagem":"🏍️ Levante — en route",
 "Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"Activée · {p} · dernier contrôle {h} — {s} Rafales actuelles : {g} km/h. Garde l'app ouverte.",
 "🌧️ A chover agora — deve parar ~{h}.":"🌧️ Il pleut — arrêt prévu ~{h}.","🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Il pleut, sans accalmie en vue pendant ~2 h.",
 "☁️ Chuva a caminho: ~{h}.":"☁️ Pluie en approche : ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ Pas de pluie en vue pendant 2 heures.",
@@ -1568,6 +1600,9 @@ Object.assign(I18N.en,{
 "⭐ guardado por ti":"⭐ saved by you","sem nome":"unnamed","Tempo em cada paragem":"Time at each stop",
 "⚠️ Perigo no teu trajeto":"⚠️ Hazard on your route",
 "Unidades":"Units",
+"Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade.":"Swiss law bans devices and apps that make speed checks harder to recognise.",
+"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada).":"In Austria, speed camera warnings are prohibited for the driver (§ 98a of the road traffic act).",
+
 "Dados:":"Data:",
 "Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no tracking: nothing you do leaves this phone. Ride smart: on a red warning, stay home.",
 "Privacidade":"Privacy",
@@ -1575,7 +1610,7 @@ Object.assign(I18N.en,{
 
 "Unidades alteradas para {u}.":"Units changed to {u}.",
 
-"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"In Belgium, warning about speed cameras has been illegal since 2015 (fines of €150–3,000 and confiscation).",
+
 "Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"In Switzerland, speed camera warnings are illegal, with confiscation and possible criminal charges.",
 "Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"In France it is illegal to show a camera's exact location — I show wider danger zones, like the big navigation apps do.",
 "Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições.":"German law forbids drivers from using speed camera warnings. You can enable it at your own risk in settings.",
@@ -1588,7 +1623,7 @@ Object.assign(I18N.en,{
 "por volta do km {k}":"around km {k}",
 "Em França a lei não permite indicar o ponto exato.":"French law does not allow showing the exact location.",
 "Avisos de radar":"Speed camera warnings",
-"A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.":"The law differs by country. In Belgium and Switzerland it is illegal, so I switch it off automatically. In France I show danger zones.",
+"A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.":"The law differs by country. In Germany, Austria and Switzerland warning the driver is forbidden, so I switch it off automatically. In France I show wide danger zones instead of the exact point.",
 "Ligar também na Alemanha":"Enable in Germany too",
 "A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"German law forbids drivers from using camera warnings. At your own risk.",
 "Avisos de radar ligados na Alemanha — por tua conta e risco.":"Camera warnings enabled in Germany — at your own risk.",
@@ -1657,6 +1692,9 @@ Object.assign(I18N.es,{
 "⭐ guardado por ti":"⭐ guardado por ti","sem nome":"sin nombre","Tempo em cada paragem":"Tiempo en cada parada",
 "⚠️ Perigo no teu trajeto":"⚠️ Peligro en tu ruta",
 "Unidades":"Unidades",
+"Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade.":"La ley suiza prohíbe dispositivos y aplicaciones que dificulten reconocer los controles de velocidad.",
+"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada).":"En Austria los avisos de radar están prohibidos al conductor (§ 98a del código de circulación).",
+
 "Dados:":"Datos:",
 "Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas ni registros: nada de lo que haces sale de este móvil. Conduce con cabeza: con aviso rojo, quédate en casa.",
 "Privacidade":"Privacidad",
@@ -1664,7 +1702,7 @@ Object.assign(I18N.es,{
 
 "Unidades alteradas para {u}.":"Unidades cambiadas a {u}.",
 
-"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"En Bélgica avisar de radares es ilegal desde 2015 (multas de 150 a 3000 € y confiscación).",
+
 "Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"En Suiza avisar de radares es ilegal, con confiscación y posible proceso penal.",
 "Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"En Francia es ilegal indicar el punto exacto de un radar — muestro zonas de peligro amplias, como las grandes apps de navegación.",
 "Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições.":"La ley alemana prohíbe al conductor usar avisos de radar. Puedes activarlo bajo tu responsabilidad en ajustes.",
@@ -1677,7 +1715,7 @@ Object.assign(I18N.es,{
 "por volta do km {k}":"hacia el km {k}",
 "Em França a lei não permite indicar o ponto exato.":"La ley francesa no permite indicar el punto exacto.",
 "Avisos de radar":"Avisos de radar",
-"A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.":"La ley cambia según el país. En Bélgica y Suiza es ilegal, así que lo desactivo automáticamente. En Francia muestro zonas de peligro.",
+"A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.":"La ley cambia según el país. En Alemania, Austria y Suiza está prohibido avisar al conductor, así que lo desactivo automáticamente. En Francia muestro zonas de peligro amplias en lugar del punto exacto.",
 "Ligar também na Alemanha":"Activar también en Alemania",
 "A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"La ley alemana prohíbe al conductor usar avisos de radar. Bajo tu responsabilidad.",
 "Avisos de radar ligados na Alemanha — por tua conta e risco.":"Avisos de radar activados en Alemania — bajo tu responsabilidad.",
@@ -1746,6 +1784,9 @@ Object.assign(I18N.fr,{
 "⭐ guardado por ti":"⭐ enregistré par toi","sem nome":"sans nom","Tempo em cada paragem":"Temps à chaque arrêt",
 "⚠️ Perigo no teu trajeto":"⚠️ Danger sur ton trajet",
 "Unidades":"Unités",
+"Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade.":"La loi suisse interdit les dispositifs et applications qui rendent les contrôles de vitesse plus difficiles à repérer.",
+"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada).":"En Autriche, les avertisseurs de radars sont interdits au conducteur (§ 98a du code de la route).",
+
 "Dados:":"Données :",
 "Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans compte ni traçage : rien de ce que tu fais ne quitte ce téléphone. Roule prudemment : en alerte rouge, reste à la maison.",
 "Privacidade":"Confidentialité",
@@ -1753,7 +1794,7 @@ Object.assign(I18N.fr,{
 
 "Unidades alteradas para {u}.":"Unités changées en {u}.",
 
-"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento).":"En Belgique, signaler les radars est interdit depuis 2015 (amendes de 150 à 3000 € et confiscation).",
+
 "Na Suíça avisar de radares é proibido, com confisco e possível processo criminal.":"En Suisse, signaler les radars est interdit, avec confiscation et poursuites pénales possibles.",
 "Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação.":"En France, il est interdit d'indiquer l'emplacement exact d'un radar — j'affiche des zones de danger élargies, comme les grandes applis de navigation.",
 "Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições.":"La loi allemande interdit au conducteur d'utiliser des avertisseurs de radars. Tu peux l'activer à tes risques dans les réglages.",
@@ -1766,7 +1807,7 @@ Object.assign(I18N.fr,{
 "por volta do km {k}":"vers le km {k}",
 "Em França a lei não permite indicar o ponto exato.":"La loi française ne permet pas d'indiquer l'emplacement exact.",
 "Avisos de radar":"Avertisseurs de radars",
-"A lei muda de país para país. Na Bélgica e na Suíça é proibido, por isso desligo automaticamente. Em França mostro zonas de perigo.":"La loi varie selon le pays. En Belgique et en Suisse c'est interdit, je le désactive donc automatiquement. En France j'affiche des zones de danger.",
+"A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.":"La loi varie selon le pays. En Allemagne, en Autriche et en Suisse, avertir le conducteur est interdit : je le désactive automatiquement. En France, j'affiche de larges zones de danger au lieu du point exact.",
 "Ligar também na Alemanha":"Activer aussi en Allemagne",
 "A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"La loi allemande interdit au conducteur d'utiliser ces avertisseurs. À tes risques.",
 "Avisos de radar ligados na Alemanha — por tua conta e risco.":"Avertisseurs activés en Allemagne — à tes risques.",
@@ -1795,7 +1836,9 @@ const THUNDER=[95,96,99], FREEZING=[56,57,66,67], SNOW=[71,73,75,77,85,86], FOG=
 const $  = (s,el=document)=>el.querySelector(s);
 const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
 function el(tag, cls, txt){ const n=document.createElement(tag); if(cls)n.className=cls;
-  if(txt!=null)n.textContent=(typeof txt==="string"&&typeof uconv==="function")?uconv(txt):txt; return n; }
+  /* NÃO converte unidades: quem compõe texto usa U.*; quem traduz usa t().
+     Ter conversão aqui E no t() foi o que criou o erro dos 145°. */
+  if(txt!=null)n.textContent=txt; return n; }
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const lerp=(a,b,f)=>a+(b-a)*f;
 const rnd=(v,d=0)=>{ const p=10**d; return Math.round(v*p)/p; };
@@ -1820,6 +1863,28 @@ function unitNum(v,d){ // arredondamento sensato: sem casas decimais em números
   const dec=Math.abs(v)>=100?0:(Math.abs(v)>=10?(d>0?1:0):d);
   return fmtN(v,dec);
 }
+
+/* ── unidades: converter VALORES, não prosa ───────────────────────────────
+   Os fornecedores respondem sempre em métrico (não pedimos outra coisa, para
+   a cache não depender das unidades de quem pergunta). Estes formatadores
+   recebem esse número e devolvem o texto já na unidade do utilizador.
+   Por receberem um número e não um texto, não há nada para reconverter:
+   é impossível aplicá-los duas vezes. Usa-os em tudo o que fores compor.
+   NUNCA os metas dentro de um t() — aí entram números em métrico, porque a
+   frase traduzida é convertida pelo próprio t(). */
+const U={
+  dist(km,d){ return milesOn()?`${unitNum(km*0.621371,d??1)} mi`:`${unitNum(km,d??1)} km`; },
+  distM(m){ return milesOn()
+      ? (m<1609?`${unitNum(m*3.28084,0)} ft`:`${unitNum(m*0.000621371,1)} mi`)
+      : (m<1000?`${unitNum(m,0)} m`:`${fmtN(m/1000,0)} km`); },   // visibilidade é grosseira: sem decimais em km
+  spd(kmh){ return milesOn()?`${unitNum(kmh*0.621371,0)} mph`:`${unitNum(kmh,0)} km/h`; },
+  temp(c){ return fahrenheitOn()?`${unitNum(c*9/5+32,0)}°F`:`${unitNum(c,0)}°`; },
+  prec(mm,d=1){ return fahrenheitOn()?`${fmtN(mm*0.0393701,2)} in`:`${fmtN(mm,d)} mm`; },
+  precH(mm,d=1){ return fahrenheitOn()?`${fmtN(mm*0.0393701,2)} in/h`:`${fmtN(mm,d)} mm/h`; },
+  alt(m){ return milesOn()?`${unitNum(m*3.28084,0)} ft`:`${unitNum(m,0)} m`; },
+  /* marca de quilometragem ao longo do trajeto ("km 15") */
+  kmMark(km){ return milesOn()?`mi ${unitNum(km*0.621371,0)}`:`km ${unitNum(km,0)}`; },
+};
 /* converte uma frase já montada (é aqui que tudo passa: ecrã, voz e notificações) */
 function uconv(s){
   if(!s||typeof s!=="string") return s;
@@ -1846,7 +1911,11 @@ function uconv(s){
   if(fahrenheitOn()){
     out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*mm\/h/g,(_,n)=>`${fmtN(num(n)*0.0393701,2)} in/h`);
     out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*mm(?![\/\w])/g,(_,n)=>`${fmtN(num(n)*0.0393701,2)} in`);
-    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*°/g,(_,n)=>`${unitNum(num(n)*9/5+32,0)}°`);
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*°C/g,(_,n)=>`${unitNum(num(n)*9/5+32,0)}°F`);
+    /* O grau sem letra é o caso normal ("17°"). O F fica explícito de propósito:
+       sem ele, um texto que passasse pelo funil duas vezes era convertido duas
+       vezes — 17 °C aparecia como 145°. Agora a segunda passagem não pega. */
+    out=out.replace(/(-?\d+(?:[.,]\d+)?)\s*°(?![CF])/g,(_,n)=>`${unitNum(num(n)*9/5+32,0)}°F`);
   }
   return out;
 }
@@ -2157,21 +2226,8 @@ async function geocodeNear(q,pos,bounded){
     const near=res.filter(r=>haversine(pos,r)<= (bounded?70:400));
     if(near.length) return near;
   }catch(e){}
-  // reserva: Nominatim com viewbox
-  const dLat=0.45, dLon=0.55;
-  const u=new URL("https://nominatim.openstreetmap.org/search");
-  const params={q, format:"jsonv2", limit:"10", addressdetails:"1", "accept-language":"pt", dedupe:"1",
-    viewbox:`${(pos.lon-dLon).toFixed(3)},${(pos.lat+dLat).toFixed(3)},${(pos.lon+dLon).toFixed(3)},${(pos.lat-dLat).toFixed(3)}`};
-  if(bounded) params.bounded="1";
-  u.search=new URLSearchParams(params).toString();
-  const j=await nomFetch(u.toString());
-  return (j||[]).map(r=>{
-    const a=r.address||{};
-    const name=r.name||(r.display_name||"").split(",")[0];
-    const where=a.suburb||a.village||a.town||a.city||a.municipality||"";
-    return {name, sub:where?where:(r.display_name||"").split(",").slice(1,3).join(",").trim(),
-      lat:+r.lat, lon:+r.lon, kind:r.type};
-  }).filter(r=>isFinite(r.lat));
+  // Sem reserva de Nominatim: a política do OpenStreetMap proíbe usá-lo em autocomplete.
+  return [];
 }
 
 /* =====================================================================
@@ -2207,14 +2263,19 @@ async function fetchCameras(coords){
 
 /* =====================================================================
    LEGALIDADE DOS AVISOS DE RADAR — muda de país para país.
-   Bélgica e Suíça proíbem por completo (coimas pesadas e confisco).
+   Suíça e Áustria proíbem avisar o condutor (coimas pesadas e confisco).
    França proíbe indicar o ponto exato, mas tolera "zonas de perigo".
    Alemanha proíbe por lei, quase nunca aplica a apps: fica à tua escolha.
-   Em tudo o resto (PT, NL, ES, IT, AT, UK…) é legal e funciona normalmente.
+   Em tudo o resto (BE, PT, NL, ES, IT, UK…) é legal e funciona normalmente.
+   A Bélgica NÃO entra na lista dos bloqueados — ver a nota abaixo.
    ===================================================================== */
+/* Nota importante: na Bélgica, nos Países Baixos, em Portugal, Espanha e Itália
+   mostrar radares FIXOS de uma base de dados é legal — o que a lei belga proíbe
+   (art. 62bis) são os detetores de radar, aparelhos que captam as emissões da
+   polícia. É por isso que o Waze, o Coyote e o Flitsmeister lá funcionam. */
 const CAM_LAW={
-  BE:{mode:"off",  why:"Na Bélgica avisar de radares é proibido desde 2015 (coimas de 150 a 3000 € e confisco do equipamento)."},
-  CH:{mode:"off",  why:"Na Suíça avisar de radares é proibido, com confisco e possível processo criminal."},
+  CH:{mode:"off",  why:"Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade."},
+  AT:{mode:"off",  why:"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada)."},
   FR:{mode:"zones",why:"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação."},
   DE:{mode:"opt",  why:"Na Alemanha a lei proíbe o condutor de usar avisos de radar. Podes ligar por tua conta e risco nas definições."},
 };
@@ -2225,6 +2286,7 @@ const CC_POLY={
   CH:[[47.59,7.58],[47.62,8.55],[47.70,9.20],[47.06,9.60],[46.85,10.47],[46.44,10.00],[46.25,8.95],[46.00,8.95],[45.83,7.85],[46.02,6.80],[46.43,6.10],[47.00,6.80],[47.35,7.00]],
   DE:[[54.90,8.40],[54.50,9.60],[54.40,11.00],[54.10,13.80],[53.90,14.30],[52.80,14.60],[51.50,15.05],[50.90,14.80],[50.20,12.10],[48.80,13.80],[47.55,13.00],[47.55,10.20],[47.60,7.58],[48.96,8.23],[49.46,6.16],[49.79,5.75],[50.17,5.79],[50.32,6.35],[50.62,6.41],[50.75,6.02],[51.05,5.80],[51.19,5.24],[51.49,5.03],[51.83,6.00],[52.45,7.05],[53.20,7.20],[53.70,7.00]],
   LU:[[50.18,5.75],[50.13,6.14],[49.80,6.53],[49.45,6.37],[49.45,5.79],[49.79,5.75]],
+  AT:[[48.77,13.83],[48.56,14.03],[48.62,15.00],[48.85,16.95],[47.71,16.42],[46.87,16.11],[46.68,15.99],[46.43,14.57],[46.53,13.71],[46.62,12.39],[46.77,12.15],[46.99,10.45],[47.27,10.18],[47.58,9.60],[47.50,10.10],[47.55,12.20],[47.70,13.00],[48.60,13.03],[48.77,13.83]],
 };
 function inPoly(lat,lon,poly){
   let inside=false;
@@ -2367,7 +2429,7 @@ function renderCameras(){
     const li=el("li","seg-item");
     const bar=el("span","seg-bar"); bar.style.background="var(--crit)";
     const main=el("div","seg-main");
-    main.append(el("b",null,c.zone?t("zona km {a}–{b}",{a:rnd(c.km),b:rnd(c.km)+2}):`km ${rnd(c.km)}`));
+    main.append(el("b",null,c.zone?t("zona km {a}–{b}",{a:rnd(c.km),b:rnd(c.km)+2}):U.kmMark(c.km)));
     const place=el("span",null,"…");
     main.append(place);
     li.append(bar,main,el("span","seg-val",c.zone?`⚠️ ${t("zona de perigo")}`
@@ -2692,10 +2754,10 @@ function renderDashboard(){
   const mkChip=(ico,lab,val)=>{ const c=el("span","chip");
     c.append(el("span",null,ico), el("span",null,lab+" "), el("b",null,val)); return c; };
   cw.append(
-    mkChip("🌡️","", `${rnd(mNow.t)}° (${t("sensação {t}°",{t:rnd(mNow.at)})})`),
-    mkChip("💨",t("vento"), `${rnd(mNow.wind)} km/h ${windArrow(mNow.dir)} · ${t("rajadas")} ${rnd(mNow.gust)}`),
+    mkChip("🌡️","", `${U.temp(mNow.t)} (${t("sensação {t}°",{t:rnd(mNow.at)})})`),
+    mkChip("💨",t("vento"), `${U.spd(mNow.wind)} ${windArrow(mNow.dir)} · ${t("rajadas")} ${U.spd(mNow.gust)}`),
     mkChip("💧",t("humidade"), `${rnd(mNow.rh)}%`),
-    mkChip("👁️",t("visibilidade"), mNow.vis<1000?`${rnd(mNow.vis)} m`:`${fmtN(mNow.vis/1000,0)} km`),
+    mkChip("👁️",t("visibilidade"), U.distM(mNow.vis)),
   );
   if(daily.uv_index_max?.[0]!=null) cw.append(mkChip("☀️",t("UV máx"), fmtN(daily.uv_index_max[0],0)));
   if(daily.sunrise?.[0]) cw.append(mkChip("🌅",t("sol"), `${fmtHM(daily.sunrise[0])} – ${fmtHM(daily.sunset[0])}`));
@@ -2764,9 +2826,9 @@ function renderTimeline(H,metrics,scores,i0,prof){
       tipShow(ev.clientX??r.left+r.width/2, r.top,
         `${fmtH(H.time[i])} · ${dayLabel(H.time[i])} — ${LVL_ICON[s.lvl]} ${t("índice {v}",{v:s.score})}`,
         [[t("Condições"),wmoTxt(m.code)],
-         [t("Temperatura"),`${rnd(m.t)}° (${t("sente-se {t}°",{t:rnd(m.at)})})`],
-         [t("Chuva"),`${fmtN(m.pr,1)} mm · ${rnd(m.pp)}%`],
-         [t("Rajadas"),`${rnd(m.gust)} km/h`]]); };
+         [t("Temperatura"),`${U.temp(m.t)} (${t("sente-se {t}°",{t:rnd(m.at)})})`],
+         [t("Chuva"),`${U.prec(m.pr)} · ${rnd(m.pp)}%`],
+         [t("Rajadas"),U.spd(m.gust)]]); };
     col.addEventListener("pointermove",show);
     col.addEventListener("focus",show);
     col.addEventListener("pointerleave",tipHide);
@@ -2785,7 +2847,7 @@ function renderTimeline(H,metrics,scores,i0,prof){
     arr.setAttribute("aria-hidden","true");
     const num=el("i",null,String(rnd(m.gust)));
     cell.append(arr,num);
-    cell.title=`${fmtH(H.time[i])}: ${t("vento")} ${rnd(m.wind)} km/h, ${t("rajadas")} ${rnd(m.gust)} km/h ${windArrow(m.dir)}`;
+    cell.title=`${fmtH(H.time[i])}: ${t("vento")} ${U.spd(m.wind)}, ${t("rajadas")} ${U.spd(m.gust)} ${windArrow(m.dir)}`;
     wr.appendChild(cell);
   }
   scroll.append(tl,xr,el("div","tl-windcap",t("💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45")),wr);
@@ -2824,7 +2886,7 @@ function renderNowcast(wx){
       if(c.pr<0.6) d.style.color="#0b0b0b";
     } else d.textContent="·";
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,`${fmtHM(c.t)}–${fmtHM(c.t+900)}`,
-      [[t("Precipitação"),`${fmtN(c.pr,2)} mm/15 min`]]);
+      [[t("Precipitação"),`${U.prec(c.pr,2)}/15 min`]]);
     d.addEventListener("pointermove",show); d.addEventListener("pointerleave",tipHide);
     row.appendChild(d);
     xs.appendChild(el("span",null,k%2===0?fmtHM(c.t):""));
@@ -2855,8 +2917,8 @@ function renderDaily(wx){
     d.append(el("div","d-name", i===0?t("hoje"):`${fmtDow(ep+43200)} ${fmtDayMo(ep+43200)}`));
     d.append(el("div","d-emoji", wmoIco(D.weather_code?.[i],1)));
     const tt=el("div","d-temp");
-    tt.append(el("b",null,`${rnd(D.temperature_2m_max[i])}°`), document.createTextNode(" "),
-      el("span",null,`${rnd(D.temperature_2m_min[i])}°`));
+    tt.append(el("b",null,U.temp(D.temperature_2m_max[i])), document.createTextNode(" "),
+      el("span",null,U.temp(D.temperature_2m_min[i])));
     d.append(tt);
     d.append(el("div","d-meta",`☔ ${rnd(D.precipitation_probability_max?.[i]??0)}% · 💨 ${rnd(D.wind_gusts_10m_max?.[i]??0)}`));
     const v=el("span","day-verdict");
@@ -2865,10 +2927,10 @@ function renderDaily(wx){
     d.append(v);
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,
       `${dayLabel(ep+43200)} — ${wmoTxt(D.weather_code?.[i])}`,
-      [[t("Máx / mín"),`${rnd(D.temperature_2m_max[i])}° / ${rnd(D.temperature_2m_min[i])}°`],
+      [[t("Máx / mín"),`${U.temp(D.temperature_2m_max[i])} / ${U.temp(D.temperature_2m_min[i])}`],
        [t("Prob. chuva"),`${rnd(D.precipitation_probability_max?.[i]??0)}%`],
-       [t("Total chuva"),`${fmtN(D.precipitation_sum?.[i]??0,1)} mm`],
-       [t("Rajadas máx"),`${rnd(D.wind_gusts_10m_max?.[i]??0)} km/h`],
+       [t("Total chuva"),U.prec(D.precipitation_sum?.[i]??0)],
+       [t("Rajadas máx"),U.spd(D.wind_gusts_10m_max?.[i]??0)],
        [t("UV máx"),fmtN(D.uv_index_max?.[i]??0,0)]]);
     d.addEventListener("pointermove",show); d.addEventListener("pointerleave",tipHide);
     grid.appendChild(d);
@@ -3360,11 +3422,11 @@ function drawRoute(fit){
       const t1=el("div"); t1.style.fontWeight="700"; t1.style.marginBottom="3px";
       const stopName=s.stop!=null?(R.pts[s.stop]?.name||`Paragem ${s.stop}`):null;
       t1.textContent= s.stop!=null?t("🛑 Paragem {n}: {p}",{n:s.stop,p:stopName})
-        :(i===0?t("🏁 Partida"):i===R.samples.length-1?t("🎯 Chegada"):`km ${rnd(s.km)}`)+` · ~${fmtHM(s.eta)}`;
+        :(i===0?t("🏁 Partida"):i===R.samples.length-1?t("🎯 Chegada"):U.kmMark(s.km))+` · ~${fmtHM(s.eta)}`;
       const div2=el("div");
       if(s.stop!=null&&R.pauseSec>0) div2.textContent=t("chegas ~{a} · voltas à estrada ~{b}",{a:fmtHM(s.eta-R.pauseSec),b:fmtHM(s.eta)});
       const t2=el("div",null,`${LVL_ICON[c.lvl]} ${rainLabel(c.lvl)} — ${wmoTxt(c.code)}`);
-      const t3=el("div",null,`💧 ${fmtN(c.pr,1)} mm/h (${rnd(c.pp)}%) · 🌡️ ${rnd(c.t)}° · 💨 ${t("rajadas")} ${rnd(c.gust)} km/h ${windArrow(c.dir)}`);
+      const t3=el("div",null,`💧 ${U.precH(c.pr)} (${rnd(c.pp)}%) · 🌡️ ${U.temp(c.t)} · 💨 ${t("rajadas")} ${U.spd(c.gust)} ${windArrow(c.dir)}`);
       const t4=el("div","muted small",s.stop!=null?"":t("a identificar a zona…"));
       div.append(t1,div2,t2,t3,t4);
       mk.bindPopup(div,{maxWidth:280}).openPopup();
@@ -3453,8 +3515,8 @@ function scheduleStayAlerts(R){
       try{
         if("Notification" in window&&Notification.permission==="granted"){
           if(navigator.serviceWorker&&navigator.serviceWorker.controller)
-            navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"vdm-stay",renotify:true})).catch(()=>{});
-          else new Notification(title,{body,tag:"vdm-stay"});
+            navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"lev-stay",renotify:true})).catch(()=>{});
+          else new Notification(title,{body,tag:"lev-stay"});
         }
       }catch(e){}
     },(fireAt-now)*1000);
@@ -3573,7 +3635,7 @@ function renderRouteSummary(){
       `${emoji} ${headline}`,
       `💨 Rajadas até ${rnd(maxGust)} km/h (vento ${wind.desc})`,
       ...currentStretches().map(st=>`• km ${rnd(st.k0)}–${rnd(st.k1)} (~${fmtHM(st.t0)}): ${rainLabel(st.lvl)}${st.place?` — perto de ${st.place}`:""}`),
-      `via app "Vou de Moto?" — dados Open-Meteo/OSM`];
+      `via Levante — dados Open-Meteo/OSM`];
     (navigator.clipboard?.writeText(lines.join("\n"))||Promise.reject())
       .then(()=>toast(t("Resumo copiado! 📋"))).catch(()=>toast(t("Não consegui copiar automaticamente.")));
   });
@@ -3815,8 +3877,8 @@ function notifyHazards(list){
       try{
         if("Notification" in window&&Notification.permission==="granted"){
           if(navigator.serviceWorker?.controller)
-            navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"vdm-hz",renotify:true})).catch(()=>{});
-          else new Notification(title,{body,tag:"vdm-hz"});
+            navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"lev-hz",renotify:true})).catch(()=>{});
+          else new Notification(title,{body,tag:"lev-hz"});
         }
       }catch(e){}
     }
@@ -3887,7 +3949,7 @@ function renderSegments(){
     ul.appendChild(li);
     const mid=R.samples[Math.round((s.i0+s.i1)/2)];
     const n=await revGeocode(mid.lat,mid.lon);
-    place.textContent=`${t("perto de {p}",{p:n.name})} · ~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${fmtN(s.pr,1)} mm/h`:""}`;
+    place.textContent=`${t("perto de {p}",{p:n.name})} · ~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${U.precH(s.pr)}`:""}`;
   });
   wv.forEach(async (s)=>{
     const li=el("li","seg-item");
@@ -4267,7 +4329,7 @@ function buildRecommendation(cand){
   // linha do tempo da viagem
   const tr=tripTransitions(R);
   if(tr.length>1){
-    const parts=tr.slice(0,5).map((t,i)=>`${fmtHM(t.eta)}${i===0?"":` (km ${rnd(t.km)})`} ${rainLabel(t.lvl).toLowerCase()}`);
+    const parts=tr.slice(0,5).map((t,i)=>`${fmtHM(t.eta)}${i===0?"":` (${U.kmMark(t.km)})`} ${rainLabel(t.lvl).toLowerCase()}`);
     A("🗺️",t("Ao longo do caminho: {x}.",{x:parts.join(" → ")}));
   }
   // render
@@ -4371,14 +4433,14 @@ function travelNotify(){
     if(!("Notification" in window)||Notification.permission!=="granted") return;
     const now=Date.now(); if(now-travel.lastNotif<25000) return; travel.lastNotif=now;
     const opts={body:`🎯 ${state.route?.d?.name??""}\n${$("#tb-next").textContent}\n${$("#tb-sub").textContent}`,
-      tag:"vdm-travel", silent:true, requireInteraction:true, renotify:false};
+      tag:"lev-travel", silent:true, requireInteraction:true, renotify:false};
     if(navigator.serviceWorker&&navigator.serviceWorker.controller){
-      navigator.serviceWorker.ready.then(r=>r.showNotification(t("🏍️ Vou de Moto — em viagem"),opts)).catch(()=>{});
-    } else { try{ new Notification(t("🏍️ Vou de Moto — em viagem"),opts); }catch(e){} }
+      navigator.serviceWorker.ready.then(r=>r.showNotification(t("🏍️ Levante — em viagem"),opts)).catch(()=>{});
+    } else { try{ new Notification(t("🏍️ Levante — em viagem"),opts); }catch(e){} }
   }catch(e){}
 }
 function travelNotifyClose(){
-  try{ navigator.serviceWorker?.ready?.then(r=>r.getNotifications({tag:"vdm-travel"})
+  try{ navigator.serviceWorker?.ready?.then(r=>r.getNotifications({tag:"lev-travel"})
     .then(ns=>ns.forEach(n=>n.close()))).catch(()=>{}); }catch(e){}
 }
 
@@ -4388,7 +4450,7 @@ function travelNotifyClose(){
    avisa ~45 min antes de a chuva começar
    ===================================================================== */
 const motoGuard={lastAt:0, lastPos:null, lastNo:null, lastFetch:0, rainAt:null, timer:null, stat:0};
-window.__vdmT={travel, motoGuard}; // para testes
+window.__levT={travel, motoGuard}; // para testes
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
   if(!key) return false;
@@ -4441,8 +4503,8 @@ function motoNotify(title,body){
   try{
     if(!("Notification" in window)||Notification.permission!=="granted") return;
     if(navigator.serviceWorker&&navigator.serviceWorker.controller)
-      navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"vdm-guard",renotify:true})).catch(()=>{});
-    else new Notification(title,{body,tag:"vdm-guard"});
+      navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:"lev-guard",renotify:true})).catch(()=>{});
+    else new Notification(title,{body,tag:"lev-guard"});
   }catch(e){}
 }
 function guardWindow(){
@@ -4834,7 +4896,7 @@ function sentinelAlert(key,txt,strong){
   toast("🔔 "+txt,7000);
   try{
     if("Notification" in window&&Notification.permission==="granted")
-      new Notification("Vou de Moto? 🏍️",{body:txt,tag:key});
+      new Notification("Levante 🏍️",{body:txt,tag:key});
   }catch(e){}
 }
 async function sentinelCheck(){
