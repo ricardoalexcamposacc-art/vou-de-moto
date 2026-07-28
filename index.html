@@ -1131,7 +1131,7 @@ en:{
 "paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
 "pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
 "vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
-"radar fixo":"fixed camera","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
+"radar fixo":"fixed camera","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
 "maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
 "Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
 "O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
@@ -1302,7 +1302,7 @@ es:{
 "paragem":"parada","paragens":"paradas","em andamento":"en marcha","partida":"salida","chegada":"llegada","por":"por",
 "pico {n} mm/h":"pico {n} mm/h","mínima no percurso {t}°":"mínima en ruta {t}°","rajadas até {g} km/h · vento {d}":"rachas hasta {g} km/h · viento {d}",
 "vento lateral até ~{g} km/h":"viento lateral hasta ~{g} km/h","perto do km {k}":"cerca del km {k}","sobe até ~{m} m":"sube hasta ~{m} m",
-"radar fixo":"radar fijo","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
+"radar fixo":"radar fijo","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
 "maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
 "Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
@@ -1458,7 +1458,7 @@ fr:{
 "paragem":"arrêt","paragens":"arrêts","em andamento":"en roulant","partida":"départ","chegada":"arrivée","por":"via",
 "pico {n} mm/h":"pic {n} mm/h","mínima no percurso {t}°":"minimale du trajet {t}°","rajadas até {g} km/h · vento {d}":"rafales jusqu'à {g} km/h · vent {d}",
 "vento lateral até ~{g} km/h":"vent latéral jusqu'à ~{g} km/h","perto do km {k}":"vers le km {k}","sobe até ~{m} m":"monte à ~{m} m",
-"radar fixo":"radar fixe","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
+"radar fixo":"radar fixe","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
 "maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
 "Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
@@ -2387,7 +2387,7 @@ async function revGeocode(lat,lon){
 
    Enquanto isto for "SUBSTITUIR", a app usa os fornecedores antigos e nada
    muda. Basta trocar a linha para passar tudo pelo Geoapify.                */
-const GEOAPIFY_KEY="SUBSTITUIR";
+const GEOAPIFY_KEY="fb2feb512dde403cb4afc8778e411101";
 /* A chave também pode ser posta em andamento, sem editar o ficheiro:
      store.set("geoapify-key","a-tua-chave")
    Serve para a experimentares no telemóvel antes de a fixarmos na linha de
@@ -2473,6 +2473,10 @@ async function geoRoute(points){
     waypoints:wp, mode:"motorcycle", details:"instruction_details,route_details",
     lang:GEO_LANG[vozIdioma?vozIdioma():state.lang]||"en", units:"metric",
   }),20000,"rota");
+  /* O Geoapify devolve UMA rota — não tem alternativas, verificado contra a API
+     com todos os nomes de parâmetro plausíveis. Percorremos na mesma a lista de
+     features, para que no dia em que passem a devolver mais, as variantes de
+     trajeto voltem sozinhas. */
   const f=(j.features||[])[0];
   if(!f) throw new Error("Sem rota");
   const pr=f.properties||{};
@@ -2496,8 +2500,15 @@ async function geoRoute(points){
   }));
   const waypoints=inicioPerna.concat([Math.max(0,coords.length-1)])
     .map(i=>({location:coords[Math.min(i,coords.length-1)]||[points[0].lon,points[0].lat]}));
-  return {routes:[{geometry:{coordinates:coords}, distance:pr.distance, duration:pr.time, legs}],
-          waypoints};
+  const rotas=[{geometry:{coordinates:coords}, distance:pr.distance, duration:pr.time, legs}];
+  for(const outra of (j.features||[]).slice(1)){
+    const o=outra.properties||{};
+    const ps=outra.geometry?.type==="MultiLineString"?outra.geometry.coordinates:[outra.geometry?.coordinates||[]];
+    const cs=[]; for(const parte of ps) for(const c of parte) cs.push(c);
+    rotas.push({geometry:{coordinates:cs}, distance:o.distance, duration:o.time,
+      legs:(o.legs||[]).map(l=>({distance:l.distance, duration:l.time, steps:[]}))});
+  }
+  return {routes:rotas, waypoints};
 }
 
 async function osrmRoute(points){ // points: [{lat,lon},...]
@@ -3545,6 +3556,9 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
   const totalKm=route.distance/1000;
   // manobras (para as indicações de condução por voz): km acumulado ao longo de todas as pernas
   const maneuvers=[];
+  /* nomes de estrada por quilómetro: vêm de graça nos passos da rota e valem
+     mais do que "km 42" para quem conduz — "vento lateral na A2" situa-se. */
+  const estradas=[];
   {
     let mkm=0;
     (route.legs||[]).forEach((leg,li,arr)=>{
@@ -3554,6 +3568,13 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
         const isFinalArrive=mv.type==="arrive"&&li===arr.length-1;
         /* também entram as manobras sem tipo, desde que tragam texto: são as
            que o fornecedor descreve com vocabulário que não classificámos */
+        const dkm=(st.distance||0)/1000;
+        const nome=st.name||st.ref||"";
+        if(nome){
+          const ult=estradas[estradas.length-1];
+          if(ult&&ult.nome===nome) ult.km1=mkm+dkm;
+          else estradas.push({km0:mkm, km1:mkm+dkm, nome});
+        }
         if((mv.type||mv.texto)&&!isFinalArrive)
           maneuvers.push({km:mkm, type:mv.type, mod:mv.modifier||"", exit:mv.exit||0,
             road:st.name||st.ref||"", texto:mv.texto||""});
@@ -3561,6 +3582,8 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
       });
     });
   }
+  /* estradas curtas não interessam a ninguém: fica o que se conduz mesmo */
+  const estradasUteis=estradas.filter(e=>e.km1-e.km0>=0.4);
   const legs=(route.legs&&route.legs.length===pts.length-1)?route.legs
     :[{duration:route.duration,distance:route.distance}];
   const travelTotal=legs.reduce((a,l)=>a+(l.duration||0),0)||route.duration;
@@ -3602,7 +3625,7 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
     samples.push({ ...coords[idx], idx, D:tg.D, stop:tg.stop,
       km:tg.D/geomKm*totalKm, travelSec:tm.travel, pauseOffset:tm.pause });
   }
-  return {coords,cum,geomKm,totalKm,legs,travelTotal,samples,maneuvers};
+  return {coords,cum,geomKm,totalKm,legs,travelTotal,samples,maneuvers,estradas:estradasUteis};
 }
 
 /* peso de chuva de um trajeto para uma dada hora de partida */
@@ -3717,6 +3740,19 @@ function sampleAt(s, eta){
     lvl:0 };
 }
 
+/* Que estrada cobre este troço do trajeto. Devolve o nome com maior
+   sobreposição, ou vazio se não soubermos — e aí fica o quilómetro, que é
+   sempre verdade. */
+function estradaEntre(km0,km1){
+  const R=state.route; const es=R&&R.estradas; if(!es||!es.length) return "";
+  const a=Math.min(km0,km1), b=Math.max(km0,km1)+0.001;
+  let melhor="", cobertura=0;
+  for(const e of es){
+    const sob=Math.min(b,e.km1)-Math.max(a,e.km0);
+    if(sob>cobertura){ cobertura=sob; melhor=e.nome; }
+  }
+  return cobertura>0?melhor:"";
+}
 function applyShift(shiftMin, fit=false){
   const R=state.route; if(!R) return;
   R.shift=shiftMin;
@@ -4213,8 +4249,10 @@ function renderHazards(){
   card.appendChild(el("p","h-sub",t("Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.")));
   list.forEach(h=>{
     const row=el("div","hz-row lvl"+h.sev);
-    const meta=[h.km1!=null?t("km {a}–{b}",{a:rnd(h.km0),b:rnd(h.km1)}):t("km {a}",{a:rnd(h.km0)}),
-      h.t1?`${fmtHM(h.t0)}–${fmtHM(h.t1)}`:`~${fmtHM(h.t0)}`].join(" · ");
+    const estrada=estradaEntre(h.km0, h.km1!=null?h.km1:h.km0);
+    const meta=[estrada?t("na {r}",{r:estrada}):null,
+      h.km1!=null?t("km {a}–{b}",{a:rnd(h.km0),b:rnd(h.km1)}):t("km {a}",{a:rnd(h.km0)}),
+      h.t1?`${fmtHM(h.t0)}–${fmtHM(h.t1)}`:`~${fmtHM(h.t0)}`].filter(Boolean).join(" · ");
     const main=el("div","hz-main");
     main.append(el("div","hz-meta",meta), el("div","hz-txt",h.txt));
     row.append(el("span","hz-ico",h.ico), main);
@@ -4309,7 +4347,8 @@ function renderSegments(){
     const val=el("span","seg-val",`${LVL_ICON[s.lvl]} ${rainLabel(s.lvl)}`);
     li.append(bar,main,val);
     ul.appendChild(li);
-    place.textContent=`~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${U.precH(s.pr)}`:""}`;
+    const estrada=estradaEntre(s.k0??s.km0??0, s.k1??s.km1??0);
+    place.textContent=`${estrada?t("na {r}",{r:estrada})+" · ":""}~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${U.precH(s.pr)}`:""}`;
   });
   wv.forEach(async (s)=>{
     const li=el("li","seg-item");
@@ -4321,7 +4360,8 @@ function renderSegments(){
     const val=el("span","seg-val",`💨 ${s.cross>=45?t("vento lateral"):t("rajadas")} ${rnd(Math.max(s.gust,s.cross))} km/h`);
     li.append(bar,main,val);
     ul.appendChild(li);
-    place.textContent=`~${fmtHM(s.t0)} · ${t("abranda e segura bem o guiador")}`;
+    const estrada=estradaEntre(s.k0,s.k1);
+    place.textContent=`${estrada?t("na {r}",{r:estrada})+" · ":""}~${fmtHM(s.t0)} · ${t("abranda e segura bem o guiador")}`;
   });
   card.appendChild(ul);
   box.appendChild(card);
@@ -4771,7 +4811,7 @@ async function rerouteFromHere(pos){
     state.route={...R, o:cur, pts, stops:remStops, dep:now, shift:0,
       variants:[v], active:0, coords:v.coords, cum:v.cum, geomKm:v.geomKm,
       totalKm:v.totalKm, travelTotal:v.travelTotal, totalSec:v.travelTotal,
-      samples:v.samples, maneuvers:v.maneuvers, cameras:[], camerasError:false};
+      samples:v.samples, maneuvers:v.maneuvers, estradas:v.estradas||[], cameras:[], camerasError:false};
     travel.geomIdx=0; travel.kmDone=0; travel.alerted.clear();
     travel.lastRecalc=now; travel.lastPaint=0;
     applyShift(0,false);
