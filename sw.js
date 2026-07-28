@@ -2,7 +2,7 @@
    - app: rede primeiro (atualiza sempre que há net), cache como rede de segurança
    - MAPA: tiles guardados em cache (cache-first) para a viagem não ficar às escuras
      quando falha a rede — inclui pré-descarga do corredor da rota */
-const V = "levante-v7";
+const V = "levante-v8";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -10,6 +10,7 @@ const TILES_ANTIGO = "vdm-tiles-v1";
 const TILE_MAX = 2600;          // ~40 MB; acima disto apagam-se os mais antigos
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./privacidade.html", "./termos.html",
+  "./paises.json",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
 ];

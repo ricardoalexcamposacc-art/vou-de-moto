@@ -1114,7 +1114,7 @@ en:{
 "paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
 "pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
 "vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
-"radar fixo":"fixed camera","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
+"radar fixo":"fixed camera","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
 "maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
 "Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
 "O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
@@ -1285,7 +1285,7 @@ es:{
 "paragem":"parada","paragens":"paradas","em andamento":"en marcha","partida":"salida","chegada":"llegada","por":"por",
 "pico {n} mm/h":"pico {n} mm/h","mínima no percurso {t}°":"mínima en ruta {t}°","rajadas até {g} km/h · vento {d}":"rachas hasta {g} km/h · viento {d}",
 "vento lateral até ~{g} km/h":"viento lateral hasta ~{g} km/h","perto do km {k}":"cerca del km {k}","sobe até ~{m} m":"sube hasta ~{m} m",
-"radar fixo":"radar fijo","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
+"radar fixo":"radar fijo","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
 "maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
 "Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
@@ -1441,7 +1441,7 @@ fr:{
 "paragem":"arrêt","paragens":"arrêts","em andamento":"en roulant","partida":"départ","chegada":"arrivée","por":"via",
 "pico {n} mm/h":"pic {n} mm/h","mínima no percurso {t}°":"minimale du trajet {t}°","rajadas até {g} km/h · vento {d}":"rafales jusqu'à {g} km/h · vent {d}",
 "vento lateral até ~{g} km/h":"vent latéral jusqu'à ~{g} km/h","perto do km {k}":"vers le km {k}","sobe até ~{m} m":"monte à ~{m} m",
-"radar fixo":"radar fixe","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
+"radar fixo":"radar fixe","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
 "maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
 "Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
@@ -1955,20 +1955,20 @@ const LVL_ICON=["✔","⚠","🌧","⛈"];
 const LVL_NAME=["Seco","Chuvisco / possível","Chuva","Forte / trovoada"];
 
 /* ---------------- fetch com timeout + aviso ---------------- */
-async function jfetch(url, timeout=14000){
+async function jfetch(url, timeout=14000, origem=null){
   /* tudo o que sai da app passa por aqui: é onde a cache poupa pedidos e
      onde se conta o que teria custado créditos. */
   const nome=typeof svcDe==="function"?svcDe(url):null;
   const chave=nome?chaveCache(nome,url):null;
   if(chave){ const guardado=cacheLer(chave);
-    if(guardado!==null){ contar(nome,url,true); return guardado; } }
+    if(guardado!==null){ contar(nome,url,true,origem); return guardado; } }
   const ctl=new AbortController(); const th=setTimeout(()=>ctl.abort(),timeout);
   try{
     const r=await fetch(url,{signal:ctl.signal});
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const j=await r.json();
     state.netFails=0; $("#net-banner").style.display="none";
-    if(nome) contar(nome,url,false);
+    if(nome) contar(nome,url,false,origem);
     if(chave) cacheEscrever(chave,j,SERVICOS[nome].ttl);
     return j;
   }catch(e){
@@ -2063,10 +2063,12 @@ function celula(lat,lon,km=CELULA_KM){
 /* ── contador de pedidos e de créditos ────────────────────────────────────
    Serve para responder a uma pergunta concreta: quantos utilizadores cabem
    no plano gratuito. Fica no dispositivo, não sai daqui.                    */
-const CRED={inicio:Date.now(), pedidos:0, poupados:0, creditos:0, porServico:{}};
-function contar(nome,url,doCache){
+const CRED={inicio:Date.now(), pedidos:0, poupados:0, creditos:0, porServico:{}, porOrigem:{}};
+function contar(nome,url,doCache,origem){
   const x=SERVICOS[nome]||{};
   const r=CRED.porServico[nome]=CRED.porServico[nome]||{pedidos:0,cache:0,creditos:0};
+  if(origem){ const o=CRED.porOrigem[origem]=CRED.porOrigem[origem]||{pedidos:0,cache:0};
+    o[doCache?"cache":"pedidos"]++; }
   if(doCache){ r.cache++; CRED.poupados++; return; }
   r.pedidos++; CRED.pedidos++;
   let c=x.creditos||0;
@@ -2185,7 +2187,7 @@ async function photonSearch(q,pos,limit=7){
   const params={q, limit:String(limit)};
   if(pos&&isFinite(pos.lat)){ params.lat=pos.lat.toFixed(4); params.lon=pos.lon.toFixed(4); }
   u.search=new URLSearchParams(params).toString();
-  const j=await jfetch(u.toString(), 9000);
+  const j=await jfetch(u.toString(), 9000, "pesquisa");
   const seen=new Set();
   return (j.features||[]).map(photonMap)
     .filter(r=>isFinite(r.lat)&&isFinite(r.lon))
@@ -2310,14 +2312,24 @@ async function geocode(q){
 }
 
 const revCache=new Map();
+/* O nome de um sítio vale para quilómetros à volta: Maastricht continua a ser
+   Maastricht 5 km em qualquer direção. Guarda-se por célula de 2 km, e durante
+   o Modo viagem nem se pergunta — quem vai a conduzir não está a ler nomes. */
+const REV_CELULA_KM=2;
+function revChave(lat,lon){ return celula(lat,lon,REV_CELULA_KM); }
 async function revGeocode(lat,lon){
+  if(typeof travel==="object" && travel.active){
+    const k=revChave(lat,lon), guardado=revCache.get(k);
+    if(guardado) return guardado;
+    return {name:t("a tua posição"), sub:""};
+  }
   const key=`${lat.toFixed(2)},${lon.toFixed(2)}`;
   if(revCache.has(key)) return revCache.get(key);
   // 1º Photon reverse (sem limites apertados); reserva: Nominatim em fila
   try{
     const u=new URL(svc("inversa"));
     u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5)}).toString();
-    const j=await jfetch(u.toString(), 8000);
+    const j=await jfetch(u.toString(), 8000, "nome-da-posição");
     const p=j.features?.[0]?.properties;
     if(p){
       const out={name:p.city||p.town||p.village||p.district||p.name||p.county||"—",
@@ -2390,6 +2402,77 @@ async function fetchCameras(coords){
   throw lastErr||new Error("overpass indisponível");
 }
 
+
+/* ── EM QUE PAÍS ESTÁ ESTE PONTO — sem rede e sem créditos ────────────────
+   Fronteiras do Natural Earth 1:50m, simplificadas (Europa a ~400 m, resto do
+   mundo a ~8 km) e publicadas ao lado da app. ~200 KB comprimidos, carregadas
+   à primeira pergunta e guardadas pelo service worker.
+
+   Era isto que antes custava uma geocodificação inversa por cada célula do
+   trajeto — a maior fatia dos créditos de uma sessão. Agora custa zero, é
+   exato junto às fronteiras (que é onde a lei muda) e continua a funcionar
+   fora da Europa e sem rede.                                                */
+const PAISES_URL="./paises.json";
+let paisesDados=null, paisesPromessa=null;
+function paisesCarregar(){
+  if(paisesDados) return Promise.resolve(paisesDados);
+  if(!paisesPromessa) paisesPromessa=fetch(PAISES_URL).then(r=>r.json())
+    .then(j=>{ paisesDados=j; return j; })
+    .catch(()=>{ paisesPromessa=null; return null; });
+  return paisesPromessa;
+}
+function pontoDentro(a,x,y){
+  let dentro=false;
+  for(let i=0,j=a.length-2;i<a.length;j=i,i+=2){
+    const xi=a[i],yi=a[i+1],xj=a[j],yj=a[j+1];
+    if(((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) dentro=!dentro;
+  }
+  return dentro;
+}
+function dist2Seg(px,py,x1,y1,x2,y2,kx){
+  const dx=(x2-x1)*kx, dy=y2-y1, den=dx*dx+dy*dy;
+  let t=den?(((px-x1)*kx*dx+(py-y1)*dy)/den):0; t=t<0?0:t>1?1:t;
+  const ex=(px-x1-t*(x2-x1))*kx, ey=py-y1-t*(y2-y1);
+  return ex*ex+ey*ey;
+}
+/* Uma cidade costeira cai fora da linha de costa simplificada — Lisboa, Nova
+   Iorque, Roterdão. Por isso, se nenhum polígono contém o ponto, aceita-se o
+   país mais próximo até 40 km. Acima disso é mar aberto e devolve nada. */
+function paisEm(lat,lon,tolKm=40){
+  if(!paisesDados) return null;
+  const kx=Math.cos(lat*Math.PI/180), tol=(tolKm/111.32)**2;
+  let melhor=null, melhorD=Infinity;
+  for(const [cc,b,aneis] of paisesDados.paises){
+    if(lon<b[0]-0.6||lon>b[2]+0.6||lat<b[1]-0.6||lat>b[3]+0.6) continue;
+    for(const a of aneis){
+      if(pontoDentro(a,lon,lat)) return cc;
+      for(let i=0,j=a.length-2;i<a.length;j=i,i+=2){
+        const d=dist2Seg(lon,lat,a[j],a[j+1],a[i],a[i+1],kx);
+        if(d<melhorD){ melhorD=d; melhor=cc; }
+      }
+    }
+  }
+  return melhorD<=tol?melhor:null;
+}
+/* Junto a uma fronteira, o traçado simplificado pode enganar-se em um ou dois
+   quilómetros — e é exatamente aí que a lei muda. Por isso, para efeitos de
+   radares, olha-se também três quilómetros à volta e fica-se pela regra mais
+   restritiva que aparecer. Errar para o lado de não mostrar é o único erro
+   aceitável nesta funcionalidade. */
+const SEVERIDADE={off:3, zones:2, on:1};
+function leiRadaresEm(lat,lon){
+  const base=paisEm(lat,lon);
+  let pior=camLawFor(base), piorCC=base;
+  const d=3/111.32;
+  for(const [dy,dx] of [[d,0],[-d,0],[0,d/Math.max(0.2,Math.cos(lat*Math.PI/180))],[0,-d/Math.max(0.2,Math.cos(lat*Math.PI/180))]]){
+    const cc=paisEm(lat+dy,lon+dx);
+    if(!cc||cc===base) continue;
+    const l=camLawFor(cc);
+    if((SEVERIDADE[l.mode]||1)>(SEVERIDADE[pior.mode]||1)){ pior=l; piorCC=cc; }
+  }
+  return {cc:base, lei:pior, ccLei:piorCC};
+}
+
 /* =====================================================================
    LEGALIDADE DOS AVISOS DE RADAR — muda de país para país.
    Suíça e Áustria proíbem avisar o condutor (coimas pesadas e confisco).
@@ -2438,16 +2521,8 @@ function saveCC(){ try{ const o={}; let n=0;
 async function countryAt(lat,lon){
   const k=ccKey(lat,lon);
   if(ccMem.has(k)) return ccMem.get(k);
-  let cc=null;
-  if(navigator.onLine){
-    try{
-      const u=new URL(svc("inversa"));
-      u.search=new URLSearchParams({lat:lat.toFixed(5), lon:lon.toFixed(5), limit:"1"}).toString();
-      const j=await jfetch(u.toString(), 7000);
-      cc=(j.features?.[0]?.properties?.countrycode||"").toUpperCase()||null;
-    }catch(e){}
-  }
-  if(!cc) cc=countryOffline(lat,lon);
+  await paisesCarregar();
+  const cc=paisEm(lat,lon);
   if(cc){ ccMem.set(k,cc); saveCC(); }
   return cc;
 }
@@ -2463,9 +2538,10 @@ async function applyCamLaw(list){
   const ccs=new Map();
   for(const [k,c] of cells) ccs.set(k, await countryAt(c.lat,c.lon));
   const out=[];
+  await paisesCarregar();
   for(const c of list){
     const cc=ccs.get(ccKey(c.lat,c.lon));
-    const law=camLawFor(cc);
+    const law=leiRadaresEm(c.lat,c.lon).lei;
     if(law.mode==="off"){ blocked[cc]=(blocked[cc]||0)+1; continue; }
     if(law.mode==="zones"){ c.zone=true; c.km=Math.round(c.km/2)*2; blocked[cc]=blocked[cc]||0; }
     c.cc=cc;
@@ -2562,8 +2638,10 @@ function renderCameras(){
     li.append(bar,main,el("span","seg-val",c.zone?`⚠️ ${t("zona de perigo")}`
       :`📸 ${c.max?t("limite {v}",{v:String(c.max).replace("mph"," mph")}):t("radar fixo")}`));
     ul.appendChild(li);
-    const n=await revGeocode(c.lat,c.lon);
-    place.textContent=t("perto de {p}",{p:n.name});
+    /* nada de geocodificação inversa aqui: a linha já diz em que quilómetro
+       do trajeto está o radar, que é a informação útil a quem conduz, e cada
+       nome de sítio custava um crédito. */
+    place.textContent=t("no teu trajeto");
   });
   card.appendChild(ul);
   if(R.cameras.length>14) card.appendChild(el("p","map-note",t("+{n} radares adicionais no mapa.",{n:R.cameras.length-14})));
@@ -3205,7 +3283,7 @@ async function revStreet(lat,lon){
   try{
     const u=new URL(svc("inversa"));
     u.search=new URLSearchParams({lat:lat.toFixed(6), lon:lon.toFixed(6)}).toString();
-    const j=await jfetch(u.toString(), 8000);
+    const j=await jfetch(u.toString(), 8000, "rua-do-pino");
     const p=j.features?.[0]?.properties;
     if(p){
       const road=[p.street||p.name, p.housenumber].filter(Boolean).join(" ");
@@ -3557,7 +3635,7 @@ function drawRoute(fit){
       const t4=el("div","muted small",s.stop!=null?"":t("a identificar a zona…"));
       div.append(t1,div2,t2,t3,t4);
       mk.bindPopup(div,{maxWidth:280}).openPopup();
-      if(s.stop==null){ const n=await revGeocode(s.lat,s.lon); t4.textContent=`📍 ${t("perto de {p}",{p:n.name})}`; }
+      if(s.stop==null){ t4.textContent=`📍 ${t("perto do km {k}",{k:rnd(s.km)})}`; }
     });
   });
   // radares fixos 📸 — em França a lei só permite zonas alargadas, não o ponto exato
@@ -4074,9 +4152,7 @@ function renderSegments(){
     const val=el("span","seg-val",`${LVL_ICON[s.lvl]} ${rainLabel(s.lvl)}`);
     li.append(bar,main,val);
     ul.appendChild(li);
-    const mid=R.samples[Math.round((s.i0+s.i1)/2)];
-    const n=await revGeocode(mid.lat,mid.lon);
-    place.textContent=`${t("perto de {p}",{p:n.name})} · ~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${U.precH(s.pr)}`:""}`;
+    place.textContent=`~${fmtHM(s.t0)}${s.t1>s.t0?`–${fmtHM(s.t1)}`:""}${s.pr>0.05?` · ${U.precH(s.pr)}`:""}`;
   });
   wv.forEach(async (s)=>{
     const li=el("li","seg-item");
@@ -4088,9 +4164,7 @@ function renderSegments(){
     const val=el("span","seg-val",`💨 ${s.cross>=45?t("vento lateral"):t("rajadas")} ${rnd(Math.max(s.gust,s.cross))} km/h`);
     li.append(bar,main,val);
     ul.appendChild(li);
-    const mid=R.samples[Math.round((s.i0+s.i1)/2)];
-    const n=await revGeocode(mid.lat,mid.lon);
-    place.textContent=`${t("perto de {p}",{p:n.name})} · ~${fmtHM(s.t0)} · ${t("abranda e segura bem o guiador")}`;
+    place.textContent=`~${fmtHM(s.t0)} · ${t("abranda e segura bem o guiador")}`;
   });
   card.appendChild(ul);
   box.appendChild(card);
@@ -4607,7 +4681,7 @@ async function isLodgingHere(pos){
   try{
     const u=new URL(svc("inversa"));
     u.search=new URLSearchParams({lat:pos.lat.toFixed(6), lon:pos.lon.toFixed(6), limit:"3"}).toString();
-    const j=await jfetch(u.toString(), 8000);
+    const j=await jfetch(u.toString(), 8000, "guarda-da-mota");
     for(const f of (j.features||[])){
       const pr=f.properties||{};
       if(isLodgingType(pr.osm_key,pr.osm_value)) return true;
