@@ -668,7 +668,9 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
         </div>
         <p class="small muted" id="cred-line" style="margin:10px 0 0;font-variant-numeric:tabular-nums"></p>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
-        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.</p>
+        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.</p>
+        <label class="chk-row" for="cam-opt"><input type="checkbox" id="cam-opt">
+          <span><b id="cam-opt-b">Mostrar radares na Alemanha</b><span id="cam-opt-s">Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.</span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
         <div class="chips" id="lang-row">
           <button class="chip click" data-lang="pt">PT</button>
@@ -986,7 +988,9 @@ function applyStaticI18n(){
     ["#tb-off-t","txt","offline"],
     ["#unit-title","txt","Unidades"],
     ["#cam-title","txt","Avisos de radar"],
-    ["#cam-law-txt","txt","A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato."],
+    ["#cam-law-txt","txt","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo."],
+    ["#cam-opt-b","txt","Mostrar radares na Alemanha"],
+    ["#cam-opt-s","txt","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado."],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
     ["#lang-title","txt","Idioma"],
   ];
@@ -1131,7 +1135,7 @@ en:{
 "paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
 "pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
 "vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
-"radar fixo":"fixed camera","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
+"radar fixo":"fixed camera","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"The law differs by country. In France I show wide danger zones instead of the exact point. In Switzerland I show nothing, because there the law also punishes whoever offers the warning. In Germany the choice is yours, just below.","Mostrar radares na Alemanha":"Show speed cameras in Germany","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"In Germany it is the rider who is fined for using speed camera warnings while riding, not whoever publishes the app. The decision is yours. It ships switched off.","Radares ligados na Alemanha — por tua conta e risco.":"Speed cameras on in Germany — at your own risk.","Radares desligados na Alemanha.":"Speed cameras off in Germany.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"Swiss law bans any warning about speed checks — and punishes whoever offers it, not only whoever uses it. So I show nothing there.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"In Germany it is the rider who is fined for using speed camera warnings while riding — not whoever publishes the app. The decision is yours.","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
 "maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
 "Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
 "O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
@@ -1302,7 +1306,7 @@ es:{
 "paragem":"parada","paragens":"paradas","em andamento":"en marcha","partida":"salida","chegada":"llegada","por":"por",
 "pico {n} mm/h":"pico {n} mm/h","mínima no percurso {t}°":"mínima en ruta {t}°","rajadas até {g} km/h · vento {d}":"rachas hasta {g} km/h · viento {d}",
 "vento lateral até ~{g} km/h":"viento lateral hasta ~{g} km/h","perto do km {k}":"cerca del km {k}","sobe até ~{m} m":"sube hasta ~{m} m",
-"radar fixo":"radar fijo","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
+"radar fixo":"radar fijo","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La ley cambia según el país. En Francia muestro zonas de peligro amplias en lugar del punto exacto. En Suiza no muestro nada, porque allí la ley también castiga a quien ofrece el aviso. En Alemania la elección es tuya, aquí abajo.","Mostrar radares na Alemanha":"Mostrar radares en Alemania","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce, no a quien publica la app. La decisión es tuya. Viene desactivado.","Radares ligados na Alemanha — por tua conta e risco.":"Radares activados en Alemania — bajo tu responsabilidad.","Radares desligados na Alemanha.":"Radares desactivados en Alemania.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La ley suiza prohíbe cualquier aviso sobre controles de velocidad — y castiga también a quien lo ofrece, no solo a quien lo usa. Por eso no muestro nada.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce — no a quien publica la app. La decisión es tuya.","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
 "maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
 "Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
@@ -1458,7 +1462,7 @@ fr:{
 "paragem":"arrêt","paragens":"arrêts","em andamento":"en roulant","partida":"départ","chegada":"arrivée","por":"via",
 "pico {n} mm/h":"pic {n} mm/h","mínima no percurso {t}°":"minimale du trajet {t}°","rajadas até {g} km/h · vento {d}":"rafales jusqu'à {g} km/h · vent {d}",
 "vento lateral até ~{g} km/h":"vent latéral jusqu'à ~{g} km/h","perto do km {k}":"vers le km {k}","sobe até ~{m} m":"monte à ~{m} m",
-"radar fixo":"radar fixe","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
+"radar fixo":"radar fixe","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La loi varie selon le pays. En France, j'affiche de larges zones de danger au lieu du point exact. En Suisse, je n'affiche rien : la loi y punit aussi celui qui propose l'avertissement. En Allemagne, le choix est le tien, juste en dessous.","Mostrar radares na Alemanha":"Afficher les radars en Allemagne","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant, pas celui qui publie l'application. La décision t'appartient. Désactivé par défaut.","Radares ligados na Alemanha — por tua conta e risco.":"Radars activés en Allemagne — à tes risques.","Radares desligados na Alemanha.":"Radars désactivés en Allemagne.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La loi suisse interdit tout avertissement sur les contrôles de vitesse — et punit aussi celui qui le propose, pas seulement celui qui l'utilise. Je n'affiche donc rien.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant — pas celui qui publie l'application. La décision t'appartient.","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
 "maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
 "Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
@@ -1615,7 +1619,7 @@ Object.assign(I18N.en,{
 "⚠️ Perigo no teu trajeto":"⚠️ Hazard on your route",
 "Unidades":"Units",
 "Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade.":"Swiss law bans devices and apps that make speed checks harder to recognise.",
-"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada).":"In Austria, speed camera warnings are prohibited for the driver (§ 98a of the road traffic act).",
+
 
 "Dados:":"Data:",
 "Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no tracking: nothing you do leaves this phone. Ride smart: on a red warning, stay home.",
@@ -1638,10 +1642,10 @@ Object.assign(I18N.en,{
 "Em França a lei não permite indicar o ponto exato.":"French law does not allow showing the exact location.",
 "Avisos de radar":"Speed camera warnings",
 "A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.":"The law differs by country. In Germany, Austria and Switzerland warning the driver is forbidden, so I switch it off automatically. In France I show wide danger zones instead of the exact point.",
-"Ligar também na Alemanha":"Enable in Germany too",
-"A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"German law forbids drivers from using camera warnings. At your own risk.",
-"Avisos de radar ligados na Alemanha — por tua conta e risco.":"Camera warnings enabled in Germany — at your own risk.",
-"Avisos de radar desligados na Alemanha.":"Camera warnings disabled in Germany.",
+
+
+
+
 
 });
 Object.assign(I18N.es,{
@@ -1707,7 +1711,7 @@ Object.assign(I18N.es,{
 "⚠️ Perigo no teu trajeto":"⚠️ Peligro en tu ruta",
 "Unidades":"Unidades",
 "Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade.":"La ley suiza prohíbe dispositivos y aplicaciones que dificulten reconocer los controles de velocidad.",
-"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada).":"En Austria los avisos de radar están prohibidos al conductor (§ 98a del código de circulación).",
+
 
 "Dados:":"Datos:",
 "Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas ni registros: nada de lo que haces sale de este móvil. Conduce con cabeza: con aviso rojo, quédate en casa.",
@@ -1730,10 +1734,10 @@ Object.assign(I18N.es,{
 "Em França a lei não permite indicar o ponto exato.":"La ley francesa no permite indicar el punto exacto.",
 "Avisos de radar":"Avisos de radar",
 "A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.":"La ley cambia según el país. En Alemania, Austria y Suiza está prohibido avisar al conductor, así que lo desactivo automáticamente. En Francia muestro zonas de peligro amplias en lugar del punto exacto.",
-"Ligar também na Alemanha":"Activar también en Alemania",
-"A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"La ley alemana prohíbe al conductor usar avisos de radar. Bajo tu responsabilidad.",
-"Avisos de radar ligados na Alemanha — por tua conta e risco.":"Avisos de radar activados en Alemania — bajo tu responsabilidad.",
-"Avisos de radar desligados na Alemanha.":"Avisos de radar desactivados en Alemania.",
+
+
+
+
 
 });
 Object.assign(I18N.fr,{
@@ -1799,7 +1803,7 @@ Object.assign(I18N.fr,{
 "⚠️ Perigo no teu trajeto":"⚠️ Danger sur ton trajet",
 "Unidades":"Unités",
 "Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade.":"La loi suisse interdit les dispositifs et applications qui rendent les contrôles de vitesse plus difficiles à repérer.",
-"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada).":"En Autriche, les avertisseurs de radars sont interdits au conducteur (§ 98a du code de la route).",
+
 
 "Dados:":"Données :",
 "Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans compte ni traçage : rien de ce que tu fais ne quitte ce téléphone. Roule prudemment : en alerte rouge, reste à la maison.",
@@ -1822,10 +1826,10 @@ Object.assign(I18N.fr,{
 "Em França a lei não permite indicar o ponto exato.":"La loi française ne permet pas d'indiquer l'emplacement exact.",
 "Avisos de radar":"Avertisseurs de radars",
 "A lei muda de país para país. Na Alemanha, na Áustria e na Suíça é proibido avisar o condutor, por isso desligo automaticamente. Em França mostro zonas de perigo alargadas em vez do ponto exato.":"La loi varie selon le pays. En Allemagne, en Autriche et en Suisse, avertir le conducteur est interdit : je le désactive automatiquement. En France, j'affiche de larges zones de danger au lieu du point exact.",
-"Ligar também na Alemanha":"Activer aussi en Allemagne",
-"A lei alemã proíbe o condutor de usar avisos de radar. Por tua conta e risco.":"La loi allemande interdit au conducteur d'utiliser ces avertisseurs. À tes risques.",
-"Avisos de radar ligados na Alemanha — por tua conta e risco.":"Avertisseurs activés en Allemagne — à tes risques.",
-"Avisos de radar desligados na Alemanha.":"Avertisseurs désactivés en Allemagne.",
+
+
+
+
 
 });
 
@@ -2616,11 +2620,16 @@ function paisEm(lat,lon,tolKm=40){
   }
   return melhorD<=tol?melhor:null;
 }
-/* Junto a uma fronteira, o traçado simplificado pode enganar-se em um ou dois
-   quilómetros — e é exatamente aí que a lei muda. Por isso, para efeitos de
-   radares, olha-se também três quilómetros à volta e fica-se pela regra mais
-   restritiva que aparecer. Errar para o lado de não mostrar é o único erro
-   aceitável nesta funcionalidade. */
+/* Junto a uma fronteira o traçado simplificado pode enganar-se em um ou dois
+   quilómetros, e é exatamente aí que a lei muda. Por isso olha-se três
+   quilómetros à volta — MAS a margem é assimétrica, e a razão importa:
+
+   · Onde o risco é NOSSO (Suíça, França), a margem ganha sempre. Na dúvida
+     sobre de que lado da fronteira estamos, esconde. A escolha do utilizador
+     não pode ligar aquilo que nos expõe a nós.
+   · Onde o risco é do CONDUTOR (Alemanha), a margem NÃO se aplica. Se ele
+     ligou o interruptor, vê radares — inclusive à beira da fronteira alemã.
+     Escondê-los ali seria decidir por ele numa coisa que é dele.            */
 const SEVERIDADE={off:3, zones:2, on:1};
 function leiRadaresEm(lat,lon){
   const base=paisEm(lat,lon);
@@ -2629,6 +2638,8 @@ function leiRadaresEm(lat,lon){
   for(const [dy,dx] of [[d,0],[-d,0],[0,d/Math.max(0.2,Math.cos(lat*Math.PI/180))],[0,-d/Math.max(0.2,Math.cos(lat*Math.PI/180))]]){
     const cc=paisEm(lat+dy,lon+dx);
     if(!cc||cc===base) continue;
+    const bruta=CAM_LAW[cc];
+    if(!bruta||bruta.risco!=="nosso") continue;      // a assimetria vive nesta linha
     const l=camLawFor(cc);
     if((SEVERIDADE[l.mode]||1)>(SEVERIDADE[pior.mode]||1)){ pior=l; piorCC=cc; }
   }
@@ -2647,11 +2658,34 @@ function leiRadaresEm(lat,lon){
    mostrar radares FIXOS de uma base de dados é legal — o que a lei belga proíbe
    (art. 62bis) são os detetores de radar, aparelhos que captam as emissões da
    polícia. É por isso que o Waze, o Coyote e o Flitsmeister lá funcionam. */
+/* ═══ DUAS PERGUNTAS, SEMPRE, ANTES DE PÔR UM PAÍS NESTA TABELA ═══════════
+
+   1. A lei proíbe o APARELHO DETETOR — o que capta as emissões do radar — ou
+      proíbe a APP DE BASE DE DADOS, que só mostra localizações conhecidas?
+      São coisas diferentes e quase toda a gente as confunde. Nós já nos
+      enganámos duas vezes: bloqueámos a Bélgica sem razão nenhuma, e quase
+      bloqueámos a Áustria pelo mesmo motivo. Na dúvida, procura se o Waze ou
+      o Coyote lá funcionam — se funcionam, é a distinção que está em causa.
+
+   2. Quem é punido: o UTILIZADOR, quem DISTRIBUI, ou os dois?
+      Só o utilizador  → o risco é dele, a escolha é dele: mode:"opt".
+      Também quem distribui → o risco também é nosso: mode:"off", sem escolha.
+      Um interruptor não transfere risco nenhum quando a oferta é que é ilegal.
+
+   O campo `risco` responde à segunda pergunta e é o que decide a regra de
+   fronteira mais abaixo.                                                     */
 const CAM_LAW={
-  CH:{mode:"off",  why:"Na Suíça a lei proíbe dispositivos e aplicações que dificultem o reconhecimento de controlos de velocidade."},
-  AT:{mode:"off",  why:"Na Áustria os avisos de radar são proibidos ao condutor (§ 98a do Código da Estrada)."},
-  FR:{mode:"zones",why:"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação."},
-  DE:{mode:"off",  why:"Na Alemanha a proibição recai sobre o condutor que usa o aviso, não sobre quem o publica — por isso desligo, para não te expor."},
+  /* Art. 98a SVG: proíbe qualquer forma de aviso público sobre controlos, e a
+     própria oferta é punível — multas até 10 000 CHF e confisco. Risco nosso. */
+  CH:{mode:"off",  risco:"nosso",    why:"Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada."},
+  /* Proíbe indicar o ponto exato, tolera zonas alargadas. É uma exceção legal
+     específica de França e NÃO é exportável para a Alemanha. */
+  FR:{mode:"zones",risco:"nosso",    why:"Em França é proibido indicar o ponto exato de um radar — mostro zonas de perigo alargadas, como fazem as apps de navegação."},
+  /* § 23 StVO: pune o condutor que usa o aviso em andamento. Quem publica não
+     é penalizado — o Blitzer.de é alemão e está nas duas lojas. Escolha dele. */
+  DE:{mode:"opt",  risco:"condutor", why:"Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua."},
+  /* A Áustria saiu desta tabela: lá as apps de base de dados são permitidas e
+     o que é proibido são os aparelhos detetores. Mesmo caso da Bélgica. */
 };
 /* contornos aproximados — só usados quando não há rede para confirmar o país */
 const CC_POLY={
@@ -2690,9 +2724,13 @@ async function countryAt(lat,lon){
   if(cc){ ccMem.set(k,cc); saveCC(); }
   return cc;
 }
+const CAM_OPT="cam-restrito";
+function camOptOn(){ return store.get(CAM_OPT)===1; }
 function camLawFor(cc){
   const law=CAM_LAW[cc];
-  return law||{mode:"on"};
+  if(!law) return {mode:"on"};
+  if(law.mode==="opt") return camOptOn()?{mode:"on", risco:law.risco}:law;
+  return law;
 }
 /* aplica a lei do país a cada radar do trajeto */
 async function applyCamLaw(list){
@@ -2706,7 +2744,7 @@ async function applyCamLaw(list){
   for(const c of list){
     const cc=ccs.get(ccKey(c.lat,c.lon));
     const law=leiRadaresEm(c.lat,c.lon).lei;
-    if(law.mode==="off"){ blocked[cc]=(blocked[cc]||0)+1; continue; }
+    if(law.mode==="off"||law.mode==="opt"){ blocked[cc]=(blocked[cc]||0)+1; continue; }
     if(law.mode==="zones"){ c.zone=true; c.km=Math.round(c.km/2)*2; blocked[cc]=blocked[cc]||0; }
     c.cc=cc;
     out.push(c);
@@ -5582,6 +5620,21 @@ function init(){
       {p:CRED.pedidos, m:min, c:CRED.poupados, k:CRED.creditos})+(det?` (${det})`:"");
   };
   pintarCreditos();
+  /* radares em países onde a lei pune o condutor: escolha informada dele,
+     desligada por omissão. Quem nunca abriu as definições não é posto a
+     infringir sem saber. */
+  const camOpt=$("#cam-opt");
+  if(camOpt){
+    if(store.get(CAM_OPT)===null&&store.get("cam-de")===1) store.set(CAM_OPT,1);  // preferência da versão antiga
+    camOpt.checked=camOptOn();
+    camOpt.addEventListener("change",()=>{
+      store.set(CAM_OPT,camOpt.checked?1:0);
+      toast(camOpt.checked?t("Radares ligados na Alemanha — por tua conta e risco.")
+                          :t("Radares desligados na Alemanha."));
+      const R=state.route;
+      if(R){ R.cameras=null; (R.variants||[]).forEach(v=>{ v.cameras=null; }); loadRouteCameras(); }
+    });
+  }
   const paintUnits=()=>$$("#unit-row .chip").forEach(c=>c.classList.toggle("sel",c.dataset.units===state.units));
   paintUnits();
   $$("#unit-row .chip").forEach(c=>c.addEventListener("click",()=>{
