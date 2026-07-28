@@ -951,6 +951,20 @@ function setLang(l){
   if(state.radar.frames.length) showRadarFrame(state.radar.idx);
   renderFavRow();
 }
+/* Atribuição obrigatória do plano gratuito do Geoapify. Tem de ser reposta a
+   cada tradução: o rodapé inteiro é uma entrada de i18n e é reescrito quando se
+   muda de idioma — foi assim que a primeira tentativa desapareceu do ecrã. */
+function pintarAtribuicao(){
+  const pe=document.querySelector("footer"); if(!pe) return;
+  pe.querySelector("#attr-geo")?.remove();
+  if(!geoOn()) return;
+  const sp=document.createElement("span"); sp.id="attr-geo";
+  const a=document.createElement("a");
+  a.href="https://www.geoapify.com/"; a.target="_blank"; a.rel="noopener";
+  a.textContent="Powered by Geoapify";
+  sp.append(document.createElement("br"), a);
+  pe.appendChild(sp);
+}
 function applyStaticI18n(){
   const map=[
     [".brand-sub","txt","meteorologia para motociclistas · grátis para começar"],
@@ -1044,6 +1058,7 @@ function applyStaticI18n(){
   }
   const tbStop=$("#tb-stop"); if(tbStop) tbStop.textContent=t("🛑 Terminar");
   updateTravelButtons();
+  pintarAtribuicao();
 }
 const I18N={pt:{},
 en:{
@@ -2185,6 +2200,7 @@ function photonMap(f){
   return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value};
 }
 async function photonSearch(q,pos,limit=7){
+  if(geoOn()) return geoSearch(q,pos,limit);
   const u=new URL(svc("procura"));
   const params={q, limit:String(limit)};
   if(pos&&isFinite(pos.lat)){ params.lat=pos.lat.toFixed(4); params.lon=pos.lon.toFixed(4); }
@@ -2231,6 +2247,7 @@ function detectPoiCat(q){
   return {tag:cat.tag, extra:den?den.extra:"", label:cat.label};
 }
 async function poiNear(cat,pos,radiusM=30000){
+  if(geoOn()) return geoPlaces(cat,pos,radiusM).catch(()=>[]);
   const body=`[out:json][timeout:20];(`+
     ["node","way"].map(k=>`${k}(around:${radiusM},${pos.lat.toFixed(5)},${pos.lon.toFixed(5)})[${cat.tag}]${cat.extra};`).join("")+
     `);out center 40;`;
@@ -2320,6 +2337,9 @@ const revCache=new Map();
 const REV_CELULA_KM=2;
 function revChave(lat,lon){ return celula(lat,lon,REV_CELULA_KM); }
 async function revGeocode(lat,lon){
+  if(geoOn()&&!(typeof travel==="object"&&travel.active)){
+    try{ const r=await geoReverse(lat,lon); return {name:r.name, sub:r.sub}; }catch(e){}
+  }
   if(typeof travel==="object" && travel.active){
     const k=revChave(lat,lon), guardado=revCache.get(k);
     if(guardado) return guardado;
@@ -2352,7 +2372,136 @@ async function revGeocode(lat,lon){
   }catch(e){ return {name:`${lat.toFixed(3)}, ${lon.toFixed(3)}`, sub:""}; }
 }
 
+
+/* =====================================================================
+   GEOAPIFY — rotas, pesquisa de sítios, morada e pontos de interesse
+   =====================================================================
+   Substitui três serviços que não podemos usar a sério: o OSRM de
+   demonstração proíbe uso comercial, a instância pública do Photon é uma
+   demonstração sem condições comerciais, e o Nominatim proíbe autocompletar,
+   que é exatamente onde estava a ser usado.
+
+   A CHAVE VIVE AQUI, numa linha só. É uma chave de plano gratuito e vai
+   dentro da página, como é suposto — o que a protege não é o segredo, é a
+   restrição por domínio na consola do Geoapify. Restringe-a antes de a pores.
+
+   Enquanto isto for "SUBSTITUIR", a app usa os fornecedores antigos e nada
+   muda. Basta trocar a linha para passar tudo pelo Geoapify.                */
+const GEOAPIFY_KEY="SUBSTITUIR";
+/* A chave também pode ser posta em andamento, sem editar o ficheiro:
+     store.set("geoapify-key","a-tua-chave")
+   Serve para a experimentares no telemóvel antes de a fixarmos na linha de
+   cima, e é como os testes a põem. */
+function geoKey(){ try{ return store.get("geoapify-key")||GEOAPIFY_KEY; }catch(e){ return GEOAPIFY_KEY; } }
+const geoOn=()=>{ const k=geoKey(); return !!k&&k!=="SUBSTITUIR"; };
+const GEO_BASE="https://api.geoapify.com";
+function geoURL(caminho,params){
+  const u=new URL((SERVICOS.proxy?SERVICOS.proxy+"/geo":GEO_BASE)+caminho);
+  for(const k in params) if(params[k]!=null&&params[k]!=="") u.searchParams.set(k,params[k]);
+  if(!SERVICOS.proxy) u.searchParams.set("apiKey",geoKey());
+  return u.toString();
+}
+/* o Geoapify traduz as instruções; usamos essa tradução só quando não
+   conseguimos classificar a manobra nós próprios */
+const GEO_LANG={pt:"pt",en:"en",es:"es",fr:"fr"};
+
+/* ── um resultado de pesquisa, no formato que a app já usa ──────────────── */
+function geoFeature(f){
+  const p=f.properties||{};
+  const rua=[p.street,p.housenumber].filter(Boolean).join(" ");
+  const nome=p.name||rua||p.address_line1||p.formatted||"—";
+  const sitio=p.city||p.town||p.village||p.county||p.state||"";
+  const sub=[p.name?rua:"", sitio].filter(Boolean).join(", ")||p.address_line2||p.country||"";
+  return {name:nome, sub, lat:p.lat??f.geometry?.coordinates?.[1],
+          lon:p.lon??f.geometry?.coordinates?.[0], kind:p.result_type||p.category};
+}
+async function geoSearch(q,pos,limit=7){
+  const j=await jfetch(geoURL("/v1/geocode/autocomplete",{
+    text:q, limit:String(limit), lang:GEO_LANG[state.lang]||"en",
+    bias:(pos&&isFinite(pos.lat))?`proximity:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)}`:null,
+  }),9000,"pesquisa");
+  return (j.features||[]).map(geoFeature).filter(r=>isFinite(r.lat)&&isFinite(r.lon));
+}
+async function geoReverse(lat,lon){
+  const j=await jfetch(geoURL("/v1/geocode/reverse",{
+    lat:lat.toFixed(5), lon:lon.toFixed(5), limit:"1", lang:GEO_LANG[state.lang]||"en",
+  }),8000,"nome-da-posição");
+  const f=(j.features||[])[0];
+  if(!f) throw new Error("sem resultado");
+  const r=geoFeature(f);
+  return {name:r.name, sub:r.sub, cc:(f.properties?.country_code||"").toUpperCase()};
+}
+async function geoPlaces(cat,pos,radiusM=30000){
+  const j=await jfetch(geoURL("/v2/places",{
+    categories:cat.geo||cat.tag, limit:"20",
+    filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${Math.round(radiusM)}`,
+    bias:`proximity:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)}`,
+    lang:GEO_LANG[state.lang]||"en",
+  }),12000,"pontos-de-interesse");
+  const out=(j.features||[]).map(geoFeature).filter(r=>isFinite(r.lat));
+  out.forEach(o=>{ o._poi=true; o._d=haversine(pos,o); });
+  out.sort((a,b)=>a._d-b._d);
+  return out.slice(0,8);
+}
+
+/* ── manobras: classificamos o que conseguimos, o resto fica com o texto
+   do próprio Geoapify, que já vem traduzido. Assim a voz mantém-se nossa
+   onde importa e nunca fica muda onde o vocabulário nos escapa. ────────── */
+function geoManobra(instr){
+  const tipo=String(instr?.type||"").toLowerCase();
+  const lado=/sharp[ _-]?left|hardleft/.test(tipo)?"sharp left"
+    :/sharp[ _-]?right|hardright/.test(tipo)?"sharp right"
+    :/slight[ _-]?left|bearleft/.test(tipo)?"slight left"
+    :/slight[ _-]?right|bearright/.test(tipo)?"slight right"
+    :/left/.test(tipo)?"left":/right/.test(tipo)?"right":"";
+  if(/roundabout|rotary/.test(tipo)) return {type:"roundabout", modifier:lado};
+  if(/uturn|u[ _-]?turn/.test(tipo)) return {type:"turn", modifier:"uturn"};
+  if(/merge/.test(tipo)) return {type:"merge", modifier:lado};
+  if(/ramp|exit|offramp|onramp/.test(tipo))
+    return {type:/off|exit/.test(tipo)?"off ramp":"on ramp", modifier:lado};
+  if(/fork|keep|stay/.test(tipo)) return {type:"fork", modifier:lado};
+  if(/destination|arrive|end/.test(tipo)) return {type:"arrive", modifier:""};
+  if(/start|depart/.test(tipo)) return {type:"depart", modifier:""};
+  if(/continue|straight|becomes/.test(tipo)) return {type:"continue", modifier:"straight"};
+  if(lado) return {type:"turn", modifier:lado};
+  return null;                                  // desconhecida: fica o texto deles
+}
+/* devolve a rota no MESMO formato que o resto da app já consome */
+async function geoRoute(points){
+  const wp=points.map(p=>`${p.lat.toFixed(5)},${p.lon.toFixed(5)}`).join("|");
+  const j=await jfetch(geoURL("/v1/routing",{
+    waypoints:wp, mode:"motorcycle", details:"instruction_details,route_details",
+    lang:GEO_LANG[vozIdioma?vozIdioma():state.lang]||"en", units:"metric",
+  }),20000,"rota");
+  const f=(j.features||[])[0];
+  if(!f) throw new Error("Sem rota");
+  const pr=f.properties||{};
+  /* a geometria vem em MultiLineString, uma linha por perna: junta-se numa só
+     e guarda-se onde cada perna começa, que é o que dá os tempos por troço */
+  const partes=f.geometry?.type==="MultiLineString"?f.geometry.coordinates:[f.geometry?.coordinates||[]];
+  const coords=[]; const inicioPerna=[];
+  for(const parte of partes){ inicioPerna.push(coords.length);
+    for(const c of parte){ if(!coords.length||coords[coords.length-1][0]!==c[0]||coords[coords.length-1][1]!==c[1]) coords.push(c); } }
+  const legs=(pr.legs||[]).map((l,i)=>({
+    distance:l.distance, duration:l.time,
+    steps:(l.steps||[]).map(st=>{
+      const mv=geoManobra(st.instruction);
+      return {distance:st.distance, duration:st.time,
+        name:st.name||st.instruction?.streets?.[0]||"",
+        ref:st.road_class==="motorway"?(st.name||""):"",
+        texto:st.instruction?.text||"",
+        maneuver:mv?{type:mv.type, modifier:mv.modifier, exit:Number(st.instruction?.exitNumber)||0}
+                   :{type:"", modifier:"", exit:0, texto:st.instruction?.text||""}};
+    }),
+  }));
+  const waypoints=inicioPerna.concat([Math.max(0,coords.length-1)])
+    .map(i=>({location:coords[Math.min(i,coords.length-1)]||[points[0].lon,points[0].lat]}));
+  return {routes:[{geometry:{coordinates:coords}, distance:pr.distance, duration:pr.time, legs}],
+          waypoints};
+}
+
 async function osrmRoute(points){ // points: [{lat,lon},...]
+  if(geoOn()) return geoRoute(points);
   const path=points.map(p=>`${p.lon.toFixed(5)},${p.lat.toFixed(5)}`).join(";");
   const alts=points.length===2?"&alternatives=true":"";
   const u=`${svc("rota")}/${path}?overview=full&geometries=geojson&steps=true${alts}`;
@@ -2521,6 +2670,8 @@ function ccKey(lat,lon){ return `${lat.toFixed(2)},${lon.toFixed(2)}`; }
 function saveCC(){ try{ const o={}; let n=0;
   for(const [k,v] of ccMem){ if(n++>400) break; o[k]=v; } store.set("cc",o); }catch(e){} }
 async function countryAt(lat,lon){
+  /* o país continua a sair das fronteiras offline: com o Geoapify custaria um
+     crédito por célula do trajeto, e a resposta offline é igualmente boa */
   const k=ccKey(lat,lon);
   if(ccMem.has(k)) return ccMem.get(k);
   await paisesCarregar();
@@ -3399,9 +3550,13 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
     (route.legs||[]).forEach((leg,li,arr)=>{
       (leg.steps||[]).forEach(st=>{
         const mv=st.maneuver||{};
+        if(!mv.texto&&st.texto) mv.texto=st.texto;
         const isFinalArrive=mv.type==="arrive"&&li===arr.length-1;
-        if(mv.type&&!isFinalArrive)
-          maneuvers.push({km:mkm, type:mv.type, mod:mv.modifier||"", exit:mv.exit||0, road:st.name||st.ref||""});
+        /* também entram as manobras sem tipo, desde que tragam texto: são as
+           que o fornecedor descreve com vocabulário que não classificámos */
+        if((mv.type||mv.texto)&&!isFinalArrive)
+          maneuvers.push({km:mkm, type:mv.type, mod:mv.modifier||"", exit:mv.exit||0,
+            road:st.name||st.ref||"", texto:mv.texto||""});
         mkm+=(st.distance||0)/1000;
       });
     });
@@ -4907,6 +5062,10 @@ const NAV_LANG={
     road:(n)=>` vers ${n}`, dist:(m)=>`Dans ${U.falaDist(m,{km:"kilomètres",m:"mètres",mi:"miles",ft:"pieds"})}, `},
 };
 function navPhrase(mv){
+  /* manobra que não soubemos classificar: dizemos o texto do próprio
+     fornecedor, que já vem traduzido. Melhor uma frase estranha do que
+     silêncio num cruzamento. */
+  if(!mv.type&&mv.texto) return mv.texto;
   const Lg=NAV_LANG[vozIdioma()]||NAV_LANG.pt;
   const road=mv.road?Lg.road(mv.road):"";
   const dir=({left:Lg.left,right:Lg.right,"slight left":Lg.sleft,"slight right":Lg.sright,
