@@ -1,7 +1,7 @@
 {
   "name": "Levante",
   "short_name": "Levante",
-  "description": "Meteorologia e rota para motociclistas: o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Vento, chuva, radar e avisos.",
+  "description": "Meteorologia e rota para motociclistas: o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Vento, chuva, radares fixos e avisos de perigo.",
   "lang": "pt-PT",
   "start_url": "./",
   "scope": "./",

@@ -25,8 +25,18 @@
 <meta name="twitter:title" content="Levante — meteorologia e rota para motociclistas">
 <meta name="twitter:description" content="Levante mostra o tempo ao longo do teu trajeto à hora a que vais passar em cada ponto. Sabes se deves ir de mota antes de sair de casa.">
 <meta name="twitter:image" content="icon-512.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- O Inter é servido por nós, não pelo Google Fonts. Ver tools/inter-proprio.py
+     para as três razões; a que decide é que um pedido ao Google em cada arranque
+     transmite o IP do utilizador e impede a declaração de "nenhum dado recolhido"
+     nas lojas. Ficheiro variável 400–800, licença SIL OFL 1.1. -->
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;
+  src:url(./inter-latin.woff2) format('woff2');
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;
+  src:url(./inter-latin-ext.woff2) format('woff2');
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 /* ================= TOKENS — "Aurora Navy" ================= */
@@ -131,6 +141,13 @@ a{color:var(--accent)}
   animation:cardIn .32s ease-out both}
 .card h2{margin:0 0 4px;font-size:15.5px;font-weight:750;letter-spacing:-.015em}
 .card .h-sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+/* A Sentinela desligada contra a vontade do utilizador não pode ser uma linha
+   cinzenta entre outras: é a única altura em que aquele texto diz que uma coisa
+   que ele ligou deixou de estar a funcionar. */
+#sentinel-status.sentinel-aviso{color:#8a5200;font-weight:600;
+  background:rgba(250,178,25,.13);border-left:3px solid #fab219;
+  padding:8px 10px;border-radius:8px}
+[data-theme="dark"] #sentinel-status.sentinel-aviso{color:#ffcf6b}
 .card-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .card-head .spacer{flex:1}
 /* ================= LOCATION BAR ================= */
@@ -243,7 +260,7 @@ a{color:var(--accent)}
   cursor:pointer;font-size:15px}
 .swap-btn:hover{border-color:var(--accent)}
 .route-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
-#map-route,#map-radar{height:440px;border-radius:12px;background:var(--surface2)}
+#map-route{height:440px;border-radius:12px;background:var(--surface2)}
 .map-card{padding:10px}
 .map-note{font-size:11.5px;color:var(--muted);margin:8px 4px 0}
 .seg-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -264,11 +281,8 @@ a{color:var(--accent)}
 .dep-chip .v{font-size:11.5px;color:var(--ink2);margin-top:1px}
 .summary-hero{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .summary-hero .big{font-size:19px;font-weight:750;letter-spacing:-.01em;display:flex;gap:9px;align-items:center}
-/* ================= RADAR ================= */
-.radar-controls{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
-.radar-controls input[type=range]{flex:1;min-width:160px;accent-color:var(--accent)}
-.radar-time{font-weight:700;font-size:14px;min-width:150px}
-.radar-time span{display:block;font-size:11px;font-weight:550;color:var(--muted)}
+/* O CSS da tab Radar saiu com ela na A2.4. Ficou aqui a estorvar durante
+   toda a remoção porque a remoção procurou funções e não folhas de estilo. */
 /* ================= TOOLTIP ================= */
 .viz-tip{position:fixed;z-index:5000;pointer-events:none;background:var(--surface);
   border:1px solid var(--border);border-radius:11px;box-shadow:var(--shadow);padding:9px 12px;
@@ -395,7 +409,7 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
   .route-grid{grid-template-columns:1fr;}
   .swap-btn{width:100%;height:34px}
   .route-extra{grid-template-columns:1fr}
-  #map-route,#map-radar{height:340px}
+  #map-route{height:340px}
   .brand-sub{display:none}
 }
 
@@ -525,6 +539,7 @@ html[data-theme="dark"] .ac-list{background:#111a2c}
 .ac-item{border-bottom:1px solid var(--border)}
 .ac-item:last-child{border-bottom:0}
 .ac-item.fav-hit{background:linear-gradient(90deg,var(--accent-soft),transparent 70%)}
+.cand-chip.cand-meu{border-color:var(--accent);background:var(--accent-soft)}
 /* o cartão que tem uma lista aberta sobe acima dos vizinhos (o blur cria contexto próprio) */
 .card{position:relative}
 .card:has(.ac-list.open){z-index:4500}
@@ -614,7 +629,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
   .pop{width:min(320px,calc(100vw - 24px));right:-2px}
   .radio-row label{padding:10px 11px;font-size:13px}
 
-  #map-route,#map-radar{height:320px;border-radius:14px}
+  #map-route{height:320px;border-radius:14px}
   .drawer{width:min(340px,92vw)}
 }
 /* linha "Partir às / hora": não pode transbordar do cartão */
@@ -678,6 +693,21 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
           <button class="chip click" data-lang="es">ES</button>
           <button class="chip click" data-lang="fr">FR</button>
         </div>
+        <!-- O estado da voz vive AQUI, e não só num toast de 8 segundos. Um
+             toast é o vejo-te-agora; não serve para uma condição que continua
+             verdadeira depois de ele morrer. Quem não apanhar o aviso fica sem
+             saber que a navegação vai ser muda, ou em inglês dentro de uma app
+             em português — e a voz é uma das coisas onde um erro invisível
+             muda uma decisão de conduzir. -->
+        <div class="h-sub" id="estado-aparelho" style="margin:8px 0 0" hidden></div>
+        <!-- CARIMBO DA VERSÃO. Passámos um dia a discutir se uma correção estava
+             no ar, com o Ricardo a dizer que publicou e o site a servir a versão
+             de 28/07 — e nenhum dos dois conseguia provar nada sem abrir o
+             código. Isto torna a pergunta verificável num relance, no telemóvel
+             e a partir daqui: se o carimbo não mudou, a publicação não chegou.
+             É texto visível de propósito; um comentário ou um JSON não se
+             conseguem ler de fora com fiabilidade. -->
+        <p class="h-sub" id="set-versao" style="margin:14px 0 0;opacity:.6"></p>
       </div>
     </div>
   </header>
@@ -685,7 +715,6 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
   <nav class="tabs" role="tablist" aria-label="Secções">
     <button class="tab" role="tab" id="tab-agora" aria-selected="true" data-view="agora">🏍️ Agora</button>
     <button class="tab" role="tab" id="tab-rota" aria-selected="false" data-view="rota">🗺️ Rota</button>
-    <button class="tab" role="tab" id="tab-radar" aria-selected="false" data-view="radar">🛰️ Radar</button>
   </nav>
 
   <div id="offline-banner" style="display:none" class="banner off-banner">
@@ -712,6 +741,13 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
         <button class="btn" id="btn-sentinel">Ligar</button>
       </div>
       <p class="h-sub" id="sentinel-status" style="margin-bottom:0">Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.</p>
+      <!-- Linha própria para o que aconteceu ao RECARREGAR, e não para o estado
+           de agora. A primeira versão escrevia o "continuou ligada" no
+           #sentinel-status, e o sentinelCheck() reescreve essa linha um segundo
+           depois com o tempo atual: o aviso existia durante um segundo e
+           desaparecia. Um aviso que desaparece sozinho é a mesma coisa que não
+           avisar — e este só apareceu porque o teste o foi ler tarde. -->
+      <p class="h-sub" id="sentinel-nota" style="margin:8px 0 0" hidden></p>
     </div>
     <div id="agora-content">
       <div class="skel" style="height:150px;margin-bottom:14px"></div>
@@ -812,9 +848,6 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
         <span><span class="dot" style="background:var(--warn)"></span>⚠ Chuvisco / possível</span>
         <span><span class="dot" style="background:var(--serious)"></span>🌧 Chuva</span>
         <span><span class="dot" style="background:var(--crit)"></span>⛈ Forte / trovoada</span>
-        <label style="margin-left:auto;display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--ink2);cursor:pointer">
-          <input type="checkbox" id="rt-radar-toggle" style="accent-color:var(--accent)"> radar ao vivo
-        </label>
       </div>
       <p class="map-note">A cor de cada troço mostra o tempo previsto <b>à hora a que lá vais passar</b>, não o tempo de agora.</p>
     </div>
@@ -824,24 +857,12 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
     <div id="route-cameras"></div>
   </section>
 
-  <!-- ============ RADAR ============ -->
-  <section class="view" id="view-radar" role="tabpanel">
-    <div class="card map-card">
-      <div id="map-radar"></div>
-      <div class="radar-controls">
-        <button class="btn" id="radar-play" aria-label="Reproduzir animação">▶</button>
-        <input type="range" id="radar-slider" min="0" max="0" value="0" aria-label="Instante do radar">
-        <div class="radar-time" id="radar-time">—<span>radar de precipitação</span></div>
-      </div>
-      <p class="map-note">Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por <b>RainViewer</b>. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.</p>
-    </div>
-  </section>
 
   <footer>
     Dados gratuitos: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (previsões) ·
     <a href="https://project-osrm.org" target="_blank" rel="noopener">OSRM</a> &amp; <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> (rotas e pesquisa) ·
-    <a href="https://www.rainviewer.com" target="_blank" rel="noopener">RainViewer</a> (radar) · Mapas © CARTO<br>
-    Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa. 🏍️
+    Mapas © CARTO<br>
+    Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa. 🏍️
   </footer>
 </div>
 
@@ -874,7 +895,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
 "use strict";
 /* =====================================================================
    Levante — meteorologia e rota para motociclistas
-   Dados: Open-Meteo · OSRM · Nominatim/OSM · RainViewer · CARTO
+   Dados: Open-Meteo · OSRM · Nominatim/OSM · CARTO
    ===================================================================== */
 
 /* ---------------- CONFIG ---------------- */
@@ -890,8 +911,6 @@ const state = {
   theme:"dark",
   home:null, wx:null,
   route:null,            // {coords, cumDist, cumTime, samples, weather, dep, totalKm, totalSec}
-  maps:{ route:null, radar:null },
-  radar:{ frames:[], idx:0, playing:false, timer:null, layers:{}, host:"" },
   netFails:0,
 };
 window.__lev=state; // para depuração/testes
@@ -950,7 +969,6 @@ function setLang(l){
   $$("#lang-row .chip").forEach(c=>c.classList.toggle("sel",c.dataset.lang===l));
   if(state.wx) renderDashboard();
   if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); }
-  if(state.radar.frames.length) showRadarFrame(state.radar.idx);
   renderFavRow();
 }
 /* Atribuição obrigatória do plano gratuito do Geoapify. Tem de ser reposta a
@@ -970,7 +988,7 @@ function pintarAtribuicao(){
 function applyStaticI18n(){
   const map=[
     [".brand-sub","txt","meteorologia para motociclistas · grátis para começar"],
-    ["#tab-agora","txt2","🏍️ ","Agora"], ["#tab-rota","txt2","🗺️ ","Rota"], ["#tab-radar","txt2","🛰️ ","Radar"],
+    ["#tab-agora","txt2","🏍️ ","Agora"], ["#tab-rota","txt2","🗺️ ","Rota"],
     ["#loc-search","ph","Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)"],
     ["#btn-install","txt","📲 Instalar"],
     ["#sentinel-card h2","txt","🔔 Sentinela meteorológica"],
@@ -1024,12 +1042,9 @@ function applyStaticI18n(){
   const lg=$$("#view-rota .legend span");
   const legendTxt=["✔ Seco","⚠ Chuvisco / possível","🌧 Chuva","⛈ Forte / trovoada"];
   lg.forEach((s,i)=>{ if(i<4&&s.childNodes.length>1) s.childNodes[1].textContent=t(legendTxt[i]); });
-  const radarLbl=$("#view-rota .legend label");
-  if(radarLbl&&radarLbl.childNodes.length>1) radarLbl.childNodes[1].textContent=" "+t("radar ao vivo");
   const notes=$$(".map-note");
   if(notes[0]){ notes[0].textContent=""; notes[0].append(document.createTextNode(t("A cor de cada troço mostra o tempo previsto ")),
     el("b",null,t("à hora a que lá vais passar")), document.createTextNode(t(", não o tempo de agora."))); }
-  if(notes[1]) notes[1].textContent=t("Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.");
   // definições
   const pop=$("#settings-pop");
   if(pop){
@@ -1051,8 +1066,8 @@ function applyStaticI18n(){
   if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
   const ft=$("footer");
   if(ft){ ft.textContent="";
-    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM & OpenStreetMap · RainViewer · CARTO — "));
-    ft.append(document.createTextNode(t("Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️ "));
+    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM & OpenStreetMap · CARTO — "));
+    ft.append(document.createTextNode(t("Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️ "));
     const mkLink=(href,txt)=>{ const a=document.createElement("a"); a.href=href; a.target="_blank";
       a.rel="noopener"; a.textContent=t(txt); return a; };
     const nav=el("div","foot-links");
@@ -1067,7 +1082,7 @@ function applyStaticI18n(){
 const I18N={pt:{},
 en:{
 "meteorologia para motociclistas · grátis para começar":"weather for motorcyclists · free to start",
-"Agora":"Now","Rota":"Route","Radar":"Radar",
+"Agora":"Now","Rota":"Route",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Search city or address… (e.g. London, Lisbon)",
 "📲 Instalar":"📲 Install","🔔 Sentinela meteorológica":"🔔 Weather sentinel",
 "✨ Assistente de viagem":"✨ Trip assistant",
@@ -1078,10 +1093,10 @@ en:{
 "Origem":"From","Destino":"To","Hora de partida":"Departure time","Planear trajeto":"Plan a trip",
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"See exactly where along the way it will rain — and the best time to leave.",
 "Paragens no caminho":"Stops on the way","até 4":"up to 4","fico 0 min":"stay 0 min","fico 1 h":"stay 1 h","fico {n} min":"stay {n} min",
-"✔ Seco":"✔ Dry","⚠ Chuvisco / possível":"⚠ Drizzle / possible","🌧 Chuva":"🌧 Rain","⛈ Forte / trovoada":"⛈ Heavy / storm","radar ao vivo":"live radar",
+"✔ Seco":"✔ Dry","⚠ Chuvisco / possível":"⚠ Drizzle / possible","🌧 Chuva":"🌧 Rain","⛈ Forte / trovoada":"⛈ Heavy / storm",
 "A cor de cada troço mostra o tempo previsto ":"Each segment's colour shows the forecast ",
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
-"Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.":"Real radar (last 2 h) + nowcast (next 30 min) by RainViewer. Blue = light rain · green/yellow = moderate · red = heavy.",
+
 "Perfil de decisão":"Decision profile","Conservador":"Cautious","Equilibrado":"Balanced","Tolerante":"Tolerant",
 "Qualquer risco relevante já pesa na decisão.":"Any relevant risk already counts against riding.",
 "Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Warnings for drizzle/moderate wind; red only in bad conditions.",
@@ -1090,7 +1105,7 @@ en:{
 "Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. Turn it on and I'll watch the weather where you are, minute by minute, and alert you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.",
 "Ligar":"Turn on","🛑 Desligar":"🛑 Turn off","🛑 Terminar":"🛑 End",
 "Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"I can't reach the weather services. Check your connection and try again — or open the app in your browser.",
-"Dados gratuitos:":"Free data:","Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no keys, no costs. Ride smart: on a red warning, stay home.",
+"Dados gratuitos:":"Free data:",
 "Céu limpo":"Clear sky","Quase limpo":"Mostly clear","Parcialmente nublado":"Partly cloudy","Encoberto":"Overcast",
 "Nevoeiro":"Fog","Nevoeiro com sincelo":"Freezing fog","Chuvisco fraco":"Light drizzle","Chuvisco":"Drizzle","Chuvisco intenso":"Heavy drizzle",
 "Chuvisco gelado":"Freezing drizzle","Chuvisco gelado forte":"Heavy freezing drizzle","Chuva fraca":"Light rain","Chuva":"Rain","Chuva forte":"Heavy rain",
@@ -1135,7 +1150,7 @@ en:{
 "paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
 "pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
 "vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
-"radar fixo":"fixed camera","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"The law differs by country. In France I show wide danger zones instead of the exact point. In Switzerland I show nothing, because there the law also punishes whoever offers the warning. In Germany the choice is yours, just below.","Mostrar radares na Alemanha":"Show speed cameras in Germany","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"In Germany it is the rider who is fined for using speed camera warnings while riding, not whoever publishes the app. The decision is yours. It ships switched off.","Radares ligados na Alemanha — por tua conta e risco.":"Speed cameras on in Germany — at your own risk.","Radares desligados na Alemanha.":"Speed cameras off in Germany.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"Swiss law bans any warning about speed checks — and punishes whoever offers it, not only whoever uses it. So I show nothing there.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"In Germany it is the rider who is fined for using speed camera warnings while riding — not whoever publishes the app. The decision is yours.","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"I only show speed cameras in countries whose law I went and read, one by one. This one I did not — and since there are countries where the app itself is punished, I would rather show nothing than take the risk.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"I found one place. Tap it and I will plot the route and the weather along the way.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"I found {n} places. Tap the one you want and I will plot the route.","🏠 A minha casa":"🏠 My home","radar fixo":"fixed camera","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"The law differs by country. In France I show wide danger zones instead of the exact point. In Switzerland I show nothing, because there the law also punishes whoever offers the warning. In Germany the choice is yours, just below.","Mostrar radares na Alemanha":"Show speed cameras in Germany","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"In Germany it is the rider who is fined for using speed camera warnings while riding, not whoever publishes the app. The decision is yours. It ships switched off.","Radares ligados na Alemanha — por tua conta e risco.":"Speed cameras on in Germany — at your own risk.","Radares desligados na Alemanha.":"Speed cameras off in Germany.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"Swiss law bans any warning about speed checks — and punishes whoever offers it, not only whoever uses it. So I show nothing there.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"In Germany it is the rider who is fined for using speed camera warnings while riding — not whoever publishes the app. The decision is yours.","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
 "maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
 "Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
 "O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
@@ -1148,7 +1163,7 @@ en:{
 "Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉":"No segments with rain or dangerous wind at this departure time. 🎉",
 "Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Route segments needing attention, at the time you'll pass them.",
 "a identificar a zona…":"identifying the area…","perto de {p}":"near {p}","vento lateral":"crosswind","abranda e segura bem o guiador":"slow down and hold firm",
-"📸 Radares de velocidade no trajeto":"📸 Speed cameras on the route",
+"📸 Radares conhecidos no trajeto":"📸 Known speed cameras on the route",
 "Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"Couldn't fetch cameras right now — try recalculating shortly.",
 "A procurar radares fixos ao longo do caminho…":"Looking for fixed cameras along the way…",
 "Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"No known fixed cameras on this route (OpenStreetMap data). Mobile ones don't show — behave! 😉",
@@ -1210,7 +1225,6 @@ en:{
 "Radar de velocidade dentro de {x}.":"Speed camera in {x}.","1 quilómetro":"one kilometre","400 metros":"400 metres","Limite {v}.":"Limit {v}.",
 "🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movement detected — Trip mode turned on.",
 "🏍️ Levante — em viagem":"🏍️ Levante — on the road",
-"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"On · {p} · last check {h} — {s} Current gusts: {g} km/h. Keep the app open to receive alerts.",
 "🌧️ A chover agora — deve parar ~{h}.":"🌧️ Raining now — should stop ~{h}.",
 "🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Raining now, no break in sight for ~2 h.",
 "☁️ Chuva a caminho: ~{h}.":"☁️ Rain on the way: ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ No rain in sight for the next 2 hours.",
@@ -1220,8 +1234,19 @@ en:{
 "O vento subiu: rajadas de {g} quilómetros por hora.":"Wind is up: gusts of {g} kilometres per hour.",
 "Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"On, but no position — enable GPS or search your city.",
 "Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"On — last check failed, retrying in ~2 min.",
-"Sentinela desligada.":"Sentinel off.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinel on — checking your area every ~2 minutes.",
-"radar real":"live radar","previsão imediata":"nowcast","Radar sem dados de momento.":"No radar data right now.","Não consegui carregar o radar.":"Couldn't load the radar.",
+"Sentinela desligada.":"Sentinel off.",
+"🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 This browser cannot speak: directions come as text and vibration, with no sound.",
+"📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 This device gives no GPS access: type your town so I know where you are.",
+"🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ The last route's map came out incomplete ({d} of {t} pieces): with no signal you will hit gaps. Recalculate the route online to finish it.",
+"🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ The map came out incomplete ({d} of {t} pieces) — see settings.",
+"Versão {v}":"Version {v}",
+"🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 This device has no voice installed: directions come as text and vibration, with no sound.",
+"🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ There is no {n} voice on this phone — I speak English. You can install the voice in your system settings.",
+"O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.":"Your phone suspended the app and I went {m} min without checking — I couldn't warn you in that time. Checking now.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.":"On · {p} · last check {h} — {s} Current gusts: {g} km/h. I only watch while the app is open and on screen: minimise it or turn the screen off and your phone suspends me.",
+"A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"The sentinel was switched off when the page reloaded — this device gives no access to your location. Tap to turn it back on.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Sentinel active — it stayed on since your last visit.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinel on — checking your area every ~2 minutes.",
+
 "Previsão para {p}":"Forecast for {p}","Localização: {p}":"Location: {p}","Origem: {p}":"From: {p}",
 "A obter a tua posição… 📡":"Getting your position… 📡","O teu browser não suporta GPS — pesquisa a cidade.":"Your browser has no GPS — search the city.",
 "Sem acesso ao GPS — escreve a origem.":"No GPS access — type the origin.","Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"No GPS access — using {p}. Search your city above.",
@@ -1236,7 +1261,7 @@ en:{
 "Rota demasiado curta.":"Route too short.","Algo correu mal. Tenta novamente.":"Something went wrong. Try again.","A calcular…":"Calculating…",
 "Sem resultados — tenta \"cidade, país\"":"No results — try \"city, country\"","coordenadas":"coordinates",
 "Trajeto {x} aplicado 🗺️":"Route {x} applied 🗺️","Perfil: {p} ✔":"Profile: {p} ✔","Mapa indisponível — precisa de ligação à internet.":"Map unavailable — internet connection needed.",
-"Radar indisponível sem internet.":"Radar unavailable offline.","Radar indisponível de momento.":"Radar unavailable right now.",
+
 "Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 On iPhone: Share button → “Add to Home Screen” to install the app.",
 "Calcula primeiro uma rota.":"Calculate a route first.","Este dispositivo não dá acesso ao GPS.":"This device doesn't provide GPS access.",
@@ -1244,7 +1269,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
-"meteorologia para motociclistas · grátis para começar":"meteorología para motociclistas · gratis para empezar","Agora":"Ahora","Rota":"Ruta","Radar":"Radar",
+"meteorologia para motociclistas · grátis para começar":"meteorología para motociclistas · gratis para empezar","Agora":"Ahora","Rota":"Ruta",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Buscar ciudad o dirección… (ej.: Madrid, Lisboa)",
 "📲 Instalar":"📲 Instalar","🔔 Sentinela meteorológica":"🔔 Centinela meteorológico","✨ Assistente de viagem":"✨ Asistente de viaje",
 "Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Dime a dónde vas: encuentro el sitio más cercano, trazo la ruta y te digo si ir en moto, esperar, usar otro transporte y qué ponerte.",
@@ -1253,9 +1278,9 @@ es:{
 "📍 Ponto de partida":"📍 Punto de partida","🏁 Para onde vais?":"🏁 ¿A dónde vas?","Origem":"Origen","Destino":"Destino","Hora de partida":"Hora de salida","Planear trajeto":"Planificar ruta",
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Ve exactamente en qué tramos lloverá — y la mejor hora para salir.",
 "Paragens no caminho":"Paradas en el camino","até 4":"hasta 4","fico 0 min":"paro 0 min","fico 1 h":"paro 1 h","fico {n} min":"paro {n} min",
-"✔ Seco":"✔ Seco","⚠ Chuvisco / possível":"⚠ Llovizna / posible","🌧 Chuva":"🌧 Lluvia","⛈ Forte / trovoada":"⛈ Fuerte / tormenta","radar ao vivo":"radar en vivo",
+"✔ Seco":"✔ Seco","⚠ Chuvisco / possível":"⚠ Llovizna / posible","🌧 Chuva":"🌧 Lluvia","⛈ Forte / trovoada":"⛈ Fuerte / tormenta",
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
-"Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.":"Radar real (últimas 2 h) + previsión inmediata (30 min), por RainViewer. Azul = lluvia débil · verde/amarillo = moderada · rojo = fuerte.",
+
 "Perfil de decisão":"Perfil de decisión","Conservador":"Prudente","Equilibrado":"Equilibrado","Tolerante":"Tolerante",
 "Qualquer risco relevante já pesa na decisão.":"Cualquier riesgo relevante ya pesa en la decisión.",
 "Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Avisos con llovizna/viento moderado; rojo solo con malas condiciones.",
@@ -1264,7 +1289,7 @@ es:{
 "Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Apagado. Actívalo y vigilo el tiempo donde estés, minuto a minuto, avisándote con voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.",
 "Ligar":"Activar","🛑 Desligar":"🛑 Apagar","🛑 Terminar":"🛑 Terminar",
 "Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"No consigo contactar los servicios meteorológicos. Revisa la conexión e inténtalo de nuevo.",
-"Dados gratuitos:":"Datos gratuitos:","Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas, sin claves, sin costes. Conduce con cabeza: con aviso rojo, quédate en casa.",
+"Dados gratuitos:":"Datos gratuitos:",
 "Céu limpo":"Cielo despejado","Quase limpo":"Casi despejado","Parcialmente nublado":"Parcialmente nublado","Encoberto":"Cubierto","Nevoeiro":"Niebla","Nevoeiro com sincelo":"Niebla helada",
 "Chuvisco fraco":"Llovizna débil","Chuvisco":"Llovizna","Chuvisco intenso":"Llovizna intensa","Chuvisco gelado":"Llovizna helada","Chuvisco gelado forte":"Llovizna helada fuerte",
 "Chuva fraca":"Lluvia débil","Chuva":"Lluvia","Chuva forte":"Lluvia fuerte","Chuva gelada":"Lluvia helada","Chuva gelada forte":"Lluvia helada fuerte",
@@ -1306,7 +1331,7 @@ es:{
 "paragem":"parada","paragens":"paradas","em andamento":"en marcha","partida":"salida","chegada":"llegada","por":"por",
 "pico {n} mm/h":"pico {n} mm/h","mínima no percurso {t}°":"mínima en ruta {t}°","rajadas até {g} km/h · vento {d}":"rachas hasta {g} km/h · viento {d}",
 "vento lateral até ~{g} km/h":"viento lateral hasta ~{g} km/h","perto do km {k}":"cerca del km {k}","sobe até ~{m} m":"sube hasta ~{m} m",
-"radar fixo":"radar fijo","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La ley cambia según el país. En Francia muestro zonas de peligro amplias en lugar del punto exacto. En Suiza no muestro nada, porque allí la ley también castiga a quien ofrece el aviso. En Alemania la elección es tuya, aquí abajo.","Mostrar radares na Alemanha":"Mostrar radares en Alemania","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce, no a quien publica la app. La decisión es tuya. Viene desactivado.","Radares ligados na Alemanha — por tua conta e risco.":"Radares activados en Alemania — bajo tu responsabilidad.","Radares desligados na Alemanha.":"Radares desactivados en Alemania.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La ley suiza prohíbe cualquier aviso sobre controles de velocidad — y castiga también a quien lo ofrece, no solo a quien lo usa. Por eso no muestro nada.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce — no a quien publica la app. La decisión es tuya.","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Solo muestro radares en los países cuya ley fui a leer, uno a uno. En este no lo hice — y como hay países donde se castiga a la propia app, prefiero no mostrar nada a arriesgarme.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"He encontrado un sitio. Tócalo y trazo la ruta y el tiempo por el camino.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"He encontrado {n} sitios. Toca el que quieras y trazo la ruta.","🏠 A minha casa":"🏠 Mi casa","radar fixo":"radar fijo","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La ley cambia según el país. En Francia muestro zonas de peligro amplias en lugar del punto exacto. En Suiza no muestro nada, porque allí la ley también castiga a quien ofrece el aviso. En Alemania la elección es tuya, aquí abajo.","Mostrar radares na Alemanha":"Mostrar radares en Alemania","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce, no a quien publica la app. La decisión es tuya. Viene desactivado.","Radares ligados na Alemanha — por tua conta e risco.":"Radares activados en Alemania — bajo tu responsabilidad.","Radares desligados na Alemanha.":"Radares desactivados en Alemania.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La ley suiza prohíbe cualquier aviso sobre controles de velocidad — y castiga también a quien lo ofrece, no solo a quien lo usa. Por eso no muestro nada.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce — no a quien publica la app. La decisión es tuya.","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
 "maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
 "Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
@@ -1318,7 +1343,7 @@ es:{
 "Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉":"Ningún tramo con lluvia o viento peligroso a esta hora. 🎉",
 "Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Tramos que requieren atención, a la hora en que pasarás.",
 "a identificar a zona…":"identificando la zona…","perto de {p}":"cerca de {p}","vento lateral":"viento lateral","abranda e segura bem o guiador":"reduce y sujeta firme el manillar",
-"📸 Radares de velocidade no trajeto":"📸 Radares de velocidad en la ruta",
+"📸 Radares conhecidos no trajeto":"📸 Radares conocidos en la ruta",
 "Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"No pude consultar los radares — recalcula en un momento.",
 "A procurar radares fixos ao longo do caminho…":"Buscando radares fijos por el camino…",
 "Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Ningún radar fijo conocido en esta ruta (datos OpenStreetMap). Los móviles no aparecen — ¡juicio! 😉",
@@ -1371,7 +1396,6 @@ es:{
 "⚠️ Possível chuvisco dentro de {d} km":"⚠️ Posible llovizna en {d} km","✅ Caminho seco daqui até ao destino":"✅ Camino seco hasta el destino",
 "Radar de velocidade dentro de {x}.":"Radar de velocidad en {x}.","1 quilómetro":"un kilómetro","400 metros":"400 metros","Limite {v}.":"Límite {v}.",
 "🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Movimiento detectado — Modo Viaje activado.","🏍️ Levante — em viagem":"🏍️ Levante — en ruta",
-"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"Activado · {p} · última comprobación {h} — {s} Rachas actuales: {g} km/h. Mantén la app abierta.",
 "🌧️ A chover agora — deve parar ~{h}.":"🌧️ Lloviendo ahora — debería parar ~{h}.","🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Lloviendo ahora, sin pausa a la vista en ~2 h.",
 "☁️ Chuva a caminho: ~{h}.":"☁️ Lluvia en camino: ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ Sin lluvia a la vista en 2 horas.",
 "Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Tormenta prevista hacia las {h}. Si la moto está fuera, guárdala.",
@@ -1380,8 +1404,19 @@ es:{
 "O vento subiu: rajadas de {g} quilómetros por hora.":"El viento subió: rachas de {g} kilómetros por hora.",
 "Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Activado, pero sin posición — activa el GPS o busca tu ciudad.",
 "Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Activado — falló la última comprobación, reintento en ~2 min.",
-"Sentinela desligada.":"Centinela apagado.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Centinela activado — vigilo tu zona cada ~2 minutos.",
-"radar real":"radar real","previsão imediata":"previsión inmediata","Radar sem dados de momento.":"Radar sin datos ahora.","Não consegui carregar o radar.":"No pude cargar el radar.",
+"Sentinela desligada.":"Centinela apagado.",
+"🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Este navegador no habla: las indicaciones van por escrito y vibración, sin sonido.",
+"📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 Este dispositivo no da acceso al GPS: escribe tu ciudad para que sepa dónde estás.",
+"🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ El mapa de la última ruta quedó incompleto ({d} de {t} piezas): sin cobertura encontrarás huecos. Vuelve a calcular la ruta con internet para completarlo.",
+"🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ El mapa quedó incompleto ({d} de {t} piezas) — mira los ajustes.",
+"Versão {v}":"Versión {v}",
+"🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 Este dispositivo no tiene ninguna voz instalada: las indicaciones van por escrito y vibración, sin sonido.",
+"🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ No hay voz {n} en este teléfono — hablo en inglés. Puedes instalarla en los ajustes del sistema.",
+"O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.":"El teléfono suspendió la app y estuve {m} min sin comprobar — no pude avisarte en ese tiempo. Comprobando ahora.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.":"Activo · {p} · última comprobación {h} — {s} Rachas actuales: {g} km/h. Solo vigilo con la app abierta y en pantalla: si la minimizas o apagas la pantalla, el teléfono me suspende.",
+"A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"El centinela se apagó al recargar la página — este dispositivo no da acceso a tu ubicación. Toca para volver a activarlo.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Centinela activo — siguió encendido desde tu última visita.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Centinela activado — vigilo tu zona cada ~2 minutos.",
+
 "Previsão para {p}":"Previsión para {p}","Localização: {p}":"Ubicación: {p}","Origem: {p}":"Origen: {p}","A obter a tua posição… 📡":"Obteniendo tu posición… 📡",
 "O teu browser não suporta GPS — pesquisa a cidade.":"Tu navegador no soporta GPS — busca la ciudad.","Sem acesso ao GPS — escreve a origem.":"Sin acceso al GPS — escribe el origen.",
 "Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"Sin GPS — usando {p}. Busca tu ciudad arriba.","Máximo de 4 paragens.":"Máximo 4 paradas.",
@@ -1393,14 +1428,14 @@ es:{
 "Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"No encontré ruta por carretera entre estos puntos.",
 "Rota demasiado curta.":"Ruta demasiado corta.","Algo correu mal. Tenta novamente.":"Algo salió mal. Inténtalo de nuevo.","A calcular…":"Calculando…",
 "Sem resultados — tenta \"cidade, país\"":"Sin resultados — prueba \"ciudad, país\"","coordenadas":"coordenadas","Trajeto {x} aplicado 🗺️":"Ruta {x} aplicada 🗺️","Perfil: {p} ✔":"Perfil: {p} ✔",
-"Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.","Radar indisponível sem internet.":"Radar no disponible sin internet.","Radar indisponível de momento.":"Radar no disponible ahora.",
+"Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 En iPhone: botón Compartir → “Añadir a pantalla de inicio”.",
 "Calcula primeiro uma rota.":"Calcula primero una ruta.","Este dispositivo não dá acesso ao GPS.":"Este dispositivo no da acceso al GPS.",
 "Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"No pude obtener la previsión. Revisa la conexión.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
-"meteorologia para motociclistas · grátis para começar":"météo pour motards · gratuit pour commencer","Agora":"Maintenant","Rota":"Itinéraire","Radar":"Radar",
+"meteorologia para motociclistas · grátis para começar":"météo pour motards · gratuit pour commencer","Agora":"Maintenant","Rota":"Itinéraire",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Rechercher une ville ou adresse… (ex. Paris, Lyon)",
 "📲 Instalar":"📲 Installer","🔔 Sentinela meteorológica":"🔔 Sentinelle météo","✨ Assistente de viagem":"✨ Assistant de trajet",
 "Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Dis-moi où tu vas — je trouve le lieu le plus proche, trace l'itinéraire et te dis s'il faut rouler, attendre, changer de transport et quoi porter.",
@@ -1409,9 +1444,9 @@ fr:{
 "📍 Ponto de partida":"📍 Point de départ","🏁 Para onde vais?":"🏁 Où vas-tu ?","Origem":"Départ","Destino":"Arrivée","Hora de partida":"Heure de départ","Planear trajeto":"Planifier un trajet",
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Vois exactement sur quels tronçons il pleuvra — et la meilleure heure pour partir.",
 "Paragens no caminho":"Arrêts en chemin","até 4":"jusqu'à 4","fico 0 min":"pause 0 min","fico 1 h":"pause 1 h","fico {n} min":"pause {n} min",
-"✔ Seco":"✔ Sec","⚠ Chuvisco / possível":"⚠ Bruine / possible","🌧 Chuva":"🌧 Pluie","⛈ Forte / trovoada":"⛈ Forte / orage","radar ao vivo":"radar en direct",
+"✔ Seco":"✔ Sec","⚠ Chuvisco / possível":"⚠ Bruine / possible","🌧 Chuva":"🌧 Pluie","⛈ Forte / trovoada":"⛈ Forte / orage",
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
-"Radar real (últimas 2 h) + previsão imediata (próximos 30 min), por RainViewer. Azul = chuva fraca · verde/amarelo = moderada · vermelho = forte.":"Radar réel (2 h) + prévision immédiate (30 min), par RainViewer. Bleu = pluie faible · vert/jaune = modérée · rouge = forte.",
+
 "Perfil de decisão":"Profil de décision","Conservador":"Prudent","Equilibrado":"Équilibré","Tolerante":"Tolérant",
 "Qualquer risco relevante já pesa na decisão.":"Tout risque pertinent pèse déjà dans la décision.",
 "Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Alertes dès bruine/vent modéré ; rouge seulement par mauvaises conditions.",
@@ -1420,7 +1455,7 @@ fr:{
 "Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Active-la et je surveille la météo où tu es, minute par minute, avec alertes voix, vibration et notification quand la pluie arrive (ou s'arrête), le vent monte ou l'orage approche.",
 "Ligar":"Activer","🛑 Desligar":"🛑 Désactiver","🛑 Terminar":"🛑 Terminer",
 "Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"Impossible de joindre les services météo. Vérifie ta connexion et réessaie.",
-"Dados gratuitos:":"Données gratuites :","Sem contas, sem chaves, sem custos. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans comptes, sans clés, sans frais. Roule malin : en cas d'alerte rouge, reste chez toi.",
+"Dados gratuitos:":"Données gratuites :",
 "Céu limpo":"Ciel dégagé","Quase limpo":"Presque dégagé","Parcialmente nublado":"Partiellement nuageux","Encoberto":"Couvert","Nevoeiro":"Brouillard","Nevoeiro com sincelo":"Brouillard givrant",
 "Chuvisco fraco":"Bruine légère","Chuvisco":"Bruine","Chuvisco intenso":"Bruine forte","Chuvisco gelado":"Bruine verglaçante","Chuvisco gelado forte":"Bruine verglaçante forte",
 "Chuva fraca":"Pluie faible","Chuva":"Pluie","Chuva forte":"Pluie forte","Chuva gelada":"Pluie verglaçante","Chuva gelada forte":"Pluie verglaçante forte",
@@ -1462,7 +1497,7 @@ fr:{
 "paragem":"arrêt","paragens":"arrêts","em andamento":"en roulant","partida":"départ","chegada":"arrivée","por":"via",
 "pico {n} mm/h":"pic {n} mm/h","mínima no percurso {t}°":"minimale du trajet {t}°","rajadas até {g} km/h · vento {d}":"rafales jusqu'à {g} km/h · vent {d}",
 "vento lateral até ~{g} km/h":"vent latéral jusqu'à ~{g} km/h","perto do km {k}":"vers le km {k}","sobe até ~{m} m":"monte à ~{m} m",
-"radar fixo":"radar fixe","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La loi varie selon le pays. En France, j'affiche de larges zones de danger au lieu du point exact. En Suisse, je n'affiche rien : la loi y punit aussi celui qui propose l'avertissement. En Allemagne, le choix est le tien, juste en dessous.","Mostrar radares na Alemanha":"Afficher les radars en Allemagne","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant, pas celui qui publie l'application. La décision t'appartient. Désactivé par défaut.","Radares ligados na Alemanha — por tua conta e risco.":"Radars activés en Allemagne — à tes risques.","Radares desligados na Alemanha.":"Radars désactivés en Allemagne.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La loi suisse interdit tout avertissement sur les contrôles de vitesse — et punit aussi celui qui le propose, pas seulement celui qui l'utilise. Je n'affiche donc rien.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant — pas celui qui publie l'application. La décision t'appartient.","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Je n'affiche les radars que dans les pays dont je suis allé lire la loi, un par un. Pas celui-ci — et comme il existe des pays où c'est l'application elle-même qui est punie, je préfère ne rien afficher que prendre le risque.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"J'ai trouvé un lieu. Touche-le et je trace le trajet et la météo en chemin.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"J'ai trouvé {n} lieux. Touche celui que tu veux et je trace le trajet.","🏠 A minha casa":"🏠 Chez moi","radar fixo":"radar fixe","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La loi varie selon le pays. En France, j'affiche de larges zones de danger au lieu du point exact. En Suisse, je n'affiche rien : la loi y punit aussi celui qui propose l'avertissement. En Allemagne, le choix est le tien, juste en dessous.","Mostrar radares na Alemanha":"Afficher les radars en Allemagne","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant, pas celui qui publie l'application. La décision t'appartient. Désactivé par défaut.","Radares ligados na Alemanha — por tua conta e risco.":"Radars activés en Allemagne — à tes risques.","Radares desligados na Alemanha.":"Radars désactivés en Allemagne.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La loi suisse interdit tout avertissement sur les contrôles de vitesse — et punit aussi celui qui le propose, pas seulement celui qui l'utilise. Je n'affiche donc rien.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant — pas celui qui publie l'application. La décision t'appartient.","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
 "maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
 "Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
@@ -1474,7 +1509,7 @@ fr:{
 "Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉":"Aucun tronçon avec pluie ou vent dangereux à cette heure. 🎉",
 "Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Tronçons à surveiller, à l'heure où tu y passeras.",
 "a identificar a zona…":"identification de la zone…","perto de {p}":"près de {p}","vento lateral":"vent latéral","abranda e segura bem o guiador":"ralentis et tiens bien le guidon",
-"📸 Radares de velocidade no trajeto":"📸 Radars de vitesse sur le trajet",
+"📸 Radares conhecidos no trajeto":"📸 Radars connus sur le trajet",
 "Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"Impossible de consulter les radars — recalcule dans un instant.",
 "A procurar radares fixos ao longo do caminho…":"Recherche des radars fixes en chemin…",
 "Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Aucun radar fixe connu sur ce trajet (données OpenStreetMap). Les mobiles n'apparaissent pas — prudence ! 😉",
@@ -1527,7 +1562,6 @@ fr:{
 "⚠️ Possível chuvisco dentro de {d} km":"⚠️ Bruine possible dans {d} km","✅ Caminho seco daqui até ao destino":"✅ Sec jusqu'à destination",
 "Radar de velocidade dentro de {x}.":"Radar de vitesse dans {x}.","1 quilómetro":"un kilomètre","400 metros":"400 mètres","Limite {v}.":"Limite {v}.",
 "🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Mouvement détecté — Mode trajet activé.","🏍️ Levante — em viagem":"🏍️ Levante — en route",
-"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.":"Activée · {p} · dernier contrôle {h} — {s} Rafales actuelles : {g} km/h. Garde l'app ouverte.",
 "🌧️ A chover agora — deve parar ~{h}.":"🌧️ Il pleut — arrêt prévu ~{h}.","🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Il pleut, sans accalmie en vue pendant ~2 h.",
 "☁️ Chuva a caminho: ~{h}.":"☁️ Pluie en approche : ~{h}.","✅ Sem chuva à vista nas próximas 2 horas.":"✅ Pas de pluie en vue pendant 2 heures.",
 "Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Orage prévu vers {h}. Si ta moto est dehors, rentre-la.",
@@ -1536,8 +1570,19 @@ fr:{
 "O vento subiu: rajadas de {g} quilómetros por hora.":"Le vent monte : rafales de {g} kilomètres-heure.",
 "Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Activée, mais sans position — active le GPS ou cherche ta ville.",
 "Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Activée — dernier contrôle échoué, nouvel essai dans ~2 min.",
-"Sentinela desligada.":"Sentinelle désactivée.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinelle activée — je surveille ta zone toutes les ~2 minutes.",
-"radar real":"radar réel","previsão imediata":"prévision immédiate","Radar sem dados de momento.":"Pas de données radar pour l'instant.","Não consegui carregar o radar.":"Impossible de charger le radar.",
+"Sentinela desligada.":"Sentinelle désactivée.",
+"🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Ce navigateur ne parle pas : les indications passent par le texte et les vibrations, sans son.",
+"📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 Cet appareil ne donne pas accès au GPS : écris ta ville pour que je sache où tu es.",
+"🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ La carte du dernier trajet est restée incomplète ({d} sur {t} morceaux) : sans réseau tu trouveras des trous. Recalcule le trajet en ligne pour la compléter.",
+"🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ La carte est restée incomplète ({d} sur {t} morceaux) — voir les réglages.",
+"Versão {v}":"Version {v}",
+"🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 Cet appareil n'a aucune voix installée : les indications passent par le texte et les vibrations, sans son.",
+"🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ Il n'y a pas de voix {n} sur ce téléphone — je parle anglais. Tu peux l'installer dans les réglages du système.",
+"O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.":"Ton téléphone a suspendu l'app et je suis resté {m} min sans vérifier — je n'ai pas pu t'avertir. Je vérifie maintenant.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.":"Activée · {p} · dernière vérification {h} — {s} Rafales actuelles : {g} km/h. Je ne surveille que si l'app est ouverte et à l'écran : si tu la réduis ou éteins l'écran, le téléphone me suspend.",
+"A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"La sentinelle a été désactivée au rechargement de la page — cet appareil ne donne pas accès à ta position. Touche pour la réactiver.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Sentinelle active — elle est restée allumée depuis ta dernière visite.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinelle activée — je surveille ta zone toutes les ~2 minutes.",
+
 "Previsão para {p}":"Prévisions pour {p}","Localização: {p}":"Position : {p}","Origem: {p}":"Départ : {p}","A obter a tua posição… 📡":"Localisation en cours… 📡",
 "O teu browser não suporta GPS — pesquisa a cidade.":"Ton navigateur n'a pas de GPS — cherche la ville.","Sem acesso ao GPS — escreve a origem.":"Pas d'accès GPS — saisis le départ.",
 "Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"Pas de GPS — {p} utilisé. Cherche ta ville ci-dessus.","Máximo de 4 paragens.":"Maximum 4 arrêts.",
@@ -1549,7 +1594,7 @@ fr:{
 "Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"Pas d'itinéraire routier entre ces points.",
 "Rota demasiado curta.":"Trajet trop court.","Algo correu mal. Tenta novamente.":"Un problème est survenu. Réessaie.","A calcular…":"Calcul…",
 "Sem resultados — tenta \"cidade, país\"":"Aucun résultat — essaie « ville, pays »","coordenadas":"coordonnées","Trajeto {x} aplicado 🗺️":"Trajet {x} appliqué 🗺️","Perfil: {p} ✔":"Profil : {p} ✔",
-"Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.","Radar indisponível sem internet.":"Radar indisponible hors ligne.","Radar indisponível de momento.":"Radar indisponible pour l'instant.",
+"Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Sur iPhone : bouton Partager → « Sur l'écran d'accueil ».",
 "Calcula primeiro uma rota.":"Calcule d'abord un itinéraire.","Este dispositivo não dá acesso ao GPS.":"Cet appareil ne fournit pas de GPS.",
@@ -1622,7 +1667,7 @@ Object.assign(I18N.en,{
 
 
 "Dados:":"Data:",
-"Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no tracking: nothing you do leaves this phone. Ride smart: on a red warning, stay home.",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no sign-ups, no tracking. Your location and your destination are sent to the weather and routing services so they can answer you — and we keep none of it. Ride smart: on a red warning, stay home.",
 "Privacidade":"Privacy",
 "Termos de utilização":"Terms of use",
 
@@ -1714,7 +1759,7 @@ Object.assign(I18N.es,{
 
 
 "Dados:":"Datos:",
-"Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas ni registros: nada de lo que haces sale de este móvil. Conduce con cabeza: con aviso rojo, quédate en casa.",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas, sin registros, sin rastreo. Tu ubicación y tu destino se envían a los servicios de meteorología y de rutas para poder responderte — y no guardamos nada. Conduce con cabeza: con aviso rojo, quédate en casa.",
 "Privacidade":"Privacidad",
 "Termos de utilização":"Términos de uso",
 
@@ -1806,7 +1851,7 @@ Object.assign(I18N.fr,{
 
 
 "Dados:":"Données :",
-"Sem contas e sem registos: nada do que fazes sai deste telemóvel. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans compte ni traçage : rien de ce que tu fais ne quitte ce téléphone. Roule prudemment : en alerte rouge, reste à la maison.",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans comptes, sans inscription, sans pistage. Ta position et ta destination sont envoyées aux services météo et d'itinéraires pour pouvoir te répondre — et nous n'en gardons rien. Roule malin : en cas d'alerte rouge, reste chez toi.",
 "Privacidade":"Confidentialité",
 "Termos de utilização":"Conditions d'utilisation",
 
@@ -2056,7 +2101,6 @@ const SERVICOS={
   procura: {url:"https://photon.komoot.io/api/",                    via:"/v1/search",   fam:"texto",  ttl:0,        creditos:1},
   inversa: {url:"https://photon.komoot.io/reverse",                 via:"/v1/reverse",  fam:"morada", ttl:0,        creditos:1},
   inversa2:{url:"https://nominatim.openstreetmap.org/reverse",      via:"/v1/reverse",  fam:"morada", ttl:0,        creditos:1},
-  radar:   {url:"https://api.rainviewer.com/public/weather-maps.json", via:"/v1/radar", fam:"curto",  ttl:4*60000,  creditos:0},
 };
 function svc(nome){ const x=SERVICOS[nome]; return SERVICOS.proxy?SERVICOS.proxy+x.via:x.url; }
 function svcDe(url){
@@ -2279,10 +2323,93 @@ async function poiNear(cat,pos,radiusM=30000){
   return [];
 }
 
+/* Distância de edição com teto: só interessa saber se está a um ou dois erros,
+   não quanto. Sai cedo, por isso é barata mesmo com vinte favoritos. */
+function distEdicao(a,b,teto){
+  if(Math.abs(a.length-b.length)>teto) return teto+1;
+  let ant=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i]; let melhor=i;
+    for(let j=1;j<=b.length;j++){
+      const c=Math.min(ant[j]+1, cur[j-1]+1, ant[j-1]+(a[i-1]===b[j-1]?0:1));
+      cur[j]=c; if(c<melhor) melhor=c;
+    }
+    if(melhor>teto) return teto+1;
+    ant=cur;
+  }
+  return ant[b.length];
+}
+/* Quão bem é que este texto corresponde ao que foi escrito. Devolve 0 quando
+   não corresponde, e quanto maior melhor. */
+function pontuaTexto(campo,nq){
+  const n=normTxt(campo||""); if(!n||!nq) return 0;
+  if(n===nq) return 100;                                    // igual
+  if(n.startsWith(nq)) return 80;                           // "cas" → "casa"
+  if(n.includes(nq)) return 60;                             // no meio
+  for(const w of n.split(/\s+/)) if(w.startsWith(nq)) return 55;   // começo de palavra
+  /* erro de escrita: um erro até 5 letras, dois acima disso. Só se compara com
+     palavras de tamanho parecido, senão "casa" casava com "casamata". */
+  const teto=nq.length<=5?1:2;
+  for(const w of n.split(/\s+/))
+    if(Math.abs(w.length-nq.length)<=teto&&distEdicao(w,nq,teto)<=teto) return 40;
+  return 0;
+}
+/* OS SÍTIOS QUE JÁ SÃO TEUS, sem rede e sem créditos.
+
+   Isto corre antes de qualquer chamada à API e o resultado vai sempre à frente.
+   O erro que isto corrige: procurava-se por `f.name`, o nome do sítio, quando o
+   que a pessoa escreve é a ETIQUETA que lhe deu — "casa", não "Sint
+   Pieterstraat 12". Por isso agora procura-se nos dois, e o que se MOSTRA é a
+   etiqueta, que é o que ela reconhece. */
+const PALAVRAS_CASA={pt:["casa","minha casa","lar"], en:["home","my home","house"],
+                     es:["casa","mi casa","hogar"], fr:["maison","chez mim","domicile"]};
+/* TUDO por onde um favorito pode ser reconhecido, num sítio só.
+
+   O que isto fecha: a pesquisa procurava em `name`, o assistente em `label` e o
+   guarda da mota em `name` outra vez. Três caminhos a ler a mesma coisa de
+   três maneiras, nenhum deles a falhar — e por isso ninguém dava por nada.
+   Quem precisar de procurar num favorito chama isto e não escolhe campos. */
+function textoDoFav(f){ return [f&&f.label, f&&f.name, f&&f.sub].filter(Boolean).join(" "); }
+
+function locaisLocais(q){
+  const nq=normTxt(q); if(!nq) return [];
+  const out=[];
+  /* A CASA. Está em `state.home`, não nos favoritos — foi definida no separador
+     Agora e é a mesma que o guarda da mota usa. Nunca tinha sido procurada, e
+     era por isso que escrever "casa" não a encontrava. Não se pede ao
+     utilizador para a guardar de novo: procura-se onde ela já está. */
+  const casa=state.home;
+  if(casa&&isFinite(casa.lat)){
+    const alias=[...(PALAVRAS_CASA[state.lang]||PALAVRAS_CASA.pt), ...PALAVRAS_CASA.pt];
+    let pt=pontuaTexto(casa.name,nq)*0.9;
+    for(const a of alias) pt=Math.max(pt, pontuaTexto(a,nq));
+    if(pt>0) out.push({name:t("🏠 A minha casa"), sub:casa.name||"", lat:casa.lat, lon:casa.lon,
+                       _fav:true, _casa:true, _pt:pt+1200});
+  }
+  for(const f of getFavs()){
+    if(!isFinite(f.lat)) continue;
+    /* a etiqueta vale mais do que o nome do sítio (é o que a pessoa escreve),
+       mas nenhum dos dois é ignorado — ver textoDoFav */
+    const pt=Math.max(pontuaTexto(f.label,nq), pontuaTexto(f.name,nq)*0.9, pontuaTexto(f.sub,nq)*0.5);
+    if(pt>0) out.push({name:f.label||f.name, sub:f.name&&f.name!==f.label?f.name:(f.sub||t("⭐ guardado por ti")),
+                       lat:f.lat, lon:f.lon, _fav:true, _pt:pt+1000});
+  }
+  for(const r of getRecentes()){
+    if(!isFinite(r.lat)) continue;
+    const pt=Math.max(pontuaTexto(r.name,nq), pontuaTexto(r.sub,nq)*0.6);
+    if(pt>0) out.push({...r, sub:r.sub||t("🕘 pesquisaste isto há pouco"), _rec:true, _pt:pt+500});
+  }
+  const vistos=new Set();
+  return out.sort((a,b)=>b._pt-a._pt).filter(x=>{
+    const k=`${x.lat.toFixed(4)},${x.lon.toFixed(4)}`;
+    if(vistos.has(k)) return false; vistos.add(k); return true;
+  }).slice(0,6);
+}
+
 const geoCache=new Map();
 async function geocode(q){
   const key=q.trim().toLowerCase();
-  if(geoCache.has(key)) return geoCache.get(key);
+  if(geoCache.has(key)) return [...locaisLocais(q), ...geoCache.get(key)].slice(0,8);
   const m=q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;]\s*(-?\d{1,3}[.,]\d+)\s*$/);
   if(m){ const lat=parseFloat(m[1].replace(",",".")), lon=parseFloat(m[2].replace(",","."));
     return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:t("coordenadas"), lat, lon}]; }
@@ -2296,16 +2423,8 @@ async function geocode(q){
     if(seen.has(k)) continue; seen.add(k); out.push(r);
   }};
 
-  // 1) OS TEUS FAVORITOS primeiro — escreves "casa" e aparece a tua casa
-  const nq=normTxt(q);
-  const favs=getFavs().filter(f=>isFinite(f.lat)&&normTxt(f.name).includes(nq))
-    .map(f=>({...f, sub:f.sub||t("⭐ guardado por ti"), _fav:true}));
-  add(favs);
-
-  // 1b) SÍTIOS RECENTES — procurados aqui, no telemóvel, antes de gastar um
-  // crédito. Quem vai ao mesmo sítio todas as semanas nunca mais paga por ele.
-  add(getRecentes().filter(r=>normTxt(r.name).includes(nq)||normTxt(r.sub||"").includes(nq))
-      .map(r=>({...r, sub:r.sub||t("🕘 pesquisaste isto há pouco")})));
+  // 1) OS TEUS SÍTIOS primeiro — favoritos e recentes, sem rede e sem créditos
+  add(locaisLocais(q));
 
   // 2) categoria reconhecida → os mais PRÓXIMOS desse tipo (não por texto)
   const cat=here?detectPoiCat(q):null;
@@ -2321,16 +2440,20 @@ async function geocode(q){
       add(await photonSearch(words.slice(0,n).join(" "), here).catch(()=>[]));
   }
 
-  // 5) ordenar: favoritos > proximidade (um resultado a 1500 km não serve de nada)
-  if(here){
-    out.forEach((r,i)=>{
-      r._d=isFinite(r._d)?r._d:haversine(here,r);
-      r._score=(r._fav?-1e6:0)+(r._poi?-500:0)+i*8+Math.min(r._d,4000)*(r._d>120?3:1);
-    });
-    out.sort((a,b)=>a._score-b._score);
-  }
+  /* 5) ordenar. Os teus sítios ganham SEMPRE, e ganham antes de a rede
+     responder — um favorito nunca pode ficar atrás de um restaurante com nome
+     parecido. Entre os da rede, decide a proximidade: um resultado a 1500 km
+     não serve para nada a quem vai de mota. */
+  out.forEach((r,i)=>{
+    r._d=isFinite(r._d)?r._d:(here?haversine(here,r):0);
+    const meu=r._fav?-3e6:r._rec?-2e6:0;
+    r._score=meu-(r._pt||0)+(r._poi?-500:0)+i*8+(here?Math.min(r._d,4000)*(r._d>120?3:1):0);
+  });
+  out.sort((a,b)=>a._score-b._score);
   const res=out.slice(0,8);
-  if(res.length) geoCache.set(key,res);
+  /* a cache guarda só o que veio da rede: guardar os favoritos aqui faria com
+     que apagar ou renomear um deles continuasse a aparecer até recarregar */
+  if(res.length) geoCache.set(key,res.filter(r=>!r._fav&&!r._rec));
   return res;
 }
 
@@ -2540,10 +2663,14 @@ async function geocodeNear(q,pos,bounded){
 /* =====================================================================
    RADARES DE VELOCIDADE FIXOS — OpenStreetMap (Overpass, gratuito)
    ===================================================================== */
+/* NÃO voltar a pôr aqui o overpass.osm.ch. É um espelho só com dados da
+   Suíça: responde HTTP 200 com zero elementos a perguntas sobre o resto do
+   mundo — sucesso com ar de sucesso e sem nada lá dentro. Foi ele que deixou
+   o ficheiro de radares vazio nos Países Baixos, na Bélgica, em Portugal e em
+   Espanha, e ninguém deu por isso porque nada falhava. */
 const OVERPASS_EPS=[
   "https://overpass.kumi.systems/api/interpreter",
   "https://overpass-api.de/api/interpreter",
-  "https://overpass.osm.ch/api/interpreter",
 ];
 async function fetchCameras(coords){
   const step=Math.max(1,Math.floor(coords.length/110));
@@ -2620,26 +2747,46 @@ function paisEm(lat,lon,tolKm=40){
   }
   return melhorD<=tol?melhor:null;
 }
+/* Que países é que têm fronteira a menos de `km` deste ponto. Mede distância
+   a sério a cada anel — a versão anterior espreitava quatro pontos a norte,
+   sul, este e oeste, e uma fronteira na diagonal passava entre eles. Ficou
+   verde durante semanas porque o único caso testado (Suíça a norte de um
+   ponto alemão) calhava estar alinhado com uma das quatro direções. */
+function paisesPerto(lat,lon,km){
+  if(!paisesDados) return [];
+  const kx=Math.cos(lat*Math.PI/180), tol=(km/111.32)**2, folga=km/111.32+0.05;
+  const out=[];
+  for(const [cc,b,aneis] of paisesDados.paises){
+    if(lon<b[0]-folga||lon>b[2]+folga||lat<b[1]-folga||lat>b[3]+folga) continue;
+    let perto=false;
+    for(const a of aneis){
+      for(let i=0,j=a.length-2;i<a.length&&!perto;j=i,i+=2)
+        if(dist2Seg(lon,lat,a[j],a[j+1],a[i],a[i+1],kx)<=tol) perto=true;
+      if(perto) break;
+    }
+    if(perto) out.push(cc);
+  }
+  return out;
+}
 /* Junto a uma fronteira o traçado simplificado pode enganar-se em um ou dois
    quilómetros, e é exatamente aí que a lei muda. Por isso olha-se três
    quilómetros à volta — MAS a margem é assimétrica, e a razão importa:
 
-   · Onde o risco é NOSSO (Suíça, França), a margem ganha sempre. Na dúvida
-     sobre de que lado da fronteira estamos, esconde. A escolha do utilizador
-     não pode ligar aquilo que nos expõe a nós.
+   · Onde o risco é NOSSO (Suíça, França, e todo o país que ninguém analisou),
+     a margem ganha sempre. Na dúvida sobre de que lado da fronteira estamos,
+     esconde. A escolha do utilizador não pode ligar o que nos expõe a nós.
    · Onde o risco é do CONDUTOR (Alemanha), a margem NÃO se aplica. Se ele
      ligou o interruptor, vê radares — inclusive à beira da fronteira alemã.
      Escondê-los ali seria decidir por ele numa coisa que é dele.            */
 const SEVERIDADE={off:3, zones:2, on:1};
+const MARGEM_KM=3;
 function leiRadaresEm(lat,lon){
   const base=paisEm(lat,lon);
   let pior=camLawFor(base), piorCC=base;
-  const d=3/111.32;
-  for(const [dy,dx] of [[d,0],[-d,0],[0,d/Math.max(0.2,Math.cos(lat*Math.PI/180))],[0,-d/Math.max(0.2,Math.cos(lat*Math.PI/180))]]){
-    const cc=paisEm(lat+dy,lon+dx);
-    if(!cc||cc===base) continue;
-    const bruta=CAM_LAW[cc];
-    if(!bruta||bruta.risco!=="nosso") continue;      // a assimetria vive nesta linha
+  for(const cc of paisesPerto(lat,lon,MARGEM_KM)){
+    if(cc===base) continue;
+    const bruta=CAM_LAW[cc]||LEI_DESCONHECIDA;
+    if(bruta.risco!=="nosso") continue;              // a assimetria vive nesta linha
     const l=camLawFor(cc);
     if((SEVERIDADE[l.mode]||1)>(SEVERIDADE[pior.mode]||1)){ pior=l; piorCC=cc; }
   }
@@ -2647,18 +2794,10 @@ function leiRadaresEm(lat,lon){
 }
 
 /* =====================================================================
-   LEGALIDADE DOS AVISOS DE RADAR — muda de país para país.
-   Suíça e Áustria proíbem avisar o condutor (coimas pesadas e confisco).
-   França proíbe indicar o ponto exato, mas tolera "zonas de perigo".
-   Alemanha proíbe por lei, quase nunca aplica a apps: fica à tua escolha.
-   Em tudo o resto (BE, PT, NL, ES, IT, UK…) é legal e funciona normalmente.
-   A Bélgica NÃO entra na lista dos bloqueados — ver a nota abaixo.
+   LEGALIDADE DOS AVISOS DE RADAR — muda de país para país, e esta tabela é
+   uma LISTA BRANCA: quem não está nela não vê radares nenhuns.
    ===================================================================== */
-/* Nota importante: na Bélgica, nos Países Baixos, em Portugal, Espanha e Itália
-   mostrar radares FIXOS de uma base de dados é legal — o que a lei belga proíbe
-   (art. 62bis) são os detetores de radar, aparelhos que captam as emissões da
-   polícia. É por isso que o Waze, o Coyote e o Flitsmeister lá funcionam. */
-/* ═══ DUAS PERGUNTAS, SEMPRE, ANTES DE PÔR UM PAÍS NESTA TABELA ═══════════
+/* ═══ TRÊS REGRAS, SEMPRE, ANTES DE MEXER NESTA TABELA ════════════════════
 
    1. A lei proíbe o APARELHO DETETOR — o que capta as emissões do radar — ou
       proíbe a APP DE BASE DE DADOS, que só mostra localizações conhecidas?
@@ -2673,7 +2812,20 @@ function leiRadaresEm(lat,lon){
       Um interruptor não transfere risco nenhum quando a oferta é que é ilegal.
 
    O campo `risco` responde à segunda pergunta e é o que decide a regra de
-   fronteira mais abaixo.                                                     */
+   fronteira mais acima.
+
+   3. QUEM NÃO ESTÁ NESTA TABELA NÃO VÊ RADARES.
+      Isto é uma lista de países onde a lei foi lida, não uma lista de
+      exceções. Há cerca de 190 países e não vamos ler 190 leis. Se um país
+      não está aqui é porque ninguém verificou — e a Suíça ensinou-nos que
+      "ninguém verificou" pode querer dizer "a mera oferta é punível, com
+      multa até 10 000 CHF e confisco". Errar por defeito é o único erro
+      aceitável nesta funcionalidade.
+      O mesmo vale quando não se sabe em que país está o ponto: sem país,
+      sem radares. E vale para os vizinhos: se a três quilómetros houver um
+      país que não está aqui, esconde-se — não sabemos de que risco se trata.
+      Na prática não se perde quase nada, porque o ficheiro de radares só
+      cobre a Europa. O que muda é que passa a ser uma decisão.             */
 const CAM_LAW={
   /* Art. 98a SVG: proíbe qualquer forma de aviso público sobre controlos, e a
      própria oferta é punível — multas até 10 000 CHF e confisco. Risco nosso. */
@@ -2684,9 +2836,33 @@ const CAM_LAW={
   /* § 23 StVO: pune o condutor que usa o aviso em andamento. Quem publica não
      é penalizado — o Blitzer.de é alemão e está nas duas lojas. Escolha dele. */
   DE:{mode:"opt",  risco:"condutor", why:"Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua."},
-  /* A Áustria saiu desta tabela: lá as apps de base de dados são permitidas e
-     o que é proibido são os aparelhos detetores. Mesmo caso da Bélgica. */
+  /* ── permitidos: a lei foi lida um a um, e em todos ela separa o APARELHO
+        DETETOR (proibido) da APP DE BASE DE DADOS (permitida) ───────────── */
+  /* Art. 62bis: proíbe os detetores. O Coyote e o Flitsmeister são belgas. */
+  BE:{mode:"on", risco:"condutor", why:""},
+  /* O Flitsmeister é neerlandês, opera cá desde 2011 e é o caso de manual. */
+  NL:{mode:"on", risco:"condutor", why:""},
+  /* Detetores proibidos pelo Código da Estrada; bases de dados, não. */
+  PT:{mode:"on", risco:"condutor", why:""},
+  /* A própria DGT publica as coordenadas dos radares fixos. */
+  ES:{mode:"on", risco:"condutor", why:""},
+  /* Os autovelox têm de estar sinalizados por lei — a localização é pública. */
+  IT:{mode:"on", risco:"condutor", why:""},
+  /* § 98a StVO pune os aparelhos detetores. Duas fontes austríacas
+     independentes confirmam que as apps de base de dados são permitidas.
+     Quase a bloqueámos por engano — foi a Bélgica outra vez. */
+  AT:{mode:"on", risco:"condutor", why:""},
+  /* Art. 8bis da lei de 14/02/1955 pune quem vende, importa, detém ou usa
+     um DETETOR. O governo confirmou que o aviso das apps não é proibido.
+     Fica no meio do corredor Maastricht–Ardenas, por isso importa. */
+  LU:{mode:"on", risco:"condutor", why:""},
+  /* Legais e usados por toda a gente — o TomTom e o Waze mostram-nos. */
+  GB:{mode:"on", risco:"condutor", why:""},
 };
+/* Um país que não está na tabela acima. Não é "provavelmente legal": é
+   "ninguém leu a lei". A resposta é a mesma da Suíça, pela mesma razão. */
+const LEI_DESCONHECIDA={mode:"off", risco:"nosso",
+  why:"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar."};
 /* contornos aproximados — só usados quando não há rede para confirmar o país */
 const CC_POLY={
   BE:[[51.50,3.35],[51.38,4.23],[51.45,4.53],[51.30,4.77],[51.49,5.03],[51.19,5.24],[51.05,5.80],[50.75,6.02],[50.62,6.41],[50.32,6.35],[50.17,5.79],[49.79,5.75],[49.53,5.82],[49.61,5.45],[49.79,5.30],[50.10,4.83],[50.15,4.51],[49.96,4.14],[50.35,4.20],[50.50,3.66],[50.71,3.24],[50.78,2.87],[51.09,2.54],[51.37,3.19]],
@@ -2728,7 +2904,7 @@ const CAM_OPT="cam-restrito";
 function camOptOn(){ return store.get(CAM_OPT)===1; }
 function camLawFor(cc){
   const law=CAM_LAW[cc];
-  if(!law) return {mode:"on"};
+  if(!law) return LEI_DESCONHECIDA;                  // omissão: esconder
   if(law.mode==="opt") return camOptOn()?{mode:"on", risco:law.risco}:law;
   return law;
 }
@@ -2799,7 +2975,7 @@ function renderCameras(){
   if(!R||!box){ if(box) box.textContent=""; return; }
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,t("📸 Radares de velocidade no trajeto")));
+  card.appendChild(el("h2",null,t("📸 Radares conhecidos no trajeto")));
   if(R.camerasError){
     card.appendChild(el("p","h-sub",t("Não consegui consultar os radares agora — tenta recalcular daqui a pouco.")));
     box.appendChild(card); return;
@@ -2808,13 +2984,19 @@ function renderCameras(){
   // nota legal: em que países é que a lei nos obriga a calar
   const lawNote=()=>{
     const b=R.camBlocked||{};
-    const ccs=Object.keys(b).filter(cc=>CAM_LAW[cc]);
+    /* nada de filtrar pelos que estão na tabela: os países que NÃO estão são
+       precisamente os que precisam de explicação, e antes desta mudança eram
+       os únicos que ficavam sem nenhuma */
+    const ccs=Object.keys(b);
     if(!ccs.length) return null;
     const bx=el("div","law-note");
     bx.append(el("span",null,"⚖️"));
     const txt=el("div");
+    const ditos=new Set();
     ccs.forEach(cc=>{
-      const law=CAM_LAW[cc], n=b[cc];
+      const law=CAM_LAW[cc]||LEI_DESCONHECIDA, n=b[cc];
+      if(!law.why||ditos.has(law.why)) return;       // um país por razão, não por fronteira
+      ditos.add(law.why);
       const p=el("p",null,t(law.why)+(n>0?" "+t("({n} radares deste trajeto não são mostrados.)",{n}):""));
       txt.appendChild(p);
     });
@@ -2849,10 +3031,6 @@ function renderCameras(){
   if(R.cameras.length>14) card.appendChild(el("p","map-note",t("+{n} radares adicionais no mapa.",{n:R.cameras.length-14})));
   const ln=lawNote(); if(ln) card.appendChild(ln);
   box.appendChild(card);
-}
-
-async function rainviewerMeta(){
-  return jfetch(svc("radar"));
 }
 
 /* =====================================================================
@@ -2992,10 +3170,18 @@ function attachAC(input, list, onPick){
   const search=debounce(async ()=>{
     const q=input.value.trim();
     if(q.length<3){ close(); return; }
-    try{ items=await geocode(q); active=items.length?0:-1; render(); }
+    try{ const r=await geocode(q); if(input.value.trim()!==q) return; items=r; active=items.length?0:-1; render(); }
     catch(e){ items=[]; render(); }
   },350);
-  input.addEventListener("input",()=>{ input._picked=null; search(); });
+  input.addEventListener("input",()=>{
+    input._picked=null;
+    /* os teus sítios aparecem já, sem esperar pelos 350 ms nem pela rede. Isto
+       é o que faz a diferença entre "os favoritos funcionam" e "os favoritos
+       aparecem lá para o fim, quando já escolhi outra coisa". */
+    const q=input.value.trim();
+    if(q.length>=2){ const meus=locaisLocais(q); if(meus.length){ items=meus; active=0; render(); } }
+    search();
+  });
   input.addEventListener("keydown",(e)=>{
     if(!list.classList.contains("open")){ if(e.key==="ArrowDown") search(); return; }
     if(e.key==="ArrowDown"){ e.preventDefault(); active=Math.min(items.length-1,active+1); render(); }
@@ -3349,11 +3535,14 @@ function renderDaily(wx){
 /* =====================================================================
    ROTA — onde vai chover no caminho
    ===================================================================== */
-function cartoLayer(){
+/* Descrição da base do mapa, em termos do MapLibre. A densidade de pixels é
+   resolvida aqui e não no molde, porque o `{r}` é uma invenção do Leaflet. */
+function baseCarto(){
   const style=document.documentElement.dataset.theme==="dark"?"dark_all":"light_all";
-  return L.tileLayer(`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`,{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
-    subdomains:"abcd", maxZoom:19});
+  const r=(window.devicePixelRatio||1)>1.3?"@2x":"";
+  return { tiles:[`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}${r}.png`],
+    subdominios:"abcd", zoomMax:19,
+    atribuicao:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>' };
 }
 /* =====================================================================
    MAPA OFFLINE — guarda os tiles do corredor da rota para a viagem
@@ -3417,60 +3606,305 @@ function setOffline(off){
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   CAMADA FINA DE MAPA — a app fala com isto, isto fala com o motor.
+
+   Porque existe: a app toca no Leaflet em 32 sítios. Trocar o motor por
+   MapLibre com o código assim seria trinta e duas migrações ao mesmo tempo,
+   cada uma capaz de partir alguma coisa, e a suite só voltaria ao verde no
+   fim. Com esta camada no meio, a troca passa a ser um ficheiro.
+
+   A REGRA QUE DECIDE O DESENHO: isto está escrito em termos do MapLibre, não
+   do Leaflet, mesmo estando hoje implementado por cima do Leaflet. Se a
+   interface falasse de polilinhas e de [lat,lon], a segunda metade da migração
+   passava o tempo a lutar contra ela. Por isso:
+
+     · coordenadas em [lon, lat], como no GeoJSON e no MapLibre — nunca [lat,lon]
+     · geometria entra como FONTES GeoJSON com propriedades, não como objetos
+       desenháveis: quem quer trinta troços de cores diferentes manda UMA fonte
+       com trinta feições e uma cor por propriedade
+     · o rumo é em graus no sentido dos ponteiros, como o `bearing` do MapLibre
+       (o leaflet-rotate usa o sinal contrário; a conversão vive aqui dentro)
+     · repintar é `fonte()` outra vez com dados novos, nunca apagar e recriar
+
+   O que NÃO está aqui de propósito: nada de tiles raster. Saiu com o
+   RainViewer e não volta a entrar por acidente.
+   ══════════════════════════════════════════════════════════════════════════ */
+const Mapa = (() => {
+  const ll = (c) => [c[1], c[0]];                 // [lon,lat] → [lat,lon] do Leaflet
+  const LL = (a) => [a.lng, a.lat];               // e de volta
+
+  /* ── VOCABULÁRIO DE ESTILO ────────────────────────────────────────────────
+     Era o último sítio onde a fachada ainda falava Leaflet. Uma camada dizia
+     `cor: p => p.cor` e `filtro: p => !p.contorno && !p.percorrido` — funções
+     JavaScript, chamadas por feição. O Leaflet aceita isso porque desenha
+     objeto a objeto em JavaScript; o MapLibre não, porque compila o estilo e
+     avalia-o no motor. Uma função opaca não se compila.
+
+     Passa a haver um vocabulário pequeno que os dois sabem ler: constantes,
+     valores tirados de uma propriedade, e três testes. O Leaflet traduz para
+     funções, o MapLibre traduzirá para expressões `["get", …]`. Quem escreve
+     uma camada deixa de poder inventar lógica que só um dos motores entende —
+     e é essa impossibilidade que faz a troca de motor caber num ficheiro.
+
+     Não é uma limitação a fingir: se um dia fizer falta lógica a sério por
+     feição, calcula-se ANTES, no `drawRoute`, e guarda-se numa propriedade.
+     Foi o que já se fazia com a cor dos troços. */
+  const CAMPO = Symbol("campo"), FILTRO = Symbol("filtro");
+  const vocab = {
+    campo: (nome, omissao) => ({ [CAMPO]: true, nome, omissao }),
+    tem: (nome) => ({ [FILTRO]: "tem", nome }),
+    naoTem: (nome) => ({ [FILTRO]: "naoTem", nome }),
+    igual: (nome, valor) => ({ [FILTRO]: "igual", nome, valor }),
+    tudo: (...fs) => ({ [FILTRO]: "tudo", fs }),
+  };
+  /* resolve um valor de estilo contra as propriedades de uma feição */
+  const valor = (v, p) => (v && v[CAMPO]) ? (p[v.nome] ?? v.omissao) : v;
+  /* resolve um filtro. Sem filtro, a feição entra. */
+  const passa = (fl, p) => {
+    if (!fl) return true;
+    switch (fl[FILTRO]) {
+      case "tem": return !!p[fl.nome];
+      case "naoTem": return !p[fl.nome];
+      case "igual": return p[fl.nome] === fl.valor;
+      case "tudo": return fl.fs.every((x) => passa(x, p));
+      default: throw new Error("filtro desconhecido na camada");
+    }
+  };
+
+  /* ---- implementação sobre Leaflet ------------------------------------- */
+  const leaflet = {
+    nome: "leaflet",
+    disponivel: () => typeof L !== "undefined",
+
+    criar(idOuEl, { centro, zoom, rodar = false } = {}) {
+      const rot = (rodar && L.Map.prototype.setBearing && !window.__noRotate)
+        ? { rotate: true, touchRotate: true, rotateControl: { closeOnZeroBearing: false } } : {};
+      const m = L.map(idOuEl, Object.assign({ zoomSnap: .5 }, rot)).setView(ll(centro), zoom);
+      return { m, fontes: new Map(), marcadores: new Set(), _rodar: !!rot.rotate };
+    },
+    /* A base entra como DESCRIÇÃO — moldes de URL, atribuição, zoom máximo —
+       e não como um objeto do motor. É o que o MapLibre chama uma fonte raster
+       e o que o Leaflet consegue servir sem perder nada, subdomínios incluídos:
+       aqui são declarados, e cada motor expande-os à sua maneira (o Leaflet
+       nativamente com {s}, o MapLibre gerando um URL por letra). O `{r}` do
+       Leaflet para o retina não existe: quem descreve a base já resolveu a
+       densidade de pixels antes de a entregar. */
+    base(h, { tiles, subdominios = "", atribuicao = "", zoomMax = 19 }) {
+      if (h.base) h.m.removeLayer(h.base);
+      h.base = L.tileLayer(tiles[0], {
+        subdomains: subdominios || "abc", attribution: atribuicao, maxZoom: zoomMax });
+      h.base.addTo(h.m);
+    },
+    redimensionar(h) { h.m.invalidateSize(); },
+
+    verCentro(h, centro, zoom) { h.m.setView(ll(centro), zoom ?? h.m.getZoom()); },
+    centro(h) { return LL(h.m.getCenter()); },
+    zoom(h) { return h.m.getZoom(); },
+    mover(h, centro) { h.m.panTo(ll(centro)); },
+    ajustar(h, coords, { margem = 26 } = {}) {
+      if (!coords.length) return;
+      h.m.fitBounds(L.latLngBounds(coords.map(ll)), { padding: [margem, margem] });
+    },
+    /* `folga` negativa encolhe a caixa, como o `.pad(-0.25)` do Leaflet; no
+       MapLibre não existe e faz-se à mão — por isso a conta vive aqui */
+    contem(h, centro, { folga = 0 } = {}) {
+      try {
+        const b = h.m.getBounds(); const s = b.getSouthWest(), n = b.getNorthEast();
+        const dx = (n.lng - s.lng) * folga, dy = (n.lat - s.lat) * folga;
+        const [lon, lat] = centro;
+        return lon >= s.lng - dx && lon <= n.lng + dx && lat >= s.lat - dy && lat <= n.lat + dy;
+      } catch (e) { return true; }
+    },
+
+    /* rumo em graus no sentido dos ponteiros. O leaflet-rotate usa o sinal
+       contrário do MapLibre — a diferença fica presa aqui e nunca sai. */
+    verRumo(h, graus) { try { h.m.setBearing && h.m.setBearing(-graus); } catch (e) {} },
+    rumo(h) { try { return h.m.getBearing ? -(h.m.getBearing() || 0) : 0; } catch (e) { return 0; } },
+    rodavel(h) { return h._rodar; },
+
+    /* ---- fontes GeoJSON e camadas ------------------------------------- */
+    fonte(h, nome, geojson) {
+      const antiga = h.fontes.get(nome);
+      if (antiga) { h.m.removeLayer(antiga.grupo); }
+      const grupo = L.layerGroup().addTo(h.m);
+      h.fontes.set(nome, { geojson, grupo, camadas: antiga ? antiga.camadas : [] });
+      const f = h.fontes.get(nome);
+      leaflet._pintarTudo(h, f);
+      return f;
+    },
+    camada(h, nome, spec) {
+      const f = h.fontes.get(nome);
+      if (!f) throw new Error("camada sem fonte: " + nome);
+      f.camadas = f.camadas.filter((s) => s.id !== spec.id).concat([spec]);
+      leaflet._pintar(h, f, spec);
+    },
+    /* Uma passagem só pelas feições, a despachar para as camadas que as
+       aceitam. A versão anterior corria a lista inteira UMA VEZ POR CAMADA —
+       com três camadas sobre a rota, três varrimentos e três filtros por
+       feição. Medido: repintar custava 13 ms contra os 2,7 ms do código
+       antigo, e este era o grosso da diferença. */
+    _pintarTudo(h, f) {
+      for (const feat of (f.geojson.features || [])) {
+        const p = feat.properties || {};
+        for (const spec of f.camadas) {
+          if (!passa(spec.filtro, p)) continue;
+          leaflet._objeto(h, f, spec, feat, p);
+        }
+      }
+    },
+    /* traduz uma especificação ao estilo MapLibre para objetos do Leaflet.
+       É este o único sítio que sabe o que é uma polilinha. */
+    _pintar(h, f, spec) {
+      for (const feat of (f.geojson.features || [])) {
+        const p = feat.properties || {};
+        if (!passa(spec.filtro, p)) continue;
+        leaflet._objeto(h, f, spec, feat, p);
+      }
+    },
+    _objeto(h, f, spec, feat, p) {
+      const val = (v) => valor(v, p);
+      {
+        const g = feat.geometry;
+        let obj = null;
+        if (spec.tipo === "linha" && g.type === "LineString") {
+          obj = L.polyline(g.coordinates.map(ll), {
+            color: val(spec.cor), weight: val(spec.espessura) ?? 4,
+            opacity: val(spec.opacidade) ?? 1, lineJoin: "round", interactive: !!spec.aoClicar });
+        } else if (spec.tipo === "circulo" && g.type === "Point") {
+          obj = L.circle(ll(g.coordinates), {
+            radius: val(spec.raio), color: val(spec.cor),
+            weight: val(spec.espessura) ?? 2, fillColor: val(spec.corDentro) ?? val(spec.cor),
+            fillOpacity: val(spec.opacidadeDentro) ?? .15 });
+        } else if (spec.tipo === "ponto" && g.type === "Point") {
+          obj = L.circleMarker(ll(g.coordinates), {
+            radius: val(spec.raio) ?? 4.5, color: val(spec.cor),
+            weight: val(spec.espessura) ?? 2, fillColor: val(spec.corDentro),
+            fillOpacity: 1 });
+        }
+        if (!obj) return;
+        if (spec.aoClicar) obj.on("click", () => spec.aoClicar(p, feat));
+        /* O conteúdo do balão é uma FÁBRICA, chamada quando o balão abre.
+           A primeira versão chamava `spec.balao(p, feat)` aqui, a construir o
+           balão de todas as feições a cada repintura: quarenta subárvores de
+           DOM por segundo, para balões que ninguém abriu. Media 9,5 ms dos
+           10,5 ms que a camada fina parecia custar — não era abstração nem
+           desajuste, era isto. O código antigo já construía o balão dentro do
+           `on("click")`, e eu troquei preguiça por ansiedade sem reparar.
+           O Leaflet aceita funções em bindPopup e só as chama ao abrir; no
+           MapLibre o balão constrói-se no manipulador do clique. As duas
+           pontas querem preguiça — a interface tem de a exprimir. */
+        if (spec.balao) obj.bindPopup((camada) => spec.balao(p, feat, camada), { maxWidth: spec.balaoLargura ?? 260 });
+        obj.addTo(f.grupo);
+      }
+    },
+    limpar(h, nome) {
+      const f = h.fontes.get(nome);
+      if (f) { h.m.removeLayer(f.grupo); h.fontes.delete(nome); }
+    },
+
+    /* ---- marcadores de DOM -------------------------------------------- */
+    marcador(h, { centro, el, tamanho = [26, 26], ancora, zIndex = 0, interativo = true }) {
+      const icon = L.divIcon({ className: "", html: el.outerHTML ?? el,
+        iconSize: tamanho, iconAnchor: ancora ?? [tamanho[0] / 2, tamanho[1] / 2] });
+      const mk = L.marker(ll(centro), { icon, zIndexOffset: zIndex, interactive: interativo }).addTo(h.m);
+      h.marcadores.add(mk);
+      return {
+        mover(c) { mk.setLatLng(ll(c)); },
+        centro() { return LL(mk.getLatLng()); },
+        elemento() { return mk.getElement && mk.getElement(); },
+        aoClicar(cb) { mk.on("click", cb); },
+        /* `conteudo` é uma fábrica, pela mesma razão que em `camada`: construir
+           o balão de um marcador que ninguém abriu é trabalho a mais em cada
+           repintura. Aceita-se também um elemento já feito, para quem só tem um. */
+        balao(conteudo, largura) { mk.bindPopup(conteudo, { maxWidth: largura ?? 280 }); return this; },
+        abrirBalao() { mk.openPopup(); },
+        repor() { mk.addTo(h.m); },
+        remover() { try { h.m.removeLayer(mk); } catch (e) {} h.marcadores.delete(mk); },
+      };
+    },
+
+    balao(h, { centro, conteudo, aoFechar }) {
+      const pop = L.popup({ autoPan: true }).setLatLng(ll(centro)).setContent(conteudo).openOn(h.m);
+      if (aoFechar && pop.on) pop.on("remove", aoFechar);
+      return { elemento: () => pop.getElement && pop.getElement(), fechar: () => h.m.closePopup(pop) };
+    },
+
+    /* ---- eventos, com nomes nossos ------------------------------------ */
+    aoEvento(h, nome, cb) {
+      const map = { arrastar: "dragstart", "clique-longo": "contextmenu", mover: "moveend" };
+      const ev = map[nome]; if (!ev) throw new Error("evento desconhecido: " + nome);
+      h.m.on(ev, (e) => cb(e.latlng ? LL(e.latlng) : null, e));
+    },
+    botao(h, { posicao = "cima-esquerda", el, aoClicar }) {
+      const POS = { "cima-esquerda": "topleft", "cima-direita": "topright" };
+      const C = L.Control.extend({ options: { position: POS[posicao] },
+        onAdd() { L.DomEvent.on(el, "click", (e) => { L.DomEvent.stop(e); aoClicar(); }); return el; } });
+      h.m.addControl(new C());
+    },
+    /* impede que um clique dentro de um balão chegue ao mapa */
+    pararEvento(e) { try { L.DomEvent.stop(e); } catch (err) {} },
+  };
+
+  const motor = leaflet;
+  const api = {};
+  for (const k of Object.keys(motor)) api[k] = motor[k];
+  Object.assign(api, vocab);          // campo, tem, naoTem, igual, tudo
+  api.motor = motor.nome;
+  return api;
+})();
+
 function initRouteMap(){
-  if(state.maps.route) return;
-  if(typeof L==="undefined"){ routeError(t("Mapa indisponível — precisa de ligação à internet.")); return; }
-  const rotOpts=(L.Map.prototype.setBearing&&!window.__noRotate)?{rotate:true, touchRotate:true, rotateControl:{closeOnZeroBearing:false}}:{};
-  // SVG renderer: com canvas, a rota "descolava" das ruas durante o pinch-zoom (bug com leaflet-rotate)
-  const m=L.map("map-route",Object.assign({zoomSnap:.5},rotOpts)).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
-  m._base=cartoLayer().addTo(m);
-  state.maps.route=m;
-  state.routeLayers=L.layerGroup().addTo(m);
+  if(state.mapaRota) return;
+  if(!Mapa.disponivel()){ routeError(t("Mapa indisponível — precisa de ligação à internet.")); return; }
+  /* Primeiro sítio a falar pela camada fina em vez de falar com o motor. As
+     coordenadas entram em [lon,lat] como no GeoJSON, e o rumo em graus no
+     sentido dos ponteiros — os dois hábitos que a troca para o MapLibre vai
+     exigir, adotados já para não haver duas convenções ao mesmo tempo. */
+  const h=Mapa.criar("map-route",{centro:[state.home?.lon??-8.0, state.home?.lat??39.5], zoom:7, rodar:true});
+  Mapa.base(h,baseCarto());
+  state.mapaRota=h;
   // botão "centrar em mim"
-  const Locate=L.Control.extend({options:{position:"topleft"},
-    onAdd(){ const b=L.DomUtil.create("button","locate-btn");
-      b.type="button"; b.textContent="◎"; b.title=t("A minha posição");
-      L.DomEvent.on(b,"click",(e)=>{ L.DomEvent.stop(e);
-        travel.follow=true;
-        if(travel.marker){ m.setView(travel.marker.getLatLng(),Math.max(m.getZoom(),14)); return; }
-        navigator.geolocation&&navigator.geolocation.getCurrentPosition(
-          p=>m.setView([p.coords.latitude,p.coords.longitude],Math.max(m.getZoom(),13)),
-          ()=>toast(t("Sem acesso ao GPS — escreve a origem.")),{timeout:8000,maximumAge:60000});
-      });
-      return b; }});
-  m.addControl(new Locate());
-  m.on("dragstart",()=>{ if(travel.active) travel.follow=false; });
+  const b=document.createElement("button");
+  b.className="locate-btn"; b.type="button"; b.textContent="◎"; b.title=t("A minha posição");
+  Mapa.botao(h,{posicao:"cima-esquerda", el:b, aoClicar(){
+    travel.follow=true;
+    if(travel.marcador){ Mapa.verCentro(h, travel.marcador.centro(), Math.max(Mapa.zoom(h),14)); return; }
+    navigator.geolocation&&navigator.geolocation.getCurrentPosition(
+      p=>Mapa.verCentro(h,[p.coords.longitude,p.coords.latitude],Math.max(Mapa.zoom(h),13)),
+      ()=>toast(t("Sem acesso ao GPS — escreve a origem.")),{timeout:8000,maximumAge:60000});
+  }});
+  Mapa.aoEvento(h,"arrastar",()=>{ if(travel.active) travel.follow=false; });
   // 📍 PIN: mantém o dedo (telemóvel) ou clica com o direito (PC) num ponto qualquer
   let pinMk=null;
-  m.on("contextmenu",(ev)=>{
-    const lat=ev.latlng.lat, lon=ev.latlng.lng;
-    if(pinMk){ try{m.removeLayer(pinMk);}catch(e){} pinMk=null; }
-    pinMk=L.marker([lat,lon],{zIndexOffset:950, interactive:false,
-      icon:L.divIcon({className:"",html:'<div class="drop-pin">📍</div>',iconSize:[30,30],iconAnchor:[15,28]})}).addTo(m);
+  const tiraPin=()=>{ if(pinMk){ pinMk.remover(); pinMk=null; } };
+  Mapa.aoEvento(h,"clique-longo",(centro)=>{
+    if(!centro) return;
+    const [lon,lat]=centro;
+    tiraPin();
+    pinMk=Mapa.marcador(h,{centro, el:'<div class="drop-pin">📍</div>',
+      tamanho:[30,30], ancora:[15,28], zIndex:950, interativo:false});
     buzz([40]);
     const loc={lat, lon, name:t("Ponto no mapa"), sub:""};
-    const pop=L.popup({autoPan:true})
-      .setLatLng([lat,lon])
-      .setContent(`<div class="pin-pop"><b>${t("Ponto no mapa")}</b><span class="pin-sub">${lat.toFixed(4)}, ${lon.toFixed(4)}</span>
+    const pop=Mapa.balao(h,{centro, conteudo:
+      `<div class="pin-pop"><b>${t("Ponto no mapa")}</b><span class="pin-sub">${lat.toFixed(4)}, ${lon.toFixed(4)}</span>
         <div class="pin-actions">
         <button type="button" data-act="dest">🏁 ${t("Ir para aqui")}</button>
         <button type="button" data-act="orig">📍 ${t("Partir daqui")}</button>
         <button type="button" data-act="stop">➕ ${t("Adicionar como paragem")}</button>
-        </div></div>`)
-      .openOn(m);
-    const clearPin=()=>{ try{m.removeLayer(pinMk);}catch(e){} pinMk=null; };
-    pop.on&&pop.on("remove",()=>{ setTimeout(()=>{ if(pinMk) clearPin(); },400); });
-    // nome da rua em segundo plano (sem bloquear o popup)
+        </div></div>`,
+      aoFechar:()=>{ setTimeout(tiraPin,400); }});
+    // nome da rua em segundo plano (sem bloquear o balão)
     revStreet(lat,lon).then(r=>{ loc.name=r.name; loc.sub=r.sub||"";
-      const root=pop.getElement&&pop.getElement(); if(!root) return;
+      const root=pop.elemento(); if(!root) return;
       const b=root.querySelector(".pin-pop b"), s=root.querySelector(".pin-sub");
       if(b) b.textContent=r.name;
       if(s) s.textContent=r.sub||`${lat.toFixed(4)}, ${lon.toFixed(4)}`;
     }).catch(()=>{});
-    const root=pop.getElement&&pop.getElement();
+    const root=pop.elemento();
     if(root) root.querySelectorAll(".pin-actions button").forEach(btn=>{
-      L.DomEvent.on(btn,"click",(e)=>{ L.DomEvent.stop(e);
-        m.closePopup(pop); clearPin();
+      btn.addEventListener("click",(e)=>{ Mapa.pararEvento(e);
+        pop.fechar(); tiraPin();
         applyPinChoice(btn.dataset.act, {...loc});
       });
     });
@@ -3749,7 +4183,6 @@ async function computeRoute(){
     autoT.used=false;
     if(state._resumeTravel&&!travel.active){ state._resumeTravel=false; setTimeout(startTravel,600); }
     else maybeAutoTravel(); // liga o Modo Viagem sozinho se detetar movimento
-    if($("#rt-radar-toggle").checked) toggleRouteRadar(true);
     try{ history.replaceState(null,"",
       "#r2="+pts.map(p=>`${p.lat.toFixed(4)},${p.lon.toFixed(4)},${encodeURIComponent(p.name)}`).join("~")
       +`|${Math.round(dep)}|${Math.round(pauseSec/60)}|${stayMin}`);}catch(e){}
@@ -3811,86 +4244,118 @@ function applyShift(shiftMin, fit=false){
 }
 
 function drawRoute(fit){
-  const R=state.route; if(!R||!state.maps.route) return;
-  const g=state.routeLayers; g.clearLayers();
+  const R=state.route, h=state.mapaRota; if(!R||!h) return;
   const surf=surfaceColor();
-  // trajetos alternativos em fantasma (clicáveis)
-  (R.variants||[]).forEach((v,i)=>{
-    if(i===R.active) return;
-    const line=L.polyline(v.coords.map(c=>[c.lat,c.lon]),{color:"#8a8f96",weight:4,opacity:.5}).addTo(g);
-    line.on("click",()=>switchVariant(i));
-  });
-  // contorno (casing)
-  const all=R.coords.map(c=>[c.lat,c.lon]);
-  L.polyline(all,{color:surf,weight:9,opacity:.9,lineJoin:"round"}).addTo(g);
-  // troços coloridos entre amostras consecutivas (pior dos dois extremos)
+  const pt=(c)=>[c.lon,c.lat];                       // [lon,lat], como no GeoJSON
+  const linha=(coords,props)=>({type:"Feature",properties:props,geometry:{type:"LineString",coordinates:coords.map(pt)}});
+  const ponto=(c,props)=>({type:"Feature",properties:props,geometry:{type:"Point",coordinates:pt(c)}});
+
+  /* ── FONTES ─────────────────────────────────────────────────────────────
+     Uma fonte por grupo lógico, com a cor e o resto nas PROPRIEDADES. Antes
+     eram trinta e tal polilinhas criadas e destruídas de cinco em cinco
+     segundos durante o Modo viagem; agora são três `setData`. É esta a forma
+     que o MapLibre quer, e é por isso que a camada fina fala assim. */
+  const troços=[];
   for(let j=0;j<R.samples.length-1;j++){
     const a=R.samples[j], b=R.samples[j+1];
-    const lvl=Math.max(a.cond.lvl,b.cond.lvl);
-    const seg=R.coords.slice(a.idx,b.idx+1).map(c=>[c.lat,c.lon]);
+    const seg=R.coords.slice(a.idx,b.idx+1);
     if(seg.length<2) continue;
-    L.polyline(seg,{color:lvlColor(lvl),weight:5,opacity:.95,lineJoin:"round"}).addTo(g);
+    troços.push(linha(seg,{cor:lvlColor(Math.max(a.cond.lvl,b.cond.lvl))}));
   }
-  // já percorrido: fica cinzento (estilo Google Maps)
-  if(travel.active&&travel.geomIdx>1){
-    L.polyline(R.coords.slice(0,travel.geomIdx+1).map(c=>[c.lat,c.lon]),
-      {color:"#8b9099",weight:5,opacity:.95,lineJoin:"round"}).addTo(g);
+  const percorrido=(travel.active&&travel.geomIdx>1)
+    ? [linha(R.coords.slice(0,travel.geomIdx+1),{})] : [];
+  Mapa.fonte(h,"rota",{type:"FeatureCollection",features:[
+    linha(R.coords,{contorno:true, cor:surf}), ...troços, ...percorrido.map(f=>(f.properties.percorrido=true,f))]});
+
+  Mapa.fonte(h,"variantes",{type:"FeatureCollection",features:
+    (R.variants||[]).map((v,i)=>i===R.active?null:linha(v.coords,{i})).filter(Boolean)});
+
+  const amostras=R.samples.map((s,i)=>ponto(s,{i, cor:lvlColor(s.cond.lvl), borda:surf}))
+    .filter((_,i)=>i>0&&i<R.samples.length-1&&R.samples[i].stop==null);
+  Mapa.fonte(h,"amostras",{type:"FeatureCollection",features:amostras});
+
+  Mapa.fonte(h,"zonas",{type:"FeatureCollection",features:
+    (R.cameras||[]).filter(c=>c.zone).map(c=>ponto(c,{km:c.km}))});
+
+  /* ── CAMADAS: declaradas UMA vez, como no MapLibre ─────────────────── */
+  if(!h._camadas){
+    h._camadas=true;
+    /* Estilo DECLARADO, não programado: `Mapa.campo("cor")` em vez de
+       `p=>p.cor`, e filtros do vocabulário em vez de expressões JavaScript.
+       É o que o MapLibre compila; o adaptador Leaflet traduz para funções.
+       A cor já vinha das propriedades — o que muda é deixar de a ir buscar
+       com código que só um dos motores sabe correr. */
+    Mapa.camada(h,"rota",{id:"contorno",tipo:"linha",filtro:Mapa.tem("contorno"),
+      cor:Mapa.campo("cor"),espessura:9,opacidade:.9});
+    Mapa.camada(h,"rota",{id:"troços",tipo:"linha",
+      filtro:Mapa.tudo(Mapa.naoTem("contorno"),Mapa.naoTem("percorrido")),
+      cor:Mapa.campo("cor"),espessura:5,opacidade:.95});
+    Mapa.camada(h,"rota",{id:"percorrido",tipo:"linha",filtro:Mapa.tem("percorrido"),
+      cor:"#8b9099",espessura:5,opacidade:.95});
+    Mapa.camada(h,"variantes",{id:"fantasmas",tipo:"linha",cor:"#8a8f96",espessura:4,opacidade:.5,
+      aoClicar:p=>switchVariant(p.i)});
+    Mapa.camada(h,"amostras",{id:"pontos",tipo:"ponto",raio:4.5,
+      cor:Mapa.campo("borda"),espessura:2,corDentro:Mapa.campo("cor"),
+      balao:p=>balaoAmostra(R.samples[p.i],p.i,R)});
+    Mapa.camada(h,"zonas",{id:"perigo",tipo:"circulo",raio:1400,cor:"#fab219",
+      espessura:2,corDentro:"#fab219",opacidadeDentro:.14,
+      balao:p=>{ const dz=el("div"); const zt=el("div"); zt.style.fontWeight="700";
+        zt.textContent=t("⚠️ Zona de perigo");
+        dz.append(zt, el("div",null,t("por volta do km {k}",{k:rnd(p.km)})),
+          el("div","muted small",t("Em França a lei não permite indicar o ponto exato.")));
+        return dz; }});
   }
-  // marcadores nas amostras (paragens com pin numerado)
+
+  /* ── MARCADORES: partida, chegada, paragens e radares ───────────────── */
+  (h._mk||[]).forEach(m=>m.remover());
+  h._mk=[];
+  const marcar=(c,html,tam,z,conteudo,larg)=>{
+    const d=document.createElement("div"); d.innerHTML=html;
+    const m=Mapa.marcador(h,{centro:pt(c),el:d.firstChild,tamanho:tam,zIndex:z});
+    if(conteudo) m.balao(conteudo,larg);
+    h._mk.push(m); return m;
+  };
   R.samples.forEach((s,i)=>{
-    let mk;
-    if(s.stop!=null){
-      mk=L.marker([s.lat,s.lon],{icon:L.divIcon({className:"",html:`<div class="stop-pin">${s.stop}</div>`,
-        iconSize:[24,24],iconAnchor:[12,12]})}).addTo(g);
-    } else if(i===0){
-      mk=L.marker([s.lat,s.lon],{zIndexOffset:800,icon:L.divIcon({className:"",html:'<div class="pt-a">A</div>',
-        iconSize:[26,26],iconAnchor:[13,13]})}).addTo(g);
-    } else if(i===R.samples.length-1){
-      mk=L.marker([s.lat,s.lon],{zIndexOffset:800,icon:L.divIcon({className:"",html:'<div class="pt-b">🏁</div>',
-        iconSize:[28,28],iconAnchor:[14,14]})}).addTo(g);
-    } else {
-      mk=L.circleMarker([s.lat,s.lon],{radius:4.5,
-        color:surf,weight:2,fillColor:lvlColor(s.cond.lvl),fillOpacity:1}).addTo(g);
-    }
-    mk.on("click",async ()=>{
-      const c=s.cond;
+    /* a fábrica, não o resultado: só se constrói o balão de quem lhe tocar */
+    const conteudo=()=>balaoAmostra(s,i,R);
+    if(s.stop!=null) marcar(s,`<div class="stop-pin">${s.stop}</div>`,[24,24],0,conteudo,280);
+    else if(i===0) marcar(s,'<div class="pt-a">A</div>',[26,26],800,conteudo,280);
+    else if(i===R.samples.length-1) marcar(s,'<div class="pt-b">🏁</div>',[28,28],800,conteudo,280);
+  });
+  (R.cameras||[]).filter(c=>!c.zone).forEach(c=>{
+    /* também em fábrica. Aqui são dois radares num teste, mas um trajeto pelo
+       norte de Itália traz trinta — e o código antigo construía os trinta a
+       cada repintura, como o dos balões das amostras. Mesmo erro, outro sítio:
+       procurar o padrão em vez de corrigir o caso. */
+    marcar(c,'<div class="cam-pin">📸</div>',[22,22],0,()=>{
       const div=el("div");
-      const t1=el("div"); t1.style.fontWeight="700"; t1.style.marginBottom="3px";
-      const stopName=s.stop!=null?(R.pts[s.stop]?.name||`Paragem ${s.stop}`):null;
-      t1.textContent= s.stop!=null?t("🛑 Paragem {n}: {p}",{n:s.stop,p:stopName})
-        :(i===0?t("🏁 Partida"):i===R.samples.length-1?t("🎯 Chegada"):U.kmMark(s.km))+` · ~${fmtHM(s.eta)}`;
-      const div2=el("div");
-      if(s.stop!=null&&R.pauseSec>0) div2.textContent=t("chegas ~{a} · voltas à estrada ~{b}",{a:fmtHM(s.eta-R.pauseSec),b:fmtHM(s.eta)});
-      const t2=el("div",null,`${LVL_ICON[c.lvl]} ${rainLabel(c.lvl)} — ${wmoTxt(c.code)}`);
-      const t3=el("div",null,`💧 ${U.precH(c.pr)} (${rnd(c.pp)}%) · 🌡️ ${U.temp(c.t)} · 💨 ${t("rajadas")} ${U.spd(c.gust)} ${windArrow(c.dir)}`);
-      const t4=el("div","muted small",s.stop!=null?"":t("a identificar a zona…"));
-      div.append(t1,div2,t2,t3,t4);
-      mk.bindPopup(div,{maxWidth:280}).openPopup();
-      if(s.stop==null){ t4.textContent=`📍 ${t("perto do km {k}",{k:rnd(s.km)})}`; }
-    });
+      const tt=el("div"); tt.style.fontWeight="700";
+      tt.textContent=`${t("📸 Radar fixo")}${c.max?` ${t("— limite {v}",{v:c.max})}`:""}`;
+      div.append(tt, el("div",null,t("km {k} do teu trajeto",{k:rnd(c.km)})),
+        el("div","muted small",t("dados OpenStreetMap")));
+      return div;
+    },220);
   });
-  // radares fixos 📸 — em França a lei só permite zonas alargadas, não o ponto exato
-  (R.cameras||[]).forEach(c=>{
-    if(c.zone){
-      const zc=L.circle([c.lat,c.lon],{radius:1400,color:"#fab219",weight:2,
-        fillColor:"#fab219",fillOpacity:.14}).addTo(g);
-      const dz=el("div");
-      const zt=el("div"); zt.style.fontWeight="700"; zt.textContent=t("⚠️ Zona de perigo");
-      dz.append(zt, el("div",null,t("por volta do km {k}",{k:rnd(c.km)})),
-        el("div","muted small",t("Em França a lei não permite indicar o ponto exato.")));
-      zc.bindPopup(dz,{maxWidth:230});
-      return;
-    }
-    const mk=L.marker([c.lat,c.lon],{icon:L.divIcon({className:"",html:'<div class="cam-pin">📸</div>',
-      iconSize:[22,22], iconAnchor:[11,11]})}).addTo(g);
-    const div=el("div");
-    const tt=el("div"); tt.style.fontWeight="700";
-    tt.textContent=`${t("📸 Radar fixo")}${c.max?` ${t("— limite {v}",{v:c.max})}`:""}`;
-    div.append(tt, el("div",null,t("km {k} do teu trajeto",{k:rnd(c.km)})),
-      el("div","muted small",t("dados OpenStreetMap")));
-    mk.bindPopup(div,{maxWidth:220});
-  });
-  if(fit){ state.maps.route.fitBounds(L.latLngBounds(all),{padding:[26,26]}); }
+
+  if(fit) Mapa.ajustar(h,R.coords.map(pt));
+}
+
+/* o balão de uma amostra — extraído porque agora é chamado de dois sítios:
+   dos marcadores e da camada de pontos */
+function balaoAmostra(s,i,R){
+  const c=s.cond;
+  const div=el("div");
+  const t1=el("div"); t1.style.fontWeight="700"; t1.style.marginBottom="3px";
+  const stopName=s.stop!=null?(R.pts[s.stop]?.name||`Paragem ${s.stop}`):null;
+  t1.textContent= s.stop!=null?t("🛑 Paragem {n}: {p}",{n:s.stop,p:stopName})
+    :(i===0?t("🏁 Partida"):i===R.samples.length-1?t("🎯 Chegada"):U.kmMark(s.km))+` · ~${fmtHM(s.eta)}`;
+  const div2=el("div");
+  if(s.stop!=null&&R.pauseSec>0) div2.textContent=t("chegas ~{a} · voltas à estrada ~{b}",{a:fmtHM(s.eta-R.pauseSec),b:fmtHM(s.eta)});
+  const t2=el("div",null,`${LVL_ICON[c.lvl]} ${rainLabel(c.lvl)} — ${wmoTxt(c.code)}`);
+  const t3=el("div",null,`💧 ${U.precH(c.pr)} (${rnd(c.pp)}%) · 🌡️ ${U.temp(c.t)} · 💨 ${t("rajadas")} ${U.spd(c.gust)} ${windArrow(c.dir)}`);
+  const t4=el("div","muted small",s.stop!=null?"":`📍 ${t("perto do km {k}",{k:rnd(s.km)})}`);
+  div.append(t1,div2,t2,t3,t4);
+  return div;
 }
 
 /* ------- estadia no destino: como fica o tempo depois de chegares ------- */
@@ -4459,20 +4924,7 @@ function renderDepartures(){
   box.appendChild(card);
 }
 
-/* radar em cima do mapa da rota */
-let routeRadarLayer=null;
-async function toggleRouteRadar(on){
-  const m=state.maps.route; if(!m) return;
-  if(!on){ if(routeRadarLayer){m.removeLayer(routeRadarLayer); routeRadarLayer=null;} return; }
-  try{
-    if(!state.radar.frames.length) await loadRadarMeta();
-    const fr=state.radar.frames.filter(f=>!f.now).slice(-1)[0]||state.radar.frames[0];
-    if(!fr) return;
-    routeRadarLayer=L.tileLayer(`${state.radar.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`,
-      {opacity:.65, maxNativeZoom:7, maxZoom:19, attribution:"RainViewer"});
-    routeRadarLayer.addTo(m);
-  }catch(e){ toast(t("Radar indisponível de momento.")); $("#rt-radar-toggle").checked=false; }
-}
+
 
 /* =====================================================================
    FAVORITOS — casa, bombas, amigos, restaurantes e rotas guardadas
@@ -4592,7 +5044,7 @@ function renderFavRow(){
     c.addEventListener("click",async ()=>{
       const pos=(await freshPos())||state.home;
       if(!pos){ toast(t("Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.")); return; }
-      assistantGo(pos,{name:f.label, sub:f.sub, lat:f.lat, lon:f.lon},[]);
+      assistantGo(pos,{name:f.label, sub:f.sub||f.name, lat:f.lat, lon:f.lon},[]);
     });
     row.appendChild(c);
   });
@@ -4654,9 +5106,9 @@ function aiMsg(kind,text){
 function renderCands(cands,pos,picked){
   const box=$("#ai-cands"); box.textContent="";
   (cands||[]).forEach(c=>{
-    const chip=el("button","chip click cand-chip"+(c===picked?" sel":""));
-    chip.append(el("span",null,"📍"), el("b",null,c.name),
-      el("span",null,`${c.sub?c.sub+" · ":""}${fmtN(c.dist,1)} km`));
+    const chip=el("button","chip click cand-chip"+(c===picked?" sel":"")+(c._fav?" cand-meu":""));
+    chip.append(el("span",null,c._fav?"⭐":c._rec?"🕘":"📍"), el("b",null,c.name),
+      el("span",null,`${c.sub?c.sub+" · ":""}${U.dist(c.dist)}`));
     chip.addEventListener("click",()=>assistantGo(pos,c,cands));
     box.appendChild(chip);
   });
@@ -4671,14 +5123,23 @@ async function assistantAsk(){
     let pos=await freshPos();
     if(!pos&&state.home) pos={...state.home, name:state.home.name||t("a tua zona")};
     if(!pos){ aiMsg("err",t("Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.")); return; }
-    const fav=favMatch(q);
-    if(fav){ await assistantGo(pos,{name:fav.label, sub:fav.sub, lat:fav.lat, lon:fav.lon},[]); return; }
+    /* NUNCA decidir o destino por ele. Antes disto, escrever "casa" fazia a app
+       assumir o primeiro resultado, traçar a rota e responder "Vai de moto!" —
+       para um restaurante que ninguém escolheu. Alguém lia o veredicto e saía
+       de casa a caminho do sítio errado. Agora mostra-se a lista e espera-se
+       por um toque, sempre, mesmo quando há um só candidato. */
+    const meus=locaisLocais(q);
     let res=await geocodeNear(q,pos,true).catch(()=>[]);
     if(!res.length) res=await geocodeNear(q,pos,false).catch(()=>[]);
-    if(!res.length){ aiMsg("err",t('Não encontrei "{q}" por aqui. Tenta com a cidade (ex.: "{q} {c}").',{q,c:state.home?.name??"Lisboa"})); return; }
     res.forEach(r=>r.dist=haversine(pos,r));
     res.sort((a,b)=>a.dist-b.dist);
-    await assistantGo(pos,res[0],res.slice(0,5));
+    const vistos=new Set(meus.map(m=>`${m.lat.toFixed(3)},${m.lon.toFixed(3)}`));
+    const cands=[...meus.map(m=>({...m, dist:haversine(pos,m)})),
+                 ...res.filter(r=>!vistos.has(`${r.lat.toFixed(3)},${r.lon.toFixed(3)}`))].slice(0,6);
+    if(!cands.length){ aiMsg("err",t('Não encontrei "{q}" por aqui. Tenta com a cidade (ex.: "{q} {c}").',{q,c:state.home?.name??"Lisboa"})); return; }
+    renderCands(cands,pos,null);
+    aiMsg("info",cands.length===1?t("Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.")
+                                 :t("Encontrei {n} sítios. Toca no que queres para eu traçar a rota.",{n:cands.length}));
   } finally { btn.disabled=false; btn.textContent=t("Perguntar"); }
 }
 async function assistantGo(pos,cand,cands){
@@ -4808,7 +5269,7 @@ function buildRecommendation(cand){
 /* =====================================================================
    MODO VIAGEM — geofencing de chuva em tempo real (com a app aberta)
    ===================================================================== */
-const travel={active:false, watch:null, marker:null, wakeLock:null, alerted:new Set(),
+const travel={active:false, watch:null, marcador:null, wakeLock:null, alerted:new Set(),
   lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0,
   offHits:0, rerouting:false, lastReroute:0,
   heading:null, prevPos:null, courseUp:true};
@@ -4897,6 +5358,11 @@ function travelNotifyClose(){
    ===================================================================== */
 const motoGuard={lastAt:0, lastPos:null, lastNo:null, lastFetch:0, rainAt:null, timer:null, stat:0};
 window.__levT={travel, motoGuard}; // para testes
+window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachada, não pelo motor
+/* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
+   Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
+   no site publicado é, por si, o aviso de que a publicação saiu do processo. */
+const BUILD="2026-07-29-1235-c4ca31";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -4909,9 +5375,15 @@ function isLodgingType(key,val){
   return false;
 }
 async function isLodgingHere(pos){
-  const H=store.get("home");
+  /* a casa vem de `state.home`, como em todo o lado; o armazenamento fica de
+     reserva para o caso de isto correr antes de o arranque a ter posto lá */
+  const H=state.home||store.get("home");
   if(H&&isFinite(H.lat)&&haversine(pos,H)<0.15) return true;
-  const fv=getFavs().find(f=>isFinite(f.lat)&&haversine(pos,f)<0.12&&/cas|home|hous|maison|apart|morad|pr[ée]d|hotel|hostel/i.test(f.name||""));
+  /* Procura na ETIQUETA e no nome do sítio, não só no nome. Antes só olhava
+     para `f.name` e um favorito chamado "Casa" em "Sint Pieterstraat 12"
+     passava despercebido — o mesmo erro que fazia a pesquisa não encontrar a
+     casa de ninguém. Ver textoDoFav. */
+  const fv=getFavs().find(f=>isFinite(f.lat)&&haversine(pos,f)<0.12&&/cas|home|hous|maison|apart|morad|pr[ée]d|hotel|hostel|hogar|lar|chez/i.test(normTxt(textoDoFav(f))));
   if(fv) return true;
   try{
     const u=new URL(svc("inversa"));
@@ -5046,6 +5518,7 @@ function vozCarregar(){
     voz.lista=(window.speechSynthesis&&speechSynthesis.getVoices())||[];
     voz.pronto=voz.lista.length>0;
     vozEscolher();
+    vozEstado();          // as vozes chegam tarde: a linha acompanha
   }catch(e){ voz.lista=[]; }
 }
 function vozEscolher(){
@@ -5068,15 +5541,59 @@ function tEm(lang,str,vars){
 }
 /* o idioma em que a app CONSEGUE falar neste aparelho */
 function vozIdioma(){ return voz.idioma||state.lang; }
+const VOZ_NOMES={pt:"portuguesa", en:"inglesa", es:"espanhola", fr:"francesa"};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   O QUE ESTE APARELHO NÃO CONSEGUE FAZER — o veículo permanente.
+
+   A auditoria aos 47 toasts da app deu a mesma resposta três vezes: uma
+   CONDIÇÃO que continua verdadeira depois de o toast morrer, entregue num
+   toast. A pergunta que separa os dois veículos não é o texto, é quanto tempo
+   a condição dura:
+
+     · "Guardado ⭐", "Perfil alterado"   → aconteceu e acabou. Toast.
+     · "não há voz instalada"             → continua verdade amanhã. Aqui.
+     · "este aparelho não dá GPS"         → idem.
+     · "o mapa offline ficou incompleto"  → idem, e este é o pior: acredita-se
+       que se tem mapa, e descobre-se o buraco na estrada sem rede.
+
+   Uma só caixa, porque o utilizador não quer três avisos espalhados — quer
+   saber o que a app não vai conseguer fazer por ele. Some sozinha quando as
+   condições deixarem de ser verdadeiras. É também onde os limites de créditos
+   da A12 vão entrar, pela mesma razão.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const estadoApp={mapa:null};
+function estadoAparelho(){
+  const el=$("#estado-aparelho"); if(!el) return;
+  const linhas=[];
+  if(!window.speechSynthesis)
+    linhas.push(t("🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som."));
+  else if(!state.muted&&voz.pronto){
+    if(!voz.escolhida) linhas.push(t("🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som."));
+    else if(voz.idioma&&voz.idioma!==state.lang) linhas.push(t("🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.",
+      {n:VOZ_NOMES[state.lang]||state.lang}));
+  }
+  if(!navigator.geolocation)
+    linhas.push(t("📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás."));
+  const m=estadoApp.mapa||store.get("mapa-parcial");
+  if(m&&m.done<m.total)
+    linhas.push(t("🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.",
+      {d:m.done, t:m.total}));
+  el.textContent="";
+  for(const L of linhas){ const d=document.createElement("div"); d.style.marginTop="4px"; d.textContent=L; el.appendChild(d); }
+  el.hidden=!linhas.length;
+  el.classList.toggle("sentinel-aviso",!!linhas.length);
+}
+const vozEstado=estadoAparelho;   // o nome antigo, para quem já lhe chamava assim
 function vozAvisar(){
+  vozEstado();
   if(voz.avisado||state.muted) return;
   voz.avisado=true;
-  const nomes={pt:"portuguesa", en:"inglesa", es:"espanhola", fr:"francesa"};
   if(!voz.escolhida)
     toast(t("Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração."),8000);
   else
     toast(t("Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.",
-      {n:nomes[state.lang]||state.lang}),8000);
+      {n:VOZ_NOMES[state.lang]||state.lang}),8000);
 }
 if(window.speechSynthesis){
   vozCarregar();
@@ -5200,17 +5717,17 @@ async function startTravel(){
 function stopTravel(msg){
   travel.active=false;
   let lastPos=null;
-  try{ if(travel.marker){ const ll=travel.marker.getLatLng(); lastPos={lat:ll.lat, lon:ll.lng}; } }catch(e){}
+  try{ if(travel.marcador){ const c=travel.marcador.centro(); lastPos={lat:c[1], lon:c[0]}; } }catch(e){}
   if(travel.watch!=null){ try{navigator.geolocation.clearWatch(travel.watch);}catch(e){} travel.watch=null; }
   try{ travel.wakeLock?.release?.(); }catch(e){} travel.wakeLock=null;
-  if(travel.marker&&state.maps.route){ state.maps.route.removeLayer(travel.marker); travel.marker=null; }
+  if(travel.marcador){ travel.marcador.remover(); travel.marcador=null; }
   travel.geomIdx=0;
   document.body.classList.remove("traveling");
   $("#travel-bar").style.display="none";
   store.del("travel");
   travelNotifyClose();
-  try{ state.maps.route&&state.maps.route.setBearing&&state.maps.route.setBearing(0); }catch(e){}
-  if(state.route&&state.maps.route) drawRoute(false); // repõe as cores sem o cinzento
+  if(state.mapaRota) Mapa.verRumo(state.mapaRota,0);   // o mapa volta a norte-acima
+  if(state.route&&state.mapaRota) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
   updateTravelButtons();
   if(lastPos) motoGuardCheck(lastPos); // paraste num alojamento? digo-te se a moto pode ficar fora
@@ -5239,30 +5756,30 @@ function onTravelPos(p){
   if(hd!=null&&!isNaN(hd)) travel.heading=hd;
   if(!travel.prevPos||haversine(travel.prevPos,pos)>0.008) travel.prevPos={lat:pos.lat,lon:pos.lon};
 
-  if(state.maps.route){
-    const M=state.maps.route;
-    if(!travel.marker){
-      travel.marker=L.marker([pos.lat,pos.lon],{zIndexOffset:9000, interactive:false,
-        icon:L.divIcon({className:"", iconSize:[40,40], iconAnchor:[20,20], html:
+  const hm=state.mapaRota;
+  if(hm){
+    const aqui=[pos.lon,pos.lat];                       // [lon,lat], como no GeoJSON
+    if(!travel.marcador){
+      travel.marcador=Mapa.marcador(hm,{centro:aqui, tamanho:[40,40], ancora:[20,20],
+        zIndex:9000, interativo:false, el:
           '<div class="me-nav"><svg viewBox="0 0 40 40">'+
           '<circle cx="20" cy="20" r="13" fill="#1a73e8" stroke="#fff" stroke-width="3"/>'+
           '<path d="M20 9.5 L26.6 25.5 L20 21.6 L13.4 25.5 Z" fill="#fff"/>'+
-          '</svg></div>'})})
-        .addTo(M);
-    } else travel.marker.setLatLng([pos.lat,pos.lon]);
+          '</svg></div>'});
+    } else travel.marcador.mover(aqui);
     // course-up: o mapa roda para o teu sentido de marcha (como o Google Maps)
-    let brg=0;
+    if(Mapa.rodavel(hm)&&travel.courseUp!==false&&travel.heading!=null
+       &&(p.coords.speed==null||p.coords.speed>1.4)) Mapa.verRumo(hm,travel.heading);
+    /* A seta aponta sempre para onde vais. Com o mapa virado para o rumo B, o
+       norte fica em −B no ecrã, portanto um rumo H desenha-se a H−B: em
+       course-up dá zero (a seta fica a apontar para cima) e com o mapa
+       norte-acima dá o próprio rumo. O sinal do leaflet-rotate não entra aqui;
+       fica preso na fachada. */
     try{
-      if(M.setBearing&&travel.courseUp!==false&&travel.heading!=null&&(p.coords.speed==null||p.coords.speed>1.4)){
-        M.setBearing(-travel.heading); brg=-travel.heading;
-      } else if(M.getBearing) brg=M.getBearing()||0;
+      const el=travel.marcador.elemento()?.querySelector(".me-nav");
+      if(el&&travel.heading!=null) el.style.transform=`rotate(${(travel.heading-Mapa.rumo(hm)).toFixed(1)}deg)`;
     }catch(e){}
-    // a seta aponta sempre para onde vais, seja o mapa norte-acima ou virado
-    try{
-      const el=travel.marker.getElement?.()?.querySelector(".me-nav");
-      if(el&&travel.heading!=null) el.style.transform=`rotate(${(travel.heading+brg).toFixed(1)}deg)`;
-    }catch(e){}
-    try{ if(travel.follow!==false&&!M.getBounds().pad(-0.25).contains([pos.lat,pos.lon])) M.panTo([pos.lat,pos.lon]); }catch(e){}
+    if(travel.follow!==false&&!Mapa.contem(hm,aqui,{folga:-0.25})) Mapa.mover(hm,aqui);
   }
   const {i:idx, off}=nearestSampleIdx(pos);
   const here=R.samples[idx];
@@ -5292,7 +5809,7 @@ function onTravelPos(p){
     R.samples.forEach(s=>{ s.eta=effDep+s.travelSec+s.pauseOffset;
       const c=sampleAt(s,s.eta); if(c){ c.lvl=rainLevel(c.pr,c.pp,c.code,prof); s.cond=c; } });
     drawRoute(false);
-    if(travel.marker) travel.marker.addTo(state.maps.route);
+    if(travel.marcador) travel.marcador.repor();
   }
   const kmNow=travel.kmDone||here.km;
   // 🗣️ indicações de condução (como o Google Maps): aviso a ~500 m e à chegada da manobra
@@ -5397,7 +5914,7 @@ function onTravelPos(p){
 /* =====================================================================
    SENTINELA — vigia o tempo onde estás e alarma quando muda
    ===================================================================== */
-const sentinel={on:false, timer:null, last:null, lastAlerts:new Set(), checking:false};
+const sentinel={on:false, timer:null, last:null, lastAlerts:new Set(), checking:false, lastAt:0};
 async function fetchSentinelWx(lat,lon){
   const u=new URL(OM_BASE);
   u.search=new URLSearchParams({
@@ -5420,7 +5937,38 @@ function sentinelAlert(key,txt,strong){
       new Notification("Levante 🏍️",{body:txt,tag:key});
   }catch(e){}
 }
-async function sentinelCheck(){
+/* Quanto tempo a app esteve sem verificar. Os browsers estrangulam os
+   temporizadores em segundo plano e o Android CONGELA a página quando se
+   minimiza o browser ou se apaga o ecrã: o `setInterval` de 150 s pura e
+   simplesmente não corre. O cartão continuava a dizer "Ligada · última
+   verificação 10:21" — verdade na letra, mentira no que se lê, porque quem olha
+   para um cartão que diz "Ligada" assume que está a ser vigiado agora.
+   Isto não se corrige do lado do cliente; corrige-se com o servidor da B4.
+   O que se corrige já é a app deixar de fingir. */
+const SENT_VELHO=6*60*1000;
+function sentinelDesatualizada(){
+  return sentinel.on&&sentinel.lastAt>0&&Date.now()-sentinel.lastAt>SENT_VELHO;
+}
+/* ao voltar ao ecrã, verificar já — não esperar até 150 s a mostrar uma leitura
+   de há meia hora como se fosse de agora */
+function sentinelAcordou(){
+  if(!sentinel.on||document.visibilityState!=="visible") return;
+  if(sentinelDesatualizada())
+    sentinelNota(t("O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.",
+      {m:Math.round((Date.now()-sentinel.lastAt)/60000)}),{aviso:true, tipo:"atraso"});
+  /* `recuperacao` para esta verificação NÃO apagar o aviso que acabou de ser
+     posto. O aviso é sobre o PASSADO — houve tempo sem vigilância — e continua
+     verdadeiro depois de a verificação correr. Sem isto aparecia e desaparecia
+     em meio segundo, que é a mesma coisa que não avisar. Foi o teste da retoma
+     a apanhar isto na primeira execução. Sai sozinho na verificação seguinte,
+     ao fim dos 150 s, quando a vigilância normal já está reposta. */
+  sentinelCheck({recuperacao:true});
+}
+document.addEventListener("visibilitychange",sentinelAcordou);
+addEventListener("resume",sentinelAcordou);      // Page Lifecycle: saiu de congelada
+addEventListener("pageshow",sentinelAcordou);
+
+async function sentinelCheck({recuperacao=false}={}){
   if(!sentinel.on||sentinel.checking) return;
   sentinel.checking=true;
   try{
@@ -5456,24 +6004,86 @@ async function sentinelCheck(){
     if(curWet) st=stopIdx>=0?t("🌧️ A chover agora — deve parar ~{h}.",{h:fmtHM(times[stopIdx])}):t("🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.");
     else if(startIdx>=0) st=t("☁️ Chuva a caminho: ~{h}.",{h:fmtHM(times[startIdx])});
     else st=t("✅ Sem chuva à vista nas próximas 2 horas.");
-    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Mantém a app aberta para os avisos chegarem.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:Math.round(gust)});
+    sentinel.lastAt=Date.now();
+    if(!recuperacao&&sentinelNotaTipo()==="atraso") sentinelNota("");   // só o aviso de atraso sai, e não na própria recuperação
+    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:Math.round(gust)});
   }catch(e){
     $("#sentinel-status").textContent=t("Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.");
   }finally{ sentinel.checking=false; }
 }
+/* SEM PRAZO DE VALIDADE, ao contrário do Modo viagem, e a assimetria é o
+   argumento: o Modo viagem expira porque tem DESTINO, e um destino de há doze
+   horas está velho. A Sentinela vigia onde estiveres — isso nunca envelhece.
+   Ligada em Maastricht e aberta em Milão, vigiar Milão é exatamente o que se
+   quer. É um interruptor, não uma sessão, e um interruptor que se desliga
+   sozinho ao fim de três dias é uma versão mais suave do problema que estamos
+   a corrigir: perguntar é melhor do que desligar em silêncio, mas não
+   perguntar é melhor do que perguntar. */
+
 async function toggleSentinel(){
   const b=$("#btn-sentinel");
   if(sentinel.on){
     sentinel.on=false; clearInterval(sentinel.timer); sentinel.timer=null;
+    store.del("sentinel"); sentinelNota("");
     b.textContent=t("Ligar");
     $("#sentinel-status").textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
     toast(t("Sentinela desligada."));
     return;
   }
+  /* A ESCOLHA TEM DE SER ESCRITA. Não estava, e ninguém tinha decidido isso:
+     não havia comentário, nem ramo, nem condição sobre bateria — era
+     esquecimento. Ligavas a Sentinela, recarregavas por qualquer razão, e ela
+     desligava-se sem dizer nada, enquanto tu ficavas convencido de que estavas
+     a ser avisado da chuva. É a categoria "falha silenciosa" aplicada à
+     funcionalidade que existe precisamente para funcionar quando ninguém está
+     a olhar — o único sítio onde o silêncio é indistinguível do bom
+     funcionamento. */
   sentinel.on=true; sentinel.lastAlerts.clear(); sentinel.last=null;
+  store.set("sentinel",{on:1, at:Date.now()});
+  sentinelNota("");
   b.textContent=t("🛑 Desligar");
   try{ if("Notification" in window&&Notification.permission==="default") await Notification.requestPermission(); }catch(e){}
   toast(t("🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos."));
+  sentinelCheck();
+  sentinel.timer=setInterval(sentinelCheck,150000);
+}
+
+/* Retoma ao arrancar. Retomar é seguro: a Sentinela não usa `watchPosition`,
+   faz uma verificação de 150 em 150 segundos, e a permissão de geolocalização
+   sobrevive ao recarregamento. Não há gesto do utilizador a exigir nem bateria
+   a poupar — só havia um `store.set` em falta.
+
+   E o que não se pode fazer, em nenhum dos ramos, é ficar calado. */
+/* A linha da nota serve duas coisas diferentes e é preciso saber qual está lá:
+     · "retoma"  — continuou ligada desde a última sessão. Fica até a pessoa
+                   mexer no interruptor; é a notícia do arranque.
+     · "atraso"  — o telemóvel suspendeu a app e houve tempo sem vigilância.
+                   Sai assim que houver uma verificação em dia.
+   A primeira versão não distinguia, e a verificação que corre logo a seguir à
+   retoma apagava o "continuou ligada" — outra vez um aviso que existe durante
+   um segundo. */
+function sentinelNota(txt,{aviso=false, tipo=""}={}){
+  const n=$("#sentinel-nota"); if(!n) return;
+  n.textContent=txt; n.hidden=!txt; n.dataset.tipo=txt?tipo:"";
+  n.classList.toggle("sentinel-aviso",!!aviso);
+}
+function sentinelNotaTipo(){ const n=$("#sentinel-nota"); return n&&!n.hidden?(n.dataset.tipo||""):""; }
+function retomaSentinela(){
+  const s=store.get("sentinel");
+  const b=$("#btn-sentinel");
+  if(!s||!s.on||!b) return;
+
+  if(!navigator.geolocation){
+    store.del("sentinel");
+    sentinelNota(t("A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar."),{aviso:true});
+    return;
+  }
+  /* retomada: o estado volta ao que era e a interface diz que voltou — numa
+     linha só dela, que o sentinelCheck() não reescreve */
+  sentinel.on=true; sentinel.lastAlerts.clear(); sentinel.last=null;
+  b.textContent=t("🛑 Desligar");
+  sentinelNota(t("🔔 Sentinela ativa — continuou ligada desde o teu último acesso."),{tipo:"retoma"});
+  store.set("sentinel",{on:1, at:Date.now()});
   sentinelCheck();
   sentinel.timer=setInterval(sentinelCheck,150000);
 }
@@ -5523,57 +6133,7 @@ function planNativeAlerts(){
   }catch(e){}
 }
 
-/* =====================================================================
-   RADAR (RainViewer)
-   ===================================================================== */
-async function loadRadarMeta(){
-  const j=await rainviewerMeta();
-  state.radar.host=j.host||"https://tilecache.rainviewer.com";
-  state.radar.frames=[...(j.radar?.past||[]).map(f=>({time:f.time,path:f.path,now:false})),
-                      ...(j.radar?.nowcast||[]).map(f=>({time:f.time,path:f.path,now:true}))];
-  return state.radar.frames;
-}
-function initRadar(){
-  if(typeof L==="undefined"){ toast(t("Radar indisponível sem internet.")); return; }
-  if(state.maps.radar){ state.maps.radar.invalidateSize(); return; }
-  const m=L.map("map-radar",(L.Map.prototype.setBearing&&!window.__noRotate)?{rotate:true,touchRotate:true,rotateControl:{closeOnZeroBearing:false}}:{}).setView([state.home?.lat??39.5,state.home?.lon??-8.0],7);
-  m._base=cartoLayer().addTo(m);
-  state.maps.radar=m;
-  loadRadarMeta().then(frames=>{
-    if(!frames.length){ toast(t("Radar sem dados de momento.")); return; }
-    const sl=$("#radar-slider");
-    sl.max=String(frames.length-1);
-    const lastPast=frames.reduce((acc,f,i)=>f.now?acc:i,0);
-    sl.value=String(lastPast);
-    showRadarFrame(lastPast);
-  }).catch(()=>toast(t("Não consegui carregar o radar.")));
-}
-function showRadarFrame(idx){
-  const R=state.radar, m=state.maps.radar;
-  if(!m||!R.frames.length) return;
-  idx=clamp(idx,0,R.frames.length-1);
-  const fr=R.frames[idx];
-  if(!R.layers[idx]){
-    R.layers[idx]=L.tileLayer(`${R.host}${fr.path}/256/{z}/{x}/{y}/2/1_1.png`,
-      {opacity:.7, maxNativeZoom:7, maxZoom:19, attribution:"© RainViewer"});
-  }
-  const prev=R.idx;
-  R.layers[idx].addTo(m);
-  if(prev!==idx&&R.layers[prev]) setTimeout(()=>{ if(state.radar.idx!==prev) m.removeLayer(R.layers[prev]); },140);
-  R.idx=idx;
-  $("#radar-slider").value=String(idx);
-  const lab=$("#radar-time");
-  lab.textContent="";
-  lab.append(document.createTextNode(fmtHM(fr.time)),
-    el("span",null, fr.now?t("previsão imediata"):t("radar real")));
-}
-function radarPlay(on){
-  const R=state.radar;
-  R.playing=on??!R.playing;
-  $("#radar-play").textContent=R.playing?"⏸":"▶";
-  clearInterval(R.timer);
-  if(R.playing) R.timer=setInterval(()=>showRadarFrame((R.idx+1)%R.frames.length),650);
-}
+
 
 /* =====================================================================
    TABS · TEMA · DEFINIÇÕES · ARRANQUE
@@ -5582,22 +6142,33 @@ function switchTab(name){
   $$(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.view===name)));
   $$(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));
   tipHide();
-  if(name==="rota"){ initRouteMap(); setTimeout(()=>state.maps.route?.invalidateSize(),60);
+  if(name==="rota"){ initRouteMap(); setTimeout(()=>state.mapaRota&&Mapa.redimensionar(state.mapaRota),60);
     if(state.route) setTimeout(()=>drawRoute(false),80);
     if(!store.get("pin-tip")){ store.set("pin-tip",1);
       setTimeout(()=>toast(t("💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá."),8000),900); } }
-  if(name==="radar"){ initRadar(); setTimeout(()=>state.maps.radar?.invalidateSize(),60); }
 }
 
-function setTheme(t){
+function setTheme(t,{guardar=true}={}){
   state.theme=t;
+  /* A escolha do tema TEM de ser escrita. O comentário na leitura já dizia "a
+     tua escolha fica memorizada" e ninguém a escrevia — clicar no botão mudava
+     o ecrã e a preferência do sistema voltava a ganhar no recarregamento
+     seguinte. `guardar:false` existe só para o arranque, que aplica a
+     preferência do sistema sem a transformar numa escolha do utilizador. */
+  if(guardar) store.set("theme",t);
   document.documentElement.dataset.theme=t;
   $("#btn-theme").textContent=t==="dark"?"🌙":"☀️";
   const mt=$("#meta-theme"); if(mt) mt.content=t==="dark"?"#0a1120":"#f2f5fb";
-  for(const key of ["route","radar"]){
-    const m=state.maps[key];
-    if(m&&m._base){ m.removeLayer(m._base); m._base=cartoLayer().addTo(m); }
-  }
+  /* RAMO MORTO CORRIGIDO. Isto era:
+         const m=state.maps[key];
+         if(m&&m._base){ m.removeLayer(m._base); m._base=cartoLayer().addTo(m); }
+     `_base` não era escrito em lado nenhum — a única atribuição estava dentro
+     do `if` que a testava, portanto o teste nunca era verdadeiro e o bloco
+     nunca corria. O mapa ficava com os tiles do tema em que foi construído:
+     abrir a rota de dia e mudar para escuro ao anoitecer deixava um mapa
+     branco na cara de quem vai a conduzir, até recarregar a app.
+     Guardado por tools/lint-ramos-mortos.mjs. */
+  if(state.mapaRota) Mapa.base(state.mapaRota, baseCarto());
   if(state.route) applyShift(state.route.shift); // re-pinta com as cores do tema
 }
 
@@ -5649,8 +6220,10 @@ function init(){
   $("#btn-plan-toggle").addEventListener("click",()=>$("#plan-card").classList.toggle("open"));
 
   // tema: sistema por defeito; a tua escolha fica memorizada
-  if(matchMedia&&matchMedia("(prefers-color-scheme: light)").matches) setTheme("light");
-  const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth);
+  if(matchMedia&&matchMedia("(prefers-color-scheme: light)").matches) setTheme("light",{guardar:false});
+  const bv=$("#set-versao"); if(bv) bv.textContent=t("Versão {v}",{v:BUILD});
+  estadoAparelho();   // o que este aparelho não consegue fazer, dito onde dura
+  const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth,{guardar:false});
   $("#btn-theme").addEventListener("click",()=>setTheme(state.theme==="dark"?"light":"dark"));
 
   // definições
@@ -5665,7 +6238,17 @@ function init(){
     const d=ev.data||{};
     if(d.type==="PRECACHE_DONE"){
       tileDL.running=false;
-      if(d.saved>30) toast(t("🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.",{n:d.saved}),6000);
+      /* Um mapa offline INCOMPLETO era dito de duas maneiras, ambas erradas:
+         um toast alegre a dizer "guardado", ou silêncio absoluto. Quem vai para
+         a estrada acredita que tem mapa e encontra o buraco sem rede — uma
+         condição que dura, entregue como notícia que passa, ou não entregue.
+         Fica guardada, porque o mapa continua incompleto depois de recarregar. */
+      const parcial=d.done<d.total?{done:d.done, total:d.total}:null;
+      estadoApp.mapa=parcial;
+      if(parcial) store.set("mapa-parcial",parcial); else store.del("mapa-parcial");
+      estadoAparelho();
+      if(parcial) toast(t("🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.",{d:d.done,t:d.total}),6000);
+      else if(d.saved>30) toast(t("🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.",{n:d.saved}),6000);
     } else if(d.type==="PRECACHE_PROGRESS"){ tileDL.done=d.done; }
   });
 
@@ -5725,11 +6308,8 @@ function init(){
   const when=$("#rt-when");
   when.value=localDT(new Date(Math.ceil((Date.now()+9*60000)/300000)*300000));
   when.min=localDT(new Date());
-  $("#rt-radar-toggle").addEventListener("change",(e)=>toggleRouteRadar(e.target.checked));
 
   // radar
-  $("#radar-play").addEventListener("click",()=>radarPlay());
-  $("#radar-slider").addEventListener("input",(e)=>{ radarPlay(false); showRadarFrame(+e.target.value); });
 
   // modo viagem + sentinela
   state.muted=store.get("muted")===1;
@@ -5798,6 +6378,9 @@ function init(){
     setHome(HOME0);
   }
   if(restored&&!state.home){ setHome(HOME0,{silent:false}); }
+
+  /* depois da localização, para a primeira verificação já ter onde olhar */
+  setTimeout(retomaSentinela,300);
 }
 
 if(typeof L==="undefined"){

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Levante — a Sentinela dispara mesmo em segundo plano?</title>
+<style>
+ :root{color-scheme:light dark}
+ body{font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:0;
+   padding:18px 16px calc(40px + env(safe-area-inset-bottom));max-width:680px;margin-inline:auto}
+ h1{font-size:19px;margin:0 0 4px} p{margin:8px 0}
+ .sub{opacity:.72;font-size:13.5px}
+ button{font:600 16px system-ui;padding:12px 18px;border-radius:10px;border:1px solid #8884;
+   background:#1a73e8;color:#fff;margin:14px 8px 14px 0}
+ button.sec{background:transparent;color:inherit}
+ .big{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:10px 0 0}
+ .caixa{padding:12px 14px;border-radius:10px;margin:14px 0;font-weight:600;
+   background:rgba(250,178,25,.14);border-left:4px solid #fab219}
+ .caixa.grave{background:rgba(214,69,69,.14);border-left-color:#d64545}
+ table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:10px}
+ td,th{text-align:left;padding:5px 7px;border-bottom:1px solid #8883;white-space:nowrap}
+ td:nth-child(2){text-align:right;font-variant-numeric:tabular-nums}
+ .mau{color:#c62828;font-weight:700} .bom{color:#2e7d32}
+ ol{padding-left:22px} li{margin:6px 0}
+ pre{white-space:pre-wrap;word-break:break-word;font-size:12px;background:#8881;
+   padding:10px;border-radius:8px;max-height:44vh;overflow:auto}
+</style></head><body>
+
+<h1>A Sentinela dispara mesmo em segundo plano?</h1>
+<p class="sub">Isto não mede um <code>setInterval</code>. Mede o que a Sentinela faz
+de verdade a cada 150 segundos: <b>pede a posição ao GPS</b> e <b>pede a
+meteorologia ao Open-Meteo</b>. Em segundo plano o relógio pode disparar e a
+geolocalização ficar pendurada ou ser negada — e aí a Sentinela não vigia nada
+com o cartão a dizer que sim. Cada disparo fica registado com o que cada uma das
+duas respondeu.</p>
+<p class="sub">Não guarda nada nossa: a posição vai ao Open-Meteo e mais nada, e o
+registo fica só neste telemóvel.</p>
+
+<div id="retomado" hidden></div>
+
+<button id="ir">Começar</button>
+<button id="parar" class="sec" hidden>Parar e ver o resultado</button>
+<button id="limpar" class="sec" hidden>Limpar</button>
+
+<div id="vivo" hidden>
+  <p class="sub"><b>Mete o telemóvel no bolso e vai fazer outra coisa 10 a 15
+  minutos.</b> Se puderes, faz as duas versões:</p>
+  <ol class="sub">
+    <li>browser aberto, <b>noutro separador</b>;</li>
+    <li>browser <b>minimizado e ecrã apagado</b> — é o caso do bolso.</li>
+  </ol>
+  <p class="big"><span id="n">0</span> disparos</p>
+  <p class="sub" id="agora"></p>
+</div>
+
+<div id="fim" hidden>
+  <div class="caixa" id="veredicto"></div>
+  <table id="tab"><thead><tr><th>#</th><th>desde o anterior</th><th>ecrã</th><th>GPS</th><th>meteo</th></tr></thead><tbody></tbody></table>
+  <p class="sub">Carrega e manda-me isto:</p>
+  <button id="copiar">Copiar resultado</button>
+  <pre id="texto"></pre>
+</div>
+
+<script>
+const PERIODO = 150000, LIMITE = 30000, CHAVE = "levante-fundo";
+const $ = (s) => document.querySelector(s);
+let E = null, tick = null, relogio = null, pulso = null;
+
+/* ── memória, porque o Android mata separadores em segundo plano ────────────
+   Se o sistema descartar a página, ela recarrega quando se volta: contadores a
+   zero e botão "Começar" outra vez, sem se saber se a medição correu mal ou se
+   o teste morreu. E o separador ter sido descartado é, em si, o PIOR resultado
+   possível para a Sentinela — é o que mais interessa registar.
+   Grava-se a cada disparo e um pulso de 5 em 5 segundos; ao carregar,
+   reconstitui-se o que aconteceu enquanto a página não existia. */
+const ler = () => { try { return JSON.parse(localStorage.getItem(CHAVE) || "null"); } catch (e) { return null; } };
+const gravar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) {} };
+const hm = (t) => new Date(t).toTimeString().slice(0, 5);
+
+function arranca(novo) {
+  if (novo) E = { t0: Date.now(), fogos: [], paragens: [], pulso: Date.now(), fim: 0 };
+  gravar();
+  clearInterval(tick); clearInterval(relogio); clearInterval(pulso);
+  tick = setInterval(disparo, PERIODO);
+  relogio = setInterval(pinta, 1000);            /* guardado, para o "Repetir" não empilhar */
+  pulso = setInterval(() => { E.pulso = Date.now(); gravar(); }, 5000);
+  $("#ir").hidden = true; $("#parar").hidden = false; $("#limpar").hidden = true;
+  $("#vivo").hidden = false; $("#fim").hidden = true;
+  pinta();
+}
+
+function pinta() {
+  if (!E) return;
+  $("#n").textContent = E.fogos.length;
+  const passou = (Date.now() - E.t0) / 1000;
+  $("#agora").textContent = `${Math.round(passou)} s desde o início · esperados ${Math.floor(passou / PERIODO * 1000)}`;
+}
+
+/* uma promessa que resolve sempre: respondeu, falhou, ou ficou pendurada.
+   "Pendurada" é o estado que interessa — é o que acontece à geolocalização em
+   segundo plano em muitos Android, e não dá erro nenhum. */
+const comLimite = (nome, f) => new Promise((res) => {
+  const t0 = performance.now();
+  let feito = false;
+  const acaba = (estado, extra) => { if (feito) return; feito = true;
+    res({ o: nome, estado, ms: Math.round(performance.now() - t0), extra }); };
+  setTimeout(() => acaba("pendurado"), LIMITE);
+  try { f((x) => acaba("ok", x), (e) => acaba("erro", e && (e.code || e.message))); }
+  catch (e) { acaba("erro", String(e).slice(0, 40)); }
+});
+
+async function disparo() {
+  if (!E) return;
+  const t = Date.now(), vis = document.visibilityState;
+  /* o registo entra ANTES das chamadas: se a página morrer a meio, fica a
+     saber-se que o relógio disparou e que as respostas nunca chegaram */
+  const r = { t, vis, gps: "por responder", meteo: "por responder" };
+  E.fogos.push(r); gravar(); pinta();
+
+  const g = await comLimite("gps", (ok, mal) =>
+    navigator.geolocation.getCurrentPosition(
+      (p) => ok({ lat: +p.coords.latitude.toFixed(2), lon: +p.coords.longitude.toFixed(2) }),
+      mal, { enableHighAccuracy: false, timeout: LIMITE - 2000, maximumAge: 60000 }));
+  r.gps = g.estado; r.gpsMs = g.ms; r.gpsErro = g.extra && g.extra.lat === undefined ? g.extra : null;
+  gravar();
+
+  const pos = g.estado === "ok" ? g.extra : { lat: 38.72, lon: -9.14 };
+  const m = await comLimite("meteo", (ok, mal) => {
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${pos.lat}&longitude=${pos.lon}&current=precipitation&forecast_days=1`;
+    fetch(u, { cache: "no-store" }).then((x) => (x.ok ? x.json() : Promise.reject(x.status))).then(ok, mal);
+  });
+  r.meteo = m.estado; r.meteoMs = m.ms;
+  gravar(); pinta();
+}
+
+/* ── ao carregar: houve medição interrompida? ─────────────────────────────── */
+(function retomar() {
+  const g = ler();
+  if (!g || !g.t0 || g.fim) { if (g && g.fim) { E = g; mostra(); $("#limpar").hidden = false; } return; }
+  E = g;
+  const parado = Date.now() - (E.pulso || E.t0);
+  /* `document.wasDiscarded` é o próprio browser a dizer que descartou a página.
+     Onde não existir, o buraco no pulso serve — mas não distingue descarte de
+     congelamento, e por isso o texto não escolhe entre os dois. */
+  const descartada = document.wasDiscarded === true;
+  if (parado > 15000) {
+    E.paragens.push({ de: E.pulso, ate: Date.now(), descartada });
+    gravar();
+    const d = $("#retomado");
+    d.className = "caixa grave"; d.hidden = false;
+    d.textContent = descartada
+      ? `O sistema DESCARTOU esta página às ${hm(E.pulso)} e só voltou a existir agora — ${Math.round(parado / 60000)} min sem existir. Para a Sentinela isto é o pior caso: não vigiou nada e não havia como avisar.`
+      : `A página esteve parada ${Math.round(parado / 60000)} min, desde as ${hm(E.pulso)} — descartada pelo sistema ou congelada. Nesse tempo a Sentinela não verificou nada.`;
+  } else {
+    const d = $("#retomado");
+    d.className = "caixa"; d.hidden = false;
+    d.textContent = `Medição retomada — começou às ${hm(E.t0)} e continua.`;
+  }
+  arranca(false);
+})();
+
+$("#ir").onclick = () => { $("#retomado").hidden = true; arranca(true); };
+$("#limpar").onclick = () => { localStorage.removeItem(CHAVE); location.reload(); };
+$("#parar").onclick = () => {
+  clearInterval(tick); clearInterval(relogio); clearInterval(pulso);
+  E.fim = Date.now(); gravar(); mostra();
+};
+
+function mostra() {
+  const total = (E.fim || Date.now()) - E.t0, esperados = Math.floor(total / PERIODO);
+  const tb = $("#tab tbody"); tb.innerHTML = "";
+  let piorSalto = 0;
+  const marca = (e) => (e === "ok" ? "bom" : "mau");
+  E.fogos.forEach((f, i) => {
+    const desde = i ? (f.t - E.fogos[i - 1].t) / 1000 : (f.t - E.t0) / 1000;
+    piorSalto = Math.max(piorSalto, desde);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${i + 1}</td><td class="${desde > 200 ? "mau" : "bom"}">${desde.toFixed(0)} s</td>` +
+      `<td class="sub">${f.vis === "visible" ? "ligado" : "apagado"}</td>` +
+      `<td class="${marca(f.gps)}">${f.gps}${f.gpsMs != null ? ` ${(f.gpsMs / 1000).toFixed(1)}s` : ""}</td>` +
+      `<td class="${marca(f.meteo)}">${f.meteo}${f.meteoMs != null ? ` ${(f.meteoMs / 1000).toFixed(1)}s` : ""}</td>`;
+    tb.appendChild(tr);
+  });
+
+  const faltaram = esperados - E.fogos.length;
+  const uteis = E.fogos.filter((f) => f.gps === "ok" && f.meteo === "ok").length;
+  const v = $("#veredicto");
+  const linhas = [];
+  if (E.paragens.length)
+    linhas.push(`A página esteve fora ${E.paragens.length} vez(es) — ${E.paragens.some((p) => p.descartada) ? "pelo menos uma por descarte do sistema" : "descartada ou congelada"}. Nesse tempo a Sentinela não vigiou nada.`);
+  if (!E.fogos.length && esperados > 0) linhas.push(`O relógio NÃO disparou nenhuma vez em ${Math.round(total / 60000)} min (esperados ${esperados}).`);
+  else if (faltaram > 0) linhas.push(`Faltaram ${faltaram} de ${esperados} disparos. Maior intervalo sem disparar: ${Math.round(piorSalto)} s (deviam ser 150).`);
+  else linhas.push(`O relógio disparou as ${esperados} vezes esperadas. Maior intervalo: ${Math.round(piorSalto)} s.`);
+  /* O RESULTADO QUE INTERESSA: não é o relógio ter corrido, é a verificação ter
+     chegado ao fim. Um disparo com o GPS pendurado não vigia nada. */
+  linhas.push(`Verificações COMPLETAS (GPS e meteorologia responderam): ${uteis} de ${esperados} esperadas.`);
+  v.textContent = linhas.join(" ");
+  v.className = "caixa" + (uteis < esperados ? " grave" : "");
+
+  $("#texto").textContent = [
+    `Levante · fundo · ${new Date(E.t0).toISOString().slice(0, 16).replace("T", " ")} → ${Math.round(total / 60000)} min`,
+    navigator.userAgent,
+    `disparos ${E.fogos.length}/${esperados} · completos ${uteis} · pior intervalo ${Math.round(piorSalto)} s`,
+    `paragens da página: ${E.paragens.map((p) => `${hm(p.de)}→${hm(p.ate)}${p.descartada ? " (descartada)" : ""}`).join(", ") || "nenhuma"}`,
+    "",
+    ...E.fogos.map((f, i) => {
+      const d = i ? (f.t - E.fogos[i - 1].t) / 1000 : (f.t - E.t0) / 1000;
+      return `${String(i + 1).padStart(2)} ${hm(f.t)} +${String(Math.round(d)).padStart(4)}s ${f.vis.padEnd(7)} gps:${String(f.gps).padEnd(13)} meteo:${f.meteo}`;
+    }),
+  ].join("\n");
+
+  $("#vivo").hidden = true; $("#fim").hidden = false;
+  $("#parar").hidden = true; $("#ir").hidden = false; $("#limpar").hidden = false;
+  $("#ir").textContent = "Nova medição";
+}
+
+$("#copiar").onclick = async () => {
+  try { await navigator.clipboard.writeText($("#texto").textContent); $("#copiar").textContent = "Copiado ✓"; }
+  catch (e) { $("#copiar").textContent = "seleciona o texto abaixo"; }
+};
+</script>
+</body></html>
