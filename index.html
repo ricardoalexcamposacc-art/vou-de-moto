@@ -263,6 +263,59 @@ a{color:var(--accent)}
 #map-route{height:440px;border-radius:12px;background:var(--surface2)}
 .map-card{padding:10px}
 .map-note{font-size:11.5px;color:var(--muted);margin:8px 4px 0}
+.hero-prov{font-size:11.5px;color:var(--muted);margin-top:2px}
+/* ================= A4.2 — O MAPA É O ECRÃ ================= */
+.map-shell{position:relative}
+#map-route{height:300px;border-radius:14px;background:var(--surface2)}
+body.rota-mapa header, body.rota-mapa .tabs, body.rota-mapa footer,
+body.rota-mapa #offline-banner, body.rota-mapa #net-banner,
+body.rota-mapa #view-rota #ai-card, body.rota-mapa #view-rota #plan-card,
+body.rota-mapa #view-rota #route-error{display:none}
+body.rota-mapa .map-shell{position:fixed;inset:0;z-index:1500}
+body.rota-mapa #map-route{position:absolute;inset:0;height:100%;border-radius:0}
+body.rota-mapa #view-agora{display:none}
+#rota-topo{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:10px;right:auto;z-index:1600;
+  display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:7px 14px 7px 8px;box-shadow:0 3px 14px rgba(0,0,0,.18);max-width:76vw}
+#rota-topo button{background:none;border:0;font-size:15px;color:var(--ink);cursor:pointer;padding:2px 6px}
+#rota-topo span{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rota-legenda{position:absolute;top:calc(60px + env(safe-area-inset-top,0px));left:10px;z-index:1600;
+  display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:7px 10px;font-size:11.5px;box-shadow:0 3px 14px rgba(0,0,0,.14)}
+#rota-legenda .lg-item{display:flex;align-items:center;gap:6px;color:var(--ink2)}
+#rota-legenda .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+#rota-legenda .lg-q{background:none;border:0;color:var(--muted);font-size:12px;cursor:pointer;
+  align-self:flex-start;padding:0;margin-top:2px;text-decoration:underline}
+#rota-faixa{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  z-index:1600;background:var(--surface);border:1px solid var(--border);border-left:6px solid var(--lvl-c,var(--good));
+  border-radius:16px;padding:11px 13px;box-shadow:0 6px 22px rgba(0,0,0,.22);cursor:pointer}
+#rota-faixa.lvl0{--lvl-c:var(--good)} #rota-faixa.lvl1{--lvl-c:var(--warn)}
+#rota-faixa.lvl2{--lvl-c:var(--serious)} #rota-faixa.lvl3{--lvl-c:var(--crit)}
+#rota-faixa .big{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700}
+#rota-faixa .fx-dot{width:11px;height:11px;border-radius:50%;background:var(--lvl-c);flex:0 0 auto}
+#rota-faixa .fx-con{font-size:12.5px;color:var(--ink2);margin-top:3px}
+#rota-faixa .fx-num{font-size:12px;color:var(--muted);margin-top:4px}
+#rota-faixa .btn{margin-top:9px;width:100%;justify-content:center}
+#rota-folha{position:fixed;left:0;right:0;bottom:0;z-index:1700;background:var(--surface);
+  border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.28);max-height:80vh;overflow:auto;
+  transform:translateY(105%);transition:transform .28s ease;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px))}
+body.folha-aberta #rota-folha{transform:none}
+#rota-folha-grab{position:sticky;top:0;background:var(--surface);padding:10px 0 8px;cursor:pointer;z-index:2}
+#rota-folha-grab span{display:block;width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto}
+body:not(.rota-mapa) #rota-folha, body:not(.rota-mapa) #rota-faixa,
+body:not(.rota-mapa) #rota-topo, body:not(.rota-mapa) #rota-legenda{display:none}
+/* os controlos do mapa saem de debaixo do pill/legenda (topo-esquerda → direita),
+   e a atribuição sobe para cima da faixa — visível é obrigatório (registo 20) */
+body.rota-mapa .leaflet-top.leaflet-left{left:auto;right:10px}
+body.rota-mapa .leaflet-bottom.leaflet-right{bottom:var(--faixa-h,150px)}
+.san-row{display:flex;gap:8px;align-items:baseline;font-size:12.5px;padding:4px 0;border-top:1px solid rgba(125,125,125,.18)}
+.san-row b{font-weight:600}
+.san-tx{flex:1;min-width:0}
+.san-pais{color:var(--muted)}
+.san-h{font-size:12px;color:var(--muted);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.4px}
+.san-x{background:none;border:0;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 6px}
+.san-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.san-corrigir{margin-top:8px}
 .seg-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .seg-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:11px;
   background:var(--surface2);border:1px solid var(--grid);font-size:13.5px}
@@ -281,6 +334,13 @@ a{color:var(--accent)}
 .dep-chip .v{font-size:11.5px;color:var(--ink2);margin-top:1px}
 .summary-hero{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .summary-hero .big{font-size:19px;font-weight:750;letter-spacing:-.01em;display:flex;gap:9px;align-items:center}
+/* veredicto com dados em falta: o cartão di-lo à vista, não só no texto */
+.hero.incompleto{outline:2px dashed rgba(216,161,0,.55);outline-offset:-2px}
+.buraco-dados{margin-top:10px;padding:8px 11px;border-radius:9px;display:flex;gap:6px;align-items:flex-start;
+  background:rgba(216,161,0,.10);border:1px solid rgba(216,161,0,.35);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.tl-col.furo .tl-bar{opacity:.45;
+  background-image:repeating-linear-gradient(45deg,transparent 0 4px,rgba(127,127,127,.6) 4px 8px)}
+.nc-cell.furo{background:transparent !important;border:1px dashed var(--muted);color:var(--muted)}
 /* O CSS da tab Radar saiu com ela na A2.4. Ficou aqui a estorvar durante
    toda a remoção porque a remoção procurou funções e não folhas de estilo. */
 /* ================= TOOLTIP ================= */
@@ -734,6 +794,7 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
       </div>
       <button class="btn" id="btn-gps" title="Usar a minha localização">📍<span class="gps-lab">GPS</span></button>
     </div>
+    <div id="foco-chip" class="chips" hidden style="margin:2px 2px 0"></div>
     <div class="card" id="sentinel-card">
       <div class="card-head">
         <h2>🔔 Sentinela meteorológica</h2>
@@ -749,6 +810,8 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
            avisar — e este só apareceu porque o teste o foi ler tarde. -->
       <p class="h-sub" id="sentinel-nota" style="margin:8px 0 0" hidden></p>
     </div>
+    <div id="confirmar-casa-slot"></div>
+    <div id="sanidade-slot"></div>
     <div id="agora-content">
       <div class="skel" style="height:150px;margin-bottom:14px"></div>
       <div class="skel" style="height:220px"></div>
@@ -839,22 +902,30 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
         </span>
       </div>
       <div id="route-error"></div>
+      <button class="btn ghost" id="btn-ver-mapa" hidden style="margin-top:10px">Ver o mapa</button>
     </div>
-    <div id="route-summary"></div>
-    <div class="card map-card">
+    <!-- A4.2: o mapa é o ecrã. Com rota calculada, a shell fica a viewport
+         inteira e por cima dela só flutua a lista FECHADA do registo 20:
+         topo (voltar), recentrar (botão do mapa), atribuição (canto do mapa),
+         legenda condicional e a faixa do veredicto. Tudo o resto vive na
+         folha que se puxa — a faixa é o puxador. -->
+    <div class="map-shell" id="map-shell">
       <div id="map-route" data-test="map-route"></div>
-      <div class="legend" style="padding:4px 6px 0">
-        <span><span class="dot" style="background:var(--good)"></span>✔ Seco</span>
-        <span><span class="dot" style="background:var(--warn)"></span>⚠ Chuvisco / possível</span>
-        <span><span class="dot" style="background:var(--serious)"></span>🌧 Chuva</span>
-        <span><span class="dot" style="background:var(--crit)"></span>⛈ Forte / trovoada</span>
+      <div id="rota-topo" hidden>
+        <button id="rt-voltar" type="button" aria-label="Voltar ao planeamento">◀</button>
+        <span id="rt-topo-txt"></span>
       </div>
-      <p class="map-note">A cor de cada troço mostra o tempo previsto <b>à hora a que lá vais passar</b>, não o tempo de agora.</p>
+      <div id="rota-legenda" hidden></div>
+      <div id="rota-faixa" hidden></div>
     </div>
-    <div id="route-departures"></div>
-    <div id="route-hazards"></div>
-    <div id="route-segments"></div>
-    <div id="route-cameras"></div>
+    <div id="rota-folha" hidden>
+      <div id="rota-folha-grab" role="button" aria-label="Fechar a folha"><span></span></div>
+      <div id="route-summary"></div>
+      <div id="route-departures"></div>
+      <div id="route-hazards"></div>
+      <div id="route-segments"></div>
+      <div id="route-cameras"></div>
+    </div>
   </section>
 
 
@@ -1011,12 +1082,16 @@ function applyStaticI18n(){
     ["#cam-opt-s","txt","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado."],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
     ["#lang-title","txt","Idioma"],
+    ["#btn-ver-mapa","txt","Ver o mapa"],
+    ["#rt-voltar","aria","Voltar ao planeamento"],
+    ["#rota-folha-grab","aria","Fechar a folha"],
   ];
   for(const [sel,kind,a,b] of map){
     const n=$(sel); if(!n) continue;
     if(kind==="txt") n.textContent=t(a);
     else if(kind==="txt2") n.textContent=a+t(b);
     else if(kind==="ph") n.placeholder=t(a);
+    else if(kind==="aria") n.setAttribute("aria-label",t(a));
   }
   const planTitle=$$("#view-rota .card h2")[1];
   if(planTitle) planTitle.textContent=t("Planear trajeto");
@@ -1038,13 +1113,9 @@ function applyStaticI18n(){
   $$("#rt-timemode option").forEach(o=>{ o.textContent=o.value==="dep"?t("Partir às"):t("Chegar às"); });
   const tt2=$("#trips-title"); if(tt2) tt2.textContent=t("🗓️ Viagens planeadas");
   const th2=$("#trips-hint"); if(th2) th2.textContent=t("Calcula uma rota com hora futura e toca em \"🗓️ Agendar viagem\" para ela aparecer aqui, com o tempo previsto.");
-  // legenda do mapa
-  const lg=$$("#view-rota .legend span");
-  const legendTxt=["✔ Seco","⚠ Chuvisco / possível","🌧 Chuva","⛈ Forte / trovoada"];
-  lg.forEach((s,i)=>{ if(i<4&&s.childNodes.length>1) s.childNodes[1].textContent=t(legendTxt[i]); });
-  const notes=$$(".map-note");
-  if(notes[0]){ notes[0].textContent=""; notes[0].append(document.createTextNode(t("A cor de cada troço mostra o tempo previsto ")),
-    el("b",null,t("à hora a que lá vais passar")), document.createTextNode(t(", não o tempo de agora."))); }
+  // A4.2: a legenda estática e a nota do mapa morreram — a legenda nova é
+  // condicional, nasce no renderLegendaRota() de UMA fonte (LVL_NAME) já
+  // dentro do t(), e a explicação vive atrás do "?" da própria legenda.
   // definições
   const pop=$("#settings-pop");
   if(pop){
@@ -1093,9 +1164,23 @@ en:{
 "Origem":"From","Destino":"To","Hora de partida":"Departure time","Planear trajeto":"Plan a trip",
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"See exactly where along the way it will rain — and the best time to leave.",
 "Paragens no caminho":"Stops on the way","até 4":"up to 4","fico 0 min":"stay 0 min","fico 1 h":"stay 1 h","fico {n} min":"stay {n} min",
-"✔ Seco":"✔ Dry","⚠ Chuvisco / possível":"⚠ Drizzle / possible","🌧 Chuva":"🌧 Rain","⛈ Forte / trovoada":"⛈ Heavy / storm",
+"Modo viagem":"Trip mode","Ver o mapa":"See the map","Voltar ao planeamento":"Back to planning",
+"Fechar a folha":"Close the sheet","O que significam as cores?":"What do the colours mean?",
 "A cor de cada troço mostra o tempo previsto ":"Each segment's colour shows the forecast ",
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
+"Vê se os teus sítios guardados batem certo":"Check that your saved places look right",
+"Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"An earlier version of the search could save a place with the wrong coordinates — up to thousands of kilometres off. That's fixed, but only you can confirm what's already saved on your device. I'll ask once.",
+"sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
+"✔ Está tudo certo":"✔ All correct","A casa não está certa — corrigir":"Home isn't right — fix it",
+"Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Pick the right place in the search above — home only changes when you choose one.",
+"Ir para a pesquisa":"Go to the search","Apagar este registo":"Delete this entry",
+"Se fechares sem responder, fica tudo como está e volto a perguntar na próxima abertura.":"If you close without answering, everything stays as it is and I'll ask again next time you open the app.",
+"Obrigado — não volto a perguntar.":"Thanks — I won't ask again.",
+"guardada antes desta versão":"saved before this version","detetada pelo GPS":"detected by GPS",
+"definida a partir de uma pesquisa":"set from a search result","valor de arranque — nunca escolhida por ti":"startup default — never chosen by you",
+"definida por ti":"set by you",
+"🏠 Mudar a casa para {p}, a {d} de distância? Isto não veio de um gesto teu, por isso pergunto antes de gravar.":"🏠 Change home to {p}, {d} away? This didn't come from a gesture of yours, so I'm asking before saving.",
+"Sim, mudar":"Yes, change it","Não, manter a minha casa":"No, keep my home",
 
 "Perfil de decisão":"Decision profile","Conservador":"Cautious","Equilibrado":"Balanced","Tolerante":"Tolerant",
 "Qualquer risco relevante já pesa na decisão.":"Any relevant risk already counts against riding.",
@@ -1113,6 +1198,25 @@ en:{
 "Aguaceiros fracos":"Light showers","Aguaceiros":"Showers","Aguaceiros violentos":"Violent showers","Aguaceiros de neve":"Snow showers","Aguaceiros de neve fortes":"Heavy snow showers",
 "Trovoada":"Thunderstorm","Trovoada com granizo":"Thunderstorm w/ hail","Trovoada com granizo forte":"Severe storm w/ hail",
 "Vai de moto!":"Ride on!","Vai, mas equipado":"Go, but geared up","Arriscado — pensa duas vezes":"Risky — think twice","Melhor não ir de moto":"Better not ride",
+"Provavelmente bom":"Probably fine","por confirmar":"to be confirmed","céu por confirmar":"sky unconfirmed",
+"Sem dados de {c} para as {h}.":"No {c} data for {h}.",
+"O que verifiquei está bom, mas sem isso não afirmo o verde.":"What I checked looks good, but without that I won't state the green.",
+"Os dados em falta não melhoravam esta resposta.":"The missing data wouldn't have improved this answer.",
+"chuva":"rain","temperatura":"temperature","estado do céu":"sky condition","nevoeiro":"fog","Sem dados":"No data","sem dados":"no data",
+"Sem chuva no que veio — mas faltam {n} dos {m} quartos de hora.":"No rain in what arrived — but {n} of {m} quarter-hours are missing.",
+"Bom? — faltam dados":"Good? — data missing",
+"Provavelmente seco — faltam-me dados em parte do caminho":"Probably dry — I'm missing data for part of the way",
+"Sem dados de {c} ao km {a}{h}.":"No {c} data at km {a}{h}.",
+"Sem dados de {c} entre o km {a} e o km {b}{h}.":"No {c} data between km {a} and km {b}{h}.",
+"O resto do caminho verifiquei — sem isso não afirmo o seco.":"I checked the rest of the way — without that I won't state it's dry.",
+"Faltam dados em parte do caminho — confirma antes de sair.":"Data missing for part of the way — check before leaving.",
+"direção desconhecida":"direction unknown","? sem dados":"? no data",
+"Provavelmente sim — mas faltam-me dados":"Probably yes — but I'm missing data",
+"Não tenho dados de parte do caminho; no que verifiquei está seco. Os pormenores estão no resumo da rota.":"I have no data for part of the way; what I checked is dry. Details are in the route summary.",
+"🅿️ Em {p} depois de chegares: provavelmente seco, mas faltam-me dados de parte dessas horas.":"🅿️ In {p} after you arrive: probably dry, but I'm missing data for part of those hours.",
+"Lá em {p}: provavelmente seco, mas faltam-me dados de parte dessas horas.":"Over in {p}: probably dry, but I'm missing data for part of those hours.",
+"faltam dados dessa hora":"data missing for that hour",
+"Sem chuva no que veio — faltam {n} dos 8 quartos de hora.":"No rain in what arrived — {n} of the 8 quarter-hours are missing.",
 "via verde":"all clear","atenção":"caution","risco":"risk","não recomendado":"not advised",
 "Seco":"Dry","Chuvisco / possível":"Drizzle / possible","Forte / trovoada":"Heavy / storm","Chuvisco possível":"Possible drizzle","Chuva forte / trovoada":"Heavy rain / storm",
 "índice moto":"ride index","{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° in {p} — call for the next 3 h",
@@ -1235,6 +1339,7 @@ en:{
 "Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"On, but no position — enable GPS or search your city.",
 "Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"On — last check failed, retrying in ~2 min.",
 "Sentinela desligada.":"Sentinel off.",
+"distância?":"distance?",
 "🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 This browser cannot speak: directions come as text and vibration, with no sound.",
 "📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 This device gives no GPS access: type your town so I know where you are.",
 "🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ The last route's map came out incomplete ({d} of {t} pieces): with no signal you will hit gaps. Recalculate the route online to finish it.",
@@ -1278,8 +1383,22 @@ es:{
 "📍 Ponto de partida":"📍 Punto de partida","🏁 Para onde vais?":"🏁 ¿A dónde vas?","Origem":"Origen","Destino":"Destino","Hora de partida":"Hora de salida","Planear trajeto":"Planificar ruta",
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Ve exactamente en qué tramos lloverá — y la mejor hora para salir.",
 "Paragens no caminho":"Paradas en el camino","até 4":"hasta 4","fico 0 min":"paro 0 min","fico 1 h":"paro 1 h","fico {n} min":"paro {n} min",
-"✔ Seco":"✔ Seco","⚠ Chuvisco / possível":"⚠ Llovizna / posible","🌧 Chuva":"🌧 Lluvia","⛈ Forte / trovoada":"⛈ Fuerte / tormenta",
+"Modo viagem":"Modo viaje","Ver o mapa":"Ver el mapa","Voltar ao planeamento":"Volver a la planificación",
+"Fechar a folha":"Cerrar la hoja","O que significam as cores?":"¿Qué significan los colores?",
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
+"Vê se os teus sítios guardados batem certo":"Comprueba que tus sitios guardados están bien",
+"Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Una versión anterior de la búsqueda podía guardar un sitio con coordenadas equivocadas — hasta a miles de kilómetros. Ya está corregido, pero lo que quedó guardado en tu dispositivo solo tú puedes confirmarlo. Pregunto una vez.",
+"sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
+"✔ Está tudo certo":"✔ Todo correcto","A casa não está certa — corrigir":"La casa no está bien — corregir",
+"Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Elige el sitio correcto en la búsqueda de arriba — la casa solo cambia cuando elijas uno.",
+"Ir para a pesquisa":"Ir a la búsqueda","Apagar este registo":"Borrar este registro",
+"Se fechares sem responder, fica tudo como está e volto a perguntar na próxima abertura.":"Si cierras sin responder, todo queda como está y vuelvo a preguntar la próxima vez.",
+"Obrigado — não volto a perguntar.":"Gracias — no vuelvo a preguntar.",
+"guardada antes desta versão":"guardada antes de esta versión","detetada pelo GPS":"detectada por GPS",
+"definida a partir de uma pesquisa":"definida desde una búsqueda","valor de arranque — nunca escolhida por ti":"valor inicial — nunca elegida por ti",
+"definida por ti":"definida por ti",
+"🏠 Mudar a casa para {p}, a {d} de distância? Isto não veio de um gesto teu, por isso pergunto antes de gravar.":"🏠 ¿Cambiar la casa a {p}, a {d} de distancia? Esto no vino de un gesto tuyo, así que pregunto antes de guardar.",
+"Sim, mudar":"Sí, cambiar","Não, manter a minha casa":"No, mantener mi casa",
 
 "Perfil de decisão":"Perfil de decisión","Conservador":"Prudente","Equilibrado":"Equilibrado","Tolerante":"Tolerante",
 "Qualquer risco relevante já pesa na decisão.":"Cualquier riesgo relevante ya pesa en la decisión.",
@@ -1296,6 +1415,25 @@ es:{
 "Neve fraca":"Nieve débil","Neve":"Nieve","Neve forte":"Nieve fuerte","Grãos de neve":"Granos de nieve","Aguaceiros fracos":"Chubascos débiles","Aguaceiros":"Chubascos","Aguaceiros violentos":"Chubascos violentos",
 "Aguaceiros de neve":"Chubascos de nieve","Aguaceiros de neve fortes":"Chubascos de nieve fuertes","Trovoada":"Tormenta","Trovoada com granizo":"Tormenta con granizo","Trovoada com granizo forte":"Tormenta fuerte con granizo",
 "Vai de moto!":"¡Sal en moto!","Vai, mas equipado":"Ve, pero equipado","Arriscado — pensa duas vezes":"Arriesgado — piénsalo dos veces","Melhor não ir de moto":"Mejor no salgas en moto",
+"Provavelmente bom":"Probablemente bien","por confirmar":"por confirmar","céu por confirmar":"cielo por confirmar",
+"Sem dados de {c} para as {h}.":"Sin datos de {c} para las {h}.",
+"O que verifiquei está bom, mas sem isso não afirmo o verde.":"Lo que verifiqué está bien, pero sin eso no afirmo el verde.",
+"Os dados em falta não melhoravam esta resposta.":"Los datos que faltan no mejorarían esta respuesta.",
+"chuva":"lluvia","temperatura":"temperatura","estado do céu":"estado del cielo","nevoeiro":"niebla","Sem dados":"Sin datos","sem dados":"sin datos",
+"Sem chuva no que veio — mas faltam {n} dos {m} quartos de hora.":"Sin lluvia en lo que llegó — pero faltan {n} de {m} cuartos de hora.",
+"Bom? — faltam dados":"¿Bueno? — faltan datos",
+"Provavelmente seco — faltam-me dados em parte do caminho":"Probablemente seco — me faltan datos de parte del camino",
+"Sem dados de {c} ao km {a}{h}.":"Sin datos de {c} en el km {a}{h}.",
+"Sem dados de {c} entre o km {a} e o km {b}{h}.":"Sin datos de {c} entre el km {a} y el km {b}{h}.",
+"O resto do caminho verifiquei — sem isso não afirmo o seco.":"El resto del camino lo verifiqué — sin eso no afirmo que esté seco.",
+"Faltam dados em parte do caminho — confirma antes de sair.":"Faltan datos de parte del camino — confirma antes de salir.",
+"direção desconhecida":"dirección desconocida","? sem dados":"? sin datos",
+"Provavelmente sim — mas faltam-me dados":"Probablemente sí — pero me faltan datos",
+"Não tenho dados de parte do caminho; no que verifiquei está seco. Os pormenores estão no resumo da rota.":"No tengo datos de parte del camino; en lo que verifiqué está seco. Los detalles están en el resumen de la ruta.",
+"🅿️ Em {p} depois de chegares: provavelmente seco, mas faltam-me dados de parte dessas horas.":"🅿️ En {p} después de llegar: probablemente seco, pero me faltan datos de parte de esas horas.",
+"Lá em {p}: provavelmente seco, mas faltam-me dados de parte dessas horas.":"Allí en {p}: probablemente seco, pero me faltan datos de parte de esas horas.",
+"faltam dados dessa hora":"faltan datos de esa hora",
+"Sem chuva no que veio — faltam {n} dos 8 quartos de hora.":"Sin lluvia en lo que llegó — faltan {n} de los 8 cuartos de hora.",
 "via verde":"vía libre","atenção":"atención","risco":"riesgo","não recomendado":"no recomendado",
 "Seco":"Seco","Chuvisco / possível":"Llovizna / posible","Forte / trovoada":"Fuerte / tormenta","Chuvisco possível":"Llovizna posible","Chuva forte / trovoada":"Lluvia fuerte / tormenta",
 "índice moto":"índice moto","{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° en {p} — decisión para las próximas 3 h",
@@ -1405,6 +1543,7 @@ es:{
 "Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Activado, pero sin posición — activa el GPS o busca tu ciudad.",
 "Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Activado — falló la última comprobación, reintento en ~2 min.",
 "Sentinela desligada.":"Centinela apagado.",
+"distância?":"¿distancia?",
 "🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Este navegador no habla: las indicaciones van por escrito y vibración, sin sonido.",
 "📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 Este dispositivo no da acceso al GPS: escribe tu ciudad para que sepa dónde estás.",
 "🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ El mapa de la última ruta quedó incompleto ({d} de {t} piezas): sin cobertura encontrarás huecos. Vuelve a calcular la ruta con internet para completarlo.",
@@ -1444,8 +1583,22 @@ fr:{
 "📍 Ponto de partida":"📍 Point de départ","🏁 Para onde vais?":"🏁 Où vas-tu ?","Origem":"Départ","Destino":"Arrivée","Hora de partida":"Heure de départ","Planear trajeto":"Planifier un trajet",
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Vois exactement sur quels tronçons il pleuvra — et la meilleure heure pour partir.",
 "Paragens no caminho":"Arrêts en chemin","até 4":"jusqu'à 4","fico 0 min":"pause 0 min","fico 1 h":"pause 1 h","fico {n} min":"pause {n} min",
-"✔ Seco":"✔ Sec","⚠ Chuvisco / possível":"⚠ Bruine / possible","🌧 Chuva":"🌧 Pluie","⛈ Forte / trovoada":"⛈ Forte / orage",
+"Modo viagem":"Mode trajet","Ver o mapa":"Voir la carte","Voltar ao planeamento":"Retour à la planification",
+"Fechar a folha":"Fermer le volet","O que significam as cores?":"Que signifient les couleurs ?",
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
+"Vê se os teus sítios guardados batem certo":"Vérifie que tes lieux enregistrés sont corrects",
+"Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Une version précédente de la recherche pouvait enregistrer un lieu avec de mauvaises coordonnées — jusqu'à des milliers de kilomètres à côté. C'est corrigé, mais ce qui est déjà enregistré sur ton appareil, toi seul peux le confirmer. Je demande une fois.",
+"sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
+"✔ Está tudo certo":"✔ Tout est bon","A casa não está certa — corrigir":"Le domicile n'est pas bon — corriger",
+"Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Choisis le bon lieu dans la recherche au-dessus — le domicile ne change que quand tu choisis.",
+"Ir para a pesquisa":"Aller à la recherche","Apagar este registo":"Supprimer cette entrée",
+"Se fechares sem responder, fica tudo como está e volto a perguntar na próxima abertura.":"Si tu fermes sans répondre, tout reste tel quel et je redemanderai à la prochaine ouverture.",
+"Obrigado — não volto a perguntar.":"Merci — je ne redemanderai plus.",
+"guardada antes desta versão":"enregistré avant cette version","detetada pelo GPS":"détecté par GPS",
+"definida a partir de uma pesquisa":"défini depuis une recherche","valor de arranque — nunca escolhida por ti":"valeur de départ — jamais choisie par toi",
+"definida por ti":"défini par toi",
+"🏠 Mudar a casa para {p}, a {d} de distância? Isto não veio de um gesto teu, por isso pergunto antes de gravar.":"🏠 Changer le domicile pour {p}, à {d} ? Cela ne vient pas d'un geste de toi, alors je demande avant d'enregistrer.",
+"Sim, mudar":"Oui, changer","Não, manter a minha casa":"Non, garder mon domicile",
 
 "Perfil de decisão":"Profil de décision","Conservador":"Prudent","Equilibrado":"Équilibré","Tolerante":"Tolérant",
 "Qualquer risco relevante já pesa na decisão.":"Tout risque pertinent pèse déjà dans la décision.",
@@ -1462,6 +1615,25 @@ fr:{
 "Neve fraca":"Neige faible","Neve":"Neige","Neve forte":"Neige forte","Grãos de neve":"Grésil","Aguaceiros fracos":"Averses faibles","Aguaceiros":"Averses","Aguaceiros violentos":"Averses violentes",
 "Aguaceiros de neve":"Averses de neige","Aguaceiros de neve fortes":"Fortes averses de neige","Trovoada":"Orage","Trovoada com granizo":"Orage avec grêle","Trovoada com granizo forte":"Fort orage avec grêle",
 "Vai de moto!":"Fonce en moto !","Vai, mas equipado":"Vas-y, mais équipé","Arriscado — pensa duas vezes":"Risqué — réfléchis-y","Melhor não ir de moto":"Mieux vaut ne pas rouler",
+"Provavelmente bom":"Probablement bon","por confirmar":"à confirmer","céu por confirmar":"ciel à confirmer",
+"Sem dados de {c} para as {h}.":"Pas de données de {c} pour {h}.",
+"O que verifiquei está bom, mas sem isso não afirmo o verde.":"Ce que j'ai vérifié est bon, mais sans cela je n'affirme pas le vert.",
+"Os dados em falta não melhoravam esta resposta.":"Les données manquantes n'auraient pas amélioré cette réponse.",
+"chuva":"pluie","temperatura":"température","estado do céu":"état du ciel","nevoeiro":"brouillard","Sem dados":"Pas de données","sem dados":"pas de données",
+"Sem chuva no que veio — mas faltam {n} dos {m} quartos de hora.":"Pas de pluie dans ce qui est arrivé — mais il manque {n} des {m} quarts d'heure.",
+"Bom? — faltam dados":"Bon ? — données manquantes",
+"Provavelmente seco — faltam-me dados em parte do caminho":"Probablement sec — il me manque des données sur une partie du trajet",
+"Sem dados de {c} ao km {a}{h}.":"Pas de données de {c} au km {a}{h}.",
+"Sem dados de {c} entre o km {a} e o km {b}{h}.":"Pas de données de {c} entre le km {a} et le km {b}{h}.",
+"O resto do caminho verifiquei — sem isso não afirmo o seco.":"J'ai vérifié le reste du trajet — sans cela je n'affirme pas le sec.",
+"Faltam dados em parte do caminho — confirma antes de sair.":"Données manquantes sur une partie du trajet — vérifie avant de partir.",
+"direção desconhecida":"direction inconnue","? sem dados":"? pas de données",
+"Provavelmente sim — mas faltam-me dados":"Probablement oui — mais il me manque des données",
+"Não tenho dados de parte do caminho; no que verifiquei está seco. Os pormenores estão no resumo da rota.":"Je n'ai pas de données pour une partie du trajet ; ce que j'ai vérifié est sec. Les détails sont dans le résumé de l'itinéraire.",
+"🅿️ Em {p} depois de chegares: provavelmente seco, mas faltam-me dados de parte dessas horas.":"🅿️ À {p} après ton arrivée : probablement sec, mais il me manque des données pour une partie de ces heures.",
+"Lá em {p}: provavelmente seco, mas faltam-me dados de parte dessas horas.":"Là-bas à {p} : probablement sec, mais il me manque des données pour une partie de ces heures.",
+"faltam dados dessa hora":"données manquantes pour cette heure",
+"Sem chuva no que veio — faltam {n} dos 8 quartos de hora.":"Pas de pluie dans ce qui est arrivé — il manque {n} des 8 quarts d'heure.",
 "via verde":"feu vert","atenção":"prudence","risco":"risque","não recomendado":"déconseillé",
 "Seco":"Sec","Chuvisco / possível":"Bruine / possible","Forte / trovoada":"Forte / orage","Chuvisco possível":"Bruine possible","Chuva forte / trovoada":"Pluie forte / orage",
 "índice moto":"indice moto","{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° à {p} — décision pour les 3 prochaines heures",
@@ -1571,6 +1743,7 @@ fr:{
 "Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Activée, mais sans position — active le GPS ou cherche ta ville.",
 "Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Activée — dernier contrôle échoué, nouvel essai dans ~2 min.",
 "Sentinela desligada.":"Sentinelle désactivée.",
+"distância?":"distance ?",
 "🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Ce navigateur ne parle pas : les indications passent par le texte et les vibrations, sans son.",
 "📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 Cet appareil ne donne pas accès au GPS : écris ta ville pour que je sache où tu es.",
 "🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ La carte du dernier trajet est restée incomplète ({d} sur {t} morceaux) : sans réseau tu trouveras des trous. Recalcule le trajet en ligne pour la compléter.",
@@ -1636,6 +1809,9 @@ Object.assign(I18N.en,{
 "km {a}–{b}":"km {a}–{b}","km {a}":"km {a}",
 "Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"First rain after {n} dry days: oil built up on the tarmac lifts and the road turns to soap for the first half hour. Brake early and gently, avoid road paint and manhole covers.",
 "Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind up to ~{g} km/h between km {a} and km {b} — firm on the bars; extra care on bridges, viaducts and when passing trucks.",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind up to ~{g} km/h near km {k} — firm on the bars; extra care on bridges, viaducts and when passing trucks.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind of ~{g0} to ~{g1} km/h between km {a} and km {b} — firm on the bars; extra care on bridges, viaducts and when passing trucks.",
+"Rota para {p}":"Route to {p}",
 "A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"At ~{v} km/h it effectively feels like {c}° (air {t}°) — hands go numb and reactions slow down. Winter gloves, layers, and stop to warm up mid-way on longer rides.",
 "Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Air at {t}° with {h}% humidity near km {k}: the road can be freezing even with air above zero — bridges, viaducts and shaded spots first. Stay upright and smooth through corners.",
 "Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Fog / visor fogging likely near km {k} (~{h}) — pinlock or visor cracked open, low beam on (never high beam) and double your following distance.",
@@ -1728,6 +1904,9 @@ Object.assign(I18N.es,{
 "km {a}–{b}":"km {a}–{b}","km {a}":"km {a}",
 "Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Primera lluvia tras {n} días secos: el aceite acumulado en el asfalto se suelta y el piso se vuelve jabón la primera media hora. Frena pronto y suave, evita pinturas y tapas de alcantarilla.",
 "Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral hasta ~{g} km/h entre el km {a} y el km {b} — firme en el manillar; ojo en puentes, viaductos y al adelantar camiones.",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral hasta ~{g} km/h cerca del km {k} — firme en el manillar; ojo en puentes, viaductos y al adelantar camiones.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral de ~{g0} a ~{g1} km/h entre el km {a} y el km {b} — firme en el manillar; ojo en puentes, viaductos y al adelantar camiones.",
+"Rota para {p}":"Ruta a {p}",
 "A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"A ~{v} km/h la sensación real es de {c}° (aire a {t}°) — las manos se entumecen y reaccionas tarde. Guantes de invierno, capas, y para a calentarte a mitad si el viaje es largo.",
 "Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Aire a {t}° con {h}% de humedad cerca del km {k}: el asfalto puede estar helándose aun con el aire sobre cero — puentes, viaductos y sombras primero. Recto y suave en las curvas.",
 "Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Niebla/visera empañada probable cerca del km {k} (~{h}) — pinlock o visera entreabierta, cortas encendidas (nunca largas) y el doble de distancia.",
@@ -1820,6 +1999,9 @@ Object.assign(I18N.fr,{
 "km {a}–{b}":"km {a}–{b}","km {a}":"km {a}",
 "Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Première pluie après {n} jours secs : l'huile accumulée sur le bitume remonte et la route devient une savonnette la première demi-heure. Freine tôt et en douceur, évite peintures et plaques d'égout.",
 "Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral jusqu'à ~{g} km/h entre le km {a} et le km {b} — tiens bien le guidon ; prudence sur les ponts, viaducs et en doublant les camions.",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral jusqu'à ~{g} km/h vers le km {k} — tiens bien le guidon ; prudence sur les ponts, viaducs et en doublant les camions.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral de ~{g0} à ~{g1} km/h entre le km {a} et le km {b} — tiens bien le guidon ; prudence sur les ponts, viaducs et en doublant les camions.",
+"Rota para {p}":"Itinéraire vers {p}",
 "A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"À ~{v} km/h le ressenti réel est de {c}° (air à {t}°) — les mains s'engourdissent et les réflexes ralentissent. Gants d'hiver, couches, et pause pour te réchauffer à mi-chemin si c'est long.",
 "Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Air à {t}° avec {h}% d'humidité vers le km {k} : la chaussée peut geler même avec l'air au-dessus de zéro — ponts, viaducs et zones d'ombre d'abord. Droit et souple dans les virages.",
 "Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Brouillard/visière embuée probable vers le km {k} (~{h}) — pinlock ou visière entrouverte, feux de croisement (jamais pleins phares) et double la distance.",
@@ -2255,7 +2437,8 @@ async function photonSearch(q,pos,limit=7){
   u.search=new URLSearchParams(params).toString();
   const j=await jfetch(u.toString(), 9000, "pesquisa");
   const seen=new Set();
-  return (j.features||[]).map(photonMap)
+  const atribF=atribDe(j);
+  return (j.features||[]).map(f=>{ const r=photonMap(f); if(atribF) r.atrib=atribF; return r; })
     .filter(r=>isFinite(r.lat)&&isFinite(r.lon))
     .filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
       if(seen.has(k)) return false; seen.add(k); return true; });
@@ -2383,7 +2566,10 @@ function locaisLocais(q){
     const alias=[...(PALAVRAS_CASA[state.lang]||PALAVRAS_CASA.pt), ...PALAVRAS_CASA.pt];
     let pt=pontuaTexto(casa.name,nq)*0.9;
     for(const a of alias) pt=Math.max(pt, pontuaTexto(a,nq));
-    if(pt>0) out.push({name:t("🏠 A minha casa"), sub:casa.name||"", lat:casa.lat, lon:casa.lon,
+    /* O subtítulo NUNCA é o nome guardado em cru (A3.5.35 ponto 6): se o nome
+       for lixo ("Jumbo"), repeti-lo aqui dá-lhe ar de facto. Mostra-se a
+       morada quando existe; senão, a proveniência — que é verdade sempre. */
+    if(pt>0) out.push({name:t("🏠 A minha casa"), sub:casa.sub||provTexto(casa.prov), lat:casa.lat, lon:casa.lon,
                        _fav:true, _casa:true, _pt:pt+1200});
   }
   for(const f of getFavs()){
@@ -2406,6 +2592,24 @@ function locaisLocais(q){
   }).slice(0,6);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   A REFERÊNCIA DA PESQUISA — uma só, e o mais tarde possível a faltar.
+
+   `state.home` demora a existir: com o GPS negado, o arranque só põe a casa de
+   reserva onze segundos depois. Nessa janela a pesquisa ficava sem referência
+   nenhuma, e o que ela fazia com isso é que era o defeito.
+
+   Aqui procura-se por ordem: a posição a que a app já chegou, a casa guardada
+   no dispositivo, o último sítio a que a pessoa foi. Só devolve nulo quando
+   realmente não há nada — e nesse caso quem chama TEM de tratar o nulo como
+   "não sei", nunca como zero.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function refPesquisa(){
+  const c=[state.home, store.get("home"), (getRecentes()||[])[0], (getFavs()||[])[0]];
+  for(const x of c) if(x&&isFinite(x.lat)&&isFinite(x.lon)) return {lat:x.lat, lon:x.lon};
+  return null;
+}
+
 const geoCache=new Map();
 async function geocode(q){
   const key=q.trim().toLowerCase();
@@ -2414,7 +2618,7 @@ async function geocode(q){
   if(m){ const lat=parseFloat(m[1].replace(",",".")), lon=parseFloat(m[2].replace(",","."));
     return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:t("coordenadas"), lat, lon}]; }
 
-  const here=state.home;
+  const here=refPesquisa();
   const out=[];
   const seen=new Set();
   const add=(arr)=>{ for(const r of (arr||[])){
@@ -2445,11 +2649,26 @@ async function geocode(q){
      parecido. Entre os da rede, decide a proximidade: um resultado a 1500 km
      não serve para nada a quem vai de mota. */
   out.forEach((r,i)=>{
-    r._d=isFinite(r._d)?r._d:(here?haversine(here,r):0);
+    /* ═══ DISTÂNCIA DESCONHECIDA É DESCONHECIDA, NÃO ZERO ═══
+       Isto dizia `: 0`. Sem referência — os primeiros segundos de uma
+       instalação nova, ou o GPS negado sem casa definida — todos os resultados
+       apareciam a **0,0 km**, incluindo um supermercado a 4800 km. Zero é a
+       mentira mais tranquilizadora que havia para dizer ali: "é já aqui".
+       E o mesmo `here ?` no `_score` fazia a proximidade deixar de contar, e é
+       por isso que o sítio no Sudão chegava a primeiro lugar.
+       Reproduzido em test/pesquisa-longe.mjs: sem casa, o Jumbo de Cartum vinha
+       em primeiro a 0,0 km; com casa, o MESMO item a 4805 km. O mesmo item,
+       dois números — que foi exatamente o relato. */
+    r._d=isFinite(r._d)?r._d:(here?haversine(here,r):null);
     const meu=r._fav?-3e6:r._rec?-2e6:0;
-    r._score=meu-(r._pt||0)+(r._poi?-500:0)+i*8+(here?Math.min(r._d,4000)*(r._d>120?3:1):0);
+    r._score=meu-(r._pt||0)+(r._poi?-500:0)+i*8+(here&&isFinite(r._d)?Math.min(r._d,4000)*(r._d>120?3:1):0);
   });
   out.sort((a,b)=>a._score-b._score);
+  /* Sem referência não se sabe o que é perto, e a lista deixa de poder ser
+     apresentada como "perto de ti". Marca-se, para quem desenha poder dizê-lo
+     em vez de deixar a pessoa supor. Errar para o lado seguro é aqui dizer
+     menos, não inventar um número. */
+  if(!here) for(const r of out) r._semRef=true;
   const res=out.slice(0,8);
   /* a cache guarda só o que veio da rede: guardar os favoritos aqui faria com
      que apagar ou renomear um deles continuasse a aparecer até recarregar */
@@ -2465,7 +2684,7 @@ const REV_CELULA_KM=2;
 function revChave(lat,lon){ return celula(lat,lon,REV_CELULA_KM); }
 async function revGeocode(lat,lon){
   if(geoOn()&&!(typeof travel==="object"&&travel.active)){
-    try{ const r=await geoReverse(lat,lon); return {name:r.name, sub:r.sub}; }catch(e){}
+    try{ const r=await geoReverse(lat,lon); return {name:r.name, sub:r.sub, atrib:r.atrib||null}; }catch(e){}
   }
   if(typeof travel==="object" && travel.active){
     const k=revChave(lat,lon), guardado=revCache.get(k);
@@ -2482,7 +2701,7 @@ async function revGeocode(lat,lon){
     const p=j.features?.[0]?.properties;
     if(p){
       const out={name:p.city||p.town||p.village||p.district||p.name||p.county||"—",
-        sub:p.state||p.country||""};
+        sub:p.state||p.country||"", atrib:atribDe(j)};
       revCache.set(key,out); return out;
     }
   }catch(e){}
@@ -2493,7 +2712,7 @@ async function revGeocode(lat,lon){
     const j=await nomFetch(u.toString());
     const a=j.address||{};
     const name=a.village||a.town||a.suburb||a.city||a.municipality||a.county||j.name||"—";
-    const out={name, sub:a.state||a.region||a.country||""};
+    const out={name, sub:a.state||a.region||a.country||"", atrib:atribDe(j)};
     revCache.set(key,out);
     return out;
   }catch(e){ return {name:`${lat.toFixed(3)}, ${lon.toFixed(3)}`, sub:""}; }
@@ -2532,6 +2751,14 @@ function geoURL(caminho,params){
    conseguimos classificar a manobra nós próprios */
 const GEO_LANG={pt:"pt",en:"en",es:"es",fr:"fr"};
 
+/* ── ATRIBUIÇÃO QUE VIAJA COM OS DADOS (licença Geoapify, email 29/07) ────
+   A resposta da geocodificação traz um campo attribution (Geoapify) ou
+   licence (Nominatim) que TEM de ser guardado com o resultado e
+   redistribuído quando o dado é mostrado ou partilhado. Guarda-se em
+   `atrib`, tal e qual veio — sem resumir nem reescrever. O que não traz
+   campo fica a nulo: não se inventa atribuição, nem se apaga a que veio. */
+const atribDe=(j)=>(j&&(j.attribution||j.licence))||null;
+
 /* ── um resultado de pesquisa, no formato que a app já usa ──────────────── */
 function geoFeature(f){
   const p=f.properties||{};
@@ -2547,7 +2774,9 @@ async function geoSearch(q,pos,limit=7){
     text:q, limit:String(limit), lang:GEO_LANG[state.lang]||"en",
     bias:(pos&&isFinite(pos.lat))?`proximity:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)}`:null,
   }),9000,"pesquisa");
-  return (j.features||[]).map(geoFeature).filter(r=>isFinite(r.lat)&&isFinite(r.lon));
+  const atrib=atribDe(j);
+  return (j.features||[]).map(f=>{ const r=geoFeature(f); if(atrib) r.atrib=atrib; return r; })
+    .filter(r=>isFinite(r.lat)&&isFinite(r.lon));
 }
 async function geoReverse(lat,lon){
   const j=await jfetch(geoURL("/v1/geocode/reverse",{
@@ -2556,7 +2785,7 @@ async function geoReverse(lat,lon){
   const f=(j.features||[])[0];
   if(!f) throw new Error("sem resultado");
   const r=geoFeature(f);
-  return {name:r.name, sub:r.sub, cc:(f.properties?.country_code||"").toUpperCase()};
+  return {name:r.name, sub:r.sub, cc:(f.properties?.country_code||"").toUpperCase(), atrib:atribDe(j)};
 }
 async function geoPlaces(cat,pos,radiusM=30000){
   const j=await jfetch(geoURL("/v2/places",{
@@ -2565,7 +2794,8 @@ async function geoPlaces(cat,pos,radiusM=30000){
     bias:`proximity:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)}`,
     lang:GEO_LANG[state.lang]||"en",
   }),12000,"pontos-de-interesse");
-  const out=(j.features||[]).map(geoFeature).filter(r=>isFinite(r.lat));
+  const atribP=atribDe(j);
+  const out=(j.features||[]).map(f=>{ const r=geoFeature(f); if(atribP) r.atrib=atribP; return r; }).filter(r=>isFinite(r.lat));
   out.forEach(o=>{ o._poi=true; o._d=haversine(pos,o); });
   out.sort((a,b)=>a._d-b._d);
   return out.slice(0,8);
@@ -2975,7 +3205,7 @@ function renderCameras(){
   if(!R||!box){ if(box) box.textContent=""; return; }
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,t("📸 Radares conhecidos no trajeto")));
+  card.appendChild(el("h2",null,semEmoji(t("📸 Radares conhecidos no trajeto"))));
   if(R.camerasError){
     card.appendChild(el("p","h-sub",t("Não consegui consultar os radares agora — tenta recalcular daqui a pouco.")));
     box.appendChild(card); return;
@@ -3036,33 +3266,51 @@ function renderCameras(){
 /* =====================================================================
    MOTOR DE DECISÃO — índice moto 0–100 por hora
    ===================================================================== */
+/* ═══ NÃO VEIO ≠ VEIO ZERO ═══
+   Isto dizia `pp:…??0, pr:…??0, code:…??0, vis:…??20000`. Cada campo em falta
+   virava o valor mais tranquilizador possível: sem dados de chuva era "0 mm",
+   sem código era "céu limpo", sem visibilidade eram "20 km". Uma hora sem
+   dados nenhuns pontuava 100 e o veredicto dizia "Vai de moto!" a cheio.
+   Um número absurdo denuncia-se; "0 mm, sem rajadas" acredita toda a gente.
+   Agora a ausência fica `null` até ao fim — quem agrega é que decide o que
+   fazer com ela (ver a condição assimétrica em renderDashboard). Zero
+   milímetros continua a ser zero: é um facto meteorológico legítimo. */
 function hourMetrics(H,i){
+  const g=(a)=>{ const v=a?.[i]; return v==null?null:v; };
   return {
-    t:H.temperature_2m[i], at:(H.apparent_temperature||H.temperature_2m)[i],
-    pp:H.precipitation_probability?.[i]??0, pr:H.precipitation?.[i]??0,
-    code:H.weather_code?.[i]??0, wind:H.wind_speed_10m?.[i]??0,
-    gust:H.wind_gusts_10m?.[i]??0, dir:H.wind_direction_10m?.[i]??0,
-    vis:H.visibility?.[i]??20000, rh:H.relative_humidity_2m?.[i]??60,
-    isDay:H.is_day?.[i]??1, time:H.time[i],
+    t:g(H.temperature_2m), at:g(H.apparent_temperature)??g(H.temperature_2m),
+    pp:g(H.precipitation_probability), pr:g(H.precipitation),
+    code:g(H.weather_code), wind:g(H.wind_speed_10m),
+    gust:g(H.wind_gusts_10m), dir:g(H.wind_direction_10m),
+    vis:g(H.visibility), rh:g(H.relative_humidity_2m),
+    isDay:g(H.is_day), time:H.time[i],
   };
 }
 
+/* A pontuação só usa o que EXISTE — um campo em falta não pode testemunhar,
+   nem a favor nem contra. Mas fica registado em `faltas`, porque "não pude
+   verificar a chuva" é informação que o veredicto tem de carregar. CUIDADO
+   COM AS COMPARAÇÕES: em JS `null<=0` é true (null vira 0) — sem os guardas
+   explícitos, uma temperatura em falta FABRICAVA "Temperatura negativa". */
 function scoreHour(m, prof=PROFILES[state.profile]){
   const R=[]; // razões {icon,label,pen}
+  const faltas=[]; // o que não veio e podia mudar a resposta
   let hard=false;
   const add=(pen,icon,label)=>{ if(pen>0) R.push({pen,icon,label}); return pen; };
   let pen=0;
   const code=m.code;
 
-  if(THUNDER.includes(code)){ hard=true; add(95,"⛈️",t("Trovoada prevista — risco elevado")); }
+  if(code==null) faltas.push(t("estado do céu"));
+  else if(THUNDER.includes(code)){ hard=true; add(95,"⛈️",t("Trovoada prevista — risco elevado")); }
   else if(FREEZING.includes(code)){ hard=true; add(95,"🧊",t("Chuva/chuvisco gelado — piso traiçoeiro")); }
   else if(SNOW.includes(code)){ hard=true; add(92,"❄️",t("Neve — não é dia de duas rodas")); }
 
   if(!hard){
-    // chuva: intensidade vs probabilidade (usa a pior)
+    // chuva: intensidade vs probabilidade (usa a pior das que vieram)
     const pr=m.pr, pp=m.pp;
-    const prPen = pr<=0.05?0 : pr<=0.3?16 : pr<=1?28 : pr<=3?44 : 60;
-    const ppPen = pp>=80?26 : pp>=60?18 : pp>=40?10 : pp>=25?5 : 0;
+    if(pr==null&&pp==null) faltas.push(t("chuva"));
+    const prPen = pr==null?0 : pr<=0.05?0 : pr<=0.3?16 : pr<=1?28 : pr<=3?44 : 60;
+    const ppPen = pp==null?0 : pp>=80?26 : pp>=60?18 : pp>=40?10 : pp>=25?5 : 0;
     const wet=Math.max(prPen,ppPen)*prof.wet;
     if(wet>0){
       const lab = pr>3?t("Chuva forte ({n} mm/h)",{n:fmtN(pr,1)}) :
@@ -3071,33 +3319,45 @@ function scoreHour(m, prof=PROFILES[state.profile]){
                   t("{p}% de probabilidade de chuva",{p:pp});
       pen+=add(wet,"🌧️",lab);
     }
-    // vento
+    // vento (a rajada é o que deita uma mota abaixo)
     const g=m.gust;
-    let gp = g<=35?0 : g<=50?(g-35)*0.9 : g<=65?13.5+(g-50)*1.8 : Math.min(62,40.5+(g-65)*2);
-    gp*=prof.wind;
-    if(gp>0) pen+=add(gp,"💨",t("Rajadas até {g} km/h",{g:rnd(g)}));
-    if(m.wind>40) pen+=add(6,"💨",t("Vento sustentado forte"));
+    if(g==null) faltas.push(t("vento"));
+    else{
+      let gp = g<=35?0 : g<=50?(g-35)*0.9 : g<=65?13.5+(g-50)*1.8 : Math.min(62,40.5+(g-65)*2);
+      gp*=prof.wind;
+      if(gp>0) pen+=add(gp,"💨",t("Rajadas até {g} km/h",{g:rnd(g)}));
+    }
+    if(m.wind!=null&&m.wind>40) pen+=add(6,"💨",t("Vento sustentado forte"));
     // frio/calor (sensação térmica — em cima da moto conta a dobrar)
     const at=m.at;
-    if(m.t<=0) pen+=add(50,"🧊",t("Temperatura negativa — risco de gelo no piso"));
-    else if(at<=0) pen+=add(26+Math.min(14,-at*2),"🥶",t("Sensação de {t}° — frio extremo",{t:rnd(at)}));
-    else if(at<=6) pen+=add(12+(6-at)*2.3,"🥶",t("Sensação de {t}° — frio a sério",{t:rnd(at)}));
-    else if(at<=12) pen+=add((12-at)*1.3,"🧥",t("Fresco (sensação {t}°)",{t:rnd(at)}));
-    if(at>=36) pen+=add(20,"🥵",t("Calor extremo (sensação {t}°)",{t:rnd(at)}));
-    else if(at>=32) pen+=add((at-32)*3,"🥵",t("Muito calor (sensação {t}°)",{t:rnd(at)}));
-    // gelo escondido
-    if(m.t<=3 && (m.pr>0||m.rh>=93)) pen+=add(25,"🧊",t("Risco de gelo em zonas de sombra e pontes"));
+    if(m.t==null||at==null) faltas.push(t("temperatura"));
+    else{
+      if(m.t<=0) pen+=add(50,"🧊",t("Temperatura negativa — risco de gelo no piso"));
+      else if(at<=0) pen+=add(26+Math.min(14,-at*2),"🥶",t("Sensação de {t}° — frio extremo",{t:rnd(at)}));
+      else if(at<=6) pen+=add(12+(6-at)*2.3,"🥶",t("Sensação de {t}° — frio a sério",{t:rnd(at)}));
+      else if(at<=12) pen+=add((12-at)*1.3,"🧥",t("Fresco (sensação {t}°)",{t:rnd(at)}));
+      if(at>=36) pen+=add(20,"🥵",t("Calor extremo (sensação {t}°)",{t:rnd(at)}));
+      else if(at>=32) pen+=add((at-32)*3,"🥵",t("Muito calor (sensação {t}°)",{t:rnd(at)}));
+      // gelo escondido — só se avalia com temperatura; humidade em falta perto
+      // de 0° é uma falta contextual (noutra estação não interessa nada)
+      if(m.t<=3){
+        if(m.pr>0||m.rh>=93) pen+=add(25,"🧊",t("Risco de gelo em zonas de sombra e pontes"));
+        else if(m.pr==null&&m.rh==null) faltas.push(t("humidade"));
+      }
+    }
     // visibilidade
     const v=m.vis;
-    let vp = v<200?38 : v<500?28 : v<1000?18 : v<2500?8 : 0;
-    if(FOG.includes(code)) vp=Math.max(vp,20);
-    if(vp>0) pen+=add(vp,"🌫️",t("Visibilidade reduzida ({v})",{v:v<1000?`${rnd(v)} m`:`${fmtN(v/1000,1)} km`}));
+    let vp=0;
+    if(v!=null) vp = v<200?38 : v<500?28 : v<1000?18 : v<2500?8 : 0;
+    else if(code==null||!FOG.includes(code)) faltas.push(t("visibilidade"));
+    if(code!=null&&FOG.includes(code)) vp=Math.max(vp,20);
+    if(vp>0) pen+=add(vp,"🌫️",t("Visibilidade reduzida ({v})",{v:(m.vis!=null&&m.vis<1000)?`${rnd(m.vis)} m`:m.vis!=null?`${fmtN(m.vis/1000,1)} km`:t("nevoeiro")}));
   } else pen=100;
 
   R.sort((a,b)=>b.pen-a.pen);
   const score=clamp(Math.round(100-pen),0,100);
   const lvl = hard?3 : score>=prof.tGood?0 : score>=prof.tWarn?1 : score>=25?2 : 3;
-  return {score, lvl, reasons:R.slice(0,3), hard};
+  return {score, lvl, reasons:R.slice(0,3), hard, faltas};
 }
 
 const VERDICT=[
@@ -3107,7 +3367,10 @@ const VERDICT=[
   {t:"Melhor não ir de moto", tag:"não recomendado", e:"🔴"},
 ];
 
-/* nível de chuva num ponto da rota (0 seco · 1 chuvisco/possível · 2 chuva · 3 forte/trovoada) */
+/* nível de chuva num ponto da rota (0 seco · 1 chuvisco/possível · 2 chuva · 3 forte/trovoada)
+   Campos null não testemunham (caem para 0): quem tem de aplicar a condição
+   assimétrica é quem AGREGA — o nível 0 de uma amostra com `faltas` nunca
+   pode virar "seco" afirmado (renderRouteSummary / renderDashboard). */
 function rainLevel(pr, pp, code, prof=PROFILES[state.profile]){
   if(THUNDER.includes(code)||FREEZING.includes(code)||SNOW.includes(code)) return 3;
   if(pr>=2.5) return 3;
@@ -3121,21 +3384,29 @@ const rainLabel=(lvl,pr)=>t(["Seco","Chuvisco possível","Chuva","Chuva forte / 
 /* equipamento recomendado a partir das próximas horas */
 function gearAdvice(hs){ // hs: métricas das próximas ~n horas
   const chips=[];
+  /* cuidado: `null<2000` e `null<=3` são TRUE em JS (null vira 0). Sem os
+     guardas, uma hora sem dados aconselhava viseira anti-nevoeiro e alerta de
+     gelo — conselhos fabricados. E `Math.min` de nulls dava 0°, inventando
+     frio. O que não veio fica fora do conselho; o cartão do veredicto já
+     carrega o aviso do buraco. */
+  const fin=(f)=>hs.map(f).filter(v=>v!=null);
   const anyRain=hs.some(m=>m.pr>0.05||m.pp>=40);
   const heavyRain=hs.some(m=>m.pr>1);
-  const minAt=Math.min(...hs.map(m=>m.at));
-  const maxAt=Math.max(...hs.map(m=>m.at));
-  const maxGust=Math.max(...hs.map(m=>m.gust));
-  const fog=hs.some(m=>FOG.includes(m.code)||m.vis<2000);
-  const ice=hs.some(m=>m.t<=3);
-  const night=hs.some(m=>!m.isDay);
+  const ats=fin(m=>m.at);
+  const minAt=ats.length?Math.min(...ats):null;
+  const maxAt=ats.length?Math.max(...ats):null;
+  const gusts=fin(m=>m.gust);
+  const maxGust=gusts.length?Math.max(...gusts):null;
+  const fog=hs.some(m=>(m.code!=null&&FOG.includes(m.code))||(m.vis!=null&&m.vis<2000));
+  const ice=hs.some(m=>m.t!=null&&m.t<=3);
+  const night=hs.some(m=>m.isDay===0);
   if(heavyRain) chips.push(t("🌧️ Fato de chuva completo (casaco + calças + cobre-botas)"));
   else if(anyRain) chips.push(t("🌦️ Leva o fato de chuva na mala — vais precisar dele"));
   if(ice) chips.push(t("🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra"));
-  if(minAt<=6) chips.push(t("🥶 Luvas de inverno + forro térmico + proteção de pescoço"));
-  else if(minAt<=12) chips.push(t("🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa"));
-  if(maxAt>=30) chips.push(t("🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres"));
-  if(maxGust>=45) chips.push(t("💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados"));
+  if(minAt!=null&&minAt<=6) chips.push(t("🥶 Luvas de inverno + forro térmico + proteção de pescoço"));
+  else if(minAt!=null&&minAt<=12) chips.push(t("🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa"));
+  if(maxAt!=null&&maxAt>=30) chips.push(t("🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres"));
+  if(maxGust!=null&&maxGust>=45) chips.push(t("💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados"));
   if(fog) chips.push(t("🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas"));
   if(night) chips.push(t("🦺 Parte do período é de noite — colete ou elementos refletores ajudam"));
   if(!chips.length) chips.push(t("😎 Condições confortáveis — equipamento habitual chega"));
@@ -3158,7 +3429,12 @@ function attachAC(input, list, onPick){
       mainCol.appendChild(el("b",null,(it._fav?"⭐ ":"")+it.name));
       if(it.sub) mainCol.appendChild(el("span",null,it.sub));
       d.appendChild(mainCol);
-      if(state.home&&isFinite(it.lat)) d.appendChild(el("span","ac-dist",U.dist(haversine(state.home,it))));
+      /* a MESMA referência que a pesquisa usou para ordenar — antes esta linha
+         media a partir de `state.home` e a ordenação a partir de outra coisa,
+         que é como o mesmo item aparecia com dois números diferentes */
+      const ref=refPesquisa();
+      if(ref&&isFinite(it.lat)) d.appendChild(el("span","ac-dist",U.dist(haversine(ref,it))));
+      else if(it._semRef) d.appendChild(el("span","ac-dist",t("distância?")));
       d.addEventListener("mousedown",(e)=>{ e.preventDefault(); pick(i); });
       list.appendChild(d);
     });
@@ -3166,7 +3442,7 @@ function attachAC(input, list, onPick){
   };
   const pick=(i)=>{ const it=items[i]; if(!it) return;
     input.value=it.name+(it.sub?` — ${it.sub.split(",")[0]}`:"");
-    input._picked=it; addRecente(it); close(); onPick&&onPick(it); };
+    input._picked=it; input._doFoco=false; addRecente(it); close(); onPick&&onPick(it); };
   const search=debounce(async ()=>{
     const q=input.value.trim();
     if(q.length<3){ close(); return; }
@@ -3175,6 +3451,7 @@ function attachAC(input, list, onPick){
   },350);
   input.addEventListener("input",()=>{
     input._picked=null;
+    input._doFoco=false;               // escrever à mão retira o campo ao foco
     /* os teus sítios aparecem já, sem esperar pelos 350 ms nem pela rede. Isto
        é o que faz a diferença entre "os favoritos funcionam" e "os favoritos
        aparecem lá para o fim, quando já escolhi outra coisa". */
@@ -3230,15 +3507,53 @@ function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomp
 /* =====================================================================
    PAINEL "AGORA"
    ===================================================================== */
-function setHome(loc, {silent=false}={}){
+/* A GUARDA DA CASA DISTANTE (a terceira correção da casa).
+   A A3.5.1 mostrou o custo de uma escrita programática: a casa foi parar ao
+   Sudão sem gesto nenhum. Hoje todos os caminhos legítimos declaram o gesto
+   (prov). O que chegar ao setHome SEM gesto e a centenas de km da casa atual
+   não se grava — pergunta-se, e só um toque do utilizador decide.
+   300 km: longe demais para ser imprecisão de morada, perto que chegue para
+   apanhar o veneno típico (4 400 km). QUANDO ESTE LIMITE ESTIVER ERRADO, O
+   GUARDA GRITA OU CALA-SE? Grita: baixo demais faz perguntas visíveis a mais;
+   nunca grava calado. */
+const LIMIAR_CASA_KM=300;
+function confirmarCasa(loc){
+  const slot=$("#confirmar-casa-slot"); if(!slot) return;
+  slot.textContent="";
+  const card=el("div","card"); card.id="confirmar-casa";
+  /* distância em métrico cru dentro do t(): é o próprio t() que converte a
+     frase final (regra das unidades — U.* dentro de t() converte duas vezes) */
+  card.appendChild(el("p",null,t("🏠 Mudar a casa para {p}, a {d} de distância? Isto não veio de um gesto teu, por isso pergunto antes de gravar.",
+    {p:loc.name||"?", d:`${Math.round(haversine(state.home,loc))} km`})));
+  const acoes=el("div","san-acoes");
+  const sim=el("button","btn primary",t("Sim, mudar"));
+  sim.addEventListener("click",()=>{ slot.textContent=""; setHome(loc,{prov:"escolha"}); });
+  const nao=el("button","btn",t("Não, manter a minha casa"));
+  nao.addEventListener("click",()=>{ slot.textContent=""; });
+  acoes.append(sim,nao); card.appendChild(acoes);
+  slot.appendChild(card);
+}
+function setHome(loc, {silent=false, prov}={}){
+  /* PROVENIÊNCIA (A3.5.35 pontos 4-6): cada escrita regista COMO nasceu —
+     gps / pesquisa / escolha / reserva. Sem prov novo, preserva-se o que o
+     objeto já traz (repetir setHome não branqueia a origem). A DEFAULT_LOC é
+     a reserva do arranque e fica marcada como tal — nunca como escolha.
+     Dados antigos sem registo ficam SEM registo: "guardada antes desta
+     versão" é a verdade; inventar-lhes uma origem seria o ??0 outra vez. */
+  if(!prov&&!loc.prov
+     &&state.home&&isFinite(state.home.lat)&&isFinite(loc.lat)
+     &&haversine(state.home,loc)>LIMIAR_CASA_KM){ confirmarCasa(loc); return; }
+  if(prov) loc.prov={como:prov, quando:Date.now()};
+  else if(!loc.prov&&loc===DEFAULT_LOC) loc.prov={como:"reserva", quando:Date.now()};
   state.home=loc;
-  store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon});
+  store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
+  if(sanidadePendente) sanidadeRender();   // a linha da casa no cartão de sanidade acompanha a troca
   const box=$("#agora-content");
   if(!silent){ box.textContent="";
     box.appendChild(el("div","skel")); box.lastChild.style.height="150px"; box.lastChild.style.marginBottom="14px";
     box.appendChild(el("div","skel")); box.lastChild.style.height="220px"; }
   fetchDashboardWx(loc.lat,loc.lon)
-    .then(wx=>{ state.wx=wx; renderDashboard(); })
+    .then(wx=>{ state.wx=wx; renderDashboard(); loadSecaAgora(loc.lat,loc.lon); })
     .catch(()=>{ if(!silent){ box.textContent="";
       const b=el("div","banner err"); b.append(el("span",null,"⚠️"),
         el("span",null,t("Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.")));
@@ -3253,9 +3568,9 @@ function useGPS(fromRoute){
   navigator.geolocation.getCurrentPosition(async pos=>{
     const {latitude:lat, longitude:lon}=pos.coords;
     const n=await revGeocode(lat,lon);
-    const loc={name:n.name, sub:n.sub, lat, lon};
+    const loc={name:n.name, sub:n.sub, lat, lon, atrib:n.atrib||null};
     if(fromRoute){ const o=$("#rt-o"); o.value=`📍 ${n.name}`; o._picked=loc; toast(t("Origem: {p}",{p:n.name})); }
-    else { setHome(loc); toast(t("Localização: {p}",{p:n.name})); }
+    else { setHome(loc,{prov:"gps"}); toast(t("Localização: {p}",{p:n.name})); }
   },err=>{
     const fb=store.get("home")||DEFAULT_LOC;
     toast(fromRoute?t("Sem acesso ao GPS — escreve a origem."):t("Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.",{p:fb.name}));
@@ -3282,7 +3597,17 @@ function renderDashboard(){
   const win=[{m:mNow,s:sNow},{m:metrics[i0+1],s:scores[i0+1]},{m:metrics[i0+2],s:scores[i0+2]}]
     .filter(x=>x.m&&x.s);
   const worst=win.reduce((a,b)=>b.s.score<a.s.score?b:a,win[0]);
-  const V=VERDICT[worst.s.lvl];
+  /* ═══ A CONDIÇÃO ASSIMÉTRICA ═══
+     Um veredicto mau com dados em falta mostra-se na mesma — os buracos não
+     iam melhorar a resposta. Um veredicto BOM com dados em falta não pode ser
+     afirmado: um vermelho errado deixa alguém em casa; um verde errado põe
+     alguém à chuva numa mota. Os erros não são simétricos, e um valor em
+     falta nunca pode empurrar para o lado bom. */
+  const buracos=win.filter(x=>x.s.faltas.length)
+    .map(x=>({t:x.m.time, campos:x.s.faltas}));
+  const completo=!buracos.length;
+  const verdePorConfirmar=worst.s.lvl===0&&!completo;
+  const V=verdePorConfirmar?{t:"Provavelmente bom",tag:"por confirmar",e:"🟢"}:VERDICT[worst.s.lvl];
 
   box.textContent="";
 
@@ -3297,10 +3622,22 @@ function renderDashboard(){
       t("{r} por volta das {h} ({d}). Evita estar na estrada nesse período.",{r:a.r.label,h:fmtH(a.t),d:dayLabel(a.t)})));
     const strip=el("div","alert-strip"); strip.appendChild(b); box.appendChild(strip);
   }
+  /* óleo da primeira chuva (dd-06 §2): condição PRESENTE enquanto o piso está
+     no pior momento — cartão que vive e morre com ela, nunca toast. O texto é
+     A MESMA chave do perigo da Rota: um aviso, uma frase, dois ecrãs. */
+  const oleo=oleoAgora(wx);
+  if(oleo){
+    const ob=el("div","banner err"); ob.setAttribute("data-test","oleo-agora");
+    ob.append(el("span",null,"🛢️"), el("span",null,
+      t("Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.",{n:oleo.n})));
+    box.appendChild(ob);
+  }
 
   // ---- hero ----
-  const hero=el("div",`card hero lvl${worst.s.lvl}`);
+  const hero=el("div",`card hero lvl${worst.s.lvl}${completo?"":" incompleto"}`);
   hero.setAttribute("data-test","verdict");
+  hero.dataset.nivel=String(worst.s.lvl);
+  hero.dataset.completo=completo?"1":"0";
   const sw=el("div","score-wrap");
   const ring=el("div","score-ring");
   const C=2*Math.PI*46;
@@ -3314,29 +3651,51 @@ function renderDashboard(){
   const main=el("div","hero-main");
   const title=el("div","hero-title");
   title.append(el("span","hero-emoji",V.e), el("span",null,t(V.t)), el("span","hero-tag",t(V.tag)));
-  const condTxt=t("{c} · {t}° em {p} — decisão para as próximas 3 h",{c:wmoTxt(mNow.code),t:rnd(mNow.t),p:state.home.name});
+  const condTxt=t("{c} · {t}° em {p} — decisão para as próximas 3 h",
+    {c:mNow.code==null?t("céu por confirmar"):wmoTxt(mNow.code), t:mNow.t==null?"—":rnd(mNow.t), p:state.home.name});
   main.append(title, el("div","hero-sub",condTxt));
+  /* a linha discreta da proveniência da casa (A3.5.35 ponto 5): quem vir
+     "definida a partir de uma pesquisa" percebe sozinho o que aconteceu */
+  main.append(el("div","hero-prov","🏠 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
   const ul=el("ul","reasons");
   if(worst.s.reasons.length){
     worst.s.reasons.forEach(r=>{ const li=el("li");
       li.append(el("span","r-ico",r.icon), el("span",null,r.label)); ul.appendChild(li); });
-  } else { const li=el("li"); li.append(el("span","r-ico","😎"),
+  } else if(completo){ const li=el("li"); li.append(el("span","r-ico","😎"),
       el("span",null,t("Sem chuva, vento controlado e temperatura agradável."))); ul.appendChild(li); }
-  // mudança relevante nas próximas 12h
+  // sem razões E sem dados completos: nada a afirmar aqui — o aviso do
+  // buraco, já a seguir, é que fala
+  // mudança relevante nas próximas 12h — a mesma assimetria: a notícia má
+  // mostra-se com a evidência que houver; a promessa de melhoria só sai de
+  // uma hora com os dados completos
   const curLvl=worst.s.lvl;
   for(let i=i0+3;i<Math.min(i0+14,scores.length);i++){
-    if(scores[i].lvl>curLvl+0&&scores[i].lvl>=2&&curLvl<2){
+    if(scores[i].lvl>curLvl+0&&scores[i].lvl>=2&&curLvl<2&&metrics[i].code!=null){
       const li=el("li"); li.append(el("span","r-ico","🕒"),
         el("span",null,t("A partir das {h}: {c} — se fores, volta antes disso.",{h:fmtH(H.time[i]),c:wmoTxt(metrics[i].code).toLowerCase()})));
       ul.appendChild(li); break;
     }
-    if(curLvl>=2&&scores[i].lvl<=1){
+    if(curLvl>=2&&scores[i].lvl<=1&&!scores[i].faltas.length){
       const li=el("li"); li.append(el("span","r-ico","🕒"),
         el("span",null,t("Melhora a partir das {h} ({d}).",{h:fmtH(H.time[i]),d:dayLabel(H.time[i])})));
       ul.appendChild(li); break;
     }
   }
   main.appendChild(ul);
+  /* aviso do buraco: é um aviso do PASSADO no sentido da regra 7g-bis — a
+     condição continua verdadeira depois da atualização seguinte — por isso
+     vive aqui no cartão, nunca num toast. E diz QUAIS as horas, porque
+     "faltam dados" sem horas não deixa ninguém decidir se espera ou não. */
+  if(!completo){
+    const b=el("div","buraco-dados"); b.setAttribute("data-test","buraco-dados");
+    const campos=[...new Set(buracos.flatMap(x=>x.campos))].join(", ");
+    const horas=buracos.map(x=>fmtH(x.t)).join(", ");
+    b.append(el("span",null,"⚠️ "),
+      el("span",null, t("Sem dados de {c} para as {h}.",{c:campos,h:horas})+" "+
+        (worst.s.lvl===0?t("O que verifiquei está bom, mas sem isso não afirmo o verde.")
+                        :t("Os dados em falta não melhoravam esta resposta."))));
+    main.appendChild(b);
+  }
   hero.append(sw,main);
   box.appendChild(hero);
 
@@ -3346,11 +3705,13 @@ function renderDashboard(){
   const cw=el("div","chips");
   const mkChip=(ico,lab,val)=>{ const c=el("span","chip");
     c.append(el("span",null,ico), el("span",null,lab+" "), el("b",null,val)); return c; };
+  /* valor em falta mostra-se como "—", nunca como um número inventado */
+  const q=(v,f)=>v==null?"—":f(v);
   cw.append(
-    mkChip("🌡️","", `${U.temp(mNow.t)} (${t("sensação {t}°",{t:rnd(mNow.at)})})`),
-    mkChip("💨",t("vento"), `${U.spd(mNow.wind)} ${windArrow(mNow.dir)} · ${t("rajadas")} ${U.spd(mNow.gust)}`),
-    mkChip("💧",t("humidade"), `${rnd(mNow.rh)}%`),
-    mkChip("👁️",t("visibilidade"), U.distM(mNow.vis)),
+    mkChip("🌡️","", `${q(mNow.t,U.temp)} (${t("sensação {t}°",{t:q(mNow.at,rnd)})})`),
+    mkChip("💨",t("vento"), `${q(mNow.wind,U.spd)}${mNow.dir==null?"":" "+windArrow(mNow.dir)} · ${t("rajadas")} ${q(mNow.gust,U.spd)}`),
+    mkChip("💧",t("humidade"), mNow.rh==null?"—":`${rnd(mNow.rh)}%`),
+    mkChip("👁️",t("visibilidade"), q(mNow.vis,U.distM)),
   );
   if(daily.uv_index_max?.[0]!=null) cw.append(mkChip("☀️",t("UV máx"), fmtN(daily.uv_index_max[0],0)));
   if(daily.sunrise?.[0]) cw.append(mkChip("🌅",t("sol"), `${fmtHM(daily.sunrise[0])} – ${fmtHM(daily.sunset[0])}`));
@@ -3383,9 +3744,12 @@ function renderTimeline(H,metrics,scores,i0,prof){
   const card=el("div","card");
   const head=el("div","card-head");
   head.appendChild(el("h2",null,t("⏱️ Próximas 24 horas")));
-  // melhor janela de 2h nas próximas 14h
+  // melhor janela de 2h nas próximas 14h — uma hora com dados em falta pode
+  // pontuar alto por ausência de más notícias, e a estrela empurraria alguém
+  // exatamente para o buraco; só horas completas concorrem
   let best=null;
   for(let i=i0;i<Math.min(i0+13,scores.length-1);i++){
+    if(scores[i].faltas.length||scores[i+1].faltas.length) continue;
     const v=Math.min(scores[i].score,scores[i+1].score);
     if(!best||v>best.v) best={v,i};
   }
@@ -3413,15 +3777,17 @@ function renderTimeline(H,metrics,scores,i0,prof){
     const bar=el("div","tl-bar");
     bar.style.height=`${Math.max(4,s.score*0.78)}%`;
     bar.style.background=`var(--${["good","warn","serious","crit"][s.lvl]})`;
+    if(s.faltas.length) col.classList.add("furo");
     if(k===0){ col.appendChild(el("div","tl-now",t("AGORA"))); }
     col.append(ico,bar);
     const show=(ev)=>{ const r=col.getBoundingClientRect();
       tipShow(ev.clientX??r.left+r.width/2, r.top,
-        `${fmtH(H.time[i])} · ${dayLabel(H.time[i])} — ${LVL_ICON[s.lvl]} ${t("índice {v}",{v:s.score})}`,
-        [[t("Condições"),wmoTxt(m.code)],
-         [t("Temperatura"),`${U.temp(m.t)} (${t("sente-se {t}°",{t:rnd(m.at)})})`],
-         [t("Chuva"),`${U.prec(m.pr)} · ${rnd(m.pp)}%`],
-         [t("Rajadas"),U.spd(m.gust)]]); };
+        `${fmtH(H.time[i])} · ${dayLabel(H.time[i])} — ${LVL_ICON[s.lvl]} ${t("índice {v}",{v:s.score})}${s.faltas.length?" ⚠️":""}`,
+        [[t("Condições"),m.code==null?"—":wmoTxt(m.code)],
+         [t("Temperatura"),m.t==null?"—":`${U.temp(m.t)} (${t("sente-se {t}°",{t:rnd(m.at)})})`],
+         [t("Chuva"),(m.pr==null&&m.pp==null)?"—":`${m.pr==null?"—":U.prec(m.pr)} · ${m.pp==null?"—":rnd(m.pp)+"%"}`],
+         [t("Rajadas"),m.gust==null?"—":U.spd(m.gust)],
+         ...(s.faltas.length?[[t("Sem dados"),s.faltas.join(", ")]]:[])]); };
     col.addEventListener("pointermove",show);
     col.addEventListener("focus",show);
     col.addEventListener("pointerleave",tipHide);
@@ -3434,13 +3800,13 @@ function renderTimeline(H,metrics,scores,i0,prof){
   for(let k=0;k<N;k++){
     const i=i0+k; if(i>=scores.length) break;
     const m=metrics[i];
-    const cell=el("span", m.gust>=45?"w-strong":null);
-    const arr=el("span","w-arr","➤");
-    arr.style.transform=`rotate(${Math.round(m.dir)+90}deg)`;
+    const cell=el("span", m.gust!=null&&m.gust>=45?"w-strong":null);
+    const arr=el("span","w-arr", m.dir==null?"·":"➤");
+    if(m.dir!=null) arr.style.transform=`rotate(${Math.round(m.dir)+90}deg)`;
     arr.setAttribute("aria-hidden","true");
-    const num=el("i",null,String(rnd(m.gust)));
+    const num=el("i",null, m.gust==null?"—":String(rnd(m.gust)));
     cell.append(arr,num);
-    cell.title=`${fmtH(H.time[i])}: ${t("vento")} ${U.spd(m.wind)}, ${t("rajadas")} ${U.spd(m.gust)} ${windArrow(m.dir)}`;
+    cell.title=`${fmtH(H.time[i])}: ${t("vento")} ${m.wind==null?"—":U.spd(m.wind)}, ${t("rajadas")} ${m.gust==null?"—":U.spd(m.gust)}${m.dir==null?"":" "+windArrow(m.dir)}`;
     wr.appendChild(cell);
   }
   scroll.append(tl,xr,el("div","tl-windcap",t("💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45")),wr);
@@ -3459,19 +3825,25 @@ function renderNowcast(wx){
   const now=Date.now()/1000;
   let i0=M.time.findIndex(t=>t>now-900); if(i0<0) return null;
   const cells=[];
-  for(let k=0;k<8&&i0+k<M.time.length;k++) cells.push({t:M.time[i0+k], pr:M.precipitation[i0+k]??0});
+  for(let k=0;k<8&&i0+k<M.time.length;k++) cells.push({t:M.time[i0+k], pr:M.precipitation?.[i0+k]??null});
   if(!cells.length) return null;
   const card=el("div","card");
   card.appendChild(el("h2",null,t("🌦️ Próximas 2 horas, ao quarto de hora")));
-  const startRain=cells.find(c=>c.pr>0.05);
-  const allDry=!startRain;
-  card.appendChild(el("p","h-sub", allDry?t("Sem chuva prevista nas próximas 2 horas — arranca à vontade.")
-    :t("Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).",{h:fmtHM(startRain.t)})));
+  const startRain=cells.find(c=>c.pr!=null&&c.pr>0.05);
+  const furos=cells.filter(c=>c.pr==null).length;
+  /* a chuva encontrada anuncia-se com a evidência que houver; o "arranca à
+     vontade" só se afirma com os 8 quartos de hora presentes */
+  card.appendChild(el("p","h-sub", startRain
+    ?t("Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).",{h:fmtHM(startRain.t)})
+    :furos?t("Sem chuva no que veio — mas faltam {n} dos {m} quartos de hora.",{n:furos,m:cells.length})
+    :t("Sem chuva prevista nas próximas 2 horas — arranca à vontade.")));
   const row=el("div","nowcast");
   const xs=el("div","nc-x");
   cells.forEach((c,k)=>{
     const d=el("div","nc-cell");
-    if(c.pr>0.02){
+    if(c.pr==null){
+      d.classList.add("furo"); d.textContent="?";
+    } else if(c.pr>0.02){
       d.classList.add("wet");
       const col=c.pr<0.2?"var(--seq250)":c.pr<0.6?"var(--seq400)":c.pr<1.5?"var(--seq550)":"var(--seq700)";
       d.style.background=col;
@@ -3479,7 +3851,7 @@ function renderNowcast(wx){
       if(c.pr<0.6) d.style.color="#0b0b0b";
     } else d.textContent="·";
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,`${fmtHM(c.t)}–${fmtHM(c.t+900)}`,
-      [[t("Precipitação"),`${U.prec(c.pr,2)}/15 min`]]);
+      [[t("Precipitação"),c.pr==null?t("sem dados"):`${U.prec(c.pr,2)}/15 min`]]);
     d.addEventListener("pointermove",show); d.addEventListener("pointerleave",tipHide);
     row.appendChild(d);
     xs.appendChild(el("span",null,k%2===0?fmtHM(c.t):""));
@@ -3489,15 +3861,21 @@ function renderNowcast(wx){
 }
 
 /* ---- 7 dias ---- */
+/* Isto dizia `tmin=…??15`: um mínimo em falta virava uns confortáveis 15° —
+   o valor de recurso mais tranquilizador que havia para inventar. Agora o que
+   não veio fica de fora da conta e o dia perde o direito ao verde afirmado. */
 function dayVerdict(D,i){
-  const pp=D.precipitation_probability_max?.[i]??0, ps=D.precipitation_sum?.[i]??0;
-  const g=D.wind_gusts_10m_max?.[i]??0, tmin=D.temperature_2m_min?.[i]??15, code=D.weather_code?.[i]??0;
+  const v=(a)=>{ const x=a?.[i]; return x==null?null:x; };
+  const pp=v(D.precipitation_probability_max), ps=v(D.precipitation_sum);
+  const g=v(D.wind_gusts_10m_max), tmin=v(D.temperature_2m_min), code=v(D.weather_code);
   let lvl=0;
-  if(pp>=60||ps>=3) lvl=2; else if(pp>=35||ps>=0.8) lvl=1;
-  if(g>=65) lvl=Math.max(lvl,2); else if(g>=45) lvl=Math.max(lvl,1);
-  if(tmin<=2) lvl=Math.max(lvl,2);
-  if(THUNDER.includes(code)||SNOW.includes(code)||FREEZING.includes(code)||ps>=10) lvl=3;
-  return lvl;
+  if((pp!=null&&pp>=60)||(ps!=null&&ps>=3)) lvl=2;
+  else if((pp!=null&&pp>=35)||(ps!=null&&ps>=0.8)) lvl=1;
+  if(g!=null){ if(g>=65) lvl=Math.max(lvl,2); else if(g>=45) lvl=Math.max(lvl,1); }
+  if(tmin!=null&&tmin<=2) lvl=Math.max(lvl,2);
+  if((code!=null&&(THUNDER.includes(code)||SNOW.includes(code)||FREEZING.includes(code)))||(ps!=null&&ps>=10)) lvl=3;
+  const completo=pp!=null&&ps!=null&&g!=null&&tmin!=null&&code!=null;
+  return {lvl, completo};
 }
 function renderDaily(wx){
   const D=wx.daily, card=el("div","card");
@@ -3505,26 +3883,31 @@ function renderDaily(wx){
   card.appendChild(el("p","h-sub",t("Para planear a voltinha de fim de semana.")));
   const grid=el("div","daily");
   (D.time||[]).forEach((ep,i)=>{
-    const lvl=dayVerdict(D,i);
+    const dv=dayVerdict(D,i), lvl=dv.lvl;
+    const dnum=(a,f)=>a?.[i]==null?"—":f(a[i]);
     const d=el("div","day-card");
     d.append(el("div","d-name", i===0?t("hoje"):`${fmtDow(ep+43200)} ${fmtDayMo(ep+43200)}`));
-    d.append(el("div","d-emoji", wmoIco(D.weather_code?.[i],1)));
+    d.append(el("div","d-emoji", D.weather_code?.[i]==null?"❔":wmoIco(D.weather_code[i],1)));
     const tt=el("div","d-temp");
-    tt.append(el("b",null,U.temp(D.temperature_2m_max[i])), document.createTextNode(" "),
-      el("span",null,U.temp(D.temperature_2m_min[i])));
+    tt.append(el("b",null,dnum(D.temperature_2m_max,U.temp)), document.createTextNode(" "),
+      el("span",null,dnum(D.temperature_2m_min,U.temp)));
     d.append(tt);
-    d.append(el("div","d-meta",`☔ ${rnd(D.precipitation_probability_max?.[i]??0)}% · 💨 ${rnd(D.wind_gusts_10m_max?.[i]??0)}`));
+    d.append(el("div","d-meta",`☔ ${dnum(D.precipitation_probability_max,rnd)}% · 💨 ${dnum(D.wind_gusts_10m_max,rnd)}`));
     const v=el("span","day-verdict");
-    const dot=el("span","dot"); dot.style.background=`var(--${["good","warn","serious","crit"][lvl]})`;
-    v.append(dot, document.createTextNode(t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl])));
+    const dot=el("span","dot");
+    /* dia verde só com o dia completo; senão o ponto fica cinzento e di-lo */
+    if(lvl===0&&!dv.completo){ dot.style.background="var(--muted)";
+      v.append(dot, document.createTextNode(t("Bom? — faltam dados"))); }
+    else { dot.style.background=`var(--${["good","warn","serious","crit"][lvl]})`;
+      v.append(dot, document.createTextNode(t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl]))); }
     d.append(v);
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,
-      `${dayLabel(ep+43200)} — ${wmoTxt(D.weather_code?.[i])}`,
-      [[t("Máx / mín"),`${U.temp(D.temperature_2m_max[i])} / ${U.temp(D.temperature_2m_min[i])}`],
-       [t("Prob. chuva"),`${rnd(D.precipitation_probability_max?.[i]??0)}%`],
-       [t("Total chuva"),U.prec(D.precipitation_sum?.[i]??0)],
-       [t("Rajadas máx"),U.spd(D.wind_gusts_10m_max?.[i]??0)],
-       [t("UV máx"),fmtN(D.uv_index_max?.[i]??0,0)]]);
+      `${dayLabel(ep+43200)} — ${D.weather_code?.[i]==null?"—":wmoTxt(D.weather_code[i])}`,
+      [[t("Máx / mín"),`${dnum(D.temperature_2m_max,U.temp)} / ${dnum(D.temperature_2m_min,U.temp)}`],
+       [t("Prob. chuva"),`${dnum(D.precipitation_probability_max,rnd)}%`],
+       [t("Total chuva"),dnum(D.precipitation_sum,U.prec)],
+       [t("Rajadas máx"),dnum(D.wind_gusts_10m_max,U.spd)],
+       [t("UV máx"),D.uv_index_max?.[i]==null?"—":fmtN(D.uv_index_max[i],0)]]);
     d.addEventListener("pointermove",show); d.addEventListener("pointerleave",tipHide);
     grid.appendChild(d);
   });
@@ -3540,9 +3923,12 @@ function renderDaily(wx){
 function baseCarto(){
   const style=document.documentElement.dataset.theme==="dark"?"dark_all":"light_all";
   const r=(window.devicePixelRatio||1)>1.3?"@2x":"";
+  /* A4.2: a atribuição vive no canto do mapa — a obrigação OSM/CARTO/Geoapify
+     mudou de casa quando o rodapé saiu do ecrã da rota, não morreu */
   return { tiles:[`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}${r}.png`],
     subdominios:"abcd", zoomMax:19,
-    atribuicao:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>' };
+    atribuicao:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'
+      +(typeof geoOn==="function"&&geoOn()?' · <a href="https://www.geoapify.com/">Geoapify</a>':"") };
 }
 /* =====================================================================
    MAPA OFFLINE — guarda os tiles do corredor da rota para a viagem
@@ -3677,10 +4063,12 @@ const Mapa = (() => {
     nome: "leaflet",
     disponivel: () => typeof L !== "undefined",
 
-    criar(idOuEl, { centro, zoom, rodar = false } = {}) {
+    criar(idOuEl, { centro, zoom, rodar = false, botoesZoom = true } = {}) {
       const rot = (rodar && L.Map.prototype.setBearing && !window.__noRotate)
         ? { rotate: true, touchRotate: true, rotateControl: { closeOnZeroBearing: false } } : {};
-      const m = L.map(idOuEl, Object.assign({ zoomSnap: .5 }, rot)).setView(ll(centro), zoom);
+      /* botoesZoom:false — A4.2: no ecrã-mapa a pinça, o duplo toque e a roda
+         chegam; os botões saíam da lista fechada do registo 20 */
+      const m = L.map(idOuEl, Object.assign({ zoomSnap: .5, zoomControl: botoesZoom }, rot)).setView(ll(centro), zoom);
       return { m, fontes: new Map(), marcadores: new Set(), _rodar: !!rot.rotate };
     },
     /* A base entra como DESCRIÇÃO — moldes de URL, atribuição, zoom máximo —
@@ -3861,7 +4249,7 @@ function initRouteMap(){
      coordenadas entram em [lon,lat] como no GeoJSON, e o rumo em graus no
      sentido dos ponteiros — os dois hábitos que a troca para o MapLibre vai
      exigir, adotados já para não haver duas convenções ao mesmo tempo. */
-  const h=Mapa.criar("map-route",{centro:[state.home?.lon??-8.0, state.home?.lat??39.5], zoom:7, rodar:true});
+  const h=Mapa.criar("map-route",{centro:[state.home?.lon??-8.0, state.home?.lat??39.5], zoom:7, rodar:true, botoesZoom:false});
   Mapa.base(h,baseCarto());
   state.mapaRota=h;
   // botão "centrar em mim"
@@ -3959,6 +4347,7 @@ async function applyPinChoice(act,loc){
   }
   // destino
   $("#rt-d").value=loc.name; $("#rt-d")._picked=loc;
+  focar(loc);
   if(!$("#rt-o")._picked&&$("#rt-o").value.trim().length<3){
     const pos=await freshPos();
     if(pos){ $("#rt-o").value=pos.name; $("#rt-o")._picked=pos; }
@@ -4177,6 +4566,7 @@ async function computeRoute(){
     applyShift(0,true);
     renderDepartures();
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
+    rotaMapaModo(true);                  // calcular É o gesto de entrar no ecrã-mapa (A4.2)
     scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
     loadDrySpell(); // historial de dias secos → aviso de óleo na primeira chuva
     setTimeout(precacheRouteTiles,1200); // mapa offline do corredor da rota
@@ -4195,20 +4585,31 @@ async function computeRoute(){
   }
 }
 
-/* condições num ponto da rota à hora ETA (conservador: pior das 2 horas vizinhas) */
+/* condições num ponto da rota à hora ETA (conservador: pior das 2 horas vizinhas)
+   NÃO VEIO ≠ VEIO ZERO: o pior é entre as horas QUE VIERAM; se nenhuma veio,
+   o campo fica null e entra em `faltas`. Antes, `??0` e `t??15` faziam de
+   cada buraco um céu limpo sem vento a 15° — o troço sem dados pintava-se
+   de verde e o resumo dizia "Trajeto seco — boa viagem!". */
 function sampleAt(s, eta){
   const H=s.wx?.hourly; if(!H?.time?.length) return null;
   let i=H.time.findIndex(t=>t>eta); if(i<=0) i=H.time.length-1;
   const a=i-1, b=Math.min(i,H.time.length-1);
   const f=clamp((eta-H.time[a])/((H.time[b]-H.time[a])||1),0,1);
-  const pr=Math.max(H.precipitation?.[a]??0, H.precipitation?.[b]??0);
-  const pp=Math.max(H.precipitation_probability?.[a]??0, H.precipitation_probability?.[b]??0);
-  const code=(f<0.5?H.weather_code?.[a]:H.weather_code?.[b])??0;
-  return { pr, pp, code,
-    t:lerp(H.temperature_2m?.[a]??15, H.temperature_2m?.[b]??15, f),
-    gust:Math.max(H.wind_gusts_10m?.[a]??0, H.wind_gusts_10m?.[b]??0),
-    dir:(f<0.5?H.wind_direction_10m?.[a]:H.wind_direction_10m?.[b])??0,
-    lvl:0 };
+  const par=(arr)=>{ const va=arr?.[a], vb=arr?.[b];
+    return (va==null&&vb==null)?null:Math.max(va??-Infinity, vb??-Infinity); };
+  const perto=(arr)=>(f<0.5?arr?.[a]:arr?.[b])??(f<0.5?arr?.[b]:arr?.[a])??null;
+  const faltas=[];
+  const pr=par(H.precipitation), pp=par(H.precipitation_probability);
+  const code=perto(H.weather_code);
+  const ta=H.temperature_2m?.[a], tb=H.temperature_2m?.[b];
+  const tt=(ta!=null&&tb!=null)?lerp(ta,tb,f):(ta??tb??null);
+  const gust=par(H.wind_gusts_10m);
+  const dir=perto(H.wind_direction_10m);
+  if(pr==null&&pp==null) faltas.push(t("chuva"));
+  if(code==null) faltas.push(t("estado do céu"));
+  if(tt==null) faltas.push(t("temperatura"));
+  if(gust==null) faltas.push(t("vento"));
+  return { pr, pp, code, t:tt, gust, dir, lvl:0, faltas };
 }
 
 /* Que estrada cobre este troço do trajeto. Devolve o nome com maior
@@ -4232,7 +4633,10 @@ function applyShift(shiftMin, fit=false){
   // classifica cada amostra à sua ETA (inclui pausas nas paragens já passadas)
   R.samples.forEach(s=>{
     s.eta=dep+s.travelSec+s.pauseOffset;
-    s.cond=sampleAt(s,s.eta)||{pr:0,pp:0,code:0,t:15,gust:0,dir:0};
+    /* sem meteorologia nenhuma para este ponto: TUDO em falta — nunca mais o
+       seco a 15° inventado que aqui esteve */
+    s.cond=sampleAt(s,s.eta)||{pr:null,pp:null,code:null,t:null,gust:null,dir:null,lvl:0,
+      faltas:[t("chuva"),t("vento"),t("temperatura"),t("estado do céu")], semDados:true};
     s.cond.lvl=rainLevel(s.cond.pr,s.cond.pp,s.cond.code,prof);
   });
   drawRoute(fit);
@@ -4377,7 +4781,8 @@ function stayInfo(R){
   for(let k=0;k<H.time.length;k++){
     const tt=H.time[k];
     if(tt<arr-1800||tt>end+1800) continue;
-    pts.push({t:tt, lvl:rainLevel(H.precipitation?.[k]??0,H.precipitation_probability?.[k]??0,H.weather_code?.[k]??0,prof)});
+    const pr=H.precipitation?.[k]??null, pp=H.precipitation_probability?.[k]??null, code=H.weather_code?.[k]??null;
+    pts.push({t:tt, lvl:rainLevel(pr,pp,code,prof), furo:pr==null&&pp==null&&code==null});
   }
   if(!pts.length) return null;
   // segmentos contínuos do mesmo nível
@@ -4389,10 +4794,11 @@ function stayInfo(R){
   segs.push(cur); segs[segs.length-1].b=Math.min(segs[segs.length-1].b,end);
   const worst=Math.max(...segs.map(s=>s.lvl));
   const firstRain=segs.find(s=>s.lvl>=2)?.a??null;
-  return {arr,end,segs,worst,firstRain,rest:R.stayMin<0};
+  return {arr,end,segs,worst,firstRain,rest:R.stayMin<0,furos:pts.some(p=>p.furo)};
 }
 function stayText(info,dest){
   const durTxt=info.rest?t("até ao fim do dia"):fmtDur(info.end-info.arr);
+  if(info.worst===0&&info.furos) return t("🅿️ Em {p} depois de chegares: provavelmente seco, mas faltam-me dados de parte dessas horas.",{p:dest});
   if(info.worst===0) return t("🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.",{p:dest,d:durTxt});
   const parts=info.segs.map(s=>{
     const lab=s.lvl===0?t("seco"):s.lvl===1?t("chuvisco"):s.lvl===2?t("🌧️ chuva"):t("⛈️ chuva forte");
@@ -4425,8 +4831,57 @@ function scheduleStayAlerts(R){
   }catch(e){}
 }
 
+/* ── A4.2, utilitários do ecrã-mapa ─────────────────────────────────────── */
+/* Enquanto não há ícones a sério, tirar é mais barato do que substituir: o
+   cromo do fluxo da rota mostra texto e cor, não símbolos (registo 20). O
+   dicionário mantém as chaves com emoji — a intenção — e o ecrã filtra. */
+const semEmoji=(s)=>String(s).replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu,"").replace(/ {2,}/g," ").trim();
+function rotaMapaModo(on){
+  const tem=!!state.route;
+  on=!!on&&tem;
+  document.body.classList.toggle("rota-mapa",on);
+  if(!on) document.body.classList.remove("folha-aberta");
+  for(const id of ["rota-topo","rota-faixa","rota-legenda","rota-folha"]){
+    const n=document.getElementById(id); if(n) n.hidden=!on;
+  }
+  if(on) renderLegendaRota();          // decide sozinha se se mostra (≥2 cores)
+  const vm=$("#btn-ver-mapa"); if(vm) vm.hidden=on||!tem;
+  /* redimensionar nas DUAS direções: sair do ecrã-mapa sem avisar o motor
+     deixava o mapa pequeno com o tamanho interno do grande — e o centro em
+     pixels a mentir sobre o centro geográfico (o pin caía 4 km ao lado) */
+  if(state.mapaRota) setTimeout(()=>{
+    Mapa.redimensionar(state.mapaRota);
+    const fx=$("#rota-faixa");
+    if(on&&fx&&fx.offsetHeight) document.documentElement.style.setProperty("--faixa-h",(fx.offsetHeight+20)+"px");
+  },60);
+}
+/* Legenda CONDICIONAL: só existe quando o traçado tem mais de uma cor, e
+   nasce de UMA fonte (LVL_NAME) já dentro do t() — a legenda estática à mão,
+   com a sua lista de repintura, foi a causa da A4.2.2 (regra 7g-quater). */
+function renderLegendaRota(){
+  const lg=$("#rota-legenda"); if(!lg) return;
+  const R=state.route;
+  lg.textContent="";
+  const niveis=new Set();
+  if(R&&R.samples) for(let j=0;j<R.samples.length-1;j++)
+    niveis.add(Math.max(R.samples[j].cond?.lvl??0, R.samples[j+1].cond?.lvl??0));
+  if(!document.body.classList.contains("rota-mapa")||niveis.size<2){ lg.hidden=true; return; }
+  lg.hidden=false;
+  [...niveis].sort().forEach(lvl=>{
+    const item=el("div","lg-item");
+    const d=el("span","dot"); d.style.background=`var(--${["good","warn","serious","crit"][lvl]})`;
+    item.append(d, document.createTextNode(t(LVL_NAME[lvl])));
+    lg.appendChild(item);
+  });
+  const q=el("button","lg-q","?"); q.type="button";
+  q.title=t("O que significam as cores?");
+  q.addEventListener("click",()=>toast(
+    t("A cor de cada troço mostra o tempo previsto ")+t("à hora a que lá vais passar")+t(", não o tempo de agora."),7000));
+  lg.appendChild(q);
+}
 function renderRouteSummary(){
-  const R=state.route, box=$("#route-summary"); if(!R){box.textContent="";return;}
+  const R=state.route, box=$("#route-summary");
+  if(!R){ if(box) box.textContent=""; const fx=$("#rota-faixa"); if(fx) fx.textContent=""; rotaMapaModo(false); return; }
   box.textContent="";
   const segs=R.samples;
   // km molhados (peso por segmento)
@@ -4437,35 +4892,78 @@ function renderRouteSummary(){
     if(lvl>=2) wetKm+=len; else if(lvl===1) riskKm+=len;
     worst=Math.max(worst,lvl);
   }
-  const maxGust=Math.max(...segs.map(s=>s.cond.gust));
-  const minT=Math.min(...segs.map(s=>s.cond.t));
-  const maxPr=Math.max(...segs.map(s=>s.cond.pr));
+  /* Math.max/min COAGEM null a 0 — uma rota com buracos dava "mínima 0°" e
+     "rajadas até 0": números fabricados. Só o que veio entra na conta. */
+  const fin=(f)=>segs.map(f).filter(v=>v!=null&&isFinite(v));
+  const gusts=fin(s=>s.cond.gust); const maxGust=gusts.length?Math.max(...gusts):null;
+  const temps=fin(s=>s.cond.t);    const minT=temps.length?Math.min(...temps):null;
+  const prs=fin(s=>s.cond.pr);     const maxPr=prs.length?Math.max(...prs):null;
   const wind=computeWindStats(R);
   const maxCross=wind.crossMax;
   // altitude
   const elevs=segs.map(s=>s.wx?.elevation).filter(v=>v!=null);
   const elevMax=elevs.length?Math.max(...elevs):null, elevMin=elevs.length?Math.min(...elevs):null;
 
-  const card=el("div",`card hero lvl${worst}`); card.setAttribute("data-test","route-summary");
-  const main=el("div","hero-main");
-  const big=el("div","summary-hero");
+  /* ═══ A CONDIÇÃO ASSIMÉTRICA, na rota ═══ um troço sem dados não pinta o
+     trajeto de mau — mas tira-lhe o direito ao "seco" afirmado */
+  const buracos=segs.filter(s=>s.cond.faltas?.length);
+  const completo=!buracos.length;
   const dep=R.dep+R.shift*60;
   let headline, emoji;
-  if(worst===0){ emoji="🟢"; headline=t("Trajeto seco — boa viagem!"); }
+  if(worst===0){ emoji="🟢"; headline=completo?t("Trajeto seco — boa viagem!")
+    :t("Provavelmente seco — faltam-me dados em parte do caminho"); }
   else if(worst===1){ emoji="🟡"; headline=t("Possível chuvisco em ~{n} km do caminho",{n:fmtN(riskKm,0)}); }
   else if(worst===2){ emoji="🟠"; headline=t("Vais apanhar chuva em ~{n} km ({p}% do trajeto)",{n:fmtN(wetKm,0),p:rnd(wetKm/R.totalKm*100)}); }
   else { emoji="🔴"; headline=t("Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.",{n:fmtN(wetKm,0)}); }
-  const bigLine=el("div","big");
-  bigLine.append(el("span",null,emoji), el("span",null,headline));
-  big.appendChild(bigLine);
-  main.appendChild(big);
   const nStops=(R.pts?.length||2)-2;
   const arrive=dep+R.travelTotal+nStops*R.pauseSec;
   R.arrive=arrive;
+
+  /* ═══ A FAIXA — o veredicto da rota existe UMA vez, aqui (A4.2, registo 20).
+     Cor em vez de emoji; a segunda linha é o conselho; a terceira os números;
+     a ação primária é o Modo viagem. Tocar na faixa abre a folha. ═══ */
+  const fx=$("#rota-faixa");
+  if(fx){
+    fx.textContent="";
+    fx.className=`lvl${worst}${completo?"":" incompleto"}`;
+    fx.setAttribute("data-test","route-summary");
+    fx.dataset.nivel=String(worst); fx.dataset.completo=completo?"1":"0";
+    const sh=el("div","summary-hero"), bigL=el("div","big");
+    bigL.append(el("span","fx-dot"), el("span",null,semEmoji(headline)));
+    sh.appendChild(bigL); fx.appendChild(sh);
+    let conselho=""; try{ conselho=semEmoji((gearAdvice(segs.map(s=>s.cond))||[])[0]||""); }catch(e){}
+    if(conselho) fx.appendChild(el("div","fx-con",conselho));
+    fx.appendChild(el("div","fx-num",
+      `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} · ${t("chegada")} ~${fmtHM(arrive)}`));
+    const trv=el("button","btn primary"); trv.id="btn-travel";
+    trv.textContent=travel.active?semEmoji(t("🛑 Terminar modo viagem")):t("Modo viagem");
+    trv.addEventListener("click",(e)=>{ e.stopPropagation();
+      travel.active?stopTravel("Modo viagem terminado."):startTravel(); });
+    fx.appendChild(trv);
+  }
+
+  /* ═══ A FOLHA — o resto, SEM repetir o veredicto (1× no DOM visível) ═══ */
+  const card=el("div","card"); card.setAttribute("data-test","rota-detalhe");
+  const main=el("div","hero-main");
   const viaTxt=nStops?` · ${nStops} ${nStops===1?t("paragem"):t("paragens")} (${R.stops.map(s=>s.name).join(", ")}${R.pauseSec?`, +${Math.round(R.pauseSec/60)} min`:""})`:"";
   const sub=el("div","hero-sub",
     `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} ${t("em andamento")}${viaTxt} · ${t("partida")} ${fmtHM(dep)} (${dayLabel(dep)}) · ${t("chegada")} ~${fmtHM(arrive)}`);
   main.appendChild(sub);
+  /* aviso do buraco: condição do passado, vive no cartão (7g-bis) e diz
+     ONDE e QUANDO faltam os dados */
+  if(!completo){
+    const ks=buracos.map(s=>s.km), ts=buracos.map(s=>s.eta).filter(v=>v!=null);
+    const k0=Math.min(...ks), k1=Math.max(...ks);
+    const campos=[...new Set(buracos.flatMap(s=>s.cond.faltas))].join(", ");
+    const hTxt=ts.length?` (~${fmtHM(Math.min(...ts))}–${fmtHM(Math.max(...ts))})`:"";
+    const b=el("div","buraco-dados"); b.setAttribute("data-test","buraco-dados-rota");
+    b.append(el("span",null,"⚠️ "), el("span",null,
+      (k1-k0<0.5?t("Sem dados de {c} ao km {a}{h}.",{c:campos,a:rnd(k0),h:hTxt})
+                :t("Sem dados de {c} entre o km {a} e o km {b}{h}.",{c:campos,a:rnd(k0),b:rnd(k1),h:hTxt}))+" "+
+      (worst===0?t("O resto do caminho verifiquei — sem isso não afirmo o seco.")
+                :t("Os dados em falta não melhoravam esta resposta."))));
+    main.appendChild(b);
+  }
   // etapas: 1 → paragem, 2 → destino… com km, duração e horários
   if(nStops>0){
     const legsArr=(R.variants?.[R.active]?.legs)||[];
@@ -4486,10 +4984,10 @@ function renderRouteSummary(){
     main.appendChild(lg);
   }
   const chips=el("div","chips"); chips.style.marginTop="10px";
-  const mk=(txt)=>chips.appendChild(el("span","chip",txt));
-  if(maxPr>0.05) mk(`💧 ${t("pico {n} mm/h",{n:fmtN(maxPr,1)})}`);
-  mk(`🌡️ ${t("mínima no percurso {t}°",{t:rnd(minT)})}`);
-  mk(`💨 ${t("rajadas até {g} km/h · vento {d}",{g:rnd(maxGust),d:wind.desc})}`);
+  const mk=(txt)=>chips.appendChild(el("span","chip",semEmoji(txt)));   // pastilhas usam texto (A4.2)
+  if(maxPr!=null&&maxPr>0.05) mk(`💧 ${t("pico {n} mm/h",{n:fmtN(maxPr,1)})}`);
+  if(minT!=null) mk(`🌡️ ${t("mínima no percurso {t}°",{t:rnd(minT)})}`);
+  if(maxGust!=null) mk(`💨 ${t("rajadas até {g} km/h · vento {d}",{g:rnd(maxGust),d:wind.desc})}`);
   if(maxCross>=40) mk(`⚠️💨 ${t("vento lateral até ~{g} km/h",{g:rnd(maxCross)})}${wind.crossPlace?` ${t("perto do km {k}",{k:rnd(wind.crossKm)})}`:""}`);
   if(elevMax!=null&&elevMax-elevMin>250) mk(`⛰️ ${t("sobe até ~{m} m",{m:rnd(elevMax)})}`);
   if(R.cameras?.length) mk(`📸 ${R.cameras.length} ${R.cameras.length===1?t("radar fixo"):t("radares fixos")}`);
@@ -4500,7 +4998,7 @@ function renderRouteSummary(){
   // estadia: como fica o tempo no destino depois de chegares
   const sInfo=stayInfo(R);
   if(sInfo){
-    const sl=el("div","stay-line lvl"+sInfo.worst, stayText(sInfo,R.d.name));
+    const sl=el("div","stay-line lvl"+sInfo.worst, semEmoji(stayText(sInfo,R.d.name)));
     main.appendChild(sl);
   }
   // comparação de trajetos alternativos (mudar de caminho para fugir à chuva)
@@ -4510,66 +5008,72 @@ function renderRouteSummary(){
       const w=variantWet(v,dep);
       const c=el("button","chip click variant-chip"+(i===R.active?" sel":""));
       c.append(el("b",null,t("Trajeto {x}",{x:String.fromCharCode(65+i)})),
-        el("span",null,`${fmtDur(v.travelTotal)} · ${fmtN(v.totalKm,0)} km · ${w<0.5?t("seco ✅"):t("~{n} km 🌧️",{n:fmtN(w,0)})}`));
+        el("span",null,semEmoji(`${fmtDur(v.travelTotal)} · ${fmtN(v.totalKm,0)} km · ${w<0.5?t("seco ✅"):t("~{n} km 🌧️",{n:fmtN(w,0)})}`)));
       c.addEventListener("click",()=>switchVariant(i));
       vrow.appendChild(c);
     });
     main.appendChild(vrow);
-    let bestV=0;
-    R.variants.forEach((v,i)=>{ if(variantWet(v,dep)<variantWet(R.variants[bestV],dep)-0.5) bestV=i; });
-    if(bestV!==R.active){
-      const p=el("p",null); p.style.margin="8px 0 0"; p.style.fontSize="13.5px";
-      p.append(el("span",null,"💡 "),
-        el("b",null,t("O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.",{x:String.fromCharCode(65+bestV)})));
-      main.appendChild(p);
-    }
+    /* A4.2: o parágrafo "💡 O Trajeto B apanha menos chuva…" morreu — o que
+       se desenha no mapa não se escreve: as linhas alternativas já lá estão,
+       tocáveis, e as pastilhas acima dizem os números de cada uma. */
   }
-  // ações: modo viagem + copiar resumo
+  // ações da folha (o Modo viagem vive na faixa, uma vez)
   const acts=el("div","rec-actions");
-  const trv=el("button","btn primary"); trv.id="btn-travel";
-  trv.textContent=travel.active?t("🛑 Terminar modo viagem"):t("🧭 Modo viagem (avisos de chuva)");
-  trv.addEventListener("click",()=>travel.active?stopTravel("Modo viagem terminado."):startTravel());
-  const share=el("button","btn",t("📋 Copiar resumo"));
+  const share=el("button","btn",semEmoji(t("📋 Copiar resumo")));
   share.addEventListener("click",()=>{
     const lines=[`🏍️ ${R.o.name} → ${R.d.name}${nStops?` (via ${R.stops.map(s=>s.name).join(", ")})`:""} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)}`,
       `Partida ${fmtHM(dep)} (${dayLabel(dep)}) → chegada ~${fmtHM(arrive)}`,
       `${emoji} ${headline}`,
-      `💨 Rajadas até ${rnd(maxGust)} km/h (vento ${wind.desc})`,
+      ...(maxGust!=null?[`💨 Rajadas até ${rnd(maxGust)} km/h (vento ${wind.desc})`]:[]),
+      /* o resumo partilhado leva o buraco consigo — senão redistribuía a
+         afirmação sem a reserva */
+      ...(completo?[]:[`⚠️ ${t("Faltam dados em parte do caminho — confirma antes de sair.")}`]),
       ...currentStretches().map(st=>`• km ${rnd(st.k0)}–${rnd(st.k1)} (~${fmtHM(st.t0)}): ${rainLabel(st.lvl)}${st.place?` — perto de ${st.place}`:""}`),
       `via Levante — dados Open-Meteo/OSM`];
     (navigator.clipboard?.writeText(lines.join("\n"))||Promise.reject())
       .then(()=>toast(t("Resumo copiado! 📋"))).catch(()=>toast(t("Não consegui copiar automaticamente.")));
   });
-  const favD=el("button","btn","⭐ "+t("Guardar destino"));
+  const favD=el("button","btn",t("Guardar destino"));
   favD.addEventListener("click",()=>{
     let lab=null; try{ lab=prompt(t("Nome do favorito? (ex.: Casa, Trabalho, Casa do João)"),R.d.name); }catch(e){}
     if(lab===null) return; lab=(lab||R.d.name).trim(); if(!lab) return;
     saveFav(R.d,lab); toast(t("Guardado: {p} ⭐",{p:lab}));
   });
-  const favR2=el("button","btn","💾 "+t("Guardar rota"));
+  const favR2=el("button","btn",t("Guardar rota"));
   favR2.addEventListener("click",()=>{
     let lab=null; try{ lab=prompt(t("Nome da rota?"),`${R.o.name} → ${R.d.name}`); }catch(e){}
     if(lab===null) return; lab=(lab||`${R.o.name} → ${R.d.name}`).trim();
     saveFavRoute(lab, location.hash); toast(t("Guardado: {p} ⭐",{p:lab}));
   });
-  const agd=el("button","btn","🗓️ "+t("Agendar viagem"));
+  const agd=el("button","btn",t("Agendar viagem"));
   agd.addEventListener("click",()=>{
     const depT=R.dep+R.shift*60;
     if(depT<Date.now()/1000+15*60){ toast(t("Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.")); $("#plan-card").classList.add("open"); return; }
     saveTrip({name:`${R.o.name} → ${R.d.name}`, hash:location.hash, dep:depT});
     toast(t("🗓️ Agendada: {p} — vê no calendário (canto superior direito).",{p:`${R.o.name} → ${R.d.name}`}));
   });
-  acts.append(trv,share,favD,favR2,agd);
+  acts.append(share,favD,favR2,agd);
   main.appendChild(acts);
   card.appendChild(main);
   box.appendChild(card);
+  const topoTxt=$("#rt-topo-txt"); if(topoTxt) topoTxt.textContent=`${R.o.name} → ${R.d.name}`;
+  /* re-renderizar NÃO muda de ecrã: mudar de língua nas definições com uma
+     rota viva não pode puxar o utilizador para o mapa por baixo do popup.
+     As entradas no modo-mapa são gestos: calcular, "Ver o mapa", o separador. */
+  rotaMapaModo(document.body.classList.contains("rota-mapa"));
 }
 
 /* estatísticas de vento ao longo da rota */
 function computeWindStats(R){
   let crossMax=0, crossKm=0, headSum=0, len=0, gustMax=0;
+  let gustSeen=false;
   for(let j=0;j<R.samples.length-1;j++){
     const a=R.samples[j], b=R.samples[j+1];
+    if(a.cond.gust!=null||b.cond.gust!=null) gustSeen=true;
+    gustMax=Math.max(gustMax,a.cond.gust??0,b.cond.gust??0);
+    /* sem direção ou rajada não há estatística — NaN a atravessar médias
+       acabava em "vento de costas" fabricado */
+    if(a.cond.dir==null||a.cond.gust==null) continue;
     const brg=bearing(a,b);
     const diff=(a.cond.dir-brg)*Math.PI/180;
     const cross=Math.abs(Math.sin(diff))*a.cond.gust;
@@ -4577,11 +5081,11 @@ function computeWindStats(R){
     const L=b.km-a.km;
     if(cross>crossMax){ crossMax=cross; crossKm=a.km; }
     headSum+=head*L; len+=L;
-    gustMax=Math.max(gustMax,a.cond.gust,b.cond.gust);
   }
   const headAvg=len?headSum/len:0;
-  const desc=Math.abs(headAvg)<8?t("maioritariamente lateral"):headAvg>0?t("de frente"):t("de costas");
-  return {crossMax, crossKm, crossPlace:crossMax>=40, headAvg, desc, gustMax};
+  const desc=!len?t("direção desconhecida")
+    :Math.abs(headAvg)<8?t("maioritariamente lateral"):headAvg>0?t("de frente"):t("de costas");
+  return {crossMax, crossKm, crossPlace:crossMax>=40, headAvg, desc, gustMax, gustSeen};
 }
 
 /* =====================================================================
@@ -4595,6 +5099,16 @@ const HAZARD_CFG={
   crossWindKmh:38,       // componente lateral a partir da qual a moto "anda de lado" (guiador firme)
   crossWindStrongKmh:55, // lateral forte: pontes/viadutos/camiões tornam-se perigosos — reduzir
   crossAngleMinDeg:55,   // ângulo mínimo vento↔rumo para contar como lateral (90° = perpendicular)
+  fusaoGapKm:1.5,        // corridas do MESMO perigo separadas por menos do que isto fundem-se num
+                         // cartão (dd-06 §1b: km 1–1 · 2–4 · 5–5 era UM perigo contínuo em três
+                         // cartões). ERRADO PARA BAIXO: cartões duplicados visíveis — grita.
+                         // ERRADO PARA CIMA: o intervalo de km escrito alarga — nunca esconde.
+  oleoJanelaHoras:2,     // o aviso do óleo no Agora vive nas primeiras horas de chuva — depois a
+                         // estrada lava (dd-06 §2). ERRADO PARA BAIXO: o aviso morre cedo demais
+                         // com o piso ainda ensaboado; PARA CIMA: avisa com a estrada já lavada —
+                         // nos dois casos o cartão é visível e datado, nunca calado.
+  oleoLavagemMm:5,       // ou até este acumulado desde a primeira chuva — o que acabar primeiro.
+                         // ~5 mm arrastam o filme de óleo na maioria dos pisos.
   chillColdC:5,          // sensação EM ANDAMENTO abaixo disto: mãos frias, atenção a cair
   chillSevereC:-2,       // sensação em andamento perigosa: dedos dormentes, reação lenta — parar a aquecer
   frostAirC:4,           // com o ar ≤4° o piso pode estar a 0° (irradiação): pontes e sombras primeiro
@@ -4649,11 +5163,9 @@ function routeHazards(R){
       txt:t("Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.",{n:R.drySpellDays})});
   }
   // 2) VENTO LATERAL por troço, usando o rumo real da rota
+  const ventos=[];
   let run=null;
-  const flushW=()=>{ if(!run) return;
-    H.push({sev:run.max>=cfg.crossWindStrongKmh?3:2,ico:"💨",kind:"lateral",km0:run.k0,km1:run.k1,t0:run.t0,t1:run.t1,
-      txt:t("Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.",{g:rnd(run.max),a:rnd(run.k0),b:rnd(run.k1)})});
-    run=null; };
+  const flushW=()=>{ if(run){ ventos.push(run); run=null; } };
   for(let j=0;j<segs.length-1;j++){
     const a=segs[j], b=segs[j+1];
     const d=(a.cond.dir-bearing(a,b))*Math.PI/180;
@@ -4665,6 +5177,28 @@ function routeHazards(R){
     } else flushW();
   }
   flushW();
+  /* FUSÃO (dd-06 §1b): uma rajada que cai por um troço curto abaixo do limiar
+     partia UM perigo contínuo em três cartões. O que é contínuo diz-se uma
+     vez: corridas separadas por ≤ fusaoGapKm fundem-se, o intervalo de km
+     alarga e a gama de vento diz o mínimo e o máximo das corridas. */
+  ventos.sort((x,y)=>x.k0-y.k0);
+  const fundidos=[];
+  for(const v of ventos){
+    const u=fundidos[fundidos.length-1];
+    if(u&&v.k0-u.k1<=cfg.fusaoGapKm){
+      u.k1=Math.max(u.k1,v.k1); u.t1=Math.max(u.t1,v.t1);
+      u.min=Math.min(u.min,v.max); u.max=Math.max(u.max,v.max);
+    } else fundidos.push({...v, min:v.max});
+  }
+  for(const v of fundidos){
+    const ponto=(v.k1-v.k0)<0.5;   // "entre o km 5 e o km 5" é degenerado: diz-se "perto do km 5"
+    const gama=(v.max-v.min)>=2;
+    H.push({sev:v.max>=cfg.crossWindStrongKmh?3:2,ico:"💨",kind:"lateral",
+      km0:v.k0, km1:ponto?null:v.k1, t0:v.t0, t1:ponto?null:v.t1,
+      txt: ponto ? t("Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.",{g:rnd(v.max),k:rnd(v.k0)})
+        : gama ? t("Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.",{g0:rnd(v.min),g1:rnd(v.max),a:rnd(v.k0),b:rnd(v.k1)})
+        : t("Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.",{g:rnd(v.max),a:rnd(v.k0),b:rnd(v.k1)})});
+  }
   // 3) WINDCHILL À VELOCIDADE REAL de cada troço (velocidade média OSRM)
   let wc=null;
   for(let j=0;j<segs.length-1;j++){
@@ -4713,6 +5247,77 @@ function routeHazards(R){
     txt:t("Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.",{k:rnd(gl.km),h:fmtHM(gl.eta)})});
   return H.sort((x,y)=>y.sev-x.sev||x.km0-y.km0);
 }
+/* Dias secos seguidos no FIM de uma série diária de precipitação.
+   "Não veio" não é "veio seco": um dia sem dados PÁRA a contagem — o número
+   é um mínimo construído só com dias reais, e sem histórico fica-se calado
+   (dd-06 §2), nunca se inventa uma seca a partir de buracos (7g-ter). */
+function diasSecos(s){
+  let n=0;
+  for(let i=(s?.length||0)-1;i>=0;i--){
+    const v=s[i];
+    if(v==null) break;
+    if(v<HAZARD_CFG.drySpellWetMm) n++; else break;
+  }
+  return n;
+}
+/* ── ÓLEO DA PRIMEIRA CHUVA NO AGORA (dd-06 §2) ─────────────────────────
+   A Rota já tinha este perigo; o Agora não tinha uma palavra — e foi no
+   Agora que o dia de hoje apanhou o Ricardo. Histórico numa chamada diária
+   pequena (cache 6 h por sítio), gatilho na primeira chuva (caída ou a
+   minutos no nowcast), e só na janela inicial — depois a estrada lava. */
+async function loadSecaAgora(lat,lon){
+  const chave=`seca|${lat.toFixed(2)},${lon.toFixed(2)}|${isoDate(Date.now()/1000)}`;
+  const emCache=cacheLer(chave);
+  if(emCache!==null){ state.secaDias=emCache.dias; return; }
+  try{
+    const u=new URL(OM_BASE);
+    u.search=new URLSearchParams({
+      latitude:lat.toFixed(3), longitude:lon.toFixed(3),
+      daily:"precipitation_sum",
+      start_date:isoDate(Date.now()/1000-12*86400),
+      end_date:isoDate(Date.now()/1000-86400),
+      timeformat:"unixtime", timezone:"auto",
+    }).toString();
+    const j=await jfetch(u.toString(), 15000, "historial-de-chuva");
+    state.secaDias=diasSecos(j?.daily?.precipitation_sum);
+    cacheEscrever(chave,{dias:state.secaDias},6*3600*1000);
+  }catch(e){ state.secaDias=null; }               // sem histórico → silêncio
+  if(state.wx) renderDashboard();
+}
+/* o cartão do Agora: ativo se houve seca E a primeira chuva está a cair (ou
+   a minutos), dentro da janela inicial. Devolve null = nenhum cartão. */
+function oleoAgora(wx){
+  if(state.secaDias==null||state.secaDias<HAZARD_CFG.drySpellDays) return null;
+  const H=wx?.hourly; if(!H?.time?.length) return null;
+  const agora=Date.now()/1000;
+  const meiaNoite=new Date(); meiaNoite.setHours(0,0,0,0);
+  const t0=meiaNoite.getTime()/1000;
+  let primeira=null, acumulado=0;
+  for(let i=0;i<H.time.length;i++){
+    const tt=H.time[i]; if(tt<t0||tt>agora) continue;
+    const pr=H.precipitation?.[i];
+    if(pr!=null&&pr>=HAZARD_CFG.firstRainMm){ if(primeira==null) primeira=tt; }
+    if(primeira!=null&&pr!=null) acumulado+=pr;
+  }
+  if(primeira!=null){
+    const horas=(agora-primeira)/3600;
+    if(horas<=HAZARD_CFG.oleoJanelaHoras&&acumulado<=HAZARD_CFG.oleoLavagemMm)
+      return {n:state.secaDias, aCair:true};
+    return null;                                   // já lavou (ou vai lavando)
+  }
+  // ainda não choveu hoje: o nowcast vê as primeiras gotas a chegar?
+  const M=wx?.minutely_15;
+  if(M?.time?.length){
+    for(let i=0;i<M.time.length;i++){
+      const tt=M.time[i];
+      if(tt<agora-900||tt>agora+3600) continue;
+      const pr=M.precipitation?.[i];
+      if(pr!=null&&pr>=HAZARD_CFG.firstRainMm) return {n:state.secaDias, aCair:false};
+    }
+  }
+  return null;                                     // seca continua — sem chuva, sem aviso
+}
+
 /* histórico de chuva dos últimos dias (3 pontos da rota) para o aviso do óleo */
 async function loadDrySpell(){
   const R=state.route; if(!R?.samples?.length) return;
@@ -4733,9 +5338,9 @@ async function loadDrySpell(){
     const arr=Array.isArray(j)?j:[j];
     let best=0;
     for(const w of arr){
-      const s=w?.daily?.precipitation_sum||[]; let runD=0;
-      for(let i=s.length-1;i>=0;i--){ if((s[i]??0)<HAZARD_CFG.drySpellWetMm) runD++; else break; }
-      best=Math.max(best,runD);
+      /* a mesma contagem do Agora — e com a mesma honestidade: um dia sem
+         dados pára a contagem em vez de contar como seco (era um ??0) */
+      best=Math.max(best,diasSecos(w?.daily?.precipitation_sum||[]));
     }
     R.drySpellDays=best;
   }catch(e){ R.drySpellDays=null; }
@@ -4833,7 +5438,7 @@ function renderSegments(){
   const st=currentStretches(), wv=windStretches();
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,t("🌧️💨 Onde apanhas chuva e vento")));
+  card.appendChild(el("h2",null,semEmoji(t("🌧️💨 Onde apanhas chuva e vento"))));
   if(!st.length&&!wv.length){
     card.appendChild(el("p","h-sub",t("Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉")));
     box.appendChild(card); return;
@@ -4880,18 +5485,23 @@ function evalDepartures(){
   for(const s of [0,30,60,90,120,180,240]) shifts.push(s);
   const evals=shifts.map(sh=>{
     const dep=R.dep+sh*60;
-    let wet=0;
+    let wet=0, furos=0;
     for(let j=0;j<R.samples.length-1;j++){
       const A=R.samples[j], B=R.samples[j+1];
       const a=sampleAt(A,dep+A.travelSec+A.pauseOffset);
       const b=sampleAt(B,dep+B.travelSec+B.pauseOffset);
-      if(!a||!b) continue;
+      if(!a||!b){ furos++; continue; }
+      if(a.faltas.length||b.faltas.length) furos++;
       const lvl=Math.max(rainLevel(a.pr,a.pp,a.code,prof), rainLevel(b.pr,b.pp,b.code,prof));
       wet+=(B.km-A.km)*[0,0.35,1,1.6][lvl];
     }
-    return {sh,dep,wet};
+    return {sh,dep,wet,furos};
   });
-  const best=evals.reduce((x,y)=>y.wet<x.wet-0.01?y:x,evals[0]);
+  /* a melhor partida só pode ser uma com os dados completos: uma hora sem
+     dados conta "seca" por falta de más notícias, e a sugestão "sai às 16h"
+     empurraria alguém exatamente para o buraco */
+  const completos=evals.filter(e=>!e.furos);
+  const best=completos.length?completos.reduce((x,y)=>y.wet<x.wet-0.01?y:x,completos[0]):null;
   return {evals,best};
 }
 
@@ -4899,7 +5509,7 @@ function renderDepartures(){
   const R=state.route, box=$("#route-departures"); if(!R){box.textContent="";return;}
   box.textContent="";
   const card=el("div","card");
-  card.appendChild(el("h2",null,t("🕒 E se saíres mais tarde (ou mais cedo)?")));
+  card.appendChild(el("h2",null,semEmoji(t("🕒 E se saíres mais tarde (ou mais cedo)?"))));
   card.appendChild(el("p","h-sub",t("Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.")));
   const row=el("div","dep-chips");
   const {evals,best}=evalDepartures();
@@ -4907,7 +5517,9 @@ function renderDepartures(){
     const c=el("button","dep-chip"+(ev===best&&best.wet<evals.find(e=>e.sh===R.shift)?.wet-0.5?" best":""));
     c.dataset.shift=ev.sh;
     c.appendChild(el("div","t",fmtHM(ev.dep)));
-    c.appendChild(el("div","v", ev.wet<0.5?t("seco ✅"):t("~{n} km 🌧️",{n:fmtN(ev.wet,0)})));
+    /* assimétrico: a chuva encontrada mostra-se; o "seco ✅" exige dados completos */
+    c.appendChild(el("div","v", ev.wet>=0.5?t("~{n} km 🌧️",{n:fmtN(ev.wet,0)})
+      :ev.furos?t("? sem dados"):t("seco ✅")));
     if(ev===best&&ev.wet<0.5) c.title="A opção mais seca";
     c.addEventListener("click",()=>{
       $("#rt-when").value=localDT(new Date(ev.dep*1000));
@@ -4937,15 +5549,121 @@ function addRecente(it){
   if(!it||!isFinite(it.lat)) return;
   const k=(x)=>`${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}`;
   const lista=getRecentes().filter(r=>k(r)!==k(it));
-  lista.unshift({name:it.name, sub:it.sub||"", lat:it.lat, lon:it.lon});
+  lista.unshift({name:it.name, sub:it.sub||"", lat:it.lat, lon:it.lon,
+                 prov:{como:"pesquisa", quando:Date.now()}, atrib:it.atrib||null});
   store.set("recentes", lista.slice(0,25));
 }
 function getFavRoutes(){ return store.get("favRoutes")||[]; }
 function normTxt(x){ return (x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 function saveFav(place,label){
   const favs=getFavs().filter(f=>normTxt(f.label)!==normTxt(label));
-  favs.unshift({label, name:place.name, sub:place.sub||"", lat:place.lat, lon:place.lon});
+  favs.unshift({label, name:place.name, sub:place.sub||"", lat:place.lat, lon:place.lon,
+                prov:{como:"escolha", quando:Date.now()}, atrib:place.atrib||null});
   store.set("favs",favs.slice(0,20)); renderFavRow();
+}
+
+/* =====================================================================
+   SANIDADE ÚNICA DOS DADOS GUARDADOS (A3.5.35)
+   A A3.5.1 corrigiu a pesquisa que podia gravar sítios com coordenadas
+   erradas (a milhares de km), mas o que já estava gravado não sai sozinho:
+   a casa fica até ser trocada e os recentes (25, dedup por coordenada) não
+   expiram. Pergunta-se a todos os que têm dados antigos, UMA vez, sem
+   limiar de suspeita — mostrar o PAÍS é o que torna o erro óbvio.
+   Fechar sem responder mantém tudo e o cartão volta na abertura seguinte.
+   "Corrigir" nunca apaga a casa antiga — só a troca quando o utilizador
+   escolher outra (pesquisa ou GPS, os fluxos que já existem). */
+let sanidadePendente=false;
+function sanidadePrepara(){
+  if(store.get("sanidade")?.ok) return;
+  // ANTES de qualquer setHome do arranque: numa instalação limpa não há nada
+  // gravado para confirmar, e perguntar seria ruído.
+  if(!store.get("home") && !getRecentes().length && !getFavs().length){
+    store.set("sanidade",{ok:true, vazio:true, quando:Date.now()});
+    return;
+  }
+  sanidadePendente=true;
+}
+/* Como cada sítio guardado nasceu, em palavras. A ausência de registo diz-se
+   como ausência — inventar uma origem plausível seria o valor de recurso
+   tranquilizador outra vez (7g-ter). */
+function provTexto(p){
+  if(!p||!p.como) return t("guardada antes desta versão");
+  return p.como==="gps"?t("detetada pelo GPS")
+    :p.como==="pesquisa"?t("definida a partir de uma pesquisa")
+    :p.como==="reserva"?t("valor de arranque — nunca escolhida por ti")
+    :t("definida por ti");
+}
+function nomePais(cc){
+  if(!cc) return t("país?");
+  try{ const n=new Intl.DisplayNames([state.lang||"pt"],{type:"region"}).of(cc.toUpperCase());
+    if(n) return n; }catch(e){}
+  return cc.toUpperCase();
+}
+function sanidadeRender(){
+  const slot=$("#sanidade-slot"); if(!slot) return;
+  slot.textContent="";
+  if(!sanidadePendente) return;
+  const card=el("div","card"); card.id="sanidade-card";
+  card.appendChild(el("h2",null,"🧭 "+t("Vê se os teus sítios guardados batem certo")));
+  card.appendChild(el("p","h-sub",t("Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.")));
+  const linha=(icone,titulo,x,aoApagar)=>{
+    const r=el("div","san-row");
+    r.appendChild(el("span",null,icone));
+    const tx=el("span","san-tx");
+    tx.appendChild(el("b",null,titulo??((x&&(x.label||x.name))||"")));
+    if(x&&x.sub) tx.appendChild(document.createTextNode(" — "+x.sub));
+    if(x&&isFinite(x.lat)){
+      const p=el("span","san-pais"," · …");
+      tx.appendChild(p);
+      paisesCarregar().then(()=>{ p.textContent=` · ${nomePais(paisEm(x.lat,x.lon))} · ${(+x.lat).toFixed(2)}, ${(+x.lon).toFixed(2)}`; });
+    }
+    r.appendChild(tx);
+    if(aoApagar){ const b=el("button","san-x","✕"); b.title=t("Apagar este registo");
+      b.addEventListener("click",aoApagar); r.appendChild(b); }
+    return r;
+  };
+  const h=store.get("home");
+  const lc=h?linha("🏠",h.name,h,null):linha("🏠",t("sem casa guardada"),null,null);
+  if(h) lc.querySelector(".san-tx").appendChild(el("span","san-pais"," · "+provTexto(h.prov)));
+  card.appendChild(lc);
+  const rec=getRecentes(), favs=getFavs();
+  if(rec.length){
+    card.appendChild(el("p","san-h",`${t("Recentes")} (${rec.length})`));
+    const k=(x)=>`${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}`;
+    rec.forEach(x=>card.appendChild(linha("🕘",null,x,()=>{
+      store.set("recentes",getRecentes().filter(r2=>k(r2)!==k(x)));
+      sanidadeRender();
+    })));
+  }
+  if(favs.length){
+    card.appendChild(el("p","san-h",`${t("Favoritos")} (${favs.length})`));
+    favs.forEach(x=>card.appendChild(linha("⭐",null,x,()=>{
+      store.set("favs",getFavs().filter(f=>normTxt(f.label)!==normTxt(x.label)));
+      renderFavRow();
+      sanidadeRender();
+    })));
+  }
+  const corrigir=el("div","san-corrigir"); corrigir.hidden=true;
+  corrigir.appendChild(el("p","h-sub",t("Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.")));
+  const g=el("button","btn",t("📍 A minha posição"));
+  g.addEventListener("click",()=>useGPS(false));
+  const ir=el("button","btn",t("Ir para a pesquisa"));
+  ir.addEventListener("click",()=>{ const c=$("#loc-search"); if(c){ c.scrollIntoView({behavior:"smooth",block:"center"}); c.focus(); } });
+  corrigir.append(g,ir);
+  const acoes=el("div","san-acoes");
+  const ok=el("button","btn primary",t("✔ Está tudo certo"));
+  ok.addEventListener("click",()=>{
+    store.set("sanidade",{ok:true, quando:Date.now()});
+    sanidadePendente=false; sanidadeRender();
+    toast(t("Obrigado — não volto a perguntar."));
+  });
+  const fix=el("button","btn",t("A casa não está certa — corrigir"));
+  fix.addEventListener("click",()=>{ corrigir.hidden=!corrigir.hidden; });
+  acoes.append(ok,fix);
+  card.appendChild(acoes);
+  card.appendChild(corrigir);
+  card.appendChild(el("p","h-sub",t("Se fechares sem responder, fica tudo como está e volto a perguntar na próxima abertura.")));
+  slot.appendChild(card);
 }
 /* =====================================================================
    VIAGENS PLANEADAS — calendário no menu lateral (🗓️ no topo)
@@ -4953,7 +5671,7 @@ function saveFav(place,label){
 function getTrips(){ return (store.get("trips")||[]).filter(x=>x&&x.dep>Date.now()/1000-2*3600).sort((a,b)=>a.dep-b.dep); }
 function saveTrip(tr){
   const list=getTrips().filter(x=>x.hash!==tr.hash||Math.abs(x.dep-tr.dep)>600);
-  list.push({id:Date.now().toString(36), ...tr});
+  list.push({id:Date.now().toString(36), prov:{como:"escolha", quando:Date.now()}, ...tr});
   store.set("trips", list.slice(0,20));
   planTripAlerts();
 }
@@ -4981,10 +5699,16 @@ async function tripVerdict(tr){
     const wxs=await fetchRouteWx([{lat,lon}], tr.dep-7200, tr.dep+4*3600);
     const H=wxs?.[0]?.hourly;
     let i=H?.time?.findIndex(tt=>tt>tr.dep)??-1; if(i<1) i=Math.max(1,(H?.time?.length||1)-1);
-    const lvl=rainLevel(H?.precipitation?.[i-1]??0,H?.precipitation_probability?.[i-1]??0,H?.weather_code?.[i-1]??0,PROFILES[state.profile]);
-    const gust=H?.wind_gusts_10m?.[i-1]??0;
+    const pr=H?.precipitation?.[i-1]??null, pp=H?.precipitation_probability?.[i-1]??null,
+          code=H?.weather_code?.[i-1]??null, gust=H?.wind_gusts_10m?.[i-1]??null;
+    const lvl=rainLevel(pr,pp,code,PROFILES[state.profile]);
+    /* assimétrico: a má notícia sai com a evidência que houver; o 🟢 de uma
+       viagem marcada exige a hora completa — antes, `??0` dava "bom para ir"
+       a uma hora sem dados nenhuns */
+    const furo=(pr==null&&pp==null)||code==null||gust==null;
     const v=lvl>=3?{ico:"🔴",txt:t("chuva forte/trovoada")}:lvl===2?{ico:"🟠",txt:t("chuva prevista")}
-      :gust>=60?{ico:"💨",txt:t("vento muito forte")}:lvl===1?{ico:"🟡",txt:t("possível chuvisco")}:{ico:"🟢",txt:t("bom para ir")};
+      :(gust!=null&&gust>=60)?{ico:"💨",txt:t("vento muito forte")}:lvl===1?{ico:"🟡",txt:t("possível chuvisco")}
+      :furo?{ico:"❔",txt:t("faltam dados dessa hora")}:{ico:"🟢",txt:t("bom para ir")};
     tripWx.set(tr.id,{at:now,v});
     return v;
   }catch(e){ return {ico:"❔", txt:""}; }
@@ -5023,7 +5747,7 @@ function closeTrips(){ $("#trips-drawer").classList.remove("open"); $("#trips-bg
 
 function saveFavRoute(name,hash){
   const rs=getFavRoutes().filter(r=>r.hash!==hash&&normTxt(r.name)!==normTxt(name));
-  rs.unshift({name,hash}); store.set("favRoutes",rs.slice(0,12)); renderFavRow();
+  rs.unshift({name,hash, prov:{como:"escolha", quando:Date.now()}}); store.set("favRoutes",rs.slice(0,12)); renderFavRow();
 }
 function renderFavRow(){
   const row=$("#fav-row"); if(!row) return;
@@ -5109,7 +5833,7 @@ function renderCands(cands,pos,picked){
     const chip=el("button","chip click cand-chip"+(c===picked?" sel":"")+(c._fav?" cand-meu":""));
     chip.append(el("span",null,c._fav?"⭐":c._rec?"🕘":"📍"), el("b",null,c.name),
       el("span",null,`${c.sub?c.sub+" · ":""}${U.dist(c.dist)}`));
-    chip.addEventListener("click",()=>assistantGo(pos,c,cands));
+    chip.addEventListener("click",()=>{ focar(c); assistantGo(pos,c,cands); });
     box.appendChild(chip);
   });
 }
@@ -5166,8 +5890,12 @@ function buildRecommendation(cand){
   const s=R.samples;
   const worst=Math.max(...s.map(x=>x.cond.lvl));
   const hard=s.some(x=>THUNDER.includes(x.cond.code)||FREEZING.includes(x.cond.code)||SNOW.includes(x.cond.code));
+  const buracosRec=s.filter(x=>x.cond.faltas?.length).length;
   const wind=computeWindStats(R);
-  const minT=Math.min(...s.map(x=>x.cond.t));
+  /* Math.min coage null a 0: uma rota com buracos "descobria" uma mínima de
+     0° e aconselhava luvas de inverno em julho — conselho fabricado */
+  const temps=s.map(x=>x.cond.t).filter(v=>v!=null);
+  const minT=temps.length?Math.min(...temps):null;
   let wetKm=0;
   for(let j=0;j<s.length-1;j++){ const lvl=Math.max(s[j].cond.lvl,s[j+1].cond.lvl); if(lvl>=2) wetKm+=s[j+1].km-s[j].km; }
   const {evals,best}=evalDepartures();
@@ -5193,12 +5921,18 @@ function buildRecommendation(cand){
   } else if(worst===1){
     lvl=1; emoji="🟡"; title=t("Podes ir de moto — mas leva o fato de chuva");
     A("🌦️",t("Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão."));
+  } else if(buracosRec){
+    /* a condição assimétrica: o que há está bom, mas faltam dados — o "sim"
+       a cheio não pode sair daqui */
+    lvl=0; emoji="🟢"; title=t("Provavelmente sim — mas faltam-me dados");
+    A("⚠️",t("Não tenho dados de parte do caminho; no que verifiquei está seco. Os pormenores estão no resumo da rota."));
   } else {
     lvl=0; emoji="✅"; title=t("Sim — vai de moto!");
     A("😎",t("Trajeto seco até {p} a esta hora.",{p:cand.name}));
   }
-  // vento — reporta sempre
-  if(wind.gustMax>=60){
+  // vento — reporta o que viu; sem dados de vento, não inventa calmaria
+  if(!wind.gustSeen){ /* a falta já está no resumo da rota */ }
+  else if(wind.gustMax>=60){
     if(lvl<2){ lvl=2; emoji="💨"; title=t("Vento demasiado forte para ir descansado"); }
     A("💨",t("Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.",{g:rnd(wind.gustMax),d:wind.desc,x:wind.crossPlace?t(", com lateral forte perto do km {k}",{k:rnd(wind.crossKm)}):""}));
   } else if(wind.gustMax>=45){
@@ -5207,8 +5941,9 @@ function buildRecommendation(cand){
   } else {
     A("💨",t("Vento tranquilo: rajadas máximas de {g} km/h, {d}.",{g:rnd(wind.gustMax),d:wind.desc}));
   }
-  // roupa
-  if(minT<=6) A("🥶",t("Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.",{t:rnd(minT)}));
+  // roupa — só com temperatura vista; "amena" sem dados seria inventada
+  if(minT==null){ /* a falta já está no resumo da rota */ }
+  else if(minT<=6) A("🥶",t("Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.",{t:rnd(minT)}));
   else if(minT<=13) A("🧥",t("Leva casaco quente: mínima de {t}° no percurso — em andamento sente-se bastante menos.",{t:rnd(minT)}));
   else if(minT>=30) A("🥵",t("Muito calor: hidrata-te antes de sair e usa equipamento ventilado."));
   else A("👕",t("Temperatura amena (mín. {t}°) — equipamento habitual com casaco serve.",{t:rnd(minT)}));
@@ -5229,6 +5964,8 @@ function buildRecommendation(cand){
       if(lvl===0){ lvl=1; emoji="🅿️"; title=t("Ida seca — mas vai chover em {p} depois de chegares",{p:cand.name}); }
     } else if(sInfo.worst===1){
       A("🅿️",t("Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.",{p:cand.name}));
+    } else if(sInfo.furos){
+      A("🅿️",t("Lá em {p}: provavelmente seco, mas faltam-me dados de parte dessas horas.",{p:cand.name}));
     } else {
       A("🅿️",t("Lá em {p}: seco {x} — regresso tranquilo.",{p:cand.name,x:sInfo.rest?t("até ao fim do dia"):t("durante a tua estadia")}));
     }
@@ -5239,31 +5976,12 @@ function buildRecommendation(cand){
     const parts=tr.slice(0,5).map((t,i)=>`${fmtHM(t.eta)}${i===0?"":` (${U.kmMark(t.km)})`} ${rainLabel(t.lvl).toLowerCase()}`);
     A("🗺️",t("Ao longo do caminho: {x}.",{x:parts.join(" → ")}));
   }
-  // render
-  const rec=el("div",`rec lvl${lvl}`); rec.setAttribute("data-test","ai-rec");
-  const tt=el("div","rec-title"); tt.append(el("span",null,emoji), el("span",null,title));
-  rec.appendChild(tt);
-  rec.appendChild(el("div","rec-sub",
-    `${R.o.name} → ${cand.name}${cand.sub?` (${cand.sub})`:""} · ${fmtN(R.totalKm,1)} km · ${fmtDur(R.travelTotal)} · ${t("chegada")} ~${fmtHM(R.arrive??(R.dep+R.travelTotal))}`));
-  const ul=el("ul");
-  adv.forEach(a=>{ const li=el("li"); li.append(el("span","r-ico",a.icon), el("span",null,a.txt)); ul.appendChild(li); });
-  rec.appendChild(ul);
-  const acts=el("div","rec-actions");
-  if(canWait&&!hard){
-    const b=el("button","btn primary",t("🕒 Aplicar partida às {h}",{h:fmtHM(best.dep)}));
-    b.addEventListener("click",()=>{
-      $("#rt-when").value=localDT(new Date(best.dep*1000));
-      applyShift(best.sh);
-      toast(t("Partida ajustada para as {h} ✔",{h:fmtHM(best.dep)}));
-      buildRecommendation(cand);
-    });
-    acts.appendChild(b);
-  }
-  const m=el("button","btn",t("🗺️ Ver no mapa"));
-  m.addEventListener("click",()=>$("#map-route").scrollIntoView({behavior:"smooth",block:"center"}));
-  acts.appendChild(m);
-  rec.appendChild(acts);
-  box.appendChild(rec);
+  /* A4.2 (registo 20, destino 1): o veredicto do assistente MORREU como
+     cartão. O veredicto da rota existe UMA vez — na faixa, sobre o mapa — e
+     as etapas, pastilhas e a melhor partida vivem na folha (a "Aplicar
+     partida às {h}" tem lá a casa dela, no "E se saíres mais tarde").
+     O cálculo acima mantém-se: alimenta a escolha do candidato e a voz. */
+  box.textContent="";
 }
 
 /* =====================================================================
@@ -5362,7 +6080,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-07-29-1235-c4ca31";
+const BUILD="2026-07-30-1506-44a9a6";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -5410,7 +6128,10 @@ function findNextRain(wx, from, until){
   for(let k=0;k<H.time.length;k++){
     const tt=H.time[k];
     if(tt<from-1800||tt>until) continue;
-    if((H.precipitation?.[k]??0)>=0.2||(H.precipitation_probability?.[k]??0)>=65||GUARD_WET.includes(H.weather_code?.[k]))
+    /* null não testemunha: uma hora sem dados não anuncia chuva nem estende
+       o "seco até às X" — o guarda simplesmente não a pode usar */
+    const pr=H.precipitation?.[k], pp=H.precipitation_probability?.[k];
+    if((pr!=null&&pr>=0.2)||(pp!=null&&pp>=65)||GUARD_WET.includes(H.weather_code?.[k]))
       return Math.max(tt,from);
   }
   return null;
@@ -5978,11 +6699,14 @@ async function sentinelCheck({recuperacao=false}={}){
     const now=Date.now()/1000;
     const M=j.minutely_15||{}, times=M.time||[], prs=M.precipitation||[];
     let i0=times.findIndex(t=>t>now-900); if(i0<0)i0=0;
-    const curWet=(j.current?.precipitation??0)>0.05||(prs[i0]??0)>0.05;
+    const cp=j.current?.precipitation;
+    const curWet=(cp!=null&&cp>0.05)||(prs[i0]!=null&&prs[i0]>0.05);
     let startIdx=-1, stopIdx=-1;
-    for(let k=i0;k<Math.min(i0+8,times.length);k++){ if((prs[k]??0)>0.1){ startIdx=k; break; } }
-    if(curWet) for(let k=i0;k<Math.min(i0+10,times.length);k++){ if((prs[k]??0)<=0.05){ stopIdx=k; break; } }
-    const gust=j.current?.wind_gusts_10m??0;
+    for(let k=i0;k<Math.min(i0+8,times.length);k++){ if(prs[k]!=null&&prs[k]>0.1){ startIdx=k; break; } }
+    /* "a chuva deve parar dentro de X min" é uma BOA notícia — não pode sair
+       de um quarto de hora sem dados (`??0` fazia exatamente isso) */
+    if(curWet) for(let k=i0;k<Math.min(i0+10,times.length);k++){ if(prs[k]!=null&&prs[k]<=0.05){ stopIdx=k; break; } }
+    const gust=j.current?.wind_gusts_10m??null;
     const H=j.hourly||{}; let thunderAt=-1;
     (H.time||[]).forEach((t,k)=>{ if(thunderAt<0&&t>now&&t<now+2.5*3600&&THUNDER.includes(H.weather_code?.[k])) thunderAt=t; });
     if(thunderAt>0) sentinelAlert("th-"+Math.floor(thunderAt/3600),
@@ -6001,12 +6725,14 @@ async function sentinelCheck({recuperacao=false}={}){
     sentinel.last={gust, curWet};
     motoGuardRefresh(); // a moto ficou cá fora? re-verifica a chuva no sítio dela
     let st;
+    const furosSent=times.slice(i0,i0+8).filter((_,k)=>prs[i0+k]==null).length;
     if(curWet) st=stopIdx>=0?t("🌧️ A chover agora — deve parar ~{h}.",{h:fmtHM(times[stopIdx])}):t("🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.");
     else if(startIdx>=0) st=t("☁️ Chuva a caminho: ~{h}.",{h:fmtHM(times[startIdx])});
+    else if(furosSent) st=t("Sem chuva no que veio — faltam {n} dos 8 quartos de hora.",{n:furosSent});
     else st=t("✅ Sem chuva à vista nas próximas 2 horas.");
     sentinel.lastAt=Date.now();
     if(!recuperacao&&sentinelNotaTipo()==="atraso") sentinelNota("");   // só o aviso de atraso sai, e não na própria recuperação
-    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:Math.round(gust)});
+    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:gust==null?"—":Math.round(gust)});
   }catch(e){
     $("#sentinel-status").textContent=t("Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.");
   }finally{ sentinel.checking=false; }
@@ -6114,17 +6840,22 @@ function planNativeAlerts(){
     const H=state.wx?.hourly; if(!H?.time) return;
     const now=Date.now()/1000, evs=[], seen=new Set();
     let i0=H.time.findIndex(t=>t>now-3600); if(i0<0)i0=0;
-    let prevWet=(H.precipitation?.[i0]??0)>=0.2;
+    /* null não testemunha: uma hora sem dados não é "seca" nem "molhada" —
+       não dispara alarmes nem marca a transição seco→chuva */
+    const wetAt=(i)=>{ const pr=H.precipitation?.[i], pp=H.precipitation_probability?.[i];
+      return (pr!=null&&pr>=0.2)||(pp!=null&&pp>=70); };
+    let prevWet=wetAt(i0);
     for(let i=i0+1;i<Math.min(i0+18,H.time.length);i++){
       const t=H.time[i], code=H.weather_code?.[i];
-      const wet=(H.precipitation?.[i]??0)>=0.2||(H.precipitation_probability?.[i]??0)>=70;
+      const wet=wetAt(i);
       if(THUNDER.includes(code)&&!seen.has("th")){ seen.add("th");
         evs.push({at:Math.max(now+120,t-3600), title:"⛈️ Trovoada a caminho",
           body:`Trovoada prevista por volta das ${fmtHM(t)} na tua zona. Recolhe a moto.`}); }
       if(wet&&!prevWet&&!seen.has("rain")&&t-900>now){ seen.add("rain");
         evs.push({at:t-900, title:"🌧️ Chuva a chegar",
           body:`Chuva prevista a partir das ${fmtHM(t)} na tua zona — se vais sair de moto, sai antes.`}); }
-      if((H.wind_gusts_10m?.[i]??0)>=60&&!seen.has("wind")){ seen.add("wind");
+      const g=H.wind_gusts_10m?.[i];
+      if(g!=null&&g>=60&&!seen.has("wind")){ seen.add("wind");
         evs.push({at:Math.max(now+120,t-1800), title:"💨 Vento muito forte",
           body:`Rajadas de ~${rnd(H.wind_gusts_10m[i])} km/h por volta das ${fmtHM(t)}. Evita a moto nesse período.`}); }
       prevWet=wet;
@@ -6143,11 +6874,47 @@ function switchTab(name){
   $$(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));
   tipHide();
   if(name==="rota"){ initRouteMap(); setTimeout(()=>state.mapaRota&&Mapa.redimensionar(state.mapaRota),60);
+    oferecerFocoNaRota();              // o que se procurou no Agora já espera aqui (dd-06 §1a)
     if(state.route) setTimeout(()=>drawRoute(false),80);
     if(!store.get("pin-tip")){ store.set("pin-tip",1);
       setTimeout(()=>toast(t("💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá."),8000),900); } }
+  rotaMapaModo(name==="rota");   // A4.2: com rota calculada, o separador Rota É o mapa
 }
 
+/* ── SÍTIO EM FOCO (dd-06 §1a) ──────────────────────────────────────────
+   Procurar num separador define o foco; o outro OFERECE-O — nunca roteia
+   sozinho (rotear custa chamadas e o gesto é do utilizador), e nunca
+   substitui em silêncio o que o utilizador escreveu: o destino só se
+   preenche se estiver vazio ou tiver sido preenchido por um foco anterior. */
+function focar(sitio){
+  if(!sitio||!isFinite(sitio.lat)) return;
+  state.foco={name:sitio.name, sub:sitio.sub||"", lat:sitio.lat, lon:sitio.lon,
+              atrib:sitio.atrib||null, quando:Date.now()};
+  renderFocoChip();
+  oferecerFocoNaRota();
+}
+function renderFocoChip(){
+  const box=$("#foco-chip"); if(!box) return;
+  box.textContent="";
+  if(!state.foco){ box.hidden=true; return; }
+  box.hidden=false;
+  const c=el("button","chip click",t("Rota para {p}",{p:state.foco.name}));
+  c.addEventListener("click",()=>{
+    switchTab("rota");
+    rotaMapaModo(false);              // o utilizador quer o planeador com a oferta à vista
+    oferecerFocoNaRota();
+    $("#plan-card").classList.add("open");
+  });
+  box.appendChild(c);
+}
+function oferecerFocoNaRota(){
+  const d=$("#rt-d"); if(!d||!state.foco) return;
+  const doUtilizador=(d._picked&&!d._doFoco)||(d.value.trim()&&!d._doFoco&&!d._picked);
+  if(doUtilizador) return;
+  d.value=state.foco.name+(state.foco.sub?` — ${state.foco.sub.split(",")[0]}`:"");
+  d._picked={...state.foco};
+  d._doFoco=true;
+}
 function setTheme(t,{guardar=true}={}){
   state.theme=t;
   /* A escolha do tema TEM de ser escrita. O comentário na leitura já dizia "a
@@ -6273,12 +7040,19 @@ function init(){
   $$(".tab").forEach(t=>t.addEventListener("click",()=>switchTab(t.dataset.view)));
 
   // pesquisa de localização + GPS
-  attachAC($("#loc-search"),$("#loc-results"),(it)=>{ setHome(it); $("#loc-search").value=""; toast(t("Previsão para {p}",{p:it.name})); });
+  /* Escolher a própria casa na lista NÃO a reescreve com o rótulo de exibição
+     ("🏠 A minha casa" como nome, a proveniência como morada) — usa-se o
+     objeto real. Re-escolher é um gesto explícito: a proveniência sobe para
+     "escolha". */
+  attachAC($("#loc-search"),$("#loc-results"),(it)=>{ const sitio=it._casa?state.home:it;
+    setHome(sitio,{prov:(it._casa||it._fav)?"escolha":"pesquisa"});
+    focar(sitio);                                  // o sítio em foco atravessa os separadores
+    $("#loc-search").value=""; toast(t("Previsão para {p}",{p:it.name})); });
   $("#btn-gps").addEventListener("click",()=>useGPS(false));
 
   // rota
   attachAC($("#rt-o"),$("#rt-o-list"));
-  attachAC($("#rt-d"),$("#rt-d-list"));
+  attachAC($("#rt-d"),$("#rt-d-list"),(it)=>focar(it));   // escolher destino na Rota também define o foco
   $("#btn-add-stop").addEventListener("click",()=>{ const inp=addStopRow(); if(inp) inp.focus(); });
   $("#btn-rt-gps").addEventListener("click",()=>useGPS(true));
 
@@ -6296,6 +7070,11 @@ function init(){
   addMicTo($("#rt-o"));
   addMicTo($("#rt-d"));
   $("#btn-route").addEventListener("click",computeRoute);
+  // A4.2 — o ecrã-mapa: voltar, abrir/fechar a folha, regressar ao mapa
+  $("#rt-voltar")?.addEventListener("click",()=>rotaMapaModo(false));
+  $("#rota-faixa")?.addEventListener("click",()=>document.body.classList.toggle("folha-aberta"));
+  $("#rota-folha-grab")?.addEventListener("click",()=>document.body.classList.remove("folha-aberta"));
+  $("#btn-ver-mapa")?.addEventListener("click",()=>rotaMapaModo(true));
   $("#rt-swap").addEventListener("click",()=>{
     const o=$("#rt-o"), d=$("#rt-d");
     [o.value,d.value]=[d.value,o.value];
@@ -6368,6 +7147,10 @@ function init(){
     if(restored&&tv.hash===location.hash) state._resumeTravel=true;
     else if(!restored){ restored=tryRestore(tv.hash); if(restored) state._resumeTravel=true; }
   }
+
+  // sanidade dos dados guardados — ANTES do primeiro setHome, que escreve na
+  // store e faria uma instalação limpa parecer dados antigos por confirmar
+  sanidadePrepara(); sanidadeRender();
 
   // localização inicial
   const HOME0=store.get("home")||DEFAULT_LOC;
