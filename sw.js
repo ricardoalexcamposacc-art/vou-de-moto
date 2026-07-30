@@ -2,7 +2,7 @@
    - app: rede primeiro (atualiza sempre que há net), cache como rede de segurança
    - MAPA: tiles guardados em cache (cache-first) para a viagem não ficar às escuras
      quando falha a rede — inclui pré-descarga do corredor da rota */
-const V = "levante-v8";
+const V = "levante-v9";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */

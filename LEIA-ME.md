@@ -34,9 +34,14 @@ reabre.
 
 ### O `sw.js`
 
-**Não vai neste pacote, de propósito.** O que está no servidor fica como está
-até a reescrita da Fase A2.2 estar pronta e revista. Subir um `sw.js` novo sem
-isso muda a forma da cache do mapa offline sem ninguém ter verificado.
+⚠️ **ESTE PACOTE INCLUI O `sw.js` — COM UMA ÚNICA LINHA MUDADA:
+`V="levante-v9"`** (aprovado no do-diretor-16 §3). O bump descongela o
+manifest, os ícones e o `paises.json` para quem já tem a app — sem ele, os
+subrecursos ficavam presos na cache antiga. Antes de o subir, confirma no
+browser que o que está no ar diz `V="levante-v8"`. O resto do ficheiro está
+byte a byte igual ao que está no ar; a reescrita a sério do SW continua a
+ser um bloco futuro, com o contrato do dd-07 §2 (e a atualização nunca
+interrompe uma viagem, dd-09).
 
 ---
 
@@ -52,22 +57,17 @@ isso muda a forma da cache do mapa offline sem ninguém ter verificado.
 | `inter-latin.woff2` · `inter-latin-ext.woff2` | o tipo de letra, alojado por nós |
 | `icon.svg` · `icon-192.png` · `icon-512.png` · `apple-touch-icon.png` | ícones |
 
-**Treze ficheiros, nenhuma subpasta.** É tudo o que a app carrega hoje.
+**O mapa é o MapLibre com estilo de casa e tiles do OpenFreeMap** (A2.2
+segunda metade, 30/07). O `maplibre-gl.js`, os estilos claro/escuro, os
+glifos e o sprite vêm **da nossa origem** — no arranque a app não fala com
+terceiro nenhum. Os tiles vetoriais pedem-se ao OpenFreeMap quando abres o
+mapa. O Leaflet, a CARTO, o cdnjs e o jsDelivr saíram.
 
-**O mapa ainda é o Leaflet com tiles da CARTO.** A primeira metade da Fase A2.2
-está feita — toda a app deixou de falar com o Leaflet e passa por uma camada
-fina escrita em termos do MapLibre — mas **o motor ainda não foi trocado, e não
-há interruptor**: o objeto que implementa o MapLibre ainda não existe.
-
-Por isso o `maplibre-gl.js`, os estilos, os glifos e o sprite **não vão neste
-pacote**: são cerca de 1,9 MB que nada carrega, e eram eles que traziam as
-subpastas `glifos/` e `sprite/` que o upload pela interface achata. Voltam
-quando a segunda metade estiver escrita, e nessa altura com nomes de raiz — o
-MapLibre exige um `{fontstack}` no molde dos glifos, mas aceita-o no nome do
-ficheiro em vez de numa pasta.
-
-⚠️ **O problema de licenciamento da CARTO continua vivo em produção** até essa
-segunda metade. É para isso que a A2.2 existe.
+⚠️ **Este pacote traz as subpastas `glifos/` e `sprite/`.** O upload por
+arrasto na interface do GitHub achata pastas — se publicares por arrasto,
+confirma que os caminhos `glifos/...` e `sprite/...` chegaram como pastas
+(ou usa o clone/git, que os preserva sempre). Sem eles o mapa fica sem
+letras nem símbolos.
 
 ---
 
@@ -99,9 +99,9 @@ cheio no Modo viagem.
 ## Serviços que a app usa
 
 Open-Meteo (previsões), Geoapify (rotas, pesquisa de sítios e moradas), Photon e
-Nominatim/OpenStreetMap (pesquisa), Overpass (radares fixos), CARTO (fundo do
-mapa), cdnjs e jsDelivr (Leaflet, até à troca de motor). O tipo de letra vem
-connosco, não do Google.
+Nominatim/OpenStreetMap (pesquisa), Overpass (radares fixos), OpenFreeMap
+(tiles do fundo do mapa). O motor do mapa, o estilo, os tipos de letra e os
+símbolos vêm connosco — nada de CDNs nem do Google.
 
 A lista completa e o que cada um recebe está na **página de privacidade**, que é
 a versão que conta — esta é um resumo.

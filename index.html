@@ -37,7 +37,7 @@
   src:url(./inter-latin-ext.woff2) format('woff2');
   unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="./maplibre-gl.css">
 <style>
 /* ================= TOKENS — "Aurora Navy" ================= */
 :root{
@@ -295,6 +295,12 @@ body.rota-mapa #view-agora{display:none}
 #rota-faixa .fx-dot{width:11px;height:11px;border-radius:50%;background:var(--lvl-c);flex:0 0 auto}
 #rota-faixa .fx-con{font-size:12.5px;color:var(--ink2);margin-top:3px}
 #rota-faixa .fx-num{font-size:12px;color:var(--muted);margin-top:4px}
+/* partida relativa (dd-14 §2): chips na faixa, sempre visíveis com rota viva */
+#rota-faixa .fx-partida{display:flex;gap:6px;margin:8px 0 2px;flex-wrap:wrap}
+#rota-faixa .fx-chip{font:600 12px/1 system-ui,sans-serif;padding:7px 10px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface2);color:var(--ink);cursor:pointer}
+#rota-faixa .fx-chip.sel{background:var(--lvl-c);border-color:transparent;color:#fff}
+#rota-faixa .fx-chip.star{border-style:dashed}
 #rota-faixa .btn{margin-top:9px;width:100%;justify-content:center}
 #rota-folha{position:fixed;left:0;right:0;bottom:0;z-index:1700;background:var(--surface);
   border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.28);max-height:80vh;overflow:auto;
@@ -306,8 +312,8 @@ body:not(.rota-mapa) #rota-folha, body:not(.rota-mapa) #rota-faixa,
 body:not(.rota-mapa) #rota-topo, body:not(.rota-mapa) #rota-legenda{display:none}
 /* os controlos do mapa saem de debaixo do pill/legenda (topo-esquerda → direita),
    e a atribuição sobe para cima da faixa — visível é obrigatório (registo 20) */
-body.rota-mapa .leaflet-top.leaflet-left{left:auto;right:10px}
-body.rota-mapa .leaflet-bottom.leaflet-right{bottom:var(--faixa-h,150px)}
+body.rota-mapa .maplibregl-ctrl-top-left{left:auto;right:10px}
+body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
 .san-row{display:flex;gap:8px;align-items:baseline;font-size:12.5px;padding:4px 0;border-top:1px solid rgba(125,125,125,.18)}
 .san-row b{font-weight:600}
 .san-tx{flex:1;min-width:0}
@@ -454,13 +460,16 @@ body.traveling .wrap{padding-bottom:120px}
 footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
 .gear-chips .chip{font-size:13px;padding:8px 13px}
 .alert-strip{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.leaflet-container{font:inherit}
-.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.leaflet-popup-content{margin:12px 14px;font:12.5px/1.5 system-ui,sans-serif}
-.leaflet-bar a{background:var(--surface);color:var(--ink);border-bottom-color:var(--border)}
-.leaflet-bar a:hover{background:var(--surface2)}
-.leaflet-control-attribution{background:rgba(127,127,127,.12);color:var(--muted);font-size:9.5px}
-.leaflet-control-attribution a{color:var(--muted)}
+.maplibregl-map{font:inherit}
+.maplibregl-popup-content{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);padding:12px 14px;font:12.5px/1.5 system-ui,sans-serif}
+.maplibregl-ctrl-group{background:var(--surface)}
+.maplibregl-ctrl-group button{background:var(--surface);color:var(--ink)}
+.maplibregl-ctrl-group button:hover{background:var(--surface2)}
+/* dupla classe: o CSS do próprio MapLibre usa .maplibregl-ctrl.maplibregl-ctrl-attrib
+   (fundo branco meio opaco) e ganhava por especificidade — no tema escuro a
+   barra ficava uma tira clara ilegível */
+.maplibregl-ctrl.maplibregl-ctrl-attrib{background:rgba(127,127,127,.12);color:var(--muted);font-size:9.5px}
+.maplibregl-ctrl.maplibregl-ctrl-attrib a{color:var(--muted)}
 @media (max-width:720px){
   .hero{flex-direction:row}
   .score-ring{width:86px;height:86px}.score-num{font-size:28px}
@@ -612,11 +621,15 @@ html[data-theme="dark"] .ac-list{background:#111a2c}
 html[data-theme="dark"] .pop{background:#111a2c}
 
 /* 4. balão do pin no mapa: texto legível nos dois temas */
-.leaflet-popup-content-wrapper{background:var(--surface-solid);color:var(--ink);border-radius:14px}
-html[data-theme="dark"] .leaflet-popup-content-wrapper{background:#111a2c}
-.leaflet-popup-tip{background:var(--surface-solid)}
-html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
-.leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+.maplibregl-popup-content{background:var(--surface-solid);color:var(--ink);border-radius:14px}
+html[data-theme="dark"] .maplibregl-popup-content{background:#111a2c}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip{border-top-color:var(--surface-solid)}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip{border-bottom-color:var(--surface-solid)}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip{border-right-color:var(--surface-solid)}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip{border-left-color:var(--surface-solid)}
+html[data-theme="dark"] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip{border-top-color:#111a2c}
+html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{border-bottom-color:#111a2c}
+.maplibregl-popup-close-button{color:var(--muted);font-size:16px;padding:2px 6px}
 .pin-pop b{color:var(--ink)}
 .pin-sub{color:var(--muted)}
 .pin-actions button{background:var(--surface2);color:var(--ink);border:1px solid var(--border);font-weight:650}
@@ -760,6 +773,11 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
              em português — e a voz é uma das coisas onde um erro invisível
              muda uma decisão de conduzir. -->
         <div class="h-sub" id="estado-aparelho" style="margin:8px 0 0" hidden></div>
+        <!-- O estado da INSTALAÇÃO vive aqui pela mesma razão que o da voz
+             (dd-07 §3): o botão desaparecia e deixava gente sem caminho.
+             Três estados, três mensagens — e o botão do topo ganhou caminho
+             também no iPhone, onde o prompt nunca existe. -->
+        <p class="h-sub" id="estado-instalacao" data-test="estado-instalacao" style="margin:8px 0 0"></p>
         <!-- CARIMBO DA VERSÃO. Passámos um dia a discutir se uma correção estava
              no ar, com o Ricardo a dizer que publicou e o site a servir a versão
              de 28/07 — e nenhum dos dois conseguia provar nada sem abrir o
@@ -960,8 +978,9 @@ html[data-theme="dark"] .leaflet-popup-tip{background:#111a2c}
   <button class="btn" id="tb-stop">🛑 Terminar</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2/dist/leaflet-rotate.min.js" onerror="window.__noRotate=1"></script>
+<!-- A2.2: o motor do mapa vem de CASA, como a letra — nada de CDN no arranque.
+     O leaflet-rotate morreu com o Leaflet: a rotação é nativa do MapLibre. -->
+<script src="./maplibre-gl.js"></script>
 <script>
 "use strict";
 /* =====================================================================
@@ -1041,6 +1060,9 @@ function setLang(l){
   if(state.wx) renderDashboard();
   if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); }
   renderFavRow();
+  /* o estado da instalação é dinâmico (3 estados) — não cabe na tabela
+     estática do applyStaticI18n; repinta-se aqui como os outros leitores */
+  if(typeof renderInstalacao==="function") renderInstalacao();
 }
 /* Atribuição obrigatória do plano gratuito do Geoapify. Tem de ser reposta a
    cada tradução: o rodapé inteiro é uma entrada de i18n e é reescrito quando se
@@ -1165,6 +1187,7 @@ en:{
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"See exactly where along the way it will rain — and the best time to leave.",
 "Paragens no caminho":"Stops on the way","até 4":"up to 4","fico 0 min":"stay 0 min","fico 1 h":"stay 1 h","fico {n} min":"stay {n} min",
 "Modo viagem":"Trip mode","Ver o mapa":"See the map","Voltar ao planeamento":"Back to planning",
+"agora":"now","melhor: {h}":"best: {h}",
 "Fechar a folha":"Close the sheet","O que significam as cores?":"What do the colours mean?",
 "A cor de cada troço mostra o tempo previsto ":"Each segment's colour shows the forecast ",
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
@@ -1369,6 +1392,9 @@ en:{
 
 "Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 On iPhone: Share button → “Add to Home Screen” to install the app.",
+"✅ Já tens a app — abre-a do ecrã inicial.":"✅ You already have the app — open it from your home screen.",
+"📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 You can install this as an app — “Install” button up top.",
+"📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 To install: browser menu → “Add to Home Screen”, if your browser supports it.",
 "Calcula primeiro uma rota.":"Calculate a route first.","Este dispositivo não dá acesso ao GPS.":"This device doesn't provide GPS access.",
 "Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"Couldn't fetch the forecast. Check your connection and try again.","Tentar de novo":"Try again",
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
@@ -1384,6 +1410,7 @@ es:{
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Ve exactamente en qué tramos lloverá — y la mejor hora para salir.",
 "Paragens no caminho":"Paradas en el camino","até 4":"hasta 4","fico 0 min":"paro 0 min","fico 1 h":"paro 1 h","fico {n} min":"paro {n} min",
 "Modo viagem":"Modo viaje","Ver o mapa":"Ver el mapa","Voltar ao planeamento":"Volver a la planificación",
+"agora":"ahora","melhor: {h}":"mejor: {h}",
 "Fechar a folha":"Cerrar la hoja","O que significam as cores?":"¿Qué significan los colores?",
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
 "Vê se os teus sítios guardados batem certo":"Comprueba que tus sitios guardados están bien",
@@ -1570,6 +1597,9 @@ es:{
 "Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 En iPhone: botón Compartir → “Añadir a pantalla de inicio”.",
+"✅ Já tens a app — abre-a do ecrã inicial.":"✅ Ya tienes la app — ábrela desde la pantalla de inicio.",
+"📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Se puede instalar como app — botón “Instalar” aquí arriba.",
+"📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Para instalar: menú del navegador → “Añadir a pantalla de inicio”, si tu navegador lo permite.",
 "Calcula primeiro uma rota.":"Calcula primero una ruta.","Este dispositivo não dá acesso ao GPS.":"Este dispositivo no da acceso al GPS.",
 "Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"No pude obtener la previsión. Revisa la conexión.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
@@ -1584,6 +1614,7 @@ fr:{
 "Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Vois exactement sur quels tronçons il pleuvra — et la meilleure heure pour partir.",
 "Paragens no caminho":"Arrêts en chemin","até 4":"jusqu'à 4","fico 0 min":"pause 0 min","fico 1 h":"pause 1 h","fico {n} min":"pause {n} min",
 "Modo viagem":"Mode trajet","Ver o mapa":"Voir la carte","Voltar ao planeamento":"Retour à la planification",
+"agora":"maintenant","melhor: {h}":"meilleur : {h}",
 "Fechar a folha":"Fermer le volet","O que significam as cores?":"Que signifient les couleurs ?",
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
 "Vê se os teus sítios guardados batem certo":"Vérifie que tes lieux enregistrés sont corrects",
@@ -1770,6 +1801,9 @@ fr:{
 "Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Sur iPhone : bouton Partager → « Sur l'écran d'accueil ».",
+"✅ Já tens a app — abre-a do ecrã inicial.":"✅ Tu as déjà l'app — ouvre-la depuis l'écran d'accueil.",
+"📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Tu peux l'installer comme app — bouton « Installer » juste au-dessus.",
+"📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Pour installer : menu du navigateur → « Ajouter à l'écran d'accueil », si ton navigateur le permet.",
 "Calcula primeiro uma rota.":"Calcule d'abord un itinéraire.","Este dispositivo não dá acesso ao GPS.":"Cet appareil ne fournit pas de GPS.",
 "Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"Impossible d'obtenir les prévisions. Vérifie ta connexion.","Tentar de novo":"Réessayer","Idioma":"Langue","norte":"nord",
 }};
@@ -3356,7 +3390,20 @@ function scoreHour(m, prof=PROFILES[state.profile]){
 
   R.sort((a,b)=>b.pen-a.pen);
   const score=clamp(Math.round(100-pen),0,100);
-  const lvl = hard?3 : score>=prof.tGood?0 : score>=prof.tWarn?1 : score>=25?2 : 3;
+  let lvl = hard?3 : score>=prof.tGood?0 : score>=prof.tWarn?1 : score>=25?2 : 3;
+  /* ═══ O VERDE NUNCA CONVIVE COM CHUVA PROVÁVEL (dd-14 §1) ═══
+     30/07 às 18:00, no telemóvel do Ricardo: índice 74, anel verde, "ALL
+     CLEAR" — e "82% chance of rain" na mesma caixa. A aritmética explicava:
+     o ppPen sela em 26, logo NENHUMA probabilidade de chuva — nem 100% —
+     tirava o verde ao perfil equilibrado. O utilizador sai confiante e
+     apanha chuva: o rótulo era mais tranquilizador do que os dados (7g-ter).
+     O número não era o defeito (74 é discutível); "via verde" é que mentia.
+     A régua passa a ser UMA, a mesma que pinta a rota: se o rainLevel do
+     perfil diz que a hora não está seca (chuvisco a cair, ou probabilidade
+     ≥ ppRisk), o veredicto não pode dizer "via verde" — sobe a "atenção".
+     A razão da chuva já viaja em R; nulos não disparam o piso (rainLevel
+     devolve 0 sem testemunhas — "não veio" continua a não testemunhar). */
+  if(lvl===0 && rainLevel(m.pr, m.pp, m.code, prof)>0) lvl=1;
   return {score, lvl, reasons:R.slice(0,3), hard, faltas};
 }
 
@@ -3918,40 +3965,47 @@ function renderDaily(wx){
 /* =====================================================================
    ROTA — onde vai chover no caminho
    ===================================================================== */
-/* Descrição da base do mapa, em termos do MapLibre. A densidade de pixels é
-   resolvida aqui e não no molde, porque o `{r}` é uma invenção do Leaflet. */
-function baseCarto(){
-  const style=document.documentElement.dataset.theme==="dark"?"dark_all":"light_all";
-  const r=(window.devicePixelRatio||1)>1.3?"@2x":"";
-  /* A4.2: a atribuição vive no canto do mapa — a obrigação OSM/CARTO/Geoapify
-     mudou de casa quando o rodapé saiu do ecrã da rota, não morreu */
-  return { tiles:[`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}${r}.png`],
-    subdominios:"abcd", zoomMax:19,
-    atribuicao:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'
-      +(typeof geoOn==="function"&&geoOn()?' · <a href="https://www.geoapify.com/">Geoapify</a>':"") };
+/* Descrição da base do mapa (A2.2): o ESTILO vem de casa — claro ou escuro,
+   com glifos e sprite da nossa origem — e só os tiles vêm do OpenFreeMap.
+   O CARTO morreu aqui: o serviço de tiles é só para clientes enterprise e
+   não aguentava um lançamento público (dd-16 §2).
+   A4.2: a atribuição vive no canto do mapa — a obrigação OSM/OpenFreeMap/
+   Geoapify mudou de casa quando o rodapé saiu do ecrã da rota, não morreu.
+   As atribuições OpenFreeMap/OpenMapTiles/OSM viajam DENTRO do estilo (na
+   fonte openmaptiles); aqui só entra o extra que o estilo não conhece. */
+function baseMapa(){
+  const escuro=document.documentElement.dataset.theme==="dark";
+  return { estilo:escuro?"./estilo-escuro.json":"./estilo-claro.json", zoomMax:19,
+    atribuicaoExtra:(typeof geoOn==="function"&&geoOn()?'<a href="https://www.geoapify.com/">Geoapify</a>':"") };
 }
 /* =====================================================================
    MAPA OFFLINE — guarda os tiles do corredor da rota para a viagem
    nunca ficar às escuras se a rede falhar (fronteiras, túneis, serra)
    ===================================================================== */
-const TILE_ZOOMS=[12,13,14,15];      // do "onde estou" ao detalhe de rua
+/* Tiles VETORIAIS (A2.2): o dado acaba no zoom 14 e o motor amplia a partir
+   daí — não há tiles 15 para guardar. E um tile vetorial serve os dois temas
+   (o estilo é que pinta), por isso o corredor guardado vale para claro e
+   escuro ao mesmo tempo — o dobro do valor por byte da era raster. */
+const TILE_ZOOMS=[10,12,14];         // do "onde estou" ao detalhe de rua
 const TILE_PAD=1;                    // anel de tiles à volta da rota (não fica colada à borda)
 function tileTemplate(){
-  const style=document.documentElement.dataset.theme==="dark"?"dark_all":"light_all";
-  const r=(window.devicePixelRatio||1)>1.3?"@2x":"";
-  return `https://a.basemaps.cartocdn.com/${style}/{z}/{x}/{y}${r}.png`;
+  /* o molde vivo vem do TileJSON que o Mapa.base resolveu (os caminhos do
+     OpenFreeMap têm a data do snapshot no nome); sem ele ainda, não se
+     inventa um molde — devolve-se null e o corredor espera pela próxima */
+  return state._tileTpl||null;
 }
 const lon2x=(lon,z)=>Math.floor((lon+180)/360*Math.pow(2,z));
 const lat2y=(lat,z)=>{ const r=lat*Math.PI/180;
   return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,z)); };
 function routeTileUrls(coords){
   const tpl=tileTemplate(), seen=new Set(), out=[];
+  if(!tpl) return out;   // sem TileJSON resolvido não se inventa um molde
   const step=Math.max(1,Math.floor(coords.length/900));
   for(const z of TILE_ZOOMS){
     const n=Math.pow(2,z);
     for(let i=0;i<coords.length;i+=step){
       const cx=lon2x(coords[i].lon,z), cy=lat2y(coords[i].lat,z);
-      const pad=z>=15?0:TILE_PAD;              // no zoom máximo só o essencial
+      const pad=z>=14?0:TILE_PAD;              // no zoom máximo só o essencial
       for(let dx=-pad;dx<=pad;dx++) for(let dy=-pad;dy<=pad;dy++){
         const x=cx+dx, y=cy+dy;
         if(x<0||y<0||x>=n||y>=n) continue;
@@ -4017,21 +4071,18 @@ function setOffline(off){
    RainViewer e não volta a entrar por acidente.
    ══════════════════════════════════════════════════════════════════════════ */
 const Mapa = (() => {
-  const ll = (c) => [c[1], c[0]];                 // [lon,lat] → [lat,lon] do Leaflet
-  const LL = (a) => [a.lng, a.lat];               // e de volta
-
   /* ── VOCABULÁRIO DE ESTILO ────────────────────────────────────────────────
-     Era o último sítio onde a fachada ainda falava Leaflet. Uma camada dizia
-     `cor: p => p.cor` e `filtro: p => !p.contorno && !p.percorrido` — funções
-     JavaScript, chamadas por feição. O Leaflet aceita isso porque desenha
-     objeto a objeto em JavaScript; o MapLibre não, porque compila o estilo e
-     avalia-o no motor. Uma função opaca não se compila.
+     Uma camada dizia `cor: p => p.cor` e `filtro: p => !p.contorno` —
+     funções JavaScript por feição. O Leaflet aceitava isso porque desenhava
+     objeto a objeto; o MapLibre não, porque compila o estilo e avalia-o no
+     motor. Uma função opaca não se compila.
 
-     Passa a haver um vocabulário pequeno que os dois sabem ler: constantes,
-     valores tirados de uma propriedade, e três testes. O Leaflet traduz para
-     funções, o MapLibre traduzirá para expressões `["get", …]`. Quem escreve
-     uma camada deixa de poder inventar lógica que só um dos motores entende —
-     e é essa impossibilidade que faz a troca de motor caber num ficheiro.
+     Por isso há um vocabulário pequeno: constantes, valores tirados de uma
+     propriedade, e três testes. O MapLibre traduz para expressões
+     `["get", …]` (em `_expr`/`_filtro`); o adaptador Leaflet, enquanto
+     viveu, traduzia para funções. Quem escreve uma camada não pode inventar
+     lógica que só um motor entende — foi essa impossibilidade que fez a
+     troca de motor caber num ficheiro.
 
      Não é uma limitação a fingir: se um dia fizer falta lógica a sério por
      feição, calcula-se ANTES, no `drawRoute`, e guarda-se numa propriedade.
@@ -4044,58 +4095,116 @@ const Mapa = (() => {
     igual: (nome, valor) => ({ [FILTRO]: "igual", nome, valor }),
     tudo: (...fs) => ({ [FILTRO]: "tudo", fs }),
   };
-  /* resolve um valor de estilo contra as propriedades de uma feição */
+  /* resolve um valor de estilo contra as propriedades de uma feição — é o
+     que os polígonos derivados (círculos em metros) usam fora do motor */
   const valor = (v, p) => (v && v[CAMPO]) ? (p[v.nome] ?? v.omissao) : v;
-  /* resolve um filtro. Sem filtro, a feição entra. */
-  const passa = (fl, p) => {
-    if (!fl) return true;
-    switch (fl[FILTRO]) {
-      case "tem": return !!p[fl.nome];
-      case "naoTem": return !p[fl.nome];
-      case "igual": return p[fl.nome] === fl.valor;
-      case "tudo": return fl.fs.every((x) => passa(x, p));
-      default: throw new Error("filtro desconhecido na camada");
-    }
-  };
 
-  /* ---- implementação sobre Leaflet ------------------------------------- */
-  const leaflet = {
-    nome: "leaflet",
-    disponivel: () => typeof L !== "undefined",
+  /* ---- implementação sobre MapLibre GL (A2.2, segunda metade) ----------
+     O Leaflet + CARTO morreram aqui: o CARTO estava fora dos termos para uso
+     público (dd-16 §2) e a fachada já falava MapLibre desde a primeira
+     metade. O estilo vem de casa (estilo-claro/escuro.json, glifos e sprite
+     da nossa origem); só os TILES vêm do OpenFreeMap — que o sw.js já
+     tratava por cache-first desde o v7, à espera deste dia.
+
+     O ZOOM fala a escala clássica dos tiles de 256 px (a do Leaflet e dos
+     URLs z/x/y) — toda a app foi calibrada nela. O MapLibre desenha com
+     tiles de 512 px, o que desloca a escala um nível: o mesmo enquadramento
+     é zoom N na app e N−1 no motor. A conversão vive TODA aqui dentro,
+     como vivia o sinal do rumo no leaflet-rotate — quem chama nunca a vê. */
+  const maplibre_ = {
+    nome: "maplibre",
+    disponivel: () => typeof maplibregl !== "undefined",
 
     criar(idOuEl, { centro, zoom, rodar = false, botoesZoom = true } = {}) {
-      const rot = (rodar && L.Map.prototype.setBearing && !window.__noRotate)
-        ? { rotate: true, touchRotate: true, rotateControl: { closeOnZeroBearing: false } } : {};
-      /* botoesZoom:false — A4.2: no ecrã-mapa a pinça, o duplo toque e a roda
-         chegam; os botões saíam da lista fechada do registo 20 */
-      const m = L.map(idOuEl, Object.assign({ zoomSnap: .5, zoomControl: botoesZoom }, rot)).setView(ll(centro), zoom);
-      return { m, fontes: new Map(), marcadores: new Set(), _rodar: !!rot.rotate };
+      const m = new maplibregl.Map({
+        container: idOuEl,
+        /* nasce com um fundo liso e carrega o estilo a sério no base() —
+           assim um arranque sem rede (ou um teste) tem sempre mapa vivo */
+        style: { version: 8, sources: {}, layers: [{ id: "fundo", type: "background",
+          paint: { "background-color": document.documentElement.dataset.theme === "dark" ? "#101724" : "#e8ecf3" } }] },
+        center: centro, zoom: zoom - 1,
+        attributionControl: false, antialias: false,
+      });
+      if (!rodar) { m.dragRotate.disable(); m.touchZoomRotate.disableRotation(); }
+      if (botoesZoom) m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-left");
+      /* sem um ouvinte, o MapLibre despeja no console.error cada tile que
+         não chegou — offline isso é a vida, não um erro da app. O que
+         interessa (o estilo que não carrega) trata-se no base(). */
+      m.on("error", () => {});
+      const h = { m, fontes: new Map(), marcadores: new Set(), pend: [], pronto: false, _rodar: !!rodar, _atrib: null };
+      /* o MapLibre carrega estilos por fetch: entre um setStyle e o
+         style.load, qualquer addSource rebenta. Tudo o que toca no estilo
+         passa por _agendar — guardado por uma bandeira NOSSA, não pelo
+         isStyleLoaded(): esse fica falso enquanto sprites e glifos ainda
+         descarregam, a fila enchia nessa janela e nenhum style.load voltava
+         a disparar para a despejar. A bandeira só desce dentro do base(),
+         na janela do setStyle; cada load/style.load volta a subi-la e
+         devolve ao estilo novo tudo o que a app já declarou. */
+      const acorda = () => { h.pronto = true; maplibre_._repor(h); };
+      m.on("load", acorda); m.on("style.load", acorda);
+      return h;
     },
-    /* A base entra como DESCRIÇÃO — moldes de URL, atribuição, zoom máximo —
-       e não como um objeto do motor. É o que o MapLibre chama uma fonte raster
-       e o que o Leaflet consegue servir sem perder nada, subdomínios incluídos:
-       aqui são declarados, e cada motor expande-os à sua maneira (o Leaflet
-       nativamente com {s}, o MapLibre gerando um URL por letra). O `{r}` do
-       Leaflet para o retina não existe: quem descreve a base já resolveu a
-       densidade de pixels antes de a entregar. */
-    base(h, { tiles, subdominios = "", atribuicao = "", zoomMax = 19 }) {
-      if (h.base) h.m.removeLayer(h.base);
-      h.base = L.tileLayer(tiles[0], {
-        subdomains: subdominios || "abc", attribution: atribuicao, maxZoom: zoomMax });
-      h.base.addTo(h.m);
+    _agendar(h, fn) { if (h.pronto) { try { fn(); } catch (e) {} } else h.pend.push(fn); },
+    _repor(h) {
+      h.pend.splice(0).forEach((fn) => { try { fn(); } catch (e) {} });
+      for (const [nome, f] of h.fontes) {
+        if (!h.m.getSource(nome)) h.m.addSource(nome, { type: "geojson", data: f.geojson });
+        else h.m.getSource(nome).setData(f.geojson);
+        for (const spec of f.camadas) { try { maplibre_._porCamada(h, nome, spec, true); } catch (e) {} }
+      }
     },
-    redimensionar(h) { h.m.invalidateSize(); },
 
-    verCentro(h, centro, zoom) { h.m.setView(ll(centro), zoom ?? h.m.getZoom()); },
-    centro(h) { return LL(h.m.getCenter()); },
-    zoom(h) { return h.m.getZoom(); },
-    mover(h, centro) { h.m.panTo(ll(centro)); },
+    /* A base é uma DESCRIÇÃO: o estilo de casa + a atribuição extra. As
+       atribuições OpenFreeMap/OpenMapTiles/OSM vêm das fontes do próprio
+       estilo; o extra (Geoapify, quando ligado) entra por cima. */
+    async base(h, { estilo, atribuicaoExtra = "", zoomMax = 19 } = {}) {
+      h.m.setMaxZoom(zoomMax - 1);
+      if (h._atrib) { try { h.m.removeControl(h._atrib); } catch (e) {} }
+      /* compact:false — a atribuição é uma obrigação de licença e no A4.2 é
+         a única casa dela no ecrã-mapa: não se esconde atrás de um ⓘ */
+      h._atrib = new maplibregl.AttributionControl(
+        atribuicaoExtra ? { compact: false, customAttribution: atribuicaoExtra } : { compact: false });
+      h.m.addControl(h._atrib, "bottom-right");
+      try {
+        const est = await (await fetch(estilo)).json();
+        /* o MapLibre aceita glifos relativos mas exige sprite absoluto —
+           o ficheiro guarda caminhos relativos (é um ficheiro publicado) e
+           quem o carrega absolutiza-os aqui. À MÃO, não com new URL():
+           o URL() codifica as chaves e {fontstack} virava %7Bfontstack%7D —
+           o MapLibre recusava o estilo inteiro por não ver o token {range}. */
+        const raiz = location.origin + location.pathname.replace(/[^/]*$/, "");
+        for (const k of ["sprite", "glyphs"]) {
+          if (est[k] && !/^https?:/.test(est[k])) est[k] = raiz + est[k].replace(/^\.\//, "");
+        }
+        /* tiles do TileJSON vivo: os caminhos do OpenFreeMap levam a data do
+           snapshot no nome e rodam com o tempo. O molde gravado no ficheiro
+           fica como recurso — e é esse que a cache do service worker terá. */
+        try {
+          const tj = await jfetch("https://tiles.openfreemap.org/planet", 4000, "tilejson");
+          if (Array.isArray(tj?.tiles) && tj.tiles.length && est.sources?.openmaptiles)
+            est.sources.openmaptiles.tiles = tj.tiles;
+        } catch (e) {}
+        state._tileTpl = est.sources?.openmaptiles?.tiles?.[0] || null;  // corredor offline
+        h.pronto = false;                     // janela do transplante: agenda em vez de mexer
+        h.m.setStyle(est, { diff: false });   // substituição limpa → style.load → _repor
+      } catch (e) {
+        /* sem estilo (primeiro arranque offline, teste sem rede): fica o
+           fundo liso do criar() — rota, marcadores e GPS funcionam à mesma */
+      }
+    },
+    redimensionar(h) { h.m.resize(); },
+
+    verCentro(h, centro, zoom) { h.m.jumpTo({ center: centro, zoom: (zoom ?? maplibre_.zoom(h)) - 1 }); },
+    centro(h) { const c = h.m.getCenter(); return [c.lng, c.lat]; },
+    zoom(h) { return h.m.getZoom() + 1; },
+    mover(h, centro) { h.m.panTo(centro); },
     ajustar(h, coords, { margem = 26 } = {}) {
       if (!coords.length) return;
-      h.m.fitBounds(L.latLngBounds(coords.map(ll)), { padding: [margem, margem] });
+      const b = coords.reduce((bb, c) => bb.extend(c), new maplibregl.LngLatBounds(coords[0], coords[0]));
+      h.m.fitBounds(b, { padding: margem });
     },
-    /* `folga` negativa encolhe a caixa, como o `.pad(-0.25)` do Leaflet; no
-       MapLibre não existe e faz-se à mão — por isso a conta vive aqui */
+    /* `folga` negativa encolhe a caixa — o MapLibre não tem .pad() e a conta
+       continua a viver aqui, igual à do motor anterior */
     contem(h, centro, { folga = 0 } = {}) {
       try {
         const b = h.m.getBounds(); const s = b.getSouthWest(), n = b.getNorthEast();
@@ -4105,136 +4214,227 @@ const Mapa = (() => {
       } catch (e) { return true; }
     },
 
-    /* rumo em graus no sentido dos ponteiros. O leaflet-rotate usa o sinal
-       contrário do MapLibre — a diferença fica presa aqui e nunca sai. */
-    verRumo(h, graus) { try { h.m.setBearing && h.m.setBearing(-graus); } catch (e) {} },
-    rumo(h) { try { return h.m.getBearing ? -(h.m.getBearing() || 0) : 0; } catch (e) { return 0; } },
+    /* rumo nativo: graus no sentido dos ponteiros, sem sinal trocado */
+    verRumo(h, graus) { try { h.m.setBearing(graus); } catch (e) {} },
+    rumo(h) { try { return h.m.getBearing() || 0; } catch (e) { return 0; } },
     rodavel(h) { return h._rodar; },
 
     /* ---- fontes GeoJSON e camadas ------------------------------------- */
     fonte(h, nome, geojson) {
-      const antiga = h.fontes.get(nome);
-      if (antiga) { h.m.removeLayer(antiga.grupo); }
-      const grupo = L.layerGroup().addTo(h.m);
-      h.fontes.set(nome, { geojson, grupo, camadas: antiga ? antiga.camadas : [] });
-      const f = h.fontes.get(nome);
-      leaflet._pintarTudo(h, f);
+      const f = h.fontes.get(nome) || { camadas: [] };
+      f.geojson = geojson; h.fontes.set(nome, f);
+      maplibre_._agendar(h, () => {
+        const src = h.m.getSource(nome);
+        if (src) src.setData(geojson);
+        else { h.m.addSource(nome, { type: "geojson", data: geojson });
+               f.camadas.forEach((spec) => maplibre_._porCamada(h, nome, spec, true)); }
+        /* círculos geográficos derivam de centro+raio: refazem-se com os dados */
+        f.camadas.filter((s) => s.tipo === "circulo").forEach((spec) => maplibre_._poligonos(h, nome, spec));
+      });
       return f;
     },
     camada(h, nome, spec) {
       const f = h.fontes.get(nome);
       if (!f) throw new Error("camada sem fonte: " + nome);
       f.camadas = f.camadas.filter((s) => s.id !== spec.id).concat([spec]);
-      leaflet._pintar(h, f, spec);
+      maplibre_._agendar(h, () => maplibre_._porCamada(h, nome, spec, false));
     },
-    /* Uma passagem só pelas feições, a despachar para as camadas que as
-       aceitam. A versão anterior corria a lista inteira UMA VEZ POR CAMADA —
-       com três camadas sobre a rota, três varrimentos e três filtros por
-       feição. Medido: repintar custava 13 ms contra os 2,7 ms do código
-       antigo, e este era o grosso da diferença. */
-    _pintarTudo(h, f) {
-      for (const feat of (f.geojson.features || [])) {
-        const p = feat.properties || {};
-        for (const spec of f.camadas) {
-          if (!passa(spec.filtro, p)) continue;
-          leaflet._objeto(h, f, spec, feat, p);
+    /* vocabulário → expressões do estilo. `campo` vira ["get"], os filtros
+       viram ["all"/"=="/"to-boolean"] — é a tradução simétrica da que o
+       Leaflet fazia para funções. */
+    _expr(v, omissao) {
+      if (v && v[CAMPO]) return v.omissao === undefined ? ["get", v.nome] : ["coalesce", ["get", v.nome], v.omissao];
+      return v ?? omissao;
+    },
+    _filtro(fl) {
+      switch (fl[FILTRO]) {
+        case "tem": return ["to-boolean", ["coalesce", ["get", fl.nome], false]];
+        case "naoTem": return ["!", ["to-boolean", ["coalesce", ["get", fl.nome], false]]];
+        case "igual": return ["==", ["get", fl.nome], fl.valor];
+        case "tudo": return ["all", ...fl.fs.map(maplibre_._filtro)];
+        default: throw new Error("filtro desconhecido na camada");
+      }
+    },
+    _porCamada(h, nome, spec, soSeFaltar) {
+      const id = nome + "·" + spec.id, E = maplibre_._expr;
+      if (soSeFaltar && h.m.getLayer(id)) return;
+      for (const l of [id, id + "·f"]) if (h.m.getLayer(l)) h.m.removeLayer(l);
+      const filtro = spec.filtro ? { filter: maplibre_._filtro(spec.filtro) } : {};
+      /* `sob`: inserir ANTES de outra camada nossa (ex.: o halo do corredor
+         debaixo do contorno da rota) — sem isto, uma camada declarada depois
+         pintava por cima, dependendo da ordem dos gestos e não do desenho */
+      const antes = spec.sob && h.m.getLayer(spec.sob) ? spec.sob : undefined;
+      const poe = (def) => h.m.addLayer(def, antes);
+      if (spec.tipo === "linha") {
+        poe({ id, type: "line", source: nome, ...filtro,
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: { "line-color": E(spec.cor, "#888"), "line-width": E(spec.espessura, 4),
+                   "line-opacity": E(spec.opacidade, 1) } });
+      } else if (spec.tipo === "ponto") {
+        poe({ id, type: "circle", source: nome, ...filtro,
+          paint: { "circle-radius": E(spec.raio, 4.5), "circle-color": E(spec.corDentro, "#3388ff"),
+                   "circle-stroke-color": E(spec.cor, "#3388ff"), "circle-stroke-width": E(spec.espessura, 2) } });
+      } else if (spec.tipo === "area") {
+        poe({ id, type: "fill", source: nome, ...filtro,
+          paint: { "fill-color": E(spec.cor, "#888"), "fill-opacity": E(spec.opacidade, .35) } });
+      } else if (spec.tipo === "circulo") {
+        /* círculo com raio em METROS: o MapLibre só desenha raios em pixels,
+           por isso o círculo geográfico vira um polígono derivado (48 lados),
+           refeito sempre que a fonte muda — fiel ao L.circle que substitui */
+        maplibre_._poligonos(h, nome, spec);
+        poe({ id: id + "·f", type: "fill", source: id + "·poly", ...filtro,
+          paint: { "fill-color": E(spec.corDentro ?? spec.cor, "#888"), "fill-opacity": E(spec.opacidadeDentro, .15) } });
+        poe({ id, type: "line", source: id + "·poly", ...filtro,
+          paint: { "line-color": E(spec.cor, "#888"), "line-width": E(spec.espessura, 2) } });
+      }
+      if ((spec.aoClicar || spec.balao) && !spec._ligado) {
+        spec._ligado = true;   // o handler é delegado ao mapa e sobrevive aos
+        maplibre_._clique(h, id, spec);   // setStyle — liga-se UMA vez por spec
+      }
+    },
+    _poligonos(h, nome, spec) {
+      const f = h.fontes.get(nome); if (!f) return;
+      const feats = [];
+      for (const ft of (f.geojson.features || [])) {
+        if (ft.geometry?.type !== "Point") continue;
+        const p = ft.properties || {};
+        const r = valor(spec.raio, p); if (!(r > 0)) continue;
+        const [lon, lat] = ft.geometry.coordinates;
+        const dLat = r / 111320, dLon = r / (111320 * Math.cos(lat * Math.PI / 180));
+        const anel = [];
+        for (let i = 0; i <= 48; i++) { const a = (i / 48) * 2 * Math.PI;
+          anel.push([lon + Math.cos(a) * dLon, lat + Math.sin(a) * dLat]); }
+        feats.push({ type: "Feature", properties: p, geometry: { type: "Polygon", coordinates: [anel] } });
+      }
+      const id = nome + "·" + spec.id + "·poly", data = { type: "FeatureCollection", features: feats };
+      const src = h.m.getSource(id);
+      if (src) src.setData(data); else h.m.addSource(id, { type: "geojson", data });
+    },
+    _clique(h, id, spec) {
+      h.m.on("click", id, (e) => {
+        const ft = e.features && e.features[0]; if (!ft) return;
+        const p = ft.properties || {};
+        if (spec.aoClicar) spec.aoClicar(p, ft);
+        if (spec.balao) {
+          /* fábrica chamada AO ABRIR, nunca na repintura — a preguiça que os
+             dois motores querem, agora no manipulador do clique */
+          const c = spec.balao(p, ft);
+          const pop = new maplibregl.Popup({ maxWidth: (spec.balaoLargura ?? 260) + "px" }).setLngLat(e.lngLat);
+          typeof c === "string" ? pop.setHTML(c) : pop.setDOMContent(c);
+          pop.addTo(h.m);
         }
-      }
-    },
-    /* traduz uma especificação ao estilo MapLibre para objetos do Leaflet.
-       É este o único sítio que sabe o que é uma polilinha. */
-    _pintar(h, f, spec) {
-      for (const feat of (f.geojson.features || [])) {
-        const p = feat.properties || {};
-        if (!passa(spec.filtro, p)) continue;
-        leaflet._objeto(h, f, spec, feat, p);
-      }
-    },
-    _objeto(h, f, spec, feat, p) {
-      const val = (v) => valor(v, p);
-      {
-        const g = feat.geometry;
-        let obj = null;
-        if (spec.tipo === "linha" && g.type === "LineString") {
-          obj = L.polyline(g.coordinates.map(ll), {
-            color: val(spec.cor), weight: val(spec.espessura) ?? 4,
-            opacity: val(spec.opacidade) ?? 1, lineJoin: "round", interactive: !!spec.aoClicar });
-        } else if (spec.tipo === "circulo" && g.type === "Point") {
-          obj = L.circle(ll(g.coordinates), {
-            radius: val(spec.raio), color: val(spec.cor),
-            weight: val(spec.espessura) ?? 2, fillColor: val(spec.corDentro) ?? val(spec.cor),
-            fillOpacity: val(spec.opacidadeDentro) ?? .15 });
-        } else if (spec.tipo === "ponto" && g.type === "Point") {
-          obj = L.circleMarker(ll(g.coordinates), {
-            radius: val(spec.raio) ?? 4.5, color: val(spec.cor),
-            weight: val(spec.espessura) ?? 2, fillColor: val(spec.corDentro),
-            fillOpacity: 1 });
-        }
-        if (!obj) return;
-        if (spec.aoClicar) obj.on("click", () => spec.aoClicar(p, feat));
-        /* O conteúdo do balão é uma FÁBRICA, chamada quando o balão abre.
-           A primeira versão chamava `spec.balao(p, feat)` aqui, a construir o
-           balão de todas as feições a cada repintura: quarenta subárvores de
-           DOM por segundo, para balões que ninguém abriu. Media 9,5 ms dos
-           10,5 ms que a camada fina parecia custar — não era abstração nem
-           desajuste, era isto. O código antigo já construía o balão dentro do
-           `on("click")`, e eu troquei preguiça por ansiedade sem reparar.
-           O Leaflet aceita funções em bindPopup e só as chama ao abrir; no
-           MapLibre o balão constrói-se no manipulador do clique. As duas
-           pontas querem preguiça — a interface tem de a exprimir. */
-        if (spec.balao) obj.bindPopup((camada) => spec.balao(p, feat, camada), { maxWidth: spec.balaoLargura ?? 260 });
-        obj.addTo(f.grupo);
-      }
+      });
+      h.m.on("mouseenter", id, () => { h.m.getCanvas().style.cursor = "pointer"; });
+      h.m.on("mouseleave", id, () => { h.m.getCanvas().style.cursor = ""; });
     },
     limpar(h, nome) {
-      const f = h.fontes.get(nome);
-      if (f) { h.m.removeLayer(f.grupo); h.fontes.delete(nome); }
+      const f = h.fontes.get(nome); if (!f) return;
+      h.fontes.delete(nome);
+      maplibre_._agendar(h, () => {
+        for (const spec of f.camadas) {
+          const id = nome + "·" + spec.id;
+          [id, id + "·f"].forEach((l) => { if (h.m.getLayer(l)) h.m.removeLayer(l); });
+          if (h.m.getSource(id + "·poly")) h.m.removeSource(id + "·poly");
+        }
+        if (h.m.getSource(nome)) h.m.removeSource(nome);
+      });
     },
 
     /* ---- marcadores de DOM -------------------------------------------- */
     marcador(h, { centro, el, tamanho = [26, 26], ancora, zIndex = 0, interativo = true }) {
-      const icon = L.divIcon({ className: "", html: el.outerHTML ?? el,
-        iconSize: tamanho, iconAnchor: ancora ?? [tamanho[0] / 2, tamanho[1] / 2] });
-      const mk = L.marker(ll(centro), { icon, zIndexOffset: zIndex, interactive: interativo }).addTo(h.m);
+      let no = el;
+      if (typeof no === "string") { const d = document.createElement("div"); d.innerHTML = no; no = d.firstElementChild || d; }
+      /* o motor posiciona um EMBRULHO (o transform é dele); o elemento do
+         chamador vive lá dentro intacto. É o contrato do divIcon do Leaflet
+         — e é o que deixa a seta de navegação rodar o filho sem lutar com o
+         transform de posicionamento, e o `elemento().querySelector(...)`
+         encontrar o que o chamador construiu. */
+      const w = document.createElement("div");
+      w.style.width = tamanho[0] + "px"; w.style.height = tamanho[1] + "px";
+      w.appendChild(no);
+      const a = ancora ?? [tamanho[0] / 2, tamanho[1] / 2];
+      /* âncora em pixels do ícone → deslocamento a partir do centro */
+      const mk = new maplibregl.Marker({ element: w, anchor: "center",
+        offset: [tamanho[0] / 2 - a[0], tamanho[1] / 2 - a[1]] }).setLngLat(centro).addTo(h.m);
+      w.style.zIndex = String(zIndex);
+      if (!interativo) w.style.pointerEvents = "none";
       h.marcadores.add(mk);
       return {
-        mover(c) { mk.setLatLng(ll(c)); },
-        centro() { return LL(mk.getLatLng()); },
-        elemento() { return mk.getElement && mk.getElement(); },
-        aoClicar(cb) { mk.on("click", cb); },
-        /* `conteudo` é uma fábrica, pela mesma razão que em `camada`: construir
-           o balão de um marcador que ninguém abriu é trabalho a mais em cada
-           repintura. Aceita-se também um elemento já feito, para quem só tem um. */
-        balao(conteudo, largura) { mk.bindPopup(conteudo, { maxWidth: largura ?? 280 }); return this; },
-        abrirBalao() { mk.openPopup(); },
+        mover(c) { mk.setLngLat(c); },
+        centro() { const c = mk.getLngLat(); return [c.lng, c.lat]; },
+        elemento() { return mk.getElement(); },
+        aoClicar(cb) { mk.getElement().addEventListener("click", (e) => { e.stopPropagation(); cb(); }); },
+        /* `conteudo` é uma fábrica: constrói-se quando o balão ABRE */
+        balao(conteudo, largura) {
+          const pop = new maplibregl.Popup({ maxWidth: (largura ?? 280) + "px", offset: Math.max(tamanho[1] / 2, 12) });
+          pop.on("open", () => { const c = typeof conteudo === "function" ? conteudo() : conteudo;
+            typeof c === "string" ? pop.setHTML(c) : pop.setDOMContent(c); });
+          mk.setPopup(pop); return this;
+        },
+        abrirBalao() { const p = mk.getPopup(); if (p && !p.isOpen()) mk.togglePopup(); },
         repor() { mk.addTo(h.m); },
-        remover() { try { h.m.removeLayer(mk); } catch (e) {} h.marcadores.delete(mk); },
+        remover() { try { mk.remove(); } catch (e) {} h.marcadores.delete(mk); },
       };
     },
 
     balao(h, { centro, conteudo, aoFechar }) {
-      const pop = L.popup({ autoPan: true }).setLatLng(ll(centro)).setContent(conteudo).openOn(h.m);
-      if (aoFechar && pop.on) pop.on("remove", aoFechar);
-      return { elemento: () => pop.getElement && pop.getElement(), fechar: () => h.m.closePopup(pop) };
+      const pop = new maplibregl.Popup({ maxWidth: "280px" }).setLngLat(centro);
+      typeof conteudo === "string" ? pop.setHTML(conteudo) : pop.setDOMContent(conteudo);
+      pop.addTo(h.m);
+      if (aoFechar) pop.on("close", aoFechar);
+      return { elemento: () => pop.getElement(), fechar: () => { try { pop.remove(); } catch (e) {} } };
     },
 
     /* ---- eventos, com nomes nossos ------------------------------------ */
     aoEvento(h, nome, cb) {
-      const map = { arrastar: "dragstart", "clique-longo": "contextmenu", mover: "moveend" };
-      const ev = map[nome]; if (!ev) throw new Error("evento desconhecido: " + nome);
-      h.m.on(ev, (e) => cb(e.latlng ? LL(e.latlng) : null, e));
+      if (nome === "arrastar") { h.m.on("dragstart", (e) => cb(null, e)); return; }
+      if (nome === "mover") { h.m.on("moveend", (e) => cb(null, e)); return; }
+      if (nome === "clique-longo") {
+        /* contextmenu ouvido no CONTENTOR, como o motor antigo — o MapLibre
+           ouve no canvas interior e um evento real (ou de teste) apanhado
+           mais acima nunca lá chegava. Pixels→coordenadas à mão. */
+        const cont = h.m.getContainer();
+        cont.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          const r = cont.getBoundingClientRect();
+          const c = h.m.unproject([e.clientX - r.left, e.clientY - r.top]);
+          cb([c.lng, c.lat], e);
+        });
+        /* toque longo: o MapLibre não dispara contextmenu em ecrãs tácteis —
+           e o telemóvel é onde o gesto do pin mais vale. 550 ms parado. */
+        const cv = h.m.getCanvasContainer(); let tId = null, p0 = null;
+        cv.addEventListener("touchstart", (e) => {
+          if (e.touches.length !== 1) return;
+          p0 = [e.touches[0].clientX, e.touches[0].clientY];
+          tId = setTimeout(() => { tId = null;
+            const r = cv.getBoundingClientRect();
+            const c = h.m.unproject([p0[0] - r.left, p0[1] - r.top]);
+            cb([c.lng, c.lat], e);
+          }, 550);
+        }, { passive: true });
+        const cancela = () => { if (tId) { clearTimeout(tId); tId = null; } };
+        cv.addEventListener("touchend", cancela); cv.addEventListener("touchcancel", cancela);
+        cv.addEventListener("touchmove", (e) => {
+          if (!tId || !p0) return;
+          const dx = e.touches[0].clientX - p0[0], dy = e.touches[0].clientY - p0[1];
+          if (dx * dx + dy * dy > 64) cancela();
+        }, { passive: true });
+        return;
+      }
+      throw new Error("evento desconhecido: " + nome);
     },
     botao(h, { posicao = "cima-esquerda", el, aoClicar }) {
-      const POS = { "cima-esquerda": "topleft", "cima-direita": "topright" };
-      const C = L.Control.extend({ options: { position: POS[posicao] },
-        onAdd() { L.DomEvent.on(el, "click", (e) => { L.DomEvent.stop(e); aoClicar(); }); return el; } });
-      h.m.addControl(new C());
+      const ctl = { onAdd() { const w = document.createElement("div");
+          w.className = "maplibregl-ctrl maplibregl-ctrl-group";
+          el.addEventListener("click", (e) => { e.stopPropagation(); e.preventDefault(); aoClicar(); });
+          w.appendChild(el); return w; }, onRemove() {} };
+      h.m.addControl(ctl, posicao === "cima-direita" ? "top-right" : "top-left");
     },
     /* impede que um clique dentro de um balão chegue ao mapa */
-    pararEvento(e) { try { L.DomEvent.stop(e); } catch (err) {} },
+    pararEvento(e) { try { e.stopPropagation(); e.preventDefault && e.preventDefault(); } catch (err) {} },
   };
 
-  const motor = leaflet;
+  const motor = maplibre_;
   const api = {};
   for (const k of Object.keys(motor)) api[k] = motor[k];
   Object.assign(api, vocab);          // campo, tem, naoTem, igual, tudo
@@ -4249,8 +4449,15 @@ function initRouteMap(){
      coordenadas entram em [lon,lat] como no GeoJSON, e o rumo em graus no
      sentido dos ponteiros — os dois hábitos que a troca para o MapLibre vai
      exigir, adotados já para não haver duas convenções ao mesmo tempo. */
-  const h=Mapa.criar("map-route",{centro:[state.home?.lon??-8.0, state.home?.lat??39.5], zoom:7, rodar:true, botoesZoom:false});
-  Mapa.base(h,baseCarto());
+  let h;
+  try{
+    h=Mapa.criar("map-route",{centro:[state.home?.lon??-8.0, state.home?.lat??39.5], zoom:7, rodar:true, botoesZoom:false});
+  }catch(e){
+    /* sem WebGL (browser muito velho ou bloqueado) o motor não arranca —
+       diz-se, em vez de rebentar o separador inteiro */
+    routeError(t("Mapa indisponível — precisa de ligação à internet.")); return;
+  }
+  Mapa.base(h,baseMapa());
   state.mapaRota=h;
   // botão "centrar em mim"
   const b=document.createElement("button");
@@ -4666,6 +4873,25 @@ function drawRoute(fit){
     if(seg.length<2) continue;
     troços.push(linha(seg,{cor:lvlColor(Math.max(a.cond.lvl,b.cond.lvl))}));
   }
+  /* ═══ CORREDOR-HALO (dd-19, candidato c): atenua a base SÓ onde a rota
+     respira — em vez de esvaziar o mapa inteiro, como o pálido fazia. Uma
+     faixa da cor da superfície, meio transparente, por baixo da linha.
+     Atrás de bandeira até o Ricardo escolher o estilo. ═══ */
+  if(state.corredorHalo){
+    const passo=Math.max(1,Math.floor(R.coords.length/240)), meia=0.003, E=[],D=[];
+    for(let i=0;i<R.coords.length;i+=passo){
+      const a=R.coords[i], b=R.coords[Math.min(i+passo,R.coords.length-1)];
+      let dx=b.lon-a.lon, dy=b.lat-a.lat;
+      const n=Math.hypot(dx,dy)||1; dx/=n; dy/=n;
+      const cs=Math.cos(a.lat*Math.PI/180)||1;
+      E.push([a.lon-dy*meia/cs, a.lat+dx*meia]);
+      D.push([a.lon+dy*meia/cs, a.lat-dx*meia]);
+    }
+    const anel=[...E,...D.reverse(),E[0]];
+    Mapa.fonte(h,"corredor",{type:"FeatureCollection",features:[
+      {type:"Feature",properties:{},geometry:{type:"Polygon",coordinates:[anel]}}]});
+    Mapa.camada(h,"corredor",{id:"halo",tipo:"area",cor:surf,opacidade:.38,sob:"rota·contorno"});
+  } else Mapa.limpar(h,"corredor");
   const percorrido=(travel.active&&travel.geomIdx>1)
     ? [linha(R.coords.slice(0,travel.geomIdx+1),{})] : [];
   Mapa.fonte(h,"rota",{type:"FeatureCollection",features:[
@@ -4935,6 +5161,39 @@ function renderRouteSummary(){
     if(conselho) fx.appendChild(el("div","fx-con",conselho));
     fx.appendChild(el("div","fx-num",
       `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} · ${t("chegada")} ~${fmtHM(arrive)}`));
+    /* ═══ PARTIDA RELATIVA (dd-14 §2 + dd-15 §1): sempre visível no ecrã.
+       Um motociclista decide em minutos — agora · +10 · +30 · +1 h. A ⭐
+       melhor janela é UMA opção, rotulada como sugestão, nunca a única
+       ação: o "agora" está sempre lá e é o estado por omissão. Tudo sem
+       chamadas novas — o applyShift reclassifica das horas já guardadas em
+       cada amostra, o mesmo motor do "E se saíres mais tarde" da folha
+       (onde vive a escada completa, com o +2 h e a comparação de chuva). */
+    const pdRow=el("div","fx-partida"); pdRow.id="faixa-partida";
+    const agoraS=Date.now()/1000;
+    [[t("agora"),0],["+10",10],["+30",30],["+1 h",60]].forEach(([lab,min])=>{
+      const c=el("button","fx-chip"); c.textContent=lab; c.dataset.min=String(min);
+      if(Math.abs(dep-(agoraS+min*60))<150) c.classList.add("sel");
+      c.addEventListener("click",(e)=>{ e.stopPropagation();
+        /* vazio = agora fresco no cálculo (dd-15 §2); offset = gesto, logo hora */
+        $("#rt-when").value = min===0 ? "" : localDT(new Date(Date.now()+min*60000));
+        applyShift(Math.round((Date.now()/1000+min*60-R.dep)/60));
+      });
+      pdRow.appendChild(c);
+    });
+    try{
+      const {evals,best}=evalDepartures();
+      const atual=evals.find(e=>e.sh===R.shift);
+      if(best&&best.sh!==R.shift&&(!atual||best.wet<atual.wet-0.5)){
+        const b=el("button","fx-chip star");
+        b.dataset.sh=String(best.sh);
+        b.textContent=`⭐ ${t("melhor: {h}",{h:fmtHM(best.dep)})}`;
+        b.addEventListener("click",(e)=>{ e.stopPropagation();
+          $("#rt-when").value=localDT(new Date(best.dep*1000));
+          applyShift(best.sh); });
+        pdRow.appendChild(b);
+      }
+    }catch(e){}
+    fx.appendChild(pdRow);
     const trv=el("button","btn primary"); trv.id="btn-travel";
     trv.textContent=travel.active?semEmoji(t("🛑 Terminar modo viagem")):t("Modo viagem");
     trv.addEventListener("click",(e)=>{ e.stopPropagation();
@@ -5872,7 +6131,7 @@ async function assistantGo(pos,cand,cands){
   const o=$("#rt-o"); o.value=pos.name===t("A minha posição")||pos.name==="A minha posição"?"📍 "+t("A minha posição"):pos.name; o._picked={...pos};
   const d=$("#rt-d"); d.value=cand.name+(cand.sub?` — ${cand.sub}`:""); d._picked=cand;
   $$(".stop-row").forEach(r=>r.remove());
-  $("#rt-when").value=localDT(new Date(Date.now()+5*60000));
+  $("#rt-when").value=""; // partida = agora (dd-15 §2) — o assistente não escreve horas à socapa
   const ok=await computeRoute();
   if(!ok){ aiMsg("err",t("Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.")); return; }
   buildRecommendation(cand);
@@ -6080,7 +6339,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-07-30-1506-44a9a6";
+const BUILD="2026-07-30-2018-77ce47";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -6935,8 +7194,35 @@ function setTheme(t,{guardar=true}={}){
      abrir a rota de dia e mudar para escuro ao anoitecer deixava um mapa
      branco na cara de quem vai a conduzir, até recarregar a app.
      Guardado por tools/lint-ramos-mortos.mjs. */
-  if(state.mapaRota) Mapa.base(state.mapaRota, baseCarto());
+  if(state.mapaRota) Mapa.base(state.mapaRota, baseMapa());
   if(state.route) applyShift(state.route.shift); // re-pinta com as cores do tema
+}
+
+/* ═══ O SITE DIZ O ESTADO DA INSTALAÇÃO (dd-07 §3) ═══
+   Antes: o botão aparecia com o beforeinstallprompt e desaparecia no resto —
+   quem já tinha a app não sabia que a tinha, e no iPhone (onde o prompt
+   nunca existe) havia só um toast de 7 segundos a morrer sozinho. Três
+   estados, três mensagens; a linha vive nas definições pela mesma razão que
+   a da voz: um toast é o vejo-te-agora, o estado continua verdadeiro. */
+const pwa={ prompt:null, instalada:false, ios:/iphone|ipad|ipod/i.test(navigator.userAgent) };
+function estadoInstalacao(){
+  if(matchMedia("(display-mode: standalone)").matches||navigator.standalone===true||pwa.instalada) return "instalada";
+  if(pwa.prompt) return "instalavel";
+  if(pwa.ios) return "ios";
+  return "browser";
+}
+function renderInstalacao(){
+  const est=estadoInstalacao(), b=$("#btn-install"), p=$("#estado-instalacao");
+  /* o botão é o caminho: aparece a quem pode instalar (prompt) e a quem
+     precisa das instruções (iOS); some quando já não há nada para instalar */
+  if(b) b.style.display = est==="instalavel"||est==="ios" ? "inline-flex" : "none";
+  if(p){
+    p.dataset.estado=est;
+    p.textContent = est==="instalada" ? t("✅ Já tens a app — abre-a do ecrã inicial.")
+      : est==="instalavel" ? t("📲 Dá para instalar como app — botão “Instalar” aqui em cima.")
+      : est==="ios" ? t("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.")
+      : t("📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.");
+  }
 }
 
 function init(){
@@ -7082,10 +7368,20 @@ function init(){
   });
   $$(".chip.click[data-dep]").forEach(c=>c.addEventListener("click",()=>{
     const tm=$("#rt-timemode"); if(tm) tm.value="dep"; // os atalhos são sempre hora de PARTIDA
-    $("#rt-when").value=localDT(new Date(Date.now()+(+c.dataset.dep)*60000));
+    const m=+c.dataset.dep;
+    // "Agora" limpa o campo: vazio = agora fresco no momento do cálculo,
+    // não um timestamp congelado de quando se carregou no chip (dd-15 §2)
+    $("#rt-when").value=m?localDT(new Date(Date.now()+m*60000)):"";
   }));
   const when=$("#rt-when");
-  when.value=localDT(new Date(Math.ceil((Date.now()+9*60000)/300000)*300000));
+  /* ═══ A PARTIDA POR OMISSÃO É SEMPRE "AGORA" (dd-15 §2) ═══
+     30/07 às 18:09: o planeador abriu com "Leave at 18:13" — uma hora que o
+     Ricardo nunca pediu (era o assistente a escrever now+5 à socapa no campo;
+     ele leu-a como a chegada anterior, e uma interface que se lê mal está
+     mal). A regra: o campo VAZIO é o estado por omissão e significa "agora",
+     avaliado no momento do cálculo (computeRoute já faz vazio→now). Um
+     timestamp só entra por gesto do utilizador — escrever no campo, chip de
+     partida, viagem agendada. Nunca se herda em silêncio uma hora. */
   when.min=localDT(new Date());
 
   // radar
@@ -7097,23 +7393,34 @@ function init(){
   $("#btn-sentinel").addEventListener("click",toggleSentinel);
 
   // PWA: instalação + service worker (só quando servida por http/https)
-  let deferredPrompt=null;
-  addEventListener("beforeinstallprompt",(e)=>{ e.preventDefault(); deferredPrompt=e; $("#btn-install").style.display="inline-flex"; });
+  addEventListener("beforeinstallprompt",(e)=>{ e.preventDefault(); pwa.prompt=e; renderInstalacao(); });
   $("#btn-install").addEventListener("click",async ()=>{
-    if(!deferredPrompt){ toast(t("Menu do browser → “Adicionar ao ecrã principal”.")); return; }
-    deferredPrompt.prompt();
-    const r=await deferredPrompt.userChoice.catch(()=>null);
-    if(r&&r.outcome==="accepted"){ toast(t("Instalada! Procura o ícone no teu ecrã 🏍️")); $("#btn-install").style.display="none"; }
-    deferredPrompt=null;
+    if(!pwa.prompt){
+      /* sem prompt o botão continua a ser um caminho: as instruções certas
+         para o sítio onde estás (dd-07 §3) — e num toast longo, com a
+         instrução durável a viver nas definições */
+      toast(pwa.ios?t("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.")
+        :t("Menu do browser → “Adicionar ao ecrã principal”."),8000);
+      return;
+    }
+    const p=pwa.prompt;
+    p.prompt();
+    const r=await p.userChoice.catch(()=>null);
+    if(r&&r.outcome==="accepted"){ pwa.instalada=true; toast(t("Instalada! Procura o ícone no teu ecrã 🏍️")); }
+    pwa.prompt=null;
+    renderInstalacao();
   });
-  addEventListener("appinstalled",()=>{ $("#btn-install").style.display="none"; toast(t("App instalada! 🏍️")); });
+  addEventListener("appinstalled",()=>{ pwa.prompt=null; pwa.instalada=true; toast(t("App instalada! 🏍️")); renderInstalacao(); });
   if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){
     addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
   }
-  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  if(isIOS&&!navigator.standalone&&/^https?:$/.test(location.protocol)){
+  if(pwa.ios&&!navigator.standalone&&/^https?:$/.test(location.protocol)){
     setTimeout(()=>toast(t("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app."),7000),4000);
   }
+  /* related apps (dd-07 §3): no Chrome, com o manifest a declarar-se a si
+     próprio, isto responde "já instalada" mesmo com o site aberto no browser */
+  navigator.getInstalledRelatedApps?.().then(r=>{ if(r&&r.length){ pwa.instalada=true; renderInstalacao(); } }).catch(()=>{});
+  renderInstalacao();
 
   // restaurar rota (URL #r2=… ou memória da última viagem — nada se perde ao fechar)
   const tryRestore=(hstr)=>{
