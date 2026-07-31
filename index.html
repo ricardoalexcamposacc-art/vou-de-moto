@@ -304,17 +304,21 @@ body.rota-mapa #view-agora{display:none}
 /* ═══ INTERRUPTOR DESLIZANTE (dd-42): UM componente, usado em todo o lado.
    Estado que fica = interruptor; ação instantânea = botão (Modo viagem
    continua botão por isso). Posição do botão é a pista que não é cor. ═══ */
-.sw{position:relative;width:56px;height:34px;border-radius:17px;border:none;padding:0;
-  background:#8d97ab;cursor:pointer;transition:background .18s ease;flex:none;display:inline-block}
-.sw.on{background:var(--good)}
-.sw-knob,.sw::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;
+/* dd-51: DESENHO ao tamanho do sistema (46×28 ≈ proporção 1,64:1, altura na
+   ordem do texto do título) — mas o ALVO DE TOQUE NÃO ENCOLHE: o botão mede
+   56×44 (cresceu) e a calha é desenhada dentro dele. Desenho e alvo são
+   coisas separadas. */
+.sw{position:relative;width:56px;height:44px;border:none;padding:0;background:transparent;
+  cursor:pointer;flex:none;display:inline-block}
+.sw::before{content:"";position:absolute;left:5px;top:8px;width:46px;height:28px;border-radius:14px;
+  background:#8d97ab;transition:background .18s ease}
+.sw.on::before,input.sw:checked::before{background:var(--good)}
+.sw-knob,.sw::after{content:"";position:absolute;top:11px;left:8px;width:22px;height:22px;border-radius:50%;
   background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:left .18s ease}
-.sw.on .sw-knob,.sw.on::after{left:25px}
-.sw:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-html[data-theme="dark"] .sw{background:#4a5568}
+.sw.on .sw-knob,.sw.on::after,input.sw:checked::after{left:26px}
+.sw:focus-visible{outline:3px solid var(--accent);outline-offset:-2px;border-radius:14px}
+html[data-theme="dark"] .sw::before{background:#4a5568}
 input.sw{appearance:none;-webkit-appearance:none;margin:0}
-input.sw:checked{background:var(--good)}
-input.sw:checked::after{left:25px}
 .sw .sw-knob{pointer-events:none}
 .foco-rota{width:100%;justify-content:center;font-size:15px;padding:12px 14px;margin-top:2px}
 .chuva-janela{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.35}
@@ -784,9 +788,10 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
         </div>
         <p class="small muted" id="cred-line" style="margin:10px 0 0;font-variant-numeric:tabular-nums"></p>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
-        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.</p>
+        <p class="small muted" id="cam-law-txt" style="margin:0 0 8px"></p>
+        <div id="cam-law-why" class="small muted" hidden style="margin:-4px 0 8px"></div>
         <label class="chk-row" for="cam-opt"><input type="checkbox" class="sw" id="cam-opt" role="switch">
-          <span><b id="cam-opt-b">Mostrar radares na Alemanha</b><span id="cam-opt-s">Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.</span></span></label>
+          <span><b id="cam-opt-b">Mostrar radares na Alemanha</b><span id="cam-opt-s">A decisão é tua. Vem desligado.</span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
         <div class="chips" id="lang-row">
           <button class="chip click" data-lang="pt">PT</button>
@@ -898,6 +903,8 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
           <div class="ac-list" id="rt-d-list" role="listbox"></div>
         </div>
       </div>
+      <button class="btn ghost" id="btn-mais-op" aria-expanded="false" style="margin:8px 0 2px">⚙️ Mais opções (paragens, hora de partida, estadia)</button>
+      <div id="rt-mais" hidden>
       <div id="stops-wrap" aria-label="Paragens intermédias"></div>
       <div class="route-extra">
         <div class="field">
@@ -938,15 +945,19 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
             <option value="360">~6 h</option>
           </select>
         </div>
+        <p class="small muted" style="margin:4px 0 0">Hora de partida vazia = partes agora.</p>
       </div>
-      <div class="route-actions">
-        <button class="btn primary" id="btn-route">Calcular rota e chuva</button>
+      <div class="route-actions" style="margin-top:8px">
         <button class="btn" id="btn-rt-gps" title="Usar GPS como origem">📍 A minha posição</button>
         <span class="chips">
           <button class="chip click" data-dep="0">Agora</button>
           <button class="chip click" data-dep="60">+1 h</button>
           <button class="chip click" data-dep="120">+2 h</button>
         </span>
+      </div>
+      </div>
+      <div class="route-actions">
+        <button class="btn primary" id="btn-route">Calcular rota e chuva</button>
       </div>
       <div id="loc-estado-rota" class="loc-estado"></div>
       <div id="route-error"></div>
@@ -1099,6 +1110,7 @@ function setLang(l){
      tinta seca da língua anterior */
   if(typeof renderFocoChip==="function") renderFocoChip();
   if(typeof repintarLocEstado==="function") repintarLocEstado();
+  if(typeof renderCamLei==="function") renderCamLei();
 }
 /* Atribuição obrigatória do plano gratuito do Geoapify. Tem de ser reposta a
    cada tradução: o rodapé inteiro é uma entrada de i18n e é reescrito quando se
@@ -1135,10 +1147,12 @@ function applyStaticI18n(){
     ["#tb-off-t","txt","offline"],
     ["#unit-title","txt","Unidades"],
     ["#cam-title","txt","Avisos de radar"],
-    ["#cam-law-txt","txt","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo."],
+
     ["#cam-opt-b","txt","Mostrar radares na Alemanha"],
-    ["#cam-opt-s","txt","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado."],
+    ["#cam-opt-s","txt","A decisão é tua. Vem desligado."],
     ["#btn-plan-toggle","txt","✎ Planear manualmente (paragens, hora de partida)"],
+    ["#btn-mais-op","txt","⚙️ Mais opções (paragens, hora de partida, estadia)"],
+    ["#rt-mais .small.muted","txt","Hora de partida vazia = partes agora."],
     ["#lang-title","txt","Idioma"],
     ["#btn-ver-mapa","txt","Ver o mapa"],
     ["#rt-voltar","aria","Voltar ao planeamento"],
@@ -1312,7 +1326,7 @@ en:{
 "paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
 "pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
 "vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
-"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"I only show speed cameras in countries whose law I went and read, one by one. This one I did not — and since there are countries where the app itself is punished, I would rather show nothing than take the risk.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"I found one place. Tap it and I will plot the route and the weather along the way.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"I found {n} places. Tap the one you want and I will plot the route.","🏠 A minha casa":"🏠 My home","radar fixo":"fixed camera","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"The law differs by country. In France I show wide danger zones instead of the exact point. In Switzerland I show nothing, because there the law also punishes whoever offers the warning. In Germany the choice is yours, just below.","Mostrar radares na Alemanha":"Show speed cameras in Germany","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"In Germany it is the rider who is fined for using speed camera warnings while riding, not whoever publishes the app. The decision is yours. It ships switched off.","Radares ligados na Alemanha — por tua conta e risco.":"Speed cameras on in Germany — at your own risk.","Radares desligados na Alemanha.":"Speed cameras off in Germany.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"Swiss law bans any warning about speed checks — and punishes whoever offers it, not only whoever uses it. So I show nothing there.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"In Germany it is the rider who is fined for using speed camera warnings while riding — not whoever publishes the app. The decision is yours.","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"I only show speed cameras in countries whose law I went and read, one by one. This one I did not — and since there are countries where the app itself is punished, I would rather show nothing than take the risk.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"I found one place. Tap it and I will plot the route and the weather along the way.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"I found {n} places. Tap the one you want and I will plot the route.","🏠 A minha casa":"🏠 My home","radar fixo":"fixed camera","Mostrar radares na Alemanha":"Show speed cameras in Germany","Radares ligados na Alemanha — por tua conta e risco.":"Speed cameras on in Germany — at your own risk.","Radares desligados na Alemanha.":"Speed cameras off in Germany.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"Swiss law bans any warning about speed checks — and punishes whoever offers it, not only whoever uses it. So I show nothing there.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"In Germany it is the rider who is fined for using speed camera warnings while riding — not whoever publishes the app. The decision is yours.","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
 "maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
 "Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
 "O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
@@ -1445,6 +1459,8 @@ en:{
 "Sentinela: ligada":"Sentinel: on","Sentinela: desligada":"Sentinel: off",
 "Ligada — a vigiar o tempo onde estás, minuto a minuto.":"On — watching the weather where you are, minute by minute.",
 "Sem chuva prevista até às {h}":"No rain expected until {h}","Sem chuva até às {h}":"No rain until {h}","chuva das {a} às {b}":"rain from {a} to {b}","chuva forte das {a} às {b}":"heavy rain from {a} to {b}","chuva possível das {a} às {b}":"possible rain from {a} to {b}","limpa depois das {h}":"clearing after {h}","sem dados de parte das horas":"data missing for some hours","Sem dados suficientes para prever as janelas de chuva de hoje.":"Not enough data to predict today's rain windows.",
+"⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ More options (stops, departure time, stay)","Hora de partida vazia = partes agora.":"Empty departure time = you leave now.",
+"Aqui ({p}): não mostro avisos de radar.":"Here ({p}): I show no speed-camera warnings.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Here ({p}): I show wide danger zones, not the exact spot.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Here ({p}): showing cameras is your choice — the switch is right below.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Here ({p}): I show fixed cameras on your route and warn you.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Fixed cameras: I follow the law of each country your route crosses.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"This country's law allows fixed-camera warnings — I read it before showing them.","Porquê?":"Why?","A decisão é tua. Vem desligado.":"The decision is yours. It ships switched off.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ You already have the app — open it from your home screen.",
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 You can install this as an app — “Install” button up top.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 To install: browser menu → “Add to Home Screen”, if your browser supports it.",
@@ -1549,7 +1565,7 @@ es:{
 "paragem":"parada","paragens":"paradas","em andamento":"en marcha","partida":"salida","chegada":"llegada","por":"por",
 "pico {n} mm/h":"pico {n} mm/h","mínima no percurso {t}°":"mínima en ruta {t}°","rajadas até {g} km/h · vento {d}":"rachas hasta {g} km/h · viento {d}",
 "vento lateral até ~{g} km/h":"viento lateral hasta ~{g} km/h","perto do km {k}":"cerca del km {k}","sobe até ~{m} m":"sube hasta ~{m} m",
-"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Solo muestro radares en los países cuya ley fui a leer, uno a uno. En este no lo hice — y como hay países donde se castiga a la propia app, prefiero no mostrar nada a arriesgarme.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"He encontrado un sitio. Tócalo y trazo la ruta y el tiempo por el camino.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"He encontrado {n} sitios. Toca el que quieras y trazo la ruta.","🏠 A minha casa":"🏠 Mi casa","radar fixo":"radar fijo","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La ley cambia según el país. En Francia muestro zonas de peligro amplias en lugar del punto exacto. En Suiza no muestro nada, porque allí la ley también castiga a quien ofrece el aviso. En Alemania la elección es tuya, aquí abajo.","Mostrar radares na Alemanha":"Mostrar radares en Alemania","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce, no a quien publica la app. La decisión es tuya. Viene desactivado.","Radares ligados na Alemanha — por tua conta e risco.":"Radares activados en Alemania — bajo tu responsabilidad.","Radares desligados na Alemanha.":"Radares desactivados en Alemania.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La ley suiza prohíbe cualquier aviso sobre controles de velocidad — y castiga también a quien lo ofrece, no solo a quien lo usa. Por eso no muestro nada.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce — no a quien publica la app. La decisión es tuya.","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Solo muestro radares en los países cuya ley fui a leer, uno a uno. En este no lo hice — y como hay países donde se castiga a la propia app, prefiero no mostrar nada a arriesgarme.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"He encontrado un sitio. Tócalo y trazo la ruta y el tiempo por el camino.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"He encontrado {n} sitios. Toca el que quieras y trazo la ruta.","🏠 A minha casa":"🏠 Mi casa","radar fixo":"radar fijo","Mostrar radares na Alemanha":"Mostrar radares en Alemania","Radares ligados na Alemanha — por tua conta e risco.":"Radares activados en Alemania — bajo tu responsabilidad.","Radares desligados na Alemanha.":"Radares desactivados en Alemania.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La ley suiza prohíbe cualquier aviso sobre controles de velocidad — y castiga también a quien lo ofrece, no solo a quien lo usa. Por eso no muestro nada.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Alemania se multa al conductor por usar avisos de radar mientras conduce — no a quien publica la app. La decisión es tuya.","na {r}":"en la {r}","no teu trajeto":"en tu ruta","radares fixos":"radares fijos","🌙 chegada depois do pôr-do-sol":"🌙 llegada tras la puesta de sol",
 "maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
 "Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
@@ -1668,6 +1684,8 @@ es:{
 "Sentinela: ligada":"Centinela: activada","Sentinela: desligada":"Centinela: desactivada",
 "Ligada — a vigiar o tempo onde estás, minuto a minuto.":"Activada — vigilando el tiempo donde estás, minuto a minuto.",
 "Sem chuva prevista até às {h}":"Sin lluvia prevista hasta las {h}","Sem chuva até às {h}":"Sin lluvia hasta las {h}","chuva das {a} às {b}":"lluvia de {a} a {b}","chuva forte das {a} às {b}":"lluvia fuerte de {a} a {b}","chuva possível das {a} às {b}":"lluvia posible de {a} a {b}","limpa depois das {h}":"despeja después de las {h}","sem dados de parte das horas":"faltan datos de algunas horas","Sem dados suficientes para prever as janelas de chuva de hoje.":"No hay datos suficientes para prever las ventanas de lluvia de hoy.",
+"⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Más opciones (paradas, hora de salida, estancia)","Hora de partida vazia = partes agora.":"Hora de salida vacía = sales ahora.",
+"Aqui ({p}): não mostro avisos de radar.":"Aquí ({p}): no muestro avisos de radar.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Aquí ({p}): muestro zonas de peligro amplias, no el punto exacto.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Aquí ({p}): mostrar radares es elección tuya — el interruptor está aquí abajo.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Aquí ({p}): muestro los radares fijos en tu ruta y te aviso.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Radares fijos: sigo la ley de cada país por donde pasa la ruta.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"La ley de este país permite avisos de radares fijos — la leí antes de mostrarlos.","Porquê?":"¿Por qué?","A decisão é tua. Vem desligado.":"La decisión es tuya. Viene desactivado.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ Ya tienes la app — ábrela desde la pantalla de inicio.",
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Se puede instalar como app — botón “Instalar” aquí arriba.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Para instalar: menú del navegador → “Añadir a pantalla de inicio”, si tu navegador lo permite.",
@@ -1771,7 +1789,7 @@ fr:{
 "paragem":"arrêt","paragens":"arrêts","em andamento":"en roulant","partida":"départ","chegada":"arrivée","por":"via",
 "pico {n} mm/h":"pic {n} mm/h","mínima no percurso {t}°":"minimale du trajet {t}°","rajadas até {g} km/h · vento {d}":"rafales jusqu'à {g} km/h · vent {d}",
 "vento lateral até ~{g} km/h":"vent latéral jusqu'à ~{g} km/h","perto do km {k}":"vers le km {k}","sobe até ~{m} m":"monte à ~{m} m",
-"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Je n'affiche les radars que dans les pays dont je suis allé lire la loi, un par un. Pas celui-ci — et comme il existe des pays où c'est l'application elle-même qui est punie, je préfère ne rien afficher que prendre le risque.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"J'ai trouvé un lieu. Touche-le et je trace le trajet et la météo en chemin.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"J'ai trouvé {n} lieux. Touche celui que tu veux et je trace le trajet.","🏠 A minha casa":"🏠 Chez moi","radar fixo":"radar fixe","A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.":"La loi varie selon le pays. En France, j'affiche de larges zones de danger au lieu du point exact. En Suisse, je n'affiche rien : la loi y punit aussi celui qui propose l'avertissement. En Allemagne, le choix est le tien, juste en dessous.","Mostrar radares na Alemanha":"Afficher les radars en Allemagne","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant, pas celui qui publie l'application. La décision t'appartient. Désactivé par défaut.","Radares ligados na Alemanha — por tua conta e risco.":"Radars activés en Allemagne — à tes risques.","Radares desligados na Alemanha.":"Radars désactivés en Allemagne.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La loi suisse interdit tout avertissement sur les contrôles de vitesse — et punit aussi celui qui le propose, pas seulement celui qui l'utilise. Je n'affiche donc rien.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant — pas celui qui publie l'application. La décision t'appartient.","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Je n'affiche les radars que dans les pays dont je suis allé lire la loi, un par un. Pas celui-ci — et comme il existe des pays où c'est l'application elle-même qui est punie, je préfère ne rien afficher que prendre le risque.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"J'ai trouvé un lieu. Touche-le et je trace le trajet et la météo en chemin.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"J'ai trouvé {n} lieux. Touche celui que tu veux et je trace le trajet.","🏠 A minha casa":"🏠 Chez moi","radar fixo":"radar fixe","Mostrar radares na Alemanha":"Afficher les radars en Allemagne","Radares ligados na Alemanha — por tua conta e risco.":"Radars activés en Allemagne — à tes risques.","Radares desligados na Alemanha.":"Radars désactivés en Allemagne.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"La loi suisse interdit tout avertissement sur les contrôles de vitesse — et punit aussi celui qui le propose, pas seulement celui qui l'utilise. Je n'affiche donc rien.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"En Allemagne, c'est le conducteur qui est sanctionné pour l'usage d'un avertisseur de radars en roulant — pas celui qui publie l'application. La décision t'appartient.","na {r}":"sur la {r}","no teu trajeto":"sur ton trajet","radares fixos":"radars fixes","🌙 chegada depois do pôr-do-sol":"🌙 arrivée après le coucher du soleil",
 "maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
 "Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
@@ -1890,6 +1908,8 @@ fr:{
 "Sentinela: ligada":"Sentinelle : activée","Sentinela: desligada":"Sentinelle : désactivée",
 "Ligada — a vigiar o tempo onde estás, minuto a minuto.":"Activée — je surveille la météo là où tu es, minute par minute.",
 "Sem chuva prevista até às {h}":"Pas de pluie prévue jusqu'à {h}","Sem chuva até às {h}":"Pas de pluie jusqu'à {h}","chuva das {a} às {b}":"pluie de {a} à {b}","chuva forte das {a} às {b}":"forte pluie de {a} à {b}","chuva possível das {a} às {b}":"pluie possible de {a} à {b}","limpa depois das {h}":"éclaircie après {h}","sem dados de parte das horas":"données manquantes sur certaines heures","Sem dados suficientes para prever as janelas de chuva de hoje.":"Pas assez de données pour prévoir les fenêtres de pluie du jour.",
+"⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Plus d'options (arrêts, heure de départ, séjour)","Hora de partida vazia = partes agora.":"Heure de départ vide = tu pars maintenant.",
+"Aqui ({p}): não mostro avisos de radar.":"Ici ({p}) : je ne montre aucun avertissement radar.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Ici ({p}) : je montre des zones de danger élargies, pas le point exact.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Ici ({p}) : montrer les radars est ton choix — l'interrupteur est juste en dessous.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Ici ({p}) : je montre les radars fixes sur ton trajet et je te préviens.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Radars fixes : je suis la loi de chaque pays traversé par le trajet.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"La loi de ce pays autorise les avertissements de radars fixes — je l'ai lue avant de les montrer.","Porquê?":"Pourquoi ?","A decisão é tua. Vem desligado.":"La décision est à toi. Désactivé par défaut.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ Tu as déjà l'app — ouvre-la depuis l'écran d'accueil.",
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Tu peux l'installer comme app — bouton « Installer » juste au-dessus.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Pour installer : menu du navigateur → « Ajouter à l'écran d'accueil », si ton navigateur le permet.",
@@ -3302,6 +3322,32 @@ async function countryAt(lat,lon){
 }
 const CAM_OPT="cam-restrito";
 function camOptOn(){ return store.get(CAM_OPT)===1; }
+async function renderCamLei(){
+  /* dd-43 §1: o texto dos radares dizia a NOSSA justificação; agora diz o que
+     a app FAZ no país detetado, numa frase — e a razão legal vive na dobra
+     "Porquê?", aberta só por quem quer. País por countryAt() (offline),
+     nome do país por Intl.DisplayNames (capacidade, não tabela nossa). */
+  const alvo=$("#cam-law-txt"); if(!alvo) return;
+  let cc=null;
+  try{ if(state.home&&isFinite(state.home.lat)){ await paisesCarregar(); cc=await countryAt(state.home.lat,state.home.lon); } }catch(e){}
+  const nomeDe=(c)=>{ try{ return new Intl.DisplayNames([state.lang],{type:"region"}).of(c)||c; }catch(e){ return c; } };
+  const law=cc?CAM_LAW[cc]:undefined;
+  let frase, why;
+  if(!cc){ frase=t("Radares fixos: sigo a lei de cada país por onde o trajeto passa.");
+    why=t("Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar."); }
+  else if(!law){ frase=t("Aqui ({p}): não mostro avisos de radar.",{p:nomeDe(cc)});
+    why=t("Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar."); }
+  else if(law.mode==="off"){ frase=t("Aqui ({p}): não mostro avisos de radar.",{p:nomeDe(cc)}); why=t(law.why); }
+  else if(law.mode==="zones"){ frase=t("Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.",{p:nomeDe(cc)}); why=t(law.why); }
+  else if(law.mode==="opt"){ frase=t("Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.",{p:nomeDe(cc)}); why=t(law.why); }
+  else { frase=t("Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.",{p:nomeDe(cc)});
+    why=t("A lei deste país permite avisos de radares fixos — li-a antes de os mostrar."); }
+  alvo.textContent=frase+" ";
+  const pq=document.createElement("button"); pq.className="lg-q"; pq.type="button"; pq.textContent=t("Porquê?");
+  pq.addEventListener("click",()=>{ const d=$("#cam-law-why"); if(d) d.hidden=!d.hidden; });
+  alvo.appendChild(pq);
+  const d=$("#cam-law-why"); if(d) d.textContent=why;
+}
 function camLawFor(cc){
   const law=CAM_LAW[cc];
   if(!law) return LEI_DESCONHECIDA;                  // omissão: esconder
@@ -3735,6 +3781,7 @@ function setHome(loc, {silent=false, prov, deStore=false}={}){
      normalizava o objeto e branqueava migrações — a guarda do rename viu-o */
   if(!deStore) store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
   if(sanidadePendente) sanidadeRender();   // a linha da casa no cartão de sanidade acompanha a troca
+  if(typeof renderCamLei==="function") renderCamLei(); // a frase dos radares segue a casa
   const box=$("#agora-content");
   if(!silent){ box.textContent="";
     box.appendChild(el("div","skel")); box.lastChild.style.height="150px"; box.lastChild.style.marginBottom="14px";
@@ -3827,6 +3874,18 @@ function renderLocEstado(alvo,tipo){
       p.onchange=()=>{ if(p.state!=="denied"){ locSaida.grava(null); renderLocEstado(alvo,null); toast(t("📍 Localização ligada.")); } };
     });
   }catch(e){}
+}
+async function preencherOrigemOmissao(){
+  /* dd-54 §2 (decisão da A4.2 registada no r24): o caso comum é A→B agora —
+     o De nasce preenchido. Posição fresca SE a permissão já está dada (sem
+     caixa nenhuma, dd-41); senão a casa. O utilizador escreve por cima se
+     quiser outra origem. */
+  const o=$("#rt-o"); if(!o||o.value.trim()||o._picked) return;
+  const est=await locEstado();
+  if(est==="concedida"){ const p=await freshPos();
+    if(p){ o.value="📍 "+t("A minha posição"); o._picked={...p}; return; } }
+  const casa=state.home||store.get("home");
+  if(casa&&isFinite(casa.lat)){ o.value=casa.name; o._picked={...casa}; }
 }
 async function useGPS(fromRoute){
   const alvo=fromRoute?"#loc-estado-rota":"#loc-estado-agora";
@@ -6456,7 +6515,7 @@ async function assistantGo(pos,cand,cands){
   renderCands(cands,pos,cand);
   aiMsg("info",t("A calcular a rota até {p} e o tempo em cada troço do caminho…",{p:cand.name}));
   const o=$("#rt-o"); o.value=pos.name===t("A minha posição")||pos.name==="A minha posição"?"📍 "+t("A minha posição"):pos.name; o._picked={...pos};
-  const d=$("#rt-d"); d.value=cand.name+(cand.sub?` — ${cand.sub}`:""); d._picked=cand;
+  const d=$("#rt-d"); d.value=cand.name; d._picked=cand; // dd-54 §3: só o destino
   $$(".stop-row").forEach(r=>r.remove());
   $("#rt-when").value=""; // partida = agora (dd-15 §2) — o assistente não escreve horas à socapa
   const ok=await computeRoute();
@@ -6666,7 +6725,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-07-31-1102-ef12c4";
+const BUILD="2026-07-31-1545-7136bb";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -7504,10 +7563,18 @@ function renderFocoChip(){
      não um chip discreto que passa despercebido (captura do Ricardo) */
   const c=el("button","btn primary foco-rota",t("Rota para {p}",{p:state.foco.name})+" →");
   c.addEventListener("click",()=>{
+    /* dd-53: um toque na oferta = TUDO o que é mecânico — Rota ativa,
+       destino posto, CÁLCULO a arrancar sozinho, aterragem no mapa com a
+       faixa. Tocar na oferta É o gesto (não fura o oferecer-nunca-auto-
+       rotear). O que NUNCA arranca sozinho: o Modo viagem — o veredicto
+       passa à frente dos olhos antes de a app guiar alguém. */
     switchTab("rota");
-    rotaMapaModo(false);              // o utilizador quer o planeador com a oferta à vista
     oferecerFocoNaRota();
-    $("#plan-card").classList.add("open");
+    const o=$("#rt-o");
+    if(o&&!o._picked&&!o.value.trim()&&state.home&&isFinite(state.home.lat)){
+      o._picked={...state.home}; o.value=state.home.name; // origem = a referência conhecida
+    }
+    computeRoute();
   });
   box.appendChild(c);
 }
@@ -7515,7 +7582,10 @@ function oferecerFocoNaRota(){
   const d=$("#rt-d"); if(!d||!state.foco) return;
   const doUtilizador=(d._picked&&!d._doFoco)||(d.value.trim()&&!d._doFoco&&!d._picked);
   if(doUtilizador) return;
-  d.value=state.foco.name+(state.foco.sub?` — ${state.foco.sub.split(",")[0]}`:"");
+  /* dd-54 §3: o campo mostra O DESTINO, só. A colagem "Sportcity Gym — 🏠 My
+     home" vinha daqui: o subtítulo dos favoritos é deliberadamente "o outro
+     nome" (rótulo teu ↔ nome original — bom na LISTA, absurdo no campo). */
+  d.value=state.foco.name;
   d._picked={...state.foco};
   d._doFoco=true;
 }
@@ -7615,7 +7685,15 @@ function init(){
     toast(t("Unidades alteradas para {u}.",{u:c.textContent}));
   }));
   renderFavRow();
-  $("#btn-plan-toggle").addEventListener("click",()=>$("#plan-card").classList.toggle("open"));
+  $("#btn-plan-toggle").addEventListener("click",()=>{
+    $("#plan-card").classList.toggle("open");
+    preencherOrigemOmissao(); // A4.2/dd-54: De = posição atual por omissão
+  });
+  $("#btn-mais-op").addEventListener("click",()=>{
+    const m=$("#rt-mais");
+    m.hidden=!m.hidden;
+    $("#btn-mais-op").setAttribute("aria-expanded",String(!m.hidden));
+  });
 
   // tema: sistema por defeito; a tua escolha fica memorizada
   if(matchMedia&&matchMedia("(prefers-color-scheme: light)").matches) setTheme("light",{guardar:false});
@@ -7803,6 +7881,7 @@ function init(){
   // sanidade dos dados guardados — ANTES do primeiro setHome, que escreve na
   // store e faria uma instalação limpa parecer dados antigos por confirmar
   sanidadePrepara(); sanidadeRender();
+  if(typeof renderCamLei==="function") renderCamLei(); // dd-43: a frase dos radares no país detetado
 
   // localização inicial
   const HOME0=store.get("home")||DEFAULT_LOC;
