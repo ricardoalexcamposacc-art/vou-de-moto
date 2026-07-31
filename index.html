@@ -75,8 +75,14 @@ html[data-theme="dark"]{
   --acc-grad:linear-gradient(135deg,#3b82f6 0%,#0ea5e9 62%,#22d3ee 100%);
   --accent-soft:rgba(59,130,246,.16); --accent-ink:#ffffff;
   --glow:0 8px 26px -6px rgba(34,211,238,.35);
+  /* paleta noturna (guarda test/contraste.mjs): a 20% de brilho o par
+     chuva↔trovoada ficava a ΔE 5,96 em deuteranopia — abaixo até da banda
+     da codificação secundária. Escurecer SÓ a trovoada abre o par para
+     12,1/9,46 mantendo a deteção sobre a base escura em 17,3 (mín. 15).
+     O claro não muda: a régua aprovou-o como está. */
+  --crit:#bb2828;
   --good-soft:rgba(12,163,12,.18); --warn-soft:rgba(250,178,25,.14);
-  --serious-soft:rgba(236,131,90,.14); --crit-soft:rgba(208,59,59,.18);
+  --serious-soft:rgba(236,131,90,.14); --crit-soft:rgba(187,40,40,.2);
   --seq700:#86b6ef;
   --shadow:0 1px 2px rgba(0,0,0,.45),0 14px 36px -14px rgba(0,0,0,.6);
   --shadow-lift:0 2px 6px rgba(0,0,0,.5),0 22px 52px -18px rgba(0,0,0,.7);
@@ -204,7 +210,7 @@ a{color:var(--accent)}
 .score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .score-in{display:flex;flex-direction:column;align-items:center;line-height:1}
 .score-num{font-size:34px;font-weight:800;letter-spacing:-.03em}
-.score-lab{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;max-width:92%;text-align:center;white-space:nowrap}
+.score-lab{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;max-width:86%;text-align:center;line-height:1.15;overflow-wrap:break-word}
 .hero-main{min-width:0;flex:1}
 .hero-emoji{font-size:15px}
 .hero-title{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -295,6 +301,28 @@ body.rota-mapa #view-agora{display:none}
 #rota-faixa .fx-dot{width:11px;height:11px;border-radius:50%;background:var(--lvl-c);flex:0 0 auto}
 #rota-faixa .fx-con{font-size:12.5px;color:var(--ink2);margin-top:3px}
 #rota-faixa .fx-num{font-size:12px;color:var(--muted);margin-top:4px}
+/* ═══ INTERRUPTOR DESLIZANTE (dd-42): UM componente, usado em todo o lado.
+   Estado que fica = interruptor; ação instantânea = botão (Modo viagem
+   continua botão por isso). Posição do botão é a pista que não é cor. ═══ */
+.sw{position:relative;width:56px;height:34px;border-radius:17px;border:none;padding:0;
+  background:#8d97ab;cursor:pointer;transition:background .18s ease;flex:none;display:inline-block}
+.sw.on{background:var(--good)}
+.sw-knob,.sw::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:left .18s ease}
+.sw.on .sw-knob,.sw.on::after{left:25px}
+.sw:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+html[data-theme="dark"] .sw{background:#4a5568}
+input.sw{appearance:none;-webkit-appearance:none;margin:0}
+input.sw:checked{background:var(--good)}
+input.sw:checked::after{left:25px}
+.sw .sw-knob{pointer-events:none}
+.foco-rota{width:100%;justify-content:center;font-size:15px;padding:12px 14px;margin-top:2px}
+.chuva-janela{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.35}
+.ac-ref{font-size:11px;color:var(--muted);padding:5px 12px 3px;border-bottom:1px solid var(--border)}
+.loc-estado{margin:6px 2px 0}
+.loc-estado:empty{display:none}
+.loc-estado .banner{margin:6px 0 4px}
+.loc-estado .small{color:var(--ink2);margin:2px 2px 6px}
 /* partida relativa (dd-14 §2): chips na faixa, sempre visíveis com rota viva */
 #rota-faixa .fx-partida{display:flex;gap:6px;margin:8px 0 2px;flex-wrap:wrap}
 #rota-faixa .fx-chip{font:600 12px/1 system-ui,sans-serif;padding:7px 10px;border-radius:999px;
@@ -757,7 +785,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
         <p class="small muted" id="cred-line" style="margin:10px 0 0;font-variant-numeric:tabular-nums"></p>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
         <p class="small muted" id="cam-law-txt" style="margin:0 0 8px">A lei muda de país para país. Em França mostro zonas de perigo alargadas em vez do ponto exato. Na Suíça não mostro nada, porque lá a lei também pune quem oferece o aviso. Na Alemanha a escolha é tua, aqui em baixo.</p>
-        <label class="chk-row" for="cam-opt"><input type="checkbox" id="cam-opt">
+        <label class="chk-row" for="cam-opt"><input type="checkbox" class="sw" id="cam-opt" role="switch">
           <span><b id="cam-opt-b">Mostrar radares na Alemanha</b><span id="cam-opt-s">Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento, não quem publica a app. A decisão é tua. Vem desligado.</span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
         <div class="chips" id="lang-row">
@@ -812,12 +840,13 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
       </div>
       <button class="btn" id="btn-gps" title="Usar a minha localização">📍<span class="gps-lab">GPS</span></button>
     </div>
+    <div id="loc-estado-agora" class="loc-estado"></div>
     <div id="foco-chip" class="chips" hidden style="margin:2px 2px 0"></div>
     <div class="card" id="sentinel-card">
       <div class="card-head">
         <h2>🔔 Sentinela meteorológica</h2>
         <span class="spacer"></span>
-        <button class="btn" id="btn-sentinel">Ligar</button>
+        <button class="sw" id="btn-sentinel" role="switch" aria-checked="false" aria-label="Sentinela: desligada"><span class="sw-knob"></span></button>
       </div>
       <p class="h-sub" id="sentinel-status" style="margin-bottom:0">Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.</p>
       <!-- Linha própria para o que aconteceu ao RECARREGAR, e não para o estado
@@ -919,6 +948,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
           <button class="chip click" data-dep="120">+2 h</button>
         </span>
       </div>
+      <div id="loc-estado-rota" class="loc-estado"></div>
       <div id="route-error"></div>
       <button class="btn ghost" id="btn-ver-mapa" hidden style="margin-top:10px">Ver o mapa</button>
     </div>
@@ -1063,6 +1093,12 @@ function setLang(l){
   /* o estado da instalação é dinâmico (3 estados) — não cabe na tabela
      estática do applyStaticI18n; repinta-se aqui como os outros leitores */
   if(typeof renderInstalacao==="function") renderInstalacao();
+  /* dd-48 §2 (captura do Ricardo: chip "Rota para MediaMarkt" em PT na
+     interface FR): TUDO o que se pinta por eventos tem de repintar-se na
+     troca de língua — o chip do foco e os cartões de localização eram
+     tinta seca da língua anterior */
+  if(typeof renderFocoChip==="function") renderFocoChip();
+  if(typeof repintarLocEstado==="function") repintarLocEstado();
 }
 /* Atribuição obrigatória do plano gratuito do Geoapify. Tem de ser reposta a
    cada tradução: o rodapé inteiro é uma entrada de i18n e é reescrito quando se
@@ -1153,8 +1189,7 @@ function applyStaticI18n(){
   }
   const sentSub=$("#sentinel-status");
   if(sentSub&&!sentinel.on) sentSub.textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
-  const sentBtn=$("#btn-sentinel");
-  if(sentBtn) sentBtn.textContent=sentinel.on?t("🛑 Desligar"):t("Ligar");
+  if(typeof sentinelaPinta==="function") sentinelaPinta(typeof sentinel!=="undefined"&&sentinel.on);
   const nb=$("#net-banner span:last-child");
   if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
   const ft=$("footer");
@@ -1301,7 +1336,7 @@ en:{
 "Diz-me para onde queres ir 🙂":"Tell me where you want to go 🙂","A pensar…":"Thinking…",
 "À procura de \"{q}\" perto de ti…":"Looking for \"{q}\" near you…",
 "Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"I need to know where you are: allow GPS, or search your city in the Now tab and come back.",
-"Não encontrei \"{q}\" por aqui. Tenta com a cidade (ex.: \"{q} {c}\").":"Couldn't find \"{q}\" around here. Try adding the city (e.g. \"{q} {c}\").",
+"Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"Couldn't find \"{q}\" around here. Try adding the city (e.g. \"{q} London\").","perto de: {r}":"near: {r}","a tua posição":"your position","o mapa à vista":"the map in view",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculating the route to {p} and the weather along every stretch…",
 "A minha posição":"My location","a tua zona":"your area",
 "Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"Couldn't route you there — pick another place above or adjust the form.",
@@ -1392,6 +1427,24 @@ en:{
 
 "Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 On iPhone: Share button → “Add to Home Screen” to install the app.",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Settings → Privacy & Security → Location Services: turn the main switch on and look for Levante in the list (the installed app has its own entry; if it's not there, use “Safari Websites”) → “While Using the App”.",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Settings → Privacy & Security → Location Services: turn the main switch on and choose “Safari Websites” → “While Using the App”. Then, in Safari: aA (or ⋯) button next to the address → Website Settings → Location → Allow.",
+"Abre o Chrome → menu ⋮ → Definições → Definições de sites → Localização → escolhe o site da Levante → Permitir. Se a Localização do telemóvel estiver desligada, liga-a primeiro nas Definições rápidas.":"Open Chrome → ⋮ menu → Settings → Site settings → Location → pick the Levante site → Allow. If the phone's Location is off, turn it on first in Quick Settings.",
+"Toca no ícone de informações do site, junto ao endereço → Permissões → Localização → Permitir. (Também em: menu → Definições → Definições de sites → Localização.)":"Tap the site information icon next to the address → Permissions → Location → Allow. (Also in: menu → Settings → Site settings → Location.)",
+"✍️ Escrever a origem à mão funciona sempre — a rota não precisa de localização.":"✍️ Typing the starting point always works — the route needs no location access.",
+"✍️ Escrever a cidade à mão funciona sempre — a previsão não precisa de localização.":"✍️ Typing your city always works — the forecast needs no location access.",
+"A caixa do sistema vai abrir: a posição serve para prever o tempo onde estás.":"The system prompt is about to open: your position is used to forecast the weather where you are.",
+"Este aparelho não dá acesso à localização.":"This device gives no access to location.",
+"O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"The phone can't get a position right now — system location off, no signal, or it took too long. It's not a permission problem: try again, preferably under open sky.",
+"📍 A localização está recusada para a Levante":"📍 Location is denied for Levante",
+"A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:":"The system prompt only appears once — I can't ask again. To turn it back on:",
+"📍 Localização ligada.":"📍 Location is on.",
+"📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 Location is denied — the card next to the starting point shows the way back.",
+"📡 Sem posição agora — tenta a céu aberto.":"📡 No position right now — try under open sky.",
+"índice moto":"moto index","Remover paragem":"Remove stop","A opção mais seca":"The driest option",
+"Sentinela: ligada":"Sentinel: on","Sentinela: desligada":"Sentinel: off",
+"Ligada — a vigiar o tempo onde estás, minuto a minuto.":"On — watching the weather where you are, minute by minute.",
+"Sem chuva prevista até às {h}":"No rain expected until {h}","Sem chuva até às {h}":"No rain until {h}","chuva das {a} às {b}":"rain from {a} to {b}","chuva forte das {a} às {b}":"heavy rain from {a} to {b}","chuva possível das {a} às {b}":"possible rain from {a} to {b}","limpa depois das {h}":"clearing after {h}","sem dados de parte das horas":"data missing for some hours","Sem dados suficientes para prever as janelas de chuva de hoje.":"Not enough data to predict today's rain windows.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ You already have the app — open it from your home screen.",
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 You can install this as an app — “Install” button up top.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 To install: browser menu → “Add to Home Screen”, if your browser supports it.",
@@ -1518,7 +1571,7 @@ es:{
 "chegas ~{a} · voltas à estrada ~{b}":"llegas ~{a} · vuelves a la carretera ~{b}",
 "Diz-me para onde queres ir 🙂":"Dime a dónde quieres ir 🙂","A pensar…":"Pensando…","À procura de \"{q}\" perto de ti…":"Buscando \"{q}\" cerca de ti…",
 "Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"Necesito saber dónde estás: permite el GPS o busca tu ciudad en Ahora.",
-"Não encontrei \"{q}\" por aqui. Tenta com a cidade (ex.: \"{q} {c}\").":"No encontré \"{q}\" por aquí. Prueba con la ciudad (ej.: \"{q} {c}\").",
+"Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"No encontré \"{q}\" por aquí. Prueba añadiendo la ciudad (ej.: \"{q} Madrid\").","perto de: {r}":"cerca de: {r}","a tua posição":"tu posición","o mapa à vista":"el mapa a la vista",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculando la ruta hasta {p} y el tiempo en cada tramo…",
 "A minha posição":"Mi posición","a tua zona":"tu zona","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"No pude trazar ruta hasta ahí — elige otro sitio o ajusta el formulario.",
 "Não vás de moto nesta viagem":"No vayas en moto en este viaje",
@@ -1597,6 +1650,24 @@ es:{
 "Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 En iPhone: botón Compartir → “Añadir a pantalla de inicio”.",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Ajustes → Privacidad y seguridad → Localización: activa el interruptor general y busca Levante en la lista (la app instalada tiene su propia entrada; si no aparece, usa “Sitios web de Safari”) → “Al usar la app”.",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Ajustes → Privacidad y seguridad → Localización: activa el interruptor general y elige “Sitios web de Safari” → “Al usar la app”. Después, en Safari: botón aA (o ⋯) junto a la dirección → Ajustes del sitio web → Ubicación → Permitir.",
+"Abre o Chrome → menu ⋮ → Definições → Definições de sites → Localização → escolhe o site da Levante → Permitir. Se a Localização do telemóvel estiver desligada, liga-a primeiro nas Definições rápidas.":"Abre Chrome → menú ⋮ → Configuración → Configuración de sitios → Ubicación → elige el sitio de Levante → Permitir. Si la ubicación del teléfono está apagada, enciéndela primero en los Ajustes rápidos.",
+"Toca no ícone de informações do site, junto ao endereço → Permissões → Localização → Permitir. (Também em: menu → Definições → Definições de sites → Localização.)":"Toca el icono de información del sitio, junto a la dirección → Permisos → Ubicación → Permitir. (También en: menú → Configuración → Configuración de sitios → Ubicación.)",
+"✍️ Escrever a origem à mão funciona sempre — a rota não precisa de localização.":"✍️ Escribir el origen a mano funciona siempre — la ruta no necesita ubicación.",
+"✍️ Escrever a cidade à mão funciona sempre — a previsão não precisa de localização.":"✍️ Escribir tu ciudad a mano funciona siempre — la previsión no necesita ubicación.",
+"A caixa do sistema vai abrir: a posição serve para prever o tempo onde estás.":"Se va a abrir el diálogo del sistema: tu posición sirve para prever el tiempo donde estás.",
+"Este aparelho não dá acesso à localização.":"Este dispositivo no da acceso a la ubicación.",
+"O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"El teléfono no consigue la posición ahora — ubicación del sistema apagada, sin señal, o tardó demasiado. No es un problema de permisos: inténtalo otra vez, mejor a cielo abierto.",
+"📍 A localização está recusada para a Levante":"📍 La ubicación está denegada para Levante",
+"A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:":"El diálogo del sistema solo aparece una vez — no puedo volver a pedirlo. Para activarla de nuevo:",
+"📍 Localização ligada.":"📍 Ubicación activada.",
+"📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 La ubicación está denegada — la tarjeta junto al origen muestra el camino de vuelta.",
+"📡 Sem posição agora — tenta a céu aberto.":"📡 Sin posición ahora — inténtalo a cielo abierto.",
+"índice moto":"índice moto","Remover paragem":"Quitar parada","A opção mais seca":"La opción más seca",
+"Sentinela: ligada":"Centinela: activada","Sentinela: desligada":"Centinela: desactivada",
+"Ligada — a vigiar o tempo onde estás, minuto a minuto.":"Activada — vigilando el tiempo donde estás, minuto a minuto.",
+"Sem chuva prevista até às {h}":"Sin lluvia prevista hasta las {h}","Sem chuva até às {h}":"Sin lluvia hasta las {h}","chuva das {a} às {b}":"lluvia de {a} a {b}","chuva forte das {a} às {b}":"lluvia fuerte de {a} a {b}","chuva possível das {a} às {b}":"lluvia posible de {a} a {b}","limpa depois das {h}":"despeja después de las {h}","sem dados de parte das horas":"faltan datos de algunas horas","Sem dados suficientes para prever as janelas de chuva de hoje.":"No hay datos suficientes para prever las ventanas de lluvia de hoy.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ Ya tienes la app — ábrela desde la pantalla de inicio.",
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Se puede instalar como app — botón “Instalar” aquí arriba.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Para instalar: menú del navegador → “Añadir a pantalla de inicio”, si tu navegador lo permite.",
@@ -1722,7 +1793,7 @@ fr:{
 "chegas ~{a} · voltas à estrada ~{b}":"arrivée ~{a} · reprise de la route ~{b}",
 "Diz-me para onde queres ir 🙂":"Dis-moi où tu veux aller 🙂","A pensar…":"Je réfléchis…","À procura de \"{q}\" perto de ti…":"Recherche de « {q} » près de toi…",
 "Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"J'ai besoin de ta position : autorise le GPS ou cherche ta ville dans Maintenant.",
-"Não encontrei \"{q}\" por aqui. Tenta com a cidade (ex.: \"{q} {c}\").":"« {q} » introuvable par ici. Essaie avec la ville (ex. « {q} {c} »).",
+"Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"Je n'ai pas trouvé \"{q}\" par ici. Essaie d'ajouter la ville (ex. : \"{q} Lyon\").","perto de: {r}":"près de : {r}","a tua posição":"ta position","o mapa à vista":"la carte affichée",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calcul de l'itinéraire vers {p} et de la météo sur chaque tronçon…",
 "A minha posição":"Ma position","a tua zona":"ta zone","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"Impossible de tracer l'itinéraire — choisis un autre lieu ou ajuste le formulaire.",
 "Não vás de moto nesta viagem":"Ne prends pas la moto pour ce trajet",
@@ -1801,6 +1872,24 @@ fr:{
 "Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Sur iPhone : bouton Partager → « Sur l'écran d'accueil ».",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Réglages → Confidentialité et sécurité → Service de localisation : active l'interrupteur général et cherche Levante dans la liste (l'app installée a sa propre entrée ; sinon, utilise « Sites web Safari ») → « Lorsque l'app est active ».",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Réglages → Confidentialité et sécurité → Service de localisation : active l'interrupteur général et choisis « Sites web Safari » → « Lorsque l'app est active ». Puis, dans Safari : bouton aA (ou ⋯) près de l'adresse → Réglages du site web → Position → Autoriser.",
+"Abre o Chrome → menu ⋮ → Definições → Definições de sites → Localização → escolhe o site da Levante → Permitir. Se a Localização do telemóvel estiver desligada, liga-a primeiro nas Definições rápidas.":"Ouvre Chrome → menu ⋮ → Paramètres → Paramètres des sites → Position → choisis le site Levante → Autoriser. Si la localisation du téléphone est coupée, active-la d'abord dans les réglages rapides.",
+"Toca no ícone de informações do site, junto ao endereço → Permissões → Localização → Permitir. (Também em: menu → Definições → Definições de sites → Localização.)":"Touche l'icône d'informations du site, près de l'adresse → Autorisations → Position → Autoriser. (Aussi dans : menu → Paramètres → Paramètres des sites → Position.)",
+"✍️ Escrever a origem à mão funciona sempre — a rota não precisa de localização.":"✍️ Écrire le départ à la main marche toujours — l'itinéraire n'a pas besoin de la position.",
+"✍️ Escrever a cidade à mão funciona sempre — a previsão não precisa de localização.":"✍️ Écrire ta ville à la main marche toujours — les prévisions n'ont pas besoin de la position.",
+"A caixa do sistema vai abrir: a posição serve para prever o tempo onde estás.":"La fenêtre du système va s'ouvrir : ta position sert à prévoir la météo là où tu es.",
+"Este aparelho não dá acesso à localização.":"Cet appareil ne donne pas accès à la position.",
+"O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"Le téléphone n'arrive pas à obtenir la position — localisation du système coupée, pas de signal, ou trop long. Ce n'est pas un problème d'autorisation : réessaie, de préférence à ciel ouvert.",
+"📍 A localização está recusada para a Levante":"📍 La position est refusée pour Levante",
+"A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:":"La fenêtre du système n'apparaît qu'une fois — je ne peux pas la redemander. Pour réactiver :",
+"📍 Localização ligada.":"📍 Position activée.",
+"📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 La position est refusée — la carte près du départ montre le chemin.",
+"📡 Sem posição agora — tenta a céu aberto.":"📡 Pas de position — essaie à ciel ouvert.",
+"índice moto":"indice moto","Remover paragem":"Retirer l'arrêt","A opção mais seca":"L'option la plus sèche",
+"Sentinela: ligada":"Sentinelle : activée","Sentinela: desligada":"Sentinelle : désactivée",
+"Ligada — a vigiar o tempo onde estás, minuto a minuto.":"Activée — je surveille la météo là où tu es, minute par minute.",
+"Sem chuva prevista até às {h}":"Pas de pluie prévue jusqu'à {h}","Sem chuva até às {h}":"Pas de pluie jusqu'à {h}","chuva das {a} às {b}":"pluie de {a} à {b}","chuva forte das {a} às {b}":"forte pluie de {a} à {b}","chuva possível das {a} às {b}":"pluie possible de {a} à {b}","limpa depois das {h}":"éclaircie après {h}","sem dados de parte das horas":"données manquantes sur certaines heures","Sem dados suficientes para prever as janelas de chuva de hoje.":"Pas assez de données pour prévoir les fenêtres de pluie du jour.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ Tu as déjà l'app — ouvre-la depuis l'écran d'accueil.",
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Tu peux l'installer comme app — bouton « Installer » juste au-dessus.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Pour installer : menu du navigateur → « Ajouter à l'écran d'accueil », si ton navigateur le permet.",
@@ -2460,22 +2549,37 @@ function photonMap(f){
   const addr=[p.street,p.housenumber].filter(Boolean).join(" ");
   const name=p.name||addr||"—";
   const place=p.city||p.town||p.village||p.district||"";
-  const sub=[p.name?addr:"", place].filter(Boolean).join(", ")||(p.state||p.country||"");
+  let sub=[p.name?addr:"", place].filter(Boolean).join(", ")||(p.state||p.country||"");
+  /* dd-46 defeito 2: "Jumbo / Jumbo" não distingue nada — se o subtítulo
+     repetir o nome (uma aldeia CHAMADA Jumbo tem city="Jumbo"), sobe-se na
+     hierarquia até algo que distinga; nunca o nome em cru outra vez */
+  if(sub.trim().toLowerCase()===String(name).trim().toLowerCase())
+    sub=[p.state,p.country].filter(Boolean).join(", ")||p.country||"";
   return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value};
 }
 async function photonSearch(q,pos,limit=7){
   if(geoOn()) return geoSearch(q,pos,limit);
-  const u=new URL(svc("procura"));
-  const params={q, limit:String(limit)};
-  if(pos&&isFinite(pos.lat)){ params.lat=pos.lat.toFixed(4); params.lon=pos.lon.toFixed(4); }
-  u.search=new URLSearchParams(params).toString();
-  const j=await jfetch(u.toString(), 9000, "pesquisa");
+  /* a mesma cura do geoSearch (dd-46), na reserva sem chave: o viés lat/lon
+     do Photon prefere mas não restringe — o PERTO pergunta-se com bbox */
+  const pede=async (extra)=>{
+    const u=new URL(svc("procura"));
+    const params={q, limit:String(limit), ...extra};
+    if(pos&&isFinite(pos.lat)){ params.lat=pos.lat.toFixed(4); params.lon=pos.lon.toFixed(4); }
+    u.search=new URLSearchParams(params).toString();
+    return jfetch(u.toString(), 9000, "pesquisa");
+  };
+  const mapa=(j)=>{ const a=atribDe(j);
+    return (j?.features||[]).map(f=>{ const r=photonMap(f); if(a) r.atrib=a; return r; })
+      .filter(r=>isFinite(r.lat)&&isFinite(r.lon)); };
+  let perto=[];
+  if(pos&&isFinite(pos.lat)){
+    const dLat=RAIO_PERTO_M/111320, dLon=RAIO_PERTO_M/(111320*Math.max(.05,Math.cos(pos.lat*Math.PI/180)));
+    perto=mapa(await pede({bbox:`${(pos.lon-dLon).toFixed(4)},${(pos.lat-dLat).toFixed(4)},${(pos.lon+dLon).toFixed(4)},${(pos.lat+dLat).toFixed(4)}`}).catch(()=>null));
+  }
+  const mundo=perto.length<limit?mapa(await pede({}).catch(()=>null)):[];
   const seen=new Set();
-  const atribF=atribDe(j);
-  return (j.features||[]).map(f=>{ const r=photonMap(f); if(atribF) r.atrib=atribF; return r; })
-    .filter(r=>isFinite(r.lat)&&isFinite(r.lon))
-    .filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
-      if(seen.has(k)) return false; seen.add(k); return true; });
+  return [...perto,...mundo].filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
+    if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,Math.max(limit,perto.length));
 }
 
 /* --- pesquisa por CATEGORIA ("igreja ortodoxa", "bomba de gasolina"…) ---
@@ -2639,8 +2743,17 @@ function locaisLocais(q){
    "não sei", nunca como zero.
    ═══════════════════════════════════════════════════════════════════════════ */
 function refPesquisa(){
-  const c=[state.home, store.get("home"), (getRecentes()||[])[0], (getFavs()||[])[0]];
-  for(const x of c) if(x&&isFinite(x.lat)&&isFinite(x.lon)) return {lat:x.lat, lon:x.lon};
+  /* dd-46: última posição conhecida → casa → mapa à vista, por esta ordem —
+     e a dizer honestamente com que referência se está a ordenar (rotulo) */
+  try{ if(typeof travel!=="undefined"&&travel.active&&travel.marcador){
+    const c=travel.marcador.centro();
+    if(isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("a tua posição")}; } }catch(e){}
+  for(const x of [state.home, store.get("home")])
+    if(x&&isFinite(x.lat)&&isFinite(x.lon)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
+  try{ if(state.mapaRota&&state.mapaRota.m){ const c=Mapa.centro(state.mapaRota);
+    if(c&&isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("o mapa à vista")}; } }catch(e){}
+  for(const x of [(getRecentes()||[])[0], (getFavs()||[])[0]])
+    if(x&&isFinite(x.lat)&&isFinite(x.lon)) return {lat:x.lat, lon:x.lon, rotulo:x.name||""};
   return null;
 }
 
@@ -2799,18 +2912,41 @@ function geoFeature(f){
   const rua=[p.street,p.housenumber].filter(Boolean).join(" ");
   const nome=p.name||rua||p.address_line1||p.formatted||"—";
   const sitio=p.city||p.town||p.village||p.county||p.state||"";
-  const sub=[p.name?rua:"", sitio].filter(Boolean).join(", ")||p.address_line2||p.country||"";
+  let sub=[p.name?rua:"", sitio].filter(Boolean).join(", ")||p.address_line2||p.country||"";
+  if(sub.trim().toLowerCase()===String(nome).trim().toLowerCase())
+    sub=[p.state,p.country].filter(Boolean).join(", ")||p.address_line2||p.country||"";
+  if(sub.toLowerCase().startsWith(nome.toLowerCase()+","))
+    sub=sub.slice(nome.length+1).trim(); // "Jumbo, Sudan" → "Sudan"
   return {name:nome, sub, lat:p.lat??f.geometry?.coordinates?.[1],
           lon:p.lon??f.geometry?.coordinates?.[0], kind:p.result_type||p.category};
 }
+const RAIO_PERTO_M=50000; // o "por aqui" de quem anda de mota: 50 km. 7b: errado se
+                          // um caso real mostrar um sítio querido escondido além dos
+                          // 50 km — sobe com o caso escrito; ou se o perto trouxer
+                          // lixo de longe — desce. Medido a 30/07: com ele, "jumbo"
+                          // em Maastricht dá 7 supermercados a 0,2–4,3 km.
 async function geoSearch(q,pos,limit=7){
-  const j=await jfetch(geoURL("/v1/geocode/autocomplete",{
-    text:q, limit:String(limit), lang:GEO_LANG[state.lang]||"en",
-    bias:(pos&&isFinite(pos.lat))?`proximity:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)}`:null,
-  }),9000,"pesquisa");
-  const atrib=atribDe(j);
-  return (j.features||[]).map(f=>{ const r=geoFeature(f); if(atrib) r.atrib=atrib; return r; })
-    .filter(r=>isFinite(r.lat)&&isFinite(r.lon));
+  /* ═══ DUAS PERGUNTAS, NÃO UMA (dd-46, medido a 30/07) ═══
+     O autocomplete com bias=proximity PREFERE mas não RESTRINGE: para
+     "jumbo" com viés em Maastricht devolvia CIDADES chamadas Jumbo no
+     Sudão, Nigéria, Gana e Ohio (4396–6902 km) e nem UM dos sete
+     supermercados a 2 km — o pedido certo para "perto" é outro
+     (filter=circle). Perguntamos primeiro o PERTO; o MUNDO só quando o
+     perto não encher ("Porto" a 300 km não pode desaparecer). As duas
+     respostas reais estão em test/fixtures/geoapify/. */
+  const lng=GEO_LANG[state.lang]||"en", temRef=pos&&isFinite(pos.lat);
+  const pede=(extra)=>jfetch(geoURL("/v1/geocode/autocomplete",{
+    text:q, limit:String(limit), lang:lng,
+    bias:temRef?`proximity:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)}`:null,
+    ...extra}),9000,"pesquisa");
+  const mapa=(j)=>{ const a=atribDe(j);
+    return (j?.features||[]).map(f=>{ const r=geoFeature(f); if(a) r.atrib=a; return r; })
+      .filter(r=>isFinite(r.lat)&&isFinite(r.lon)); };
+  const perto=temRef?mapa(await pede({filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${RAIO_PERTO_M}`}).catch(()=>null)):[];
+  let mundo=[];
+  if(perto.length<limit) mundo=mapa(await pede({}).catch(()=>null));
+  const vistos=new Set(perto.map(r=>`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`));
+  return [...perto, ...mundo.filter(r=>!vistos.has(`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`))].slice(0,Math.max(limit,perto.length));
 }
 async function geoReverse(lat,lon){
   const j=await jfetch(geoURL("/v1/geocode/reverse",{
@@ -3469,6 +3605,8 @@ function attachAC(input, list, onPick){
   const render=()=>{
     list.textContent="";
     if(!items.length){ const d=el("div","ac-empty",t('Sem resultados — tenta "cidade, país"')); list.appendChild(d); }
+    else { const ref=refPesquisa(); if(ref&&ref.rotulo)
+      list.appendChild(el("div","ac-ref",t("perto de: {r}",{r:ref.rotulo}))); }
     items.forEach((it,i)=>{
       const d=el("div","ac-item"+(i===active?" active":"")+(it._fav?" fav-hit":""));
       d.setAttribute("role","option");
@@ -3580,7 +3718,7 @@ function confirmarCasa(loc){
   acoes.append(sim,nao); card.appendChild(acoes);
   slot.appendChild(card);
 }
-function setHome(loc, {silent=false, prov}={}){
+function setHome(loc, {silent=false, prov, deStore=false}={}){
   /* PROVENIÊNCIA (A3.5.35 pontos 4-6): cada escrita regista COMO nasceu —
      gps / pesquisa / escolha / reserva. Sem prov novo, preserva-se o que o
      objeto já traz (repetir setHome não branqueia a origem). A DEFAULT_LOC é
@@ -3593,7 +3731,9 @@ function setHome(loc, {silent=false, prov}={}){
   if(prov) loc.prov={como:prov, quando:Date.now()};
   else if(!loc.prov&&loc===DEFAULT_LOC) loc.prov={como:"reserva", quando:Date.now()};
   state.home=loc;
-  store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
+  /* adotar a casa que JÁ está no store (arranque) não a reescreve: reescrever
+     normalizava o objeto e branqueava migrações — a guarda do rename viu-o */
+  if(!deStore) store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
   if(sanidadePendente) sanidadeRender();   // a linha da casa no cartão de sanidade acompanha a troca
   const box=$("#agora-content");
   if(!silent){ box.textContent="";
@@ -3609,22 +3749,154 @@ function setHome(loc, {silent=false, prov}={}){
       box.appendChild(b); box.appendChild(r); } });
 }
 
-function useGPS(fromRoute){
-  if(!navigator.geolocation){ toast(t("O teu browser não suporta GPS — pesquisa a cidade.")); return; }
-  toast(t("A obter a tua posição… 📡"));
+/* ═══ OS TRÊS ESTADOS DA LOCALIZAÇÃO (dd-41, registo 42) ═══════════════════
+   A caixa do sistema só aparece UMA vez. Quem recusa (ou tem a localização
+   do sistema desligada) fica sem caminho de volta — e nenhum botão nosso a
+   faz reaparecer. Portanto: três estados, nunca confundidos, cada um com a
+   sua interface; a recusa ganha um cartão PERMANENTE (7g-bis) com o caminho
+   exato da plataforma (verificado na documentação a 30/07/2026, fontes no
+   relatório-32); e escrever à mão está sempre à vista — a previsão nunca
+   depende de permissão. Deteção por CAPACIDADE, nunca por marca.           */
+const locSaida={ // o último desfecho REAL de um pedido — a memória de quem tenta
+  grava(x){ store.set("loc-desfecho",x); },
+  le(){ return store.get("loc-desfecho")||null; }
+};
+async function locEstado(){
+  if(!navigator.geolocation) return "sem-suporte";
+  try{
+    if(navigator.permissions?.query){
+      const p=await navigator.permissions.query({name:"geolocation"});
+      if(p.state==="denied") return "recusada";
+      if(p.state==="granted") return "concedida";
+      // "prompt" com recusa gravada = plataforma que não persiste a recusa na
+      // consulta mas persistiu-a no gesto — a história manda
+      return locSaida.le()==="recusada" ? "recusada" : "nunca-pedida";
+    }
+  }catch(e){}
+  const d=locSaida.le(); // sem API de consulta: só a história dos gestos
+  if(d==="recusada") return "recusada";
+  if(d==="ok"||d==="indisponivel") return "concedida";
+  return "nunca-pedida";
+}
+function locCaminho(){
+  /* capacidades, não marcas: `"standalone" in navigator` só existe na família
+     Safari do iOS/iPadOS; o modo de exibição diz se está instalada */
+  const instalada=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  const familiaIOS=("standalone" in navigator);
+  if(familiaIOS&&instalada) return t("Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.");
+  if(familiaIOS) return t("Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.");
+  if(instalada) return t("Abre o Chrome → menu ⋮ → Definições → Definições de sites → Localização → escolhe o site da Levante → Permitir. Se a Localização do telemóvel estiver desligada, liga-a primeiro nas Definições rápidas.");
+  return t("Toca no ícone de informações do site, junto ao endereço → Permissões → Localização → Permitir. (Também em: menu → Definições → Definições de sites → Localização.)");
+}
+const locPintado={}; // último tipo por alvo — para repintar na troca de língua
+function repintarLocEstado(){ for(const a in locPintado) if(locPintado[a]) renderLocEstado(a,locPintado[a]); }
+function renderLocEstado(alvo,tipo){
+  const box=$(alvo); if(!box) return;
+  locPintado[alvo]=tipo||null;
+  box.textContent=""; box.dataset.tipo=tipo||"";
+  if(!tipo) return;
+  const manual=el("div","small",alvo==="#loc-estado-rota"
+    ? t("✍️ Escrever a origem à mão funciona sempre — a rota não precisa de localização.")
+    : t("✍️ Escrever a cidade à mão funciona sempre — a previsão não precisa de localização."));
+  if(tipo==="pedindo"){ // nunca-pedida, no gesto: o porquê ao lado da caixa
+    const b=el("div","banner"); b.append(el("span",null,"📍"),
+      el("span",null,t("A caixa do sistema vai abrir: a posição serve para prever o tempo onde estás.")));
+    box.append(b); return;
+  }
+  if(tipo==="sem-suporte"){
+    const b=el("div","banner warn"); b.append(el("span",null,"📍"),
+      el("span",null,t("Este aparelho não dá acesso à localização.")));
+    box.append(b,manual); return;
+  }
+  if(tipo==="indisponivel"){ // ≠ recusada, pelo nome — e aqui repetir é lícito
+    const b=el("div","banner warn"); b.append(el("span",null,"📡"),
+      el("span",null,t("O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.")));
+    box.append(b,manual); return;
+  }
+  // recusada: cartão permanente, caminho da plataforma, ZERO repedidos
+  const c=el("div","banner err");
+  const tit=el("div"); tit.style.fontWeight="700";
+  tit.textContent=t("📍 A localização está recusada para a Levante");
+  const p1=el("div",null,t("A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:"));
+  const p2=el("div"); p2.style.marginTop="4px"; p2.textContent=locCaminho();
+  const col=el("div"); col.append(tit,p1,p2);
+  c.append(el("span",null,"🔒"),col);
+  box.append(c,manual);
+  try{ // reaparecimento passivo: se a permissão mudar lá fora, o cartão sai sozinho
+    navigator.permissions?.query({name:"geolocation"}).then(p=>{
+      p.onchange=()=>{ if(p.state!=="denied"){ locSaida.grava(null); renderLocEstado(alvo,null); toast(t("📍 Localização ligada.")); } };
+    });
+  }catch(e){}
+}
+async function useGPS(fromRoute){
+  const alvo=fromRoute?"#loc-estado-rota":"#loc-estado-agora";
+  const est=await locEstado();
+  if(est==="sem-suporte"){ renderLocEstado(alvo,"sem-suporte"); return; }
+  if(est==="recusada"){ renderLocEstado(alvo,"recusada"); return; } // sem caixa possível: zero pedidos
+  if(est==="nunca-pedida") renderLocEstado(alvo,"pedindo");
+  else toast(t("A obter a tua posição… 📡"));
   navigator.geolocation.getCurrentPosition(async pos=>{
+    locSaida.grava("ok"); renderLocEstado(alvo,null);
     const {latitude:lat, longitude:lon}=pos.coords;
     const n=await revGeocode(lat,lon);
     const loc={name:n.name, sub:n.sub, lat, lon, atrib:n.atrib||null};
     if(fromRoute){ const o=$("#rt-o"); o.value=`📍 ${n.name}`; o._picked=loc; toast(t("Origem: {p}",{p:n.name})); }
     else { setHome(loc,{prov:"gps"}); toast(t("Localização: {p}",{p:n.name})); }
   },err=>{
+    const recusou=err&&err.code===1;
+    locSaida.grava(recusou?"recusada":"indisponivel");
+    renderLocEstado(alvo,recusou?"recusada":"indisponivel");
     const fb=store.get("home")||DEFAULT_LOC;
-    toast(fromRoute?t("Sem acesso ao GPS — escreve a origem."):t("Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.",{p:fb.name}));
-    if(!fromRoute && !state.wx) setHome(fb);
+    if(!fromRoute && !state.wx) setHome(fb); // a app continua a servir com a casa
   },{enableHighAccuracy:false, timeout:9000, maximumAge:300000});
 }
 
+const JANELA_CFG={
+  horas:18,      // horizonte da frase: o dia de quem decide de manhã. 7b: mais
+                 // que isto é prometer o que o modelo não resolve; menos deixa
+                 // a tarde de fora. Errado se: pedidos reais mostrarem outra
+                 // janela útil — muda o número, não a frase.
+  ppProvavel:60, // ≥60% diz-se "chuva". 7b: acima disto o Open-Meteo acerta
+                 // mais vezes do que falha; dizer "possível" a 80% é medo.
+  ppPossivel:30, // 30–59% = "possível". Abaixo de 30 não se fala — falar de
+                 // tudo é não dizer nada. Mesmos limiares do perfil (ppRisk).
+  prForte:2.5,   // mm/h de "forte" — o MESMO degrau do rainLevel nível 3:
+                 // uma régua só (7g-quater: réguas divergentes mentem).
+};
+function fraseJanelaChuva(H,metrics,i0,prof){
+  const N=Math.min(i0+JANELA_CFG.horas,metrics.length);
+  if(N-i0<3) return null;
+  let faltas=0; const cls=[];
+  for(let i=i0;i<N;i++){
+    const m=metrics[i];
+    if(m.pr==null&&m.pp==null){ cls.push("?"); faltas++; continue; }
+    if((m.pr??0)>=JANELA_CFG.prForte||THUNDER.includes(m.code)) cls.push("F");
+    else if((m.pp??0)>=JANELA_CFG.ppProvavel||(m.pr??0)>=0.8) cls.push("C");
+    else if((m.pp??0)>=JANELA_CFG.ppPossivel||(m.pr??0)>=0.08) cls.push("P");
+    else cls.push("S");
+  }
+  if(faltas>=(N-i0)/2) return {tipo:"sem-dados",txt:t("Sem dados suficientes para prever as janelas de chuva de hoje.")};
+  const runs=[]; for(let k=0;k<cls.length;k++){
+    if(runs.length&&runs[runs.length-1].c===cls[k]) runs[runs.length-1].b=k;
+    else runs.push({c:cls[k],a:k,b:k}); }
+  const h=(k)=>fmtH(H.time[i0+k]);
+  const hFim=(k)=>fmtH(H.time[Math.min(i0+k+1,H.time.length-1)]);
+  const chuvosos=runs.filter(r=>"FCP".includes(r.c));
+  let txt;
+  if(!chuvosos.length) txt=t("Sem chuva prevista até às {h}",{h:hFim(cls.length-1)});
+  else{
+    const partes=[];
+    const primeiro=chuvosos[0];
+    if(primeiro.a>0) partes.push(t("Sem chuva até às {h}",{h:h(primeiro.a)}));
+    for(const r of chuvosos.slice(0,3))
+      partes.push(t(r.c==="F"?"chuva forte das {a} às {b}":r.c==="C"?"chuva das {a} às {b}":"chuva possível das {a} às {b}",{a:h(r.a),b:hFim(r.b)}));
+    const ultimo=chuvosos[chuvosos.length-1];
+    if(ultimo.b<cls.length-1&&runs[runs.length-1].c==="S") partes.push(t("limpa depois das {h}",{h:hFim(ultimo.b)}));
+    txt=partes.join(" · ");
+  }
+  if(faltas>0) txt+=" · "+t("sem dados de parte das horas");
+  return {tipo:chuvosos.length?"com-chuva":"seca",txt};
+}
 function renderDashboard(){
   const wx=state.wx, H=wx.hourly, box=$("#agora-content");
   const prof=PROFILES[state.profile];
@@ -3693,7 +3965,7 @@ function renderDashboard(){
     <circle cx="52" cy="52" r="46" fill="none" stroke="var(--lvl-c)" stroke-width="8"
       stroke-linecap="round" stroke-dasharray="${(worst.s.score/100*C).toFixed(1)} ${C.toFixed(1)}"/></svg>`;
   const si=el("div","score-in");
-  si.append(el("span","score-num",String(worst.s.score)), el("span","score-lab","índice moto"));
+  si.append(el("span","score-num",String(worst.s.score)), el("span","score-lab",t("índice moto")));
   ring.appendChild(si); sw.appendChild(ring);
   const main=el("div","hero-main");
   const title=el("div","hero-title");
@@ -3701,6 +3973,12 @@ function renderDashboard(){
   const condTxt=t("{c} · {t}° em {p} — decisão para as próximas 3 h",
     {c:mNow.code==null?t("céu por confirmar"):wmoTxt(mNow.code), t:mNow.t==null?"—":rnd(mNow.t), p:state.home.name});
   main.append(title, el("div","hero-sub",condTxt));
+  /* dd-47 §3: o resto do dia numa linha, das horárias QUE JÁ PEDIMOS — zero
+     chamadas novas. Honestidade por faixas (7g-ter): probabilidade não é
+     certeza ao minuto, e dados em falta são silêncio honesto, nunca "sem
+     chuva" inventado (a família do ??0). */
+  const jc=fraseJanelaChuva(H,metrics,i0,prof);
+  if(jc){ const l=el("div","chuva-janela"); l.id="chuva-janela"; l.dataset.tipo=jc.tipo; l.textContent=jc.txt; main.appendChild(l); }
   /* a linha discreta da proveniência da casa (A3.5.35 ponto 5): quem vir
      "definida a partir de uma pesquisa" percebe sozinho o que aconteceu */
   main.append(el("div","hero-prov","🏠 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
@@ -4152,6 +4430,38 @@ const Mapa = (() => {
         else h.m.getSource(nome).setData(f.geojson);
         for (const spec of f.camadas) { try { maplibre_._porCamada(h, nome, spec, true); } catch (e) {} }
       }
+      /* o estilo novo chega rico: se a viagem pediu magro, volta a emagrecer
+         (troca de tema em viagem não pode devolver os POIs) */
+      h._magroOrig = {};
+      maplibre_._aplicarMagro(h);
+    },
+    /* ── rico a planear, magro a conduzir (dd-21/dd-29) ──────────────────
+       Em Modo viagem o mapa emagrece sozinho: POIs e rótulos secundários
+       desaparecem e sobram as cores da rota, os perigos e os nomes de
+       estrada. SÓ camadas symbol — geometria nunca se esconde. A reposição
+       devolve a visibilidade DECLARADA (um estilo pode trazer camadas já
+       escondidas de origem — repor "visible" às cegas era ligá-las).       */
+    magro(h, ligado) {
+      h._magro = !!ligado;
+      maplibre_._aplicarMagro(h);
+    },
+    _aplicarMagro(h) {
+      if (!h.m?.getStyle) return;
+      const st = h.m.getStyle(); if (!st?.layers) return;
+      h._magroOrig = h._magroOrig || {};
+      for (const l of st.layers) {
+        if (l.type !== "symbol") continue;
+        if (!/^(poi|airport|housenumber|place_(hamlet|suburb|neighbourhood|isolated))/.test(l.id)) continue;
+        try {
+          if (h._magro) {
+            if (!(l.id in h._magroOrig)) h._magroOrig[l.id] = l.layout?.visibility || "visible";
+            h.m.setLayoutProperty(l.id, "visibility", "none");
+          } else if (l.id in h._magroOrig) {
+            h.m.setLayoutProperty(l.id, "visibility", h._magroOrig[l.id]);
+            delete h._magroOrig[l.id];
+          }
+        } catch (e) {}
+      }
     },
 
     /* A base é uma DESCRIÇÃO: o estilo de casa + a atribuição extra. As
@@ -4266,10 +4576,14 @@ const Mapa = (() => {
       const antes = spec.sob && h.m.getLayer(spec.sob) ? spec.sob : undefined;
       const poe = (def) => h.m.addLayer(def, antes);
       if (spec.tipo === "linha") {
+        /* `tracejado`: codificação SECUNDÁRIA de forma (dd-30 §4 "dar contorno
+           às cores dos troços" + régua do contraste: um par de cores na banda
+           6–8 de deutera só é legal com uma pista que não seja cor) */
         poe({ id, type: "line", source: nome, ...filtro,
-          layout: { "line-join": "round", "line-cap": "round" },
+          layout: { "line-join": "round", "line-cap": spec.tracejado ? "butt" : "round" },
           paint: { "line-color": E(spec.cor, "#888"), "line-width": E(spec.espessura, 4),
-                   "line-opacity": E(spec.opacidade, 1) } });
+                   "line-opacity": E(spec.opacidade, 1),
+                   ...(spec.tracejado ? { "line-dasharray": spec.tracejado } : {}) } });
       } else if (spec.tipo === "ponto") {
         poe({ id, type: "circle", source: nome, ...filtro,
           paint: { "circle-radius": E(spec.raio, 4.5), "circle-color": E(spec.corDentro, "#3388ff"),
@@ -4467,7 +4781,9 @@ function initRouteMap(){
     if(travel.marcador){ Mapa.verCentro(h, travel.marcador.centro(), Math.max(Mapa.zoom(h),14)); return; }
     navigator.geolocation&&navigator.geolocation.getCurrentPosition(
       p=>Mapa.verCentro(h,[p.coords.longitude,p.coords.latitude],Math.max(Mapa.zoom(h),13)),
-      ()=>toast(t("Sem acesso ao GPS — escreve a origem.")),{timeout:8000,maximumAge:60000});
+      err=>{ const recusou=err&&err.code===1; locSaida.grava(recusou?"recusada":"indisponivel");
+        toast(recusou?t("📍 A localização está recusada — o cartão junto à origem diz o caminho."):t("📡 Sem posição agora — tenta a céu aberto.")); },
+      {timeout:8000,maximumAge:60000});
   }});
   Mapa.aoEvento(h,"arrastar",()=>{ if(travel.active) travel.follow=false; });
   // 📍 PIN: mantém o dedo (telemóvel) ou clica com o direito (PC) num ponto qualquer
@@ -4588,7 +4904,7 @@ function addStopRow(prefill){
   const dot=el("span","stop-dot","1");
   const inp=document.createElement("input");
   inp.type="text"; inp.placeholder=t("Paragem (ex.: Continente, bomba de gasolina, casa do João…)"); inp.autocomplete="off";
-  const x=el("button","x-btn","✕"); x.title="Remover paragem"; x.setAttribute("aria-label","Remover paragem");
+  const x=el("button","x-btn","✕"); x.title=t("Remover paragem"); x.setAttribute("aria-label",t("Remover paragem"));
   const list=el("div","ac-list");
   row.append(dot,inp);
   if(SR){
@@ -4871,7 +5187,11 @@ function drawRoute(fit){
     const a=R.samples[j], b=R.samples[j+1];
     const seg=R.coords.slice(a.idx,b.idx+1);
     if(seg.length<2) continue;
-    troços.push(linha(seg,{cor:lvlColor(Math.max(a.cond.lvl,b.cond.lvl))}));
+    const nivelTroço=Math.max(a.cond.lvl,b.cond.lvl);
+    /* trovoada tracejada: o par chuva↔trovoada a 20% de brilho fica a ΔE 6,0
+       em deuteranopia — cor sozinha não chega de noite; a forma desempata
+       (guarda test/contraste.mjs, régua da codificação secundária) */
+    troços.push(linha(seg,{cor:lvlColor(nivelTroço),...(nivelTroço>=3?{trovoada:true}:{})}));
   }
   /* ═══ CORREDOR-HALO (dd-19, candidato c): atenua a base SÓ onde a rota
      respira — em vez de esvaziar o mapa inteiro, como o pálido fazia. Uma
@@ -4905,7 +5225,7 @@ function drawRoute(fit){
   Mapa.fonte(h,"amostras",{type:"FeatureCollection",features:amostras});
 
   Mapa.fonte(h,"zonas",{type:"FeatureCollection",features:
-    (R.cameras||[]).filter(c=>c.zone).map(c=>ponto(c,{km:c.km}))});
+    (R.cameras||[]).filter(c=>c.zone).map(c=>ponto(c,{km:c.km,borda:surf}))});
 
   /* ── CAMADAS: declaradas UMA vez, como no MapLibre ─────────────────── */
   if(!h._camadas){
@@ -4918,8 +5238,10 @@ function drawRoute(fit){
     Mapa.camada(h,"rota",{id:"contorno",tipo:"linha",filtro:Mapa.tem("contorno"),
       cor:Mapa.campo("cor"),espessura:9,opacidade:.9});
     Mapa.camada(h,"rota",{id:"troços",tipo:"linha",
-      filtro:Mapa.tudo(Mapa.naoTem("contorno"),Mapa.naoTem("percorrido")),
+      filtro:Mapa.tudo(Mapa.naoTem("contorno"),Mapa.naoTem("percorrido"),Mapa.naoTem("trovoada")),
       cor:Mapa.campo("cor"),espessura:5,opacidade:.95});
+    Mapa.camada(h,"rota",{id:"troços·trovoada",tipo:"linha",filtro:Mapa.tem("trovoada"),
+      cor:Mapa.campo("cor"),espessura:5,opacidade:.95,tracejado:[2,1.2]});
     Mapa.camada(h,"rota",{id:"percorrido",tipo:"linha",filtro:Mapa.tem("percorrido"),
       cor:"#8b9099",espessura:5,opacidade:.95});
     Mapa.camada(h,"variantes",{id:"fantasmas",tipo:"linha",cor:"#8a8f96",espessura:4,opacidade:.5,
@@ -4927,6 +5249,11 @@ function drawRoute(fit){
     Mapa.camada(h,"amostras",{id:"pontos",tipo:"ponto",raio:4.5,
       cor:Mapa.campo("borda"),espessura:2,corDentro:Mapa.campo("cor"),
       balao:p=>balaoAmostra(R.samples[p.i],p.i,R)});
+    /* molde do aro: sanduíche de duas arestas (guarda do contraste) — sem
+       isto o âmbar desaparecia sobre as autoestradas laranja do liberty
+       (ΔE 9,0) e sobre a relva (13,7) */
+    Mapa.camada(h,"zonas",{id:"perigo·molde",tipo:"circulo",raio:1400,
+      cor:Mapa.campo("borda"),espessura:5,opacidadeDentro:0});
     Mapa.camada(h,"zonas",{id:"perigo",tipo:"circulo",raio:1400,cor:"#fab219",
       espessura:2,corDentro:"#fab219",opacidadeDentro:.14,
       balao:p=>{ const dz=el("div"); const zt=el("div"); zt.style.fontWeight="700";
@@ -5779,7 +6106,7 @@ function renderDepartures(){
     /* assimétrico: a chuva encontrada mostra-se; o "seco ✅" exige dados completos */
     c.appendChild(el("div","v", ev.wet>=0.5?t("~{n} km 🌧️",{n:fmtN(ev.wet,0)})
       :ev.furos?t("? sem dados"):t("seco ✅")));
-    if(ev===best&&ev.wet<0.5) c.title="A opção mais seca";
+    if(ev===best&&ev.wet<0.5) c.title=t("A opção mais seca");
     c.addEventListener("click",()=>{
       $("#rt-when").value=localDT(new Date(ev.dep*1000));
       applyShift(ev.sh);
@@ -6119,7 +6446,7 @@ async function assistantAsk(){
     const vistos=new Set(meus.map(m=>`${m.lat.toFixed(3)},${m.lon.toFixed(3)}`));
     const cands=[...meus.map(m=>({...m, dist:haversine(pos,m)})),
                  ...res.filter(r=>!vistos.has(`${r.lat.toFixed(3)},${r.lon.toFixed(3)}`))].slice(0,6);
-    if(!cands.length){ aiMsg("err",t('Não encontrei "{q}" por aqui. Tenta com a cidade (ex.: "{q} {c}").',{q,c:state.home?.name??"Lisboa"})); return; }
+    if(!cands.length){ aiMsg("err",t('Não encontrei "{q}" por aqui. Tenta juntar a cidade (ex.: "{q} Lisboa").',{q})); return; }
     renderCands(cands,pos,null);
     aiMsg("info",cands.length===1?t("Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.")
                                  :t("Encontrei {n} sítios. Toca no que queres para eu traçar a rota.",{n:cands.length}));
@@ -6339,7 +6666,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-07-31-1048-77ce47";
+const BUILD="2026-07-31-1102-ef12c4";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -6681,6 +7008,7 @@ async function startTravel(){
   precacheRouteTiles(); // guarda o mapa do trajeto antes de arrancar
   stopAutoTravel();
   document.body.classList.add("traveling");
+  if(state.mapaRota) Mapa.magro(state.mapaRota,true); // rico a planear, magro a conduzir
   $("#travel-bar").style.display="flex";
   $("#tb-next").textContent=t("🧭 Modo viagem ligado");
   $("#tb-sub").textContent=t("à procura do teu GPS…");
@@ -6706,6 +7034,7 @@ function stopTravel(msg){
   $("#travel-bar").style.display="none";
   store.del("travel");
   travelNotifyClose();
+  if(state.mapaRota) Mapa.magro(state.mapaRota,false); // o mapa volta a engordar
   if(state.mapaRota) Mapa.verRumo(state.mapaRota,0);   // o mapa volta a norte-acima
   if(state.route&&state.mapaRota) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
@@ -7005,12 +7334,21 @@ async function sentinelCheck({recuperacao=false}={}){
    a corrigir: perguntar é melhor do que desligar em silêncio, mas não
    perguntar é melhor do que perguntar. */
 
+function sentinelaPinta(on){
+  const b=$("#btn-sentinel"); if(!b) return;
+  b.classList.toggle("on",!!on);
+  b.setAttribute("aria-checked",String(!!on));
+  /* o rótulo diz o ESTADO, não a ação — quem usa leitor de ecrã ouve
+     "Sentinela: ligada", nunca "Turn off" (dd-42 §3) */
+  b.setAttribute("aria-label",on?t("Sentinela: ligada"):t("Sentinela: desligada"));
+  b.title=on?t("Sentinela: ligada"):t("Sentinela: desligada");
+}
 async function toggleSentinel(){
   const b=$("#btn-sentinel");
   if(sentinel.on){
     sentinel.on=false; clearInterval(sentinel.timer); sentinel.timer=null;
     store.del("sentinel"); sentinelNota("");
-    b.textContent=t("Ligar");
+    sentinelaPinta(false);
     $("#sentinel-status").textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
     toast(t("Sentinela desligada."));
     return;
@@ -7026,7 +7364,11 @@ async function toggleSentinel(){
   sentinel.on=true; sentinel.lastAlerts.clear(); sentinel.last=null;
   store.set("sentinel",{on:1, at:Date.now()});
   sentinelNota("");
-  b.textContent=t("🛑 Desligar");
+  sentinelaPinta(true);
+  /* o estado escreve-se JÁ — o sentinelCheck() refina depois com o tempo
+     atual, mas um interruptor verde ao lado de "Desligada." é uma
+     contradição (apanhada numa captura da bancada sem rede) */
+  $("#sentinel-status").textContent=t("Ligada — a vigiar o tempo onde estás, minuto a minuto.");
   try{ if("Notification" in window&&Notification.permission==="default") await Notification.requestPermission(); }catch(e){}
   toast(t("🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos."));
   sentinelCheck();
@@ -7066,7 +7408,7 @@ function retomaSentinela(){
   /* retomada: o estado volta ao que era e a interface diz que voltou — numa
      linha só dela, que o sentinelCheck() não reescreve */
   sentinel.on=true; sentinel.lastAlerts.clear(); sentinel.last=null;
-  b.textContent=t("🛑 Desligar");
+  sentinelaPinta(true);
   sentinelNota(t("🔔 Sentinela ativa — continuou ligada desde o teu último acesso."),{tipo:"retoma"});
   store.set("sentinel",{on:1, at:Date.now()});
   sentinelCheck();
@@ -7157,7 +7499,10 @@ function renderFocoChip(){
   box.textContent="";
   if(!state.foco){ box.hidden=true; return; }
   box.hidden=false;
-  const c=el("button","chip click",t("Rota para {p}",{p:state.foco.name}));
+  /* dd-47 §2: oferecer NUNCA auto-rotear mantém-se — o que muda é o peso:
+     depois de uma pesquisa escolhida, a oferta é a ação primária visível,
+     não um chip discreto que passa despercebido (captura do Ricardo) */
+  const c=el("button","btn primary foco-rota",t("Rota para {p}",{p:state.foco.name})+" →");
   c.addEventListener("click",()=>{
     switchTab("rota");
     rotaMapaModo(false);              // o utilizador quer o planeador com a oferta à vista
@@ -7462,10 +7807,17 @@ function init(){
   // localização inicial
   const HOME0=store.get("home")||DEFAULT_LOC;
   if(AUTO_GPS&&navigator.geolocation&&!restored){
-    useGPS(false);
-    setTimeout(()=>{ if(!state.home) setHome(HOME0); },11000);
+    /* dd-41 §1: a caixa do sistema NUNCA ao arrancar. O GPS de arranque só
+       corre quando a permissão JÁ está concedida — aí não há caixa nenhuma.
+       De resto, a casa serve e o botão 📍 pede no momento em que faz sentido,
+       com o porquê escrito ao lado. */
+    locEstado().then(est=>{
+      const deStore=!!store.get("home");
+      if(est==="concedida"){ useGPS(false); setTimeout(()=>{ if(!state.home) setHome(HOME0,{deStore}); },11000); }
+      else if(!state.home) setHome(HOME0,{deStore});
+    });
   } else if(!state.home){
-    setHome(HOME0);
+    setHome(HOME0,{deStore:!!store.get("home")});
   }
   if(restored&&!state.home){ setHome(HOME0,{silent:false}); }
 
