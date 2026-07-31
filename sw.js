@@ -1,8 +1,12 @@
-/* Levante — service worker v7
+/* Levante — service worker
    - app: rede primeiro (atualiza sempre que há net), cache como rede de segurança
    - MAPA: tiles guardados em cache (cache-first) para a viagem não ficar às escuras
-     quando falha a rede — inclui pré-descarga do corredor da rota */
-const V = "levante-v10";
+     quando falha a rede — inclui pré-descarga do corredor da rota
+   - REGRA (dd-55): sempre que uma publicação muda o index, o V muda TAMBÉM —
+     um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
+     abertas ficam sem qualquer sinal de que há versão nova. O portão em
+     tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+const V = "levante-v11";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -73,6 +77,7 @@ self.addEventListener("fetch", (e) => {
   const sameOrigin = u.origin === self.location.origin;
   const isCDN = u.host === "cdnjs.cloudflare.com";
   if (!sameOrigin && !isCDN) return;         // APIs meteo/rotas/radar: sempre rede (dados frescos)
+  if (sameOrigin && /\/versao\.json$/.test(u.pathname)) return;  // frescura: sempre rede, NUNCA desta cache — em cache, diria para sempre "estás atualizado"
   const putCache = (res) => {
     const copy = res.clone();
     caches.open(V).then((c) => c.put(e.request, copy)).catch(() => {});

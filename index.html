@@ -154,7 +154,16 @@ a{color:var(--accent)}
   background:rgba(250,178,25,.13);border-left:3px solid #fab219;
   padding:8px 10px;border-radius:8px}
 [data-theme="dark"] #sentinel-status.sentinel-aviso{color:#ffcf6b}
-.card-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+/* dd-56: título e interruptor na MESMA linha, centrados um com o outro.
+   Era `baseline` — e um botão sem texto tem a linha de base no fundo, logo
+   subia 17 px acima do centro do título e ficava a pairar no canto (medido).
+   O `wrap` também podia atirá-lo para outra linha em ecrãs estreitos. */
+.card-head{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-width:0}
+.card-head h2{min-width:0}
+/* o desenho do interruptor tem 5 px de folga transparente à direita (é o alvo
+   de toque a envolvê-lo): descontam-se, para o desenho ficar na MESMA margem
+   que o texto do cartão respeita */
+.card-head .sw{margin-right:-5px}
 .card-head .spacer{flex:1}
 /* ================= LOCATION BAR ================= */
 .locbar{display:flex;gap:8px;align-items:center;position:relative}
@@ -318,6 +327,23 @@ body.rota-mapa #view-agora{display:none}
 .sw.on .sw-knob,.sw.on::after,input.sw:checked::after{left:26px}
 .sw:focus-visible{outline:3px solid var(--accent);outline-offset:-2px;border-radius:14px}
 html[data-theme="dark"] .sw::before{background:#4a5568}
+/* Os meus sítios (dd-48a): linhas de gestão na gaveta */
+.sitio-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);min-width:0}
+.sitio-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.sitio-tx b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sitio-tx .small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sitio-row .icon-btn{width:38px;height:38px;flex:none}
+.sitio-conf{display:flex;gap:8px;align-items:center;padding:8px 0;flex-wrap:wrap}
+.sitio-edit{display:flex;gap:6px;flex:1;min-width:0}
+.sitio-edit input{flex:1;min-width:0;height:38px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);padding:0 10px;font-size:14px}
+.sitios-acoes{display:flex;flex-direction:column;gap:8px;margin:8px 0 2px}
+.sitios-acoes .btn{width:100%;justify-content:flex-start}
+/* dd-55: aviso discreto de versão nova — informa, nunca interrompe */
+.vnova{display:flex;align-items:center;gap:10px;margin:2px 2px 0;padding:9px 12px;
+  border:1px solid var(--border);border-radius:12px;background:var(--surface2);
+  font-size:13.5px;color:var(--muted)}
+.vnova .btn{flex:none;height:34px;padding:0 14px}
 input.sw{appearance:none;-webkit-appearance:none;margin:0}
 .sw .sw-knob{pointer-events:none}
 .foco-rota{width:100%;justify-content:center;font-size:15px;padding:12px 14px;margin-top:2px}
@@ -338,6 +364,11 @@ input.sw{appearance:none;-webkit-appearance:none;margin:0}
   border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.28);max-height:80vh;overflow:auto;
   transform:translateY(105%);transition:transform .28s ease;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px))}
 body.folha-aberta #rota-folha{transform:none}
+/* a conduzir, a folha do planeador sai do caminho (dd-33 fase 1): os chips de
+   adiar a partida e o resumo do planeamento não servem quem já está a andar —
+   e tapavam metade do ecrã por cima do mapa. Quem conduz tem o painel em cima
+   e a barra de viagem em baixo. */
+body.traveling #rota-folha,body.traveling #rota-folha-grab,body.traveling #rota-faixa{display:none}
 #rota-folha-grab{position:sticky;top:0;background:var(--surface);padding:10px 0 8px;cursor:pointer;z-index:2}
 #rota-folha-grab span{display:block;width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto}
 body:not(.rota-mapa) #rota-folha, body:not(.rota-mapa) #rota-faixa,
@@ -445,6 +476,9 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
 /* seta de navegação (aponta para onde vais, como no Google Maps) */
 .me-nav{width:40px;height:40px;position:relative;transform-origin:50% 50%;
   transition:transform .28s cubic-bezier(.22,.61,.36,1);will-change:transform}
+/* sem sinal de GPS (dd-33): a posição esbate-se, mas NÃO se move — o que se
+   mostra é a última certeza, nunca uma posição extrapolada (7g-ter) */
+.esmaecido .me-nav,.me-nav.esmaecido{opacity:.42;filter:grayscale(.7)}
 .me-nav svg{position:absolute;inset:0;width:40px;height:40px;
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.45))}
 .me-nav::before{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;
@@ -466,6 +500,17 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 .rec li{font-size:13.5px;display:flex;gap:8px;align-items:baseline}
 .rec li .r-ico{flex:none;width:20px;text-align:center}
 .rec .rec-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+/* dd-58: uma ação primária à vista, as outras atrás do "⋯" */
+.rec-actions .btn.primary{flex:1 1 auto;justify-content:center}
+.rec-mais{margin-top:8px}
+.rec-mais[hidden]{display:none}
+/* dd-58 §1: o que não tem conteúdo vira UMA linha discreta — informa sem
+   ocupar meio ecrã a dizer que não há nada */
+.nada-linha{display:flex;align-items:center;gap:8px;margin:8px 2px 0;padding:9px 12px;
+  border-radius:11px;background:var(--surface2);color:var(--muted);font-size:13px}
+.nada-clic{cursor:pointer}
+.nada-clic:hover{color:var(--text)}
+.nada-mais{margin-left:auto;font-weight:700;color:var(--accent);white-space:nowrap}
 .cand-chip{cursor:pointer}
 .cand-chip:hover{border-color:var(--accent)}
 .cand-chip.sel{background:var(--accent);color:var(--accent-ink);border-color:transparent}
@@ -478,6 +523,32 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 .tl-wind i{font-style:normal;display:block;font-variant-numeric:tabular-nums}
 .tl-wind .w-strong i{font-weight:750;color:var(--ink)}
 /* modo viagem */
+/* PAINEL DE CONDUÇÃO (dd-33 fase 1) — tipografia de luva: manobra ≥22 px,
+   distância ≥34 px a negro, via ≥16 px. Vive EM CIMA (a atenção sobe ao
+   para-brisas); a barra de viagem continua em baixo. Fundo sólido: um painel
+   translúcido sobre o mapa é ilegível ao sol. */
+#nav-painel{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top,0px));z-index:4100;
+  background:var(--surface-solid);border:1px solid var(--border);border-left:5px solid var(--accent);
+  border-radius:16px;padding:12px 14px;box-shadow:0 6px 30px rgba(0,0,0,.3)}
+#nav-painel[hidden]{display:none}
+.nav-linha{display:flex;gap:12px;align-items:center;min-width:0}
+.nav-seta{font-size:38px;line-height:1;flex:none;width:46px;text-align:center}
+.nav-tx{min-width:0;flex:1}
+.nav-dist{font-size:34px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums}
+.nav-man{font-size:22px;font-weight:700;line-height:1.2;margin-top:2px}
+.nav-via{font-size:16px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-depois{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:16px;color:var(--ink2)}
+.nav-ceu{margin-top:8px;padding:8px 10px;border-radius:11px;font-size:16px;font-weight:700;
+  display:flex;gap:8px;align-items:center;
+  background:var(--lvl-soft,var(--surface2));border:1px solid var(--lvl-c,var(--border))}
+.nav-ceu[hidden]{display:none}
+#nav-painel.sem-sinal{border-left-color:var(--muted);opacity:.92}
+#btn-recentrar{position:fixed;right:12px;bottom:96px;z-index:4050;
+  background:var(--surface-solid);box-shadow:0 4px 18px rgba(0,0,0,.28);font-weight:700}
+#btn-recentrar[hidden]{display:none}
+@media (max-width:380px){
+  .nav-dist{font-size:30px} .nav-man{font-size:20px} .nav-seta{font-size:32px;width:40px}
+}
 #travel-bar{position:fixed;left:10px;right:10px;bottom:10px;z-index:4000;display:flex;gap:10px;align-items:center;
   background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border:1px solid var(--border);border-radius:18px;
@@ -562,13 +633,21 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 }
 .legs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 /* drawer de viagens planeadas */
-.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2900}
+/* acima do cabeçalho da app (head-actions vive em 5200 para a pop das
+   definições passar as tabs): a 2900/3000 os botões 🗓️ ☀️ ⚙️ ficavam POR CIMA
+   da gaveta e tapavam o ✕ de fechar. Abaixo do toast (6000), que é o último
+   a falar. Componente único: vale para as viagens planeadas também. */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:5300}
 .drawer-bg.open{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,90vw);background:var(--surface);z-index:3000;
+/* fundo SÓLIDO, não o vidro dos cartões: uma gaveta cobre a página inteira e
+   o --surface translúcido (alpha .78, sem blur por baixo) deixava o ecrã de
+   trás ler-se ATRAVÉS do texto — visto na primeira captura dos Meus Sítios.
+   Componente único: as viagens planeadas ganham a mesma legibilidade. */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,90vw);background:var(--surface-solid);z-index:5400;
   transform:translateX(105%);transition:transform .22s ease;box-shadow:-8px 0 30px rgba(0,0,0,.25);
   display:flex;flex-direction:column;overflow-y:auto}
 .drawer.open{transform:translateX(0)}
-.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;position:sticky;top:0;background:var(--surface);z-index:1}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;position:sticky;top:0;background:var(--surface-solid);z-index:1}
 .drawer-head h2{margin:0;font-size:16px}
 #trips-list{padding:0 12px 8px;display:flex;flex-direction:column;gap:6px}
 .trip-day{font-size:12px;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 4px 2px}
@@ -594,8 +673,16 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .chk-row{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border:1px solid var(--border);
   border-radius:11px;cursor:pointer;font-size:13px}
 .chk-row:has(input:checked){border-color:var(--warn);background:var(--warn-soft)}
+/* dd-56 no OUTRO sítio do componente único: aqui o interruptor está à
+   esquerda de um rótulo de duas linhas. O contrato é o mesmo — alinha com a
+   linha do TÍTULO (o <b>), nunca com o bloco todo. O botão tem 44 px de alvo
+   com o desenho centrado nele; a margem negativa sobe esse centro até ao
+   meio da primeira linha (medido: sem ela, 14 px abaixo). */
+.chk-row{--chk-lh:19px}
+.chk-row input.sw{flex:none;margin-top:calc((var(--chk-lh) - 44px) / 2);margin-bottom:calc((var(--chk-lh) - 44px) / 2)}
 .chk-row input{margin-top:2px;flex:none}
 .chk-row span{display:flex;flex-direction:column;gap:2px}
+.chk-row span b{line-height:var(--chk-lh)}
 .chk-row span span{font-size:11.5px;color:var(--muted);font-weight:400}
 .law-note{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding:10px 12px;border-radius:12px;
   background:var(--surface2);border-left:3px solid var(--muted);font-size:12.5px;line-height:1.45;color:var(--ink2)}
@@ -792,6 +879,9 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
         <div id="cam-law-why" class="small muted" hidden style="margin:-4px 0 8px"></div>
         <label class="chk-row" for="cam-opt"><input type="checkbox" class="sw" id="cam-opt" role="switch">
           <span><b id="cam-opt-b">Mostrar radares na Alemanha</b><span id="cam-opt-s">A decisão é tua. Vem desligado.</span></span></label>
+        <h3 style="margin-top:14px">🔊 <span id="som-title">Som de aviso</span></h3>
+        <label class="chk-row" for="som-opt"><input type="checkbox" class="sw" id="som-opt" role="switch" checked>
+          <span><b id="som-opt-b">Tocar um som nos avisos</b><span id="som-opt-s"></span></span></label>
         <h3 style="margin-top:14px">🌐 <span id="lang-title">Idioma</span></h3>
         <div class="chips" id="lang-row">
           <button class="chip click" data-lang="pt">PT</button>
@@ -805,6 +895,13 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
              saber que a navegação vai ser muda, ou em inglês dentro de uma app
              em português — e a voz é uma das coisas onde um erro invisível
              muda uma decisão de conduzir. -->
+        <!-- dd-48a / rel-45: a casa era visível no cartão e não havia NENHUMA
+             porta para a ver, mudar ou apagar — a violação original. A porta
+             vive aqui; a gestão vive na gaveta (a pop é pequena de mais para
+             25 recentes). -->
+        <h3 style="margin-top:14px">📍 <span id="sitios-title">Os meus sítios</span></h3>
+        <p class="small muted" id="sitios-casa-linha" style="margin:0 0 8px"></p>
+        <button class="btn" id="btn-sitios" style="width:100%;justify-content:center"></button>
         <div class="h-sub" id="estado-aparelho" style="margin:8px 0 0" hidden></div>
         <!-- O estado da INSTALAÇÃO vive aqui pela mesma razão que o da voz
              (dd-07 §3): o botão desaparecia e deixava gente sem caminho.
@@ -847,6 +944,14 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
     </div>
     <div id="loc-estado-agora" class="loc-estado"></div>
     <div id="foco-chip" class="chips" hidden style="margin:2px 2px 0"></div>
+    <!-- dd-55: uma janela aberta há horas não tem NENHUM sinal de que a app
+         mudou no servidor — foi assim que a captura do diretor mostrou o
+         interruptor antigo depois da publicação do novo. Nunca recarrega
+         sozinha; oferece o gesto. -->
+    <div id="versao-nova" class="vnova" role="status" hidden>
+      <span id="vnova-txt"></span>
+      <button class="btn" id="btn-vnova" type="button"></button>
+    </div>
     <div class="card" id="sentinel-card">
       <div class="card-head">
         <h2>🔔 Sentinela meteorológica</h2>
@@ -1009,6 +1114,36 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
   <div id="trips-list"></div>
   <p class="h-sub" id="trips-hint" style="padding:0 16px 16px">Calcula uma rota com hora futura e toca em "🗓️ Agendar viagem" para ela aparecer aqui, com o tempo previsto.</p>
 </aside>
+<!-- OS MEUS SÍTIOS (dd-48a, desenho do rel-45 §2): casa com proveniência
+     visível e três caminhos para redefinir; guardados com renomear/apagar
+     confirmado; recentes com apagar um a um e limpar tudo. Tudo local. -->
+<div class="drawer-bg" id="sitios-bg"></div>
+<aside class="drawer" id="sitios-drawer" role="dialog" aria-label="Os meus sítios">
+  <div class="drawer-head">
+    <h2 id="sitios-head">📍 Os meus sítios</h2>
+    <button class="icon-btn" id="sitios-close" aria-label="Fechar">✕</button>
+  </div>
+  <div id="sitios-corpo" style="padding:0 16px 16px"></div>
+</aside>
+<!-- PAINEL DE CONDUÇÃO (dd-33 fase 1). A violação original: as capturas de
+     30/07, sem nada disto. Só promete o que os dados TÊM (medido no
+     anexo-payload-geoapify.json): seta pelo type, distância a contar da
+     polilinha (zero chamadas), nome da via, "depois:" a <300 m — e a fusão
+     meteorológica, que é o que o Google não tem. Faixas NÃO existem no
+     payload: morreram com a razão escrita, não se desenham a fingir. -->
+<div id="nav-painel" hidden aria-live="polite">
+  <div class="nav-linha">
+    <div class="nav-seta" id="nav-seta">↑</div>
+    <div class="nav-tx">
+      <div class="nav-dist" id="nav-dist"></div>
+      <div class="nav-man" id="nav-man"></div>
+      <div class="nav-via" id="nav-via"></div>
+    </div>
+  </div>
+  <div class="nav-depois" id="nav-depois" hidden></div>
+  <div class="nav-ceu" id="nav-ceu" hidden></div>
+</div>
+<button class="btn" id="btn-recentrar" hidden>🎯 Recentrar</button>
 <div id="travel-bar" style="display:none" role="status" aria-live="assertive">
   <div class="tb-main">
     <b id="tb-next">🧭 Modo viagem ligado</b>
@@ -1111,6 +1246,14 @@ function setLang(l){
   if(typeof renderFocoChip==="function") renderFocoChip();
   if(typeof repintarLocEstado==="function") repintarLocEstado();
   if(typeof renderCamLei==="function") renderCamLei();
+  if(typeof renderVersaoNova==="function") renderVersaoNova();
+  if(typeof pintarSitiosLinha==="function") pintarSitiosLinha();
+  if(typeof renderSitios==="function"&&$("#sitios-drawer")?.classList.contains("open")) renderSitios();
+  if(typeof pintarSom==="function") pintarSom();
+  /* o painel de condução é tinta viva: em viagem, repinta na troca de língua
+     (dd-48 §2 — nada fica na língua anterior, nem a conduzir) */
+  if(typeof pintarNavPainel==="function"&&travel.active)
+    pintarNavPainel(travel.kmDone||0,{semSinal:travel.semSinal});
 }
 /* Atribuição obrigatória do plano gratuito do Geoapify. Tem de ser reposta a
    cada tradução: o rodapé inteiro é uma entrada de i18n e é reescrito quando se
@@ -1133,6 +1276,9 @@ function applyStaticI18n(){
     ["#loc-search","ph","Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)"],
     ["#btn-install","txt","📲 Instalar"],
     ["#sentinel-card h2","txt","🔔 Sentinela meteorológica"],
+    ["#sitios-title","txt","Os meus sítios"], ["#sitios-head","txt2","📍 ","Os meus sítios"],
+    ["#som-title","txt","Som de aviso"], ["#som-opt-b","txt","Tocar um som nos avisos"],
+    ["#btn-recentrar","txt","🎯 Recentrar"],
     ["#view-rota .card h2","txt","✨ Assistente de viagem"],
     ["#ai-card .h-sub","txt","Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir."],
     ["#ai-q","ph",'ex.: "vou ao MediaMarkt" · "decathlon" · "bombas de gasolina"'],
@@ -1242,7 +1388,7 @@ en:{
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
 "Vê se os teus sítios guardados batem certo":"Check that your saved places look right",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"An earlier version of the search could save a place with the wrong coordinates — up to thousands of kilometres off. That's fixed, but only you can confirm what's already saved on your device. I'll ask once.",
-"sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
+"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"The Now forecast, the search anchor, the planner's From and the speed-camera notice all follow this home.","Redefinir por pesquisa":"Reset by search","Redefinir pelo GPS":"Reset by GPS","Redefinir por toque no mapa":"Reset by tapping the map","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Guardados":"Saved","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nothing saved yet. Plan a route and tap ⭐ to save the destination under your own name.","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","não invento onde estás. Sigo assim que voltar.":"I won't guess where you are. I'll follow as soon as it's back.","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
 "✔ Está tudo certo":"✔ All correct","A casa não está certa — corrigir":"Home isn't right — fix it",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Pick the right place in the search above — home only changes when you choose one.",
 "Ir para a pesquisa":"Go to the search","Apagar este registo":"Delete this entry",
@@ -1439,7 +1585,7 @@ en:{
 "Sem resultados — tenta \"cidade, país\"":"No results — try \"city, country\"","coordenadas":"coordinates",
 "Trajeto {x} aplicado 🗺️":"Route {x} applied 🗺️","Perfil: {p} ✔":"Profile: {p} ✔","Mapa indisponível — precisa de ligação à internet.":"Map unavailable — internet connection needed.",
 
-"Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️","Há uma versão nova da app.":"There's a new version of the app.","Recarregar":"Reload",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 On iPhone: Share button → “Add to Home Screen” to install the app.",
 "Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Settings → Privacy & Security → Location Services: turn the main switch on and look for Levante in the list (the installed app has its own entry; if it's not there, use “Safari Websites”) → “While Using the App”.",
 "Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Settings → Privacy & Security → Location Services: turn the main switch on and choose “Safari Websites” → “While Using the App”. Then, in Safari: aA (or ⋯) button next to the address → Website Settings → Location → Allow.",
@@ -1484,7 +1630,7 @@ es:{
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
 "Vê se os teus sítios guardados batem certo":"Comprueba que tus sitios guardados están bien",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Una versión anterior de la búsqueda podía guardar un sitio con coordenadas equivocadas — hasta a miles de kilómetros. Ya está corregido, pero lo que quedó guardado en tu dispositivo solo tú puedes confirmarlo. Pregunto una vez.",
-"sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
+"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La previsión de Ahora, el ancla de la búsqueda, el Desde del planificador y la frase de los radares siguen esta casa.","Redefinir por pesquisa":"Redefinir por búsqueda","Redefinir pelo GPS":"Redefinir por GPS","Redefinir por toque no mapa":"Redefinir tocando el mapa","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Guardados":"Guardados","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Aún no hay nada guardado. Calcula una ruta y toca ⭐ para guardar el destino con tu nombre.","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","não invento onde estás. Sigo assim que voltar.":"No me invento dónde estás. Sigo en cuanto vuelva.","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
 "✔ Está tudo certo":"✔ Todo correcto","A casa não está certa — corrigir":"La casa no está bien — corregir",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Elige el sitio correcto en la búsqueda de arriba — la casa solo cambia cuando elijas uno.",
 "Ir para a pesquisa":"Ir a la búsqueda","Apagar este registo":"Borrar este registro",
@@ -1664,7 +1810,7 @@ es:{
 "Rota demasiado curta.":"Ruta demasiado corta.","Algo correu mal. Tenta novamente.":"Algo salió mal. Inténtalo de nuevo.","A calcular…":"Calculando…",
 "Sem resultados — tenta \"cidade, país\"":"Sin resultados — prueba \"ciudad, país\"","coordenadas":"coordenadas","Trajeto {x} aplicado 🗺️":"Ruta {x} aplicada 🗺️","Perfil: {p} ✔":"Perfil: {p} ✔",
 "Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.",
-"Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️","Há uma versão nova da app.":"Hay una versión nueva de la app.","Recarregar":"Recargar",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 En iPhone: botón Compartir → “Añadir a pantalla de inicio”.",
 "Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Ajustes → Privacidad y seguridad → Localización: activa el interruptor general y busca Levante en la lista (la app instalada tiene su propia entrada; si no aparece, usa “Sitios web de Safari”) → “Al usar la app”.",
 "Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Ajustes → Privacidad y seguridad → Localización: activa el interruptor general y elige “Sitios web de Safari” → “Al usar la app”. Después, en Safari: botón aA (o ⋯) junto a la dirección → Ajustes del sitio web → Ubicación → Permitir.",
@@ -1708,7 +1854,7 @@ fr:{
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
 "Vê se os teus sítios guardados batem certo":"Vérifie que tes lieux enregistrés sont corrects",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Une version précédente de la recherche pouvait enregistrer un lieu avec de mauvaises coordonnées — jusqu'à des milliers de kilomètres à côté. C'est corrigé, mais ce qui est déjà enregistré sur ton appareil, toi seul peux le confirmer. Je demande une fois.",
-"sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
+"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La prévision de Maintenant, l'ancre de la recherche, le Départ du planificateur et la phrase des radars suivent ce domicile.","Redefinir por pesquisa":"Redéfinir par recherche","Redefinir pelo GPS":"Redéfinir par GPS","Redefinir por toque no mapa":"Redéfinir en touchant la carte","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Guardados":"Enregistrés","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Rien d'enregistré pour l'instant. Calcule un itinéraire et touche ⭐ pour enregistrer la destination sous ton nom.","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","não invento onde estás. Sigo assim que voltar.":"Je n'invente pas ta position. Je reprends dès son retour.","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
 "✔ Está tudo certo":"✔ Tout est bon","A casa não está certa — corrigir":"Le domicile n'est pas bon — corriger",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Choisis le bon lieu dans la recherche au-dessus — le domicile ne change que quand tu choisis.",
 "Ir para a pesquisa":"Aller à la recherche","Apagar este registo":"Supprimer cette entrée",
@@ -1888,7 +2034,7 @@ fr:{
 "Rota demasiado curta.":"Trajet trop court.","Algo correu mal. Tenta novamente.":"Un problème est survenu. Réessaie.","A calcular…":"Calcul…",
 "Sem resultados — tenta \"cidade, país\"":"Aucun résultat — essaie « ville, pays »","coordenadas":"coordonnées","Trajeto {x} aplicado 🗺️":"Trajet {x} appliqué 🗺️","Perfil: {p} ✔":"Profil : {p} ✔",
 "Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.",
-"Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️","Há uma versão nova da app.":"Une nouvelle version de l'app est disponible.","Recarregar":"Recharger",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Sur iPhone : bouton Partager → « Sur l'écran d'accueil ».",
 "Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Réglages → Confidentialité et sécurité → Service de localisation : active l'interrupteur général et cherche Levante dans la liste (l'app installée a sa propre entrée ; sinon, utilise « Sites web Safari ») → « Lorsque l'app est active ».",
 "Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Réglages → Confidentialité et sécurité → Service de localisation : active l'interrupteur général et choisis « Sites web Safari » → « Lorsque l'app est active ». Puis, dans Safari : bouton aA (ou ⋯) près de l'adresse → Réglages du site web → Position → Autoriser.",
@@ -2895,8 +3041,14 @@ async function revGeocode(lat,lon){
    que é exatamente onde estava a ser usado.
 
    A CHAVE VIVE AQUI, numa linha só. É uma chave de plano gratuito e vai
-   dentro da página, como é suposto — o que a protege não é o segredo, é a
-   restrição por domínio na consola do Geoapify. Restringe-a antes de a pores.
+   dentro da página — mas NÃO se lhe chame protegida (dd-59 a): a restrição
+   por domínio da consola do Geoapify NÃO é proteção. Medido a 31/07/2026,
+   deste contentor, sem enviar referrer nenhum: `geocode` 200 e `routing`
+   200, respostas completas. Quem copiar esta linha gasta os nossos créditos
+   de onde quiser. O que existe é um teto (3.000/dia, sem cartão associado,
+   logo sem fatura possível) e um plano: o proxy do papel-do-proxy.md, depois
+   do lançamento. Não repetir em lado nenhum a ideia de que a consola do
+   Geoapify a torna inacessível a terceiros: não torna.
 
    Enquanto isto for "SUBSTITUIR", a app usa os fornecedores antigos e nada
    muda. Basta trocar a linha para passar tudo pelo Geoapify.                */
@@ -3427,6 +3579,13 @@ function renderCameras(){
     box.appendChild(card); return;
   }
   if(!R.cameras){ card.appendChild(el("p","h-sub",t("A procurar radares fixos ao longo do caminho…"))); box.appendChild(card); return; }
+  /* dd-58 §1: zero radares e nenhuma lei por explicar → uma linha, não um
+     cartão com título e parágrafo a dizer que não há nada */
+  if(!R.cameras.length&&!Object.keys(R.camBlocked||{}).length){
+    box.textContent="";
+    box.appendChild(linhaVazia(t("sem radares fixos conhecidos no trajeto")));
+    return;
+  }
   // nota legal: em que países é que a lei nos obriga a calar
   const lawNote=()=>{
     const b=R.camBlocked||{};
@@ -3782,6 +3941,8 @@ function setHome(loc, {silent=false, prov, deStore=false}={}){
   if(!deStore) store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
   if(sanidadePendente) sanidadeRender();   // a linha da casa no cartão de sanidade acompanha a troca
   if(typeof renderCamLei==="function") renderCamLei(); // a frase dos radares segue a casa
+  if(typeof pintarSitiosLinha==="function") pintarSitiosLinha(); // a porta das definições diz a casa nova
+  if(typeof renderSitios==="function"&&$("#sitios-drawer")?.classList.contains("open")) renderSitios();
   const box=$("#agora-content");
   if(!silent){ box.textContent="";
     box.appendChild(el("div","skel")); box.lastChild.style.height="150px"; box.lastChild.style.marginBottom="14px";
@@ -4567,10 +4728,18 @@ const Mapa = (() => {
     centro(h) { const c = h.m.getCenter(); return [c.lng, c.lat]; },
     zoom(h) { return h.m.getZoom() + 1; },
     mover(h, centro) { h.m.panTo(centro); },
-    ajustar(h, coords, { margem = 26 } = {}) {
+    /* `margem` pode ser um número (igual dos quatro lados) ou {top,right,
+       bottom,left} — o dd-57 exige contar com a faixa do veredicto em baixo e
+       a barra do título em cima, senão o traço fica por baixo delas. */
+    ajustar(h, coords, { margem = 26, ms = 0 } = {}) {
       if (!coords.length) return;
       const b = coords.reduce((bb, c) => bb.extend(c), new maplibregl.LngLatBounds(coords[0], coords[0]));
-      h.m.fitBounds(b, { padding: margem });
+      h.m.fitBounds(b, { padding: margem, duration: ms, bearing: 0, pitch: 0 });
+    },
+    /* os limites da vista, para se poder AFIRMAR que a rota cabe */
+    limites(h) {
+      try { const b = h.m.getBounds(); const s = b.getSouthWest(), n = b.getNorthEast();
+        return { o: s.lng, s: s.lat, e: n.lng, n: n.lat }; } catch (e) { return null; }
     },
     /* `folga` negativa encolhe a caixa — o MapLibre não tem .pad() e a conta
        continua a viver aqui, igual à do motor anterior */
@@ -4587,6 +4756,42 @@ const Mapa = (() => {
     verRumo(h, graus) { try { h.m.setBearing(graus); } catch (e) {} },
     rumo(h) { try { return h.m.getBearing() || 0; } catch (e) { return 0; } },
     rodavel(h) { return h._rodar; },
+
+    /* CÂMARA DE CONDUÇÃO (dd-33 fase 1) — um só verbo, um só easeTo.
+       Antes eram três gestos separados (panTo + setBearing + nada) e cada um
+       animava por si: o mapa saltava. Aqui a posição, o rumo, a inclinação e
+       a âncora movem-se JUNTOS. A âncora é padding do motor, não deslocação
+       do marcador — o espreitar e os balões continuam a bater certo. */
+    camara(h, { centro, rumo, pitch = 0, zoom, ancoraBaixo = 0, ms = 300 }) {
+      try {
+        /* ÂNCORA EM BAIXO = padding no TOPO. O padding encolhe a área onde o
+           centro é colocado: com padding em baixo, o centro SOBE — foi o que
+           a primeira captura desta fase mostrou (posição a 27% do topo, o
+           contrário do pedido). A espec nomeia o campo `padding.bottom`; o
+           que ela descreve, e o que vale, é o EFEITO: "a posição a ~1/4 do
+           fundo do ecrã". Manda o efeito. */
+        const alt = h.m.getContainer().clientHeight || 0;
+        const opc = { padding: { top: Math.round(alt * ancoraBaixo), right: 0, bottom: 0, left: 0 }, duration: ms };
+        if (centro) opc.center = centro;
+        if (rumo != null) opc.bearing = rumo;
+        if (pitch != null) opc.pitch = pitch;
+        if (zoom != null) opc.zoom = zoom;
+        h.m.easeTo(opc);
+      } catch (e) {}
+    },
+    camaraEstado(h, ponto) {
+      try {
+        const p = h.m.getPadding ? h.m.getPadding() : { top: 0 };
+        const alt = h.m.getContainer().clientHeight || 1;
+        const est = { rumo: h.m.getBearing() || 0, pitch: h.m.getPitch() || 0,
+          zoom: h.m.getZoom(), ancoraBaixo: (p.top || 0) / alt };
+        /* onde um ponto CAI no ecrã, em fração da altura (0 = topo, 1 = fundo).
+           É esta a medida que vale para a âncora — o número do padding pode
+           estar certo e a posição estar no sítio errado (dd-55). */
+        if (ponto) { const q = h.m.project(ponto); est.fracEcra = q.y / alt; }
+        return est;
+      } catch (e) { return null; }
+    },
 
     /* ---- fontes GeoJSON e camadas ------------------------------------- */
     fonte(h, nome, geojson) {
@@ -4844,7 +5049,13 @@ function initRouteMap(){
         toast(recusou?t("📍 A localização está recusada — o cartão junto à origem diz o caminho."):t("📡 Sem posição agora — tenta a céu aberto.")); },
       {timeout:8000,maximumAge:60000});
   }});
-  Mapa.aoEvento(h,"arrastar",()=>{ if(travel.active) travel.follow=false; });
+  /* espreitar e regressar (dd-33 fase 1): o gesto sai do seguimento, mostra o
+     Recentrar, e 10 s depois a câmara volta sozinha — quem se distraiu não
+     fica com o mapa virado para trás */
+  Mapa.aoEvento(h,"arrastar",()=>{
+    if(travel.active) navGestoNoMapa();
+    else state.rotaMexida=true;   // dd-57: só o gesto sai do enquadramento
+  });
   // 📍 PIN: mantém o dedo (telemóvel) ou clica com o direito (PC) num ponto qualquer
   let pinMk=null;
   const tiraPin=()=>{ if(pinMk){ pinMk.remover(); pinMk=null; } };
@@ -4862,6 +5073,7 @@ function initRouteMap(){
         <button type="button" data-act="dest">🏁 ${t("Ir para aqui")}</button>
         <button type="button" data-act="orig">📍 ${t("Partir daqui")}</button>
         <button type="button" data-act="stop">➕ ${t("Adicionar como paragem")}</button>
+        <button type="button" data-act="casa">🏠 ${t("Usar como casa")}</button>
         </div></div>`,
       aoFechar:()=>{ setTimeout(tiraPin,400); }});
     // nome da rua em segundo plano (sem bloquear o balão)
@@ -4913,6 +5125,13 @@ async function revStreet(lat,lon){
 }
 /* o que fazer com o ponto marcado */
 async function applyPinChoice(act,loc){
+  if(act==="casa"){
+    /* o 3º caminho de redefinir a casa (rel-45 §2) — consequência dita na hora */
+    setHome({...loc},{prov:"escolha"});
+    switchTab("agora");
+    toast(t("🏠 Casa atualizada — a partir de agora prevejo para aqui."),6000);
+    return;
+  }
   if(act==="orig"){
     $("#rt-o").value=loc.name; $("#rt-o")._picked=loc;
     toast(t("📍 Partida definida: {p}",{p:loc.name}));
@@ -5090,7 +5309,7 @@ function switchVariant(i){
   Object.assign(R,{active:i, coords:v.coords, cum:v.cum, geomKm:v.geomKm, totalKm:v.totalKm,
     travelTotal:v.travelTotal, totalSec:v.travelTotal, samples:v.samples, maneuvers:v.maneuvers});
   R.cameras=null;
-  applyShift(R.shift);
+  applyShift(R.shift,true);   // dd-57: trajeto novo = geometria nova = volta a enquadrar
   renderDepartures();
   renderCameras(); loadRouteCameras();
   toast(t("Trajeto {x} aplicado 🗺️",{x:String.fromCharCode(65+i)}));
@@ -5222,6 +5441,7 @@ function applyShift(shiftMin, fit=false){
     s.cond.lvl=rainLevel(s.cond.pr,s.cond.pp,s.cond.code,prof);
   });
   drawRoute(fit);
+  if(fit){ state.rotaMexida=false; enquadrarRota(); }
   renderRouteSummary();
   renderSegments();
   renderHazards();
@@ -5229,6 +5449,48 @@ function applyShift(shiftMin, fit=false){
   $$(".dep-chip").forEach(c=>c.classList.toggle("sel",+c.dataset.shift===shiftMin));
 }
 
+/* ═══ ENQUADRAMENTO DA ROTA (dd-57 §1) ═════════════════════════════════════
+   Violação original: captura do Ricardo — rota calculada e o mapa a mostrá-la
+   cortada, com o destino a meio do ecrã e metade da vista com cidade
+   irrelevante. É o primeiro ecrã depois de pedir uma rota.
+
+   O padding NÃO é uma margem uniforme: mede-se o que flutua por cima do mapa
+   (a barra do título em cima, a faixa do veredicto e a legenda em baixo) e
+   dá-se-lhe espaço, senão o traço fica escondido por baixo delas. Em viagem
+   isto não corre — lá manda a câmara de condução (dd-33). */
+function enquadrarRota(tentativa=0){
+  const h=state.mapaRota, R=state.route;
+  if(!h||!R||!R.coords?.length) return;
+  if(typeof travel==="object"&&travel.active) return;   // a conduzir, a câmara manda
+  /* A RAIZ DO DEFEITO, medida: ao aterrar no separador o contentor do mapa
+     ainda tem ALTURA ZERO (a vista acabou de ficar visível e o layout não
+     assentou). Um enquadramento nesse instante não faz nada — e ficava assim,
+     com a rota cortada, que é a captura do Ricardo. Espera-se pelo frame em
+     que o mapa tem tamanho, no máximo ~20 frames. */
+  const cont=h.m.getContainer().getBoundingClientRect();
+  /* e não basta ter ALGUMA altura: enquadrar a meio do crescimento deixava a
+     rota a 5% do ecrã (medido). Espera-se que o tamanho ESTABILIZE — dois
+     frames com a mesma altura — antes de decidir o zoom. */
+  const pequeno=cont.height<150||cont.width<150;
+  const cresceu=enquadrarRota._h!==cont.height;
+  enquadrarRota._h=cont.height;
+  if((pequeno||cresceu)&&tentativa<24){
+    requestAnimationFrame(()=>enquadrarRota(tentativa+1)); return;
+  }
+  const alt=(el)=>{ const n=$(el); if(!n||n.hidden) return 0;
+    const r=n.getBoundingClientRect(); return r.height>0?r.height+10:0; };
+  const margem={
+    top:Math.round(18+alt("#rota-topo")),
+    bottom:Math.round(18+alt("#rota-faixa")+alt("#rota-legenda")),
+    left:22, right:22,
+  };
+  /* o padding nunca pode comer o mapa todo: com pouco espaço, encolhe-se */
+  const cabe=(v,limite)=>Math.min(v,Math.max(8,Math.floor(limite*0.4)));
+  margem.top=cabe(margem.top,cont.height); margem.bottom=cabe(margem.bottom,cont.height);
+  margem.left=cabe(margem.left,cont.width); margem.right=cabe(margem.right,cont.width);
+  Mapa.ajustar(h,R.coords.map(pt=>[pt.lon,pt.lat]),{margem, ms:420});
+  state.rotaMexida=false;
+}
 function drawRoute(fit){
   const R=state.route, h=state.mapaRota; if(!R||!h) return;
   const surf=surfaceColor();
@@ -5430,7 +5692,7 @@ function scheduleStayAlerts(R){
     const title=t("🌧️ O tempo vai mudar em {p}",{p:R.d.name});
     const body=t("Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.",{h:fmtHM(info.firstRain)});
     motoStay.timer=setTimeout(()=>{
-      toast(title+" — "+body, 9000); buzz([200,90,200]); speak(body);
+      toast(title+" — "+body, 9000); avisar([200,90,200]); speak(body);
       try{
         if("Notification" in window&&Notification.permission==="granted"){
           if(navigator.serviceWorker&&navigator.serviceWorker.controller)
@@ -5697,8 +5959,24 @@ function renderRouteSummary(){
     saveTrip({name:`${R.o.name} → ${R.d.name}`, hash:location.hash, dep:depT});
     toast(t("🗓️ Agendada: {p} — vê no calendário (canto superior direito).",{p:`${R.o.name} → ${R.d.name}`}));
   });
-  acts.append(share,favD,favR2,agd);
+  /* dd-58 §2: UMA ação primária, as outras atrás de um "⋯". Quatro botões
+     iguais não são quatro escolhas, são zero — e ocupavam uma linha inteira
+     da folha. "Guardar rota" fica à vista (é a que se repete: quem calcula a
+     mesma rota outra vez quer guardá-la); as outras três abrem por gesto. */
+  favR2.className="btn primary";
+  const mais=el("button","btn","⋯");
+  mais.type="button";
+  mais.setAttribute("aria-expanded","false");
+  mais.title=t("Mais ações");
+  mais.setAttribute("aria-label",t("Mais ações"));
+  const gaveta=el("div","rec-actions rec-mais"); gaveta.hidden=true;
+  gaveta.append(share,favD,agd);
+  mais.addEventListener("click",(e)=>{ e.stopPropagation();
+    gaveta.hidden=!gaveta.hidden;
+    mais.setAttribute("aria-expanded",String(!gaveta.hidden)); });
+  acts.append(favR2,mais);
   main.appendChild(acts);
+  main.appendChild(gaveta);
   card.appendChild(main);
   box.appendChild(card);
   const topoTxt=$("#rt-topo-txt"); if(topoTxt) topoTxt.textContent=`${R.o.name} → ${R.d.name}`;
@@ -6078,16 +6356,24 @@ function windStretches(){
   return out;
 }
 
+/* dd-58 §1: uma secção que não tem nada para dizer não ocupa meio ecrã a
+   dizê-lo. Vira UMA linha discreta — o utilizador continua informado (o
+   silêncio não é resposta), mas o espaço fica para o que muda a decisão. */
+function linhaVazia(texto){
+  const l=el("div","nada-linha");
+  l.append(el("span",null,"✓"), el("span",null,texto));
+  return l;
+}
 function renderSegments(){
   const R=state.route, box=$("#route-segments"); if(!R){box.textContent="";return;}
   const st=currentStretches(), wv=windStretches();
   box.textContent="";
+  if(!st.length&&!wv.length){
+    box.appendChild(linhaVazia(t("sem chuva nem vento perigoso no caminho")));
+    return;
+  }
   const card=el("div","card");
   card.appendChild(el("h2",null,semEmoji(t("🌧️💨 Onde apanhas chuva e vento"))));
-  if(!st.length&&!wv.length){
-    card.appendChild(el("p","h-sub",t("Nenhum troço com chuva ou vento perigoso a esta hora de partida. 🎉")));
-    box.appendChild(card); return;
-  }
   card.appendChild(el("p","h-sub",t("Troços do trajeto com condições a merecer atenção, à hora a que lá passas.")));
   const ul=el("ul","seg-list");
   st.forEach(async (s)=>{
@@ -6153,11 +6439,33 @@ function evalDepartures(){
 function renderDepartures(){
   const R=state.route, box=$("#route-departures"); if(!R){box.textContent="";return;}
   box.textContent="";
+  const {evals,best}=evalDepartures();
+  /* dd-58 §3: cinco pastilhas todas a dizer "seco" não informam ninguém. Só
+     se abre quando as horas DIFEREM entre si; iguais, é uma linha — e o
+     detalhe fica a um toque, para quem quiser mesmo comparar. */
+  const molhados=evals.map(e=>e.wet>=0.5?Math.round(e.wet):0);
+  const iguais=evals.length&&molhados.every(v=>v===molhados[0])&&!evals.some(e=>e.furos);
+  if(iguais){
+    const ultimo=evals[evals.length-1];
+    const linha=el("div","nada-linha nada-clic");
+    linha.setAttribute("role","button"); linha.tabIndex=0;
+    linha.append(el("span",null,"🕒"), el("span",null, molhados[0]===0
+      ? t("seco a qualquer hora até às {h}",{h:fmtHM(ultimo.dep)})
+      : t("~{n} km de chuva a qualquer hora até às {h}",{n:molhados[0],h:fmtHM(ultimo.dep)})),
+      el("span","nada-mais",t("ver horas")));
+    const abrir=()=>{ box.textContent=""; box.appendChild(cartaoDepartures(evals,best,R)); };
+    linha.addEventListener("click",abrir);
+    linha.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); abrir(); } });
+    box.appendChild(linha);
+    return;
+  }
+  box.appendChild(cartaoDepartures(evals,best,R));
+}
+function cartaoDepartures(evals,best,R){
   const card=el("div","card");
   card.appendChild(el("h2",null,semEmoji(t("🕒 E se saíres mais tarde (ou mais cedo)?"))));
   card.appendChild(el("p","h-sub",t("Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.")));
   const row=el("div","dep-chips");
-  const {evals,best}=evalDepartures();
   evals.forEach(ev=>{
     const c=el("button","dep-chip"+(ev===best&&best.wet<evals.find(e=>e.sh===R.shift)?.wet-0.5?" best":""));
     c.dataset.shift=ev.sh;
@@ -6178,7 +6486,7 @@ function renderDepartures(){
     p.append(el("span",null,"💡 "), el("b",null,t("Se saíres às {h} apanhas {x}.",{h:fmtHM(best.dep),x:best.wet<0.5?t("o trajeto praticamente seco"):t("só ~{n} km de chuva",{n:fmtN(best.wet,0)})})));
     card.appendChild(p);
   }
-  box.appendChild(card);
+  return card;
 }
 
 
@@ -6430,6 +6738,124 @@ function renderFavRow(){
     row.appendChild(c);
   });
 }
+/* ═══ OS MEUS SÍTIOS (dd-48a, desenho do rel-45 §2) ════════════════════════
+   A violação original: uma casa visível no cartão e NENHUMA porta para a
+   ver, mudar ou apagar. A porta vive nas definições; a gestão vive nesta
+   gaveta. A casa nunca se apaga (a app precisa de uma âncora) — redefine-se
+   pelos três caminhos que já existem: pesquisa, GPS, toque no mapa. Os
+   consumidores da casa (veredicto, âncora da pesquisa, casa-distante,
+   De-omissão, frase dos radares, guarda-da-mota, sanidade) seguem-na por
+   construção: todos leem state.home/store — a guarda meus-sitios afirma-o. */
+function provQuando(p){
+  let s=provTexto(p);
+  if(p&&p.quando){ try{ s+=" · "+new Date(p.quando).toLocaleDateString(state.lang||"pt"); }catch(e){} }
+  return s;
+}
+function pintarSitiosLinha(){
+  const li=$("#sitios-casa-linha"); if(!li) return;
+  const h=state.home||store.get("home");
+  li.textContent=h?`🏠 ${h.name}${h.sub?" — "+h.sub:""} · ${provQuando(h.prov)}`:t("sem casa guardada");
+  const b=$("#btn-sitios"); if(b) b.textContent=t("Gerir os meus sítios");
+}
+function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
+  renderSitios(); $("#sitios-drawer").classList.add("open"); $("#sitios-bg").classList.add("open"); }
+function fecharSitios(){ $("#sitios-drawer").classList.remove("open"); $("#sitios-bg").classList.remove("open"); }
+function renderSitios(){
+  const box=$("#sitios-corpo"); if(!box) return;
+  box.textContent="";
+  $("#sitios-head").textContent="📍 "+t("Os meus sítios");
+
+  /* ── CASA: proveniência à vista + consequência dita + 3 caminhos ── */
+  box.appendChild(el("p","san-h","🏠 "+t("Casa")));
+  const h=state.home||store.get("home");
+  const rc=el("div","sitio-row");
+  const tc=el("div","sitio-tx");
+  tc.appendChild(el("b",null,h?`${h.name}${h.sub?" — "+h.sub:""}`:t("sem casa guardada")));
+  if(h) tc.appendChild(el("span","small muted",provQuando(h.prov)));
+  rc.appendChild(tc); box.appendChild(rc);
+  box.appendChild(el("p","small muted",t("A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.")));
+  const ac=el("div","sitios-acoes");
+  const b1=el("button","btn","🔍 "+t("Redefinir por pesquisa"));
+  b1.addEventListener("click",()=>{ fecharSitios(); switchTab("agora");
+    $("#loc-search")?.focus(); toast(t("Pesquisa o sítio e escolhe-o — fica como a tua casa."),6000); });
+  const b2=el("button","btn","📍 "+t("Redefinir pelo GPS"));
+  b2.addEventListener("click",()=>{ fecharSitios(); switchTab("agora"); useGPS(false); });
+  const b3=el("button","btn","🗺️ "+t("Redefinir por toque no mapa"));
+  b3.addEventListener("click",()=>{ fecharSitios(); switchTab("rota"); initRouteMap();
+    toast(t("No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”."),8000); });
+  ac.append(b1,b2,b3); box.appendChild(ac);
+
+  /* ── GUARDADOS: renomear e apagar, nunca em silêncio ── */
+  box.appendChild(el("p","san-h","⭐ "+t("Guardados")+` (${getFavs().length}/20)`));
+  const favs=getFavs();
+  if(!favs.length) box.appendChild(el("p","small muted",t("Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.")));
+  favs.forEach(f=>{
+    const r=el("div","sitio-row");
+    const tx=el("div","sitio-tx");
+    tx.appendChild(el("b",null,"⭐ "+f.label));
+    tx.appendChild(el("span","small muted",`${f.name}${f.sub?" — "+f.sub:""}`));
+    r.appendChild(tx);
+    const be=el("button","icon-btn","✏️"); be.title=t("Renomear");
+    be.addEventListener("click",()=>{
+      const ed=el("div","sitio-edit");
+      const inp=document.createElement("input"); inp.value=f.label; inp.maxLength=40;
+      const ok=el("button","btn primary",t("Guardar"));
+      ok.addEventListener("click",()=>{
+        const novo=inp.value.trim(); if(!novo) return;
+        store.set("favs",getFavs().map(g=>normTxt(g.label)===normTxt(f.label)?{...g,label:novo}:g));
+        renderFavRow(); renderSitios(); toast(t("Renomeado: {p}",{p:novo}));
+      });
+      r.textContent=""; ed.append(inp,ok); r.appendChild(ed); inp.focus(); inp.select();
+    });
+    const bx=el("button","icon-btn","🗑️"); bx.title=t("Apagar");
+    bx.addEventListener("click",()=>{
+      const conf=el("div","sitio-conf");
+      conf.appendChild(el("span","small",t("Apagar {p}?",{p:f.label})));
+      const sim=el("button","btn primary",t("Sim, apagar"));
+      sim.addEventListener("click",()=>{
+        store.set("favs",getFavs().filter(g=>normTxt(g.label)!==normTxt(f.label)));
+        renderFavRow(); renderSitios(); toast(t("Apagado: {p}",{p:f.label}));
+      });
+      const nao=el("button","btn",t("Não"));
+      nao.addEventListener("click",()=>renderSitios());
+      conf.append(sim,nao); r.textContent=""; r.appendChild(conf);
+    });
+    r.append(be,bx); box.appendChild(r);
+  });
+
+  /* ── RECENTES: ver, apagar um a um, limpar tudo ── */
+  const rec=getRecentes();
+  box.appendChild(el("p","san-h","🕘 "+t("Recentes")+` (${rec.length}/25)`));
+  if(!rec.length) box.appendChild(el("p","small muted",t("Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.")));
+  rec.forEach((x,i)=>{
+    const r=el("div","sitio-row");
+    const tx=el("div","sitio-tx");
+    tx.appendChild(el("b",null,x.name));
+    tx.appendChild(el("span","small muted",`${x.sub||""}${x.prov?.quando?(x.sub?" · ":"")+new Date(x.prov.quando).toLocaleDateString(state.lang||"pt"):""}`));
+    r.appendChild(tx);
+    const bx=el("button","icon-btn","✕"); bx.title=t("Apagar");
+    bx.addEventListener("click",()=>{
+      store.set("recentes",getRecentes().filter((_,j)=>j!==i));
+      renderSitios(); toast(t("Apagado: {p}",{p:x.name}));
+    });
+    r.appendChild(bx); box.appendChild(r);
+  });
+  if(rec.length){
+    const lb=el("button","btn",t("Limpar todos os recentes"));
+    lb.style.marginTop="8px";
+    lb.addEventListener("click",()=>{
+      const conf=el("div","sitio-conf");
+      conf.appendChild(el("span","small",t("Apagar os {n} recentes?",{n:rec.length})));
+      const sim=el("button","btn primary",t("Sim, apagar"));
+      sim.addEventListener("click",()=>{ store.set("recentes",[]); renderSitios(); toast(t("Recentes limpos.")); });
+      const nao=el("button","btn",t("Não"));
+      nao.addEventListener("click",()=>renderSitios());
+      conf.append(sim,nao); lb.replaceWith(conf);
+    });
+    box.appendChild(lb);
+  }
+}
+
 /* input à balda → favorito ("vou a casa do joao" acerta em "Casa do João") */
 function favMatch(q){
   const nq=normTxt(q);
@@ -6635,15 +7061,226 @@ function buildRecommendation(cand){
 const travel={active:false, watch:null, marcador:null, wakeLock:null, alerted:new Set(),
   lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0,
   offHits:0, rerouting:false, lastReroute:0,
-  heading:null, prevPos:null, courseUp:true};
+  heading:null, prevPos:null, courseUp:true,
+  /* fase 1 da câmara (dd-33): gesto do utilizador e último fix */
+  gestoEm:0, timerRecentrar:null, ultimoFix:0, semSinal:false};
+
+/* ═══ CÂMARA E PAINEL DE CONDUÇÃO — dd-33 FASE 1 ═══════════════════════════
+   Violação original: as capturas do Ricardo de 30/07 — posição ao CENTRO do
+   ecrã, norte para cima, mapa plano, e nenhum painel de manobra. Quem conduz
+   vê metade do ecrã ocupada com o que já passou e tem de traduzir "a rota
+   vira para oeste" em "vira à direita".
+
+   Os números vêm da especificação (não se inventam aqui) e vivem no CFG,
+   com a pergunta da 7b ao lado de cada um — para se mexerem sem caçar
+   literais pelo código. */
+const CAM_CFG={
+  pitch:45,             // 45° e não 60: a vista bonita esconde a rota (a22-estilo-3d-inclinado)
+  zoom:16,              // fixo na fase 1 — zoom-por-velocidade é surpresa a conduzir
+  ancoraBaixo:0.45,     // padding do motor: a posição cai a ~1/4 do fundo
+  easeMs:300,           // uma atualização de GPS por segundo, sem saltos e sem espera
+  velRumoMin:2.0,       // m/s (7,2 km/h) — abaixo disto o heading do GPS dança: usa-se o rumo da rota
+  recentrarSeg:10,      // 7b: curto rouba o espreitar; longo deixa o mapa virado para trás
+  semSinalSeg:6,        // >6 s sem fix = "sem sinal de GPS". NUNCA se extrapola posição (7g-ter)
+  depoisM:300,          // a linha "depois:" só quando a manobra seguinte está a <300 m
+  /* escada do fora-de-rota (dd-32 §1-2). A régua puxa para ADMITIR CEDO:
+     demorar a admitir que te perdeste é o erro mais grave. */
+  desvioM:120,          // 7b: baixo demais, uma rotunda vira desvio; alto demais, andas perdido a ouvir "segue em frente"
+  desvioSeg:6,          // e SÓ com a distância a aumentar — ruído de GPS e túneis não disparam nada
+};
+
+/* a seta grande vem do TYPE da manobra, nunca de interpretar texto (medido:
+   o payload traz o type estruturado; ler a frase seria adivinhar) */
+function setaManobra(mv){
+  if(!mv) return "↑";
+  const t=mv.type||"", m=mv.mod||"";
+  if(/roundabout|rotary/.test(t)) return "🔄";
+  if(t==="uturn"||m==="uturn") return "⤶";
+  if(t==="arrive") return "🏁";
+  if(t==="depart") return "↑";
+  if(/off ramp/.test(t)) return m.includes("left")?"↙":"↘";
+  if(/on ramp|merge/.test(t)) return m.includes("left")?"↖":"↗";
+  if(m.includes("sharp left")) return "↰";
+  if(m.includes("sharp right")) return "↱";
+  if(m.includes("slight left")) return "↖";
+  if(m.includes("slight right")) return "↗";
+  if(m.includes("left")) return "←";
+  if(m.includes("right")) return "→";
+  return "↑";
+}
+/* distância a contar, em unidades do utilizador e com a régua de quem conduz:
+   metros redondos ao perto, décimas de km ao longe */
+/* métrico cru, para o t()/uconv converterem: metros abaixo de 1 km, senão km
+   com uma casa. UMA régua só — a primeira captura do fora-de-rota dizia
+   "0,39 km" em cima e "390 m" em baixo, no mesmo cartão. */
+function distCurta(km){ return km<1?`${Math.round(km*1000)} m`:`${fmtN(km,1)} km`; }
+function distManobra(km){
+  const m=km*1000;
+  if(m<30) return t("agora");
+  if(m<1000) return U.dist(Math.max(50,Math.round(m/50)*50)/1000,0);
+  return U.dist(km,1);
+}
+/* rumo pela ROTA quando o GPS não é de fiar (parado ao semáforo, a arrancar) */
+function rumoDaRota(idx){
+  try{
+    const R=state.route; if(!R?.coords) return null;
+    const a=R.coords[Math.max(0,idx)], b=R.coords[Math.min(R.coords.length-1,idx+2)];
+    if(!a||!b||(a.lat===b.lat&&a.lon===b.lon)) return null;
+    return bearing(a,b);
+  }catch(e){ return null; }
+}
+/* a manobra a servir agora + a seguinte (para a linha "depois:") */
+function manobrasAqui(kmNow){
+  const R=state.route; if(!R?.maneuvers?.length) return {};
+  const i=R.maneuvers.findIndex(mv=>mv.km>kmNow+0.015&&mv.type!=="depart");
+  if(i<0) return {};
+  return {mv:R.maneuvers[i], prox:R.maneuvers[i+1]||null};
+}
+/* UM SÓ PINTOR para o painel (aprendido à segunda: com dois pintores — um
+   para a manobra, outro para o fora-de-rota — o último a correr apagava o
+   outro, e quem saía da rota via na mesma "vira à direita"). O estado manda:
+   sem sinal > fora da rota > manobra. */
+function pintarNavPainel(kmNow,{semSinal=false}={}){
+  const el=$("#nav-painel"); if(!el) return;
+  if(!travel.active){ el.hidden=true; return; }
+  el.hidden=false;
+  el.classList.toggle("sem-sinal",!!semSinal);
+  if(!semSinal&&travel.fora){ pintarForaDeRota(travel.foraPos,travel.fora); return; }
+  if(semSinal){
+    /* 7g-ter: nunca extrapolar. Diz-se que não se sabe — e o que se sabia
+       fica visível, esbatido, em vez de uma posição inventada. */
+    $("#nav-seta").textContent="📡";
+    $("#nav-dist").textContent="—";
+    $("#nav-man").textContent=t("Sem sinal de GPS");
+    $("#nav-via").textContent=t("não invento onde estás. Sigo assim que voltar.");
+    $("#nav-depois").hidden=true; $("#nav-ceu").hidden=true;
+    return;
+  }
+  const {mv,prox}=manobrasAqui(kmNow);
+  if(!mv){
+    $("#nav-seta").textContent="🏁";
+    $("#nav-dist").textContent="";
+    $("#nav-man").textContent=t("Segue em frente");
+    $("#nav-via").textContent="";
+    $("#nav-depois").hidden=true;
+  } else {
+    const d=Math.max(0,mv.km-kmNow);
+    $("#nav-seta").textContent=setaManobra(mv);
+    $("#nav-dist").textContent=distManobra(d);
+    $("#nav-man").textContent=navPhrase(mv);
+    $("#nav-via").textContent=mv.road||"";
+    /* "depois:" só quando a seguinte está mesmo colada — senão é ruído */
+    const dp=$("#nav-depois");
+    if(prox&&(prox.km-mv.km)*1000<CAM_CFG.depoisM){
+      dp.hidden=false;
+      dp.textContent=t("depois: {x}",{x:setaManobra(prox)+" "+navPhrase(prox)});
+    } else dp.hidden=true;
+  }
+  /* A FUSÃO — o que o Google não tem: o céu do troço que aí vem, com as
+     cores e as chaves que já passaram no contraste (dd-29/30). */
+  const ceu=$("#nav-ceu");
+  const R=state.route;
+  const s=R?.samples?.[Math.min(R.samples.length-1,(travel.geomIdx||0))];
+  const aqui=R?.samples?.find(x=>x.km>=kmNow+0.2&&x.cond&&x.cond.lvl>=1);
+  if(aqui){
+    ceu.hidden=false;
+    /* as cores vêm das classes do veredicto que JÁ passaram no contraste
+       (dd-29/30) — nada de tons novos inventados para o painel */
+    ceu.className="nav-ceu lvl"+aqui.cond.lvl;
+    const dKm=Math.max(0,aqui.km-kmNow);
+    /* métrico cru dentro do t() (o uconv converte para milhas se for o caso),
+       mas com o separador decimal da língua — fmtN, nunca toFixed */
+    ceu.textContent=`${aqui.cond.lvl>=2?"🌧️":"🌦️"} ${t("{x} daqui a {d}",{x:rainLabel(aqui.cond.lvl),d:`${fmtN(dKm,1)} km`})}`;
+  } else if(s&&s.cond&&s.cond.lvl===0){
+    ceu.hidden=false; ceu.className="nav-ceu lvl0";
+    ceu.textContent="☀️ "+t("Céu limpo à frente");
+  } else ceu.hidden=true;
+}
+/* DEGRAU 1 do dd-32: "fora da rota · regressa ~200 m a nordeste". A geometria
+   completa está no cliente — a distância e o rumo de regresso custam zero.
+   Estado honesto: diz-se que se saiu E diz-se o caminho de volta, em vez de
+   fingir que nada aconteceu ou de saltar logo para uma rota nova. */
+const ROSA=["norte","nordeste","este","sudeste","sul","sudoeste","oeste","noroeste"];
+function rumoEmPalavras(g){ return t(ROSA[Math.round(((g%360)+360)%360/45)%8]); }
+function pintarForaDeRota(pos,pj){
+  const el=$("#nav-painel"); if(!el||!travel.active) return;
+  const R=state.route; const alvo=pj.pe||R?.coords?.[pj.idx];
+  el.hidden=false; el.classList.remove("sem-sinal");
+  $("#nav-seta").textContent="↩";
+  $("#nav-dist").textContent=t("{d}",{d:distCurta(pj.off)});
+  $("#nav-man").textContent=t("Fora da rota");
+  $("#nav-via").textContent=alvo
+    ? t("regressa {d} a {r}",{d:distCurta(pj.off), r:rumoEmPalavras(bearing(pos,alvo))})
+    : "";
+  $("#nav-depois").hidden=true;
+  $("#nav-ceu").hidden=true;
+}
+
+/* espreitar e regressar: o gesto sai do seguimento; 10 s sem gesto e volta */
+function navGestoNoMapa(){
+  if(!travel.active) return;
+  travel.follow=false; travel.gestoEm=Date.now();
+  const b=$("#btn-recentrar"); if(b) b.hidden=false;
+  if(travel.timerRecentrar) clearTimeout(travel.timerRecentrar);
+  travel.timerRecentrar=setTimeout(navRecentrar,CAM_CFG.recentrarSeg*1000);
+}
+function navRecentrar(){
+  if(travel.timerRecentrar){ clearTimeout(travel.timerRecentrar); travel.timerRecentrar=null; }
+  travel.follow=true;
+  const b=$("#btn-recentrar"); if(b) b.hidden=true;
+  const hm=state.mapaRota;
+  if(hm&&travel.marcador){
+    try{ Mapa.camara(hm,{centro:travel.marcador.centro(), rumo:travel.heading??0,
+      pitch:CAM_CFG.pitch, zoom:CAM_CFG.zoom, ancoraBaixo:CAM_CFG.ancoraBaixo, ms:CAM_CFG.easeMs}); }catch(e){}
+  }
+}
+/* >6 s sem fix = sem sinal. Nunca se extrapola posição. */
+function navVigiarSinal(){
+  if(!travel.active) return;
+  const passou=(Date.now()-travel.ultimoFix)/1000;
+  const sem=travel.ultimoFix>0&&passou>CAM_CFG.semSinalSeg;
+  if(sem!==travel.semSinal){
+    travel.semSinal=sem;
+    try{ travel.marcador?.elemento()?.classList.toggle("esmaecido",sem); }catch(e){}
+    pintarNavPainel(travel.kmDone||0,{semSinal:sem});
+  }
+}
 
 /* posição exata ao longo da geometria da rota (para o cinzento e distâncias precisas) */
+/* PROJEÇÃO NA POLILINHA (dd-32 §1: "ponto mais próximo da polilinha").
+   Era ao VÉRTICE mais próximo — e isso mente onde a geometria é esparsa: numa
+   reta de autoestrada com vértices a 500 m, quem vai a meio do segmento fica
+   a 250 m do vértice e a app declarava-o fora da rota. A guarda da fase 1
+   apanhou-o com uma rota de vértices a ~490 m: três leituras a direito na
+   rota e o motor a pedir recálculo. Agora mede-se ao SEGMENTO (perpendicular)
+   e o km interpola dentro dele — a distância a contar deixa de andar aos
+   degraus do tamanho dos vértices. */
 function travelProject(pos){
   const R=state.route, C=R.coords;
+  if(!C||C.length<2) return {idx:0, off:1e12, km:0};
+  /* graus→km locais: perto o suficiente para projetar dentro de um segmento */
+  const kLat=111.32, kLon=111.32*Math.cos(pos.lat*Math.PI/180);
+  const px=pos.lon*kLon, py=pos.lat*kLat;
   const stride=Math.max(1,Math.floor(C.length/1500));
-  let bi=0,bd=1e12;
-  for(let i=0;i<C.length;i+=stride){ const d=haversine(pos,C[i]); if(d<bd){bd=d;bi=i;} }
-  return {idx:bi, off:bd, km:(R.cum[bi]/R.geomKm)*R.totalKm};
+  let bi=0, bd=1e12, bt=0;
+  for(let i=0;i+stride<C.length;i+=stride){
+    const a=C[i], b=C[i+stride];
+    const ax=a.lon*kLon, ay=a.lat*kLat, bx=b.lon*kLon, by=b.lat*kLat;
+    const dx=bx-ax, dy=by-ay;
+    const len2=dx*dx+dy*dy;
+    /* t = onde cai o pé da perpendicular dentro do segmento, preso a [0,1]
+       (fora dele, o ponto mais próximo é uma das pontas) */
+    const t=len2>0?Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/len2)):0;
+    const qx=ax+t*dx, qy=ay+t*dy;
+    const d=Math.hypot(px-qx,py-qy);
+    if(d<bd){ bd=d; bi=i; bt=t; }
+  }
+  const j=Math.min(C.length-1,bi+stride);
+  const cum=R.cum[bi]+(R.cum[j]-R.cum[bi])*bt;   // km interpolado DENTRO do segmento
+  /* o PÉ da perpendicular, não o vértice: é para ali que se volta pelo caminho
+     mais curto, e é isso que o degrau 1 do fora-de-rota diz ao utilizador */
+  const pe={lat:C[bi].lat+(C[j].lat-C[bi].lat)*bt, lon:C[bi].lon+(C[j].lon-C[bi].lon)*bt};
+  return {idx:bt>0.5?j:bi, off:bd, km:(cum/R.geomKm)*R.totalKm, pe};
 }
 /* saíste do caminho? recalcula a rota a partir de onde estás (estilo Google Maps) */
 async function rerouteFromHere(pos){
@@ -6725,7 +7362,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-07-31-1545-7136bb";
+const BUILD="2026-07-31-2041-660294";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -6783,7 +7420,7 @@ function findNextRain(wx, from, until){
 }
 function motoNotify(title,body){
   toast(title+" — "+body, 9000);
-  buzz([200,90,200]);
+  avisar([200,90,200],/✅|pode ficar/.test(title)?"bom":"perigo");
   try{ speak(title.replace(/[^\p{L}\p{N} ,.!?…—-]/gu,"").trim()+". "+body); }catch(e){}
   try{
     if(!("Notification" in window)||Notification.permission!=="granted") return;
@@ -7056,6 +7693,71 @@ function setMuted(m){
 }
 function buzz(pat){ try{ navigator.vibrate&&navigator.vibrate(pat); }catch(e){} }
 
+/* ═══ SOM DE AVISO (dd-43 §2, papel do rel-38) ═════════════════════════════
+   O pedido do Enrique: um som NOSSO, reconhecível dentro do capacete,
+   distinto do toque do telemóvel, curto, que não assuste a conduzir.
+
+   Síntese (Web Audio), como o papel recomendou: 0 KB no pacote, 0 rede,
+   latência nula, e o volume é o do sistema por construção — nunca temos um
+   controlo de volume próprio. Se o timbre soar barato no capacete, a troca
+   por ficheiros gravados é dentro de `tocarSom` e mais nada.
+
+   As regras do papel §3, todas em código:
+   · desligável (interruptor próprio, o componente .sw do dd-42; vem ligado);
+   · NUNCA sobre a voz de manobra — se a voz está a falar, cala-se: o som é
+     o toque no ombro, a voz é a informação;
+   · volume do sistema, zero controlos nossos;
+   · a vibração acompanha (já existia — o som junta-se, não substitui);
+   · iOS com o interruptor de silêncio: o Web Audio pode não soar — a
+     vibração e a notificação seguram o aviso, e a linha das definições
+     di-lo em vez de prometer som sempre.
+
+   Onde toca (papel §4): perigo à frente e mudanças da Sentinela. NUNCA em
+   toasts informativos nem com a interface parada. */
+const som={ctx:null, on:store.get("som")!==0};
+function somLigado(){ return som.on; }
+function setSom(v){ som.on=!!v; store.set("som",v?1:0); pintarSom(); if(v) tocarSom("bom"); }
+function pintarSom(){
+  const c=$("#som-opt"); if(!c) return;
+  c.checked=som.on;
+  c.setAttribute("aria-checked",String(som.on));
+  /* o rótulo diz o ESTADO (dd-42 §3), e diz a verdade do iOS em vez de
+     prometer som sempre */
+  c.setAttribute("aria-label",som.on?t("Som de aviso: ligado"):t("Som de aviso: desligado"));
+  const s=$("#som-opt-s");
+  if(s) s.textContent=som.on
+    ? t("Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.")
+    : t("Só vibração e texto nos avisos.");
+}
+function tocarSom(tipo){
+  try{
+    if(!som.on||state.muted) return;
+    /* a voz ganha sempre: um som por cima de uma manobra falada é ruído no
+       pior momento possível */
+    if(window.speechSynthesis&&(speechSynthesis.speaking||speechSynthesis.pending)) return;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    if(!som.ctx) som.ctx=new AC();
+    if(som.ctx.state==="suspended") som.ctx.resume().catch(()=>{});
+    const c=som.ctx, t0=c.currentTime;
+    /* duas notas grave→agudo para PERIGO (urgente, não assustador);
+       uma nota suave ascendente para BOA NOTÍCIA (deixou de chover) */
+    const notas=tipo==="bom"?[[660,0,0.34]]:[[440,0,0.16],[660,0.18,0.30]];
+    for(const [hz,quando,ate] of notas){
+      const o=c.createOscillator(), g=c.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(hz,t0+quando);
+      if(tipo==="bom") o.frequency.linearRampToValueAtTime(hz*1.5,t0+ate);
+      /* envelope suave: um clique seco assusta quem vai a conduzir */
+      g.gain.setValueAtTime(0.0001,t0+quando);
+      g.gain.exponentialRampToValueAtTime(0.22,t0+quando+0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001,t0+ate);
+      o.connect(g); g.connect(c.destination);
+      o.start(t0+quando); o.stop(t0+ate+0.02);
+    }
+  }catch(e){}
+}
+/* o par que os pontos de aviso passam a chamar: vibração + som, juntos */
+function avisar(pat,tipo){ buzz(pat); tocarSom(tipo||"perigo"); }
+
 async function startTravel(){
   const R=state.route;
   if(!R){ toast(t("Calcula primeiro uma rota.")); return; }
@@ -7066,8 +7768,17 @@ async function startTravel(){
   travel.heading=null; travel.prevPos=null;
   precacheRouteTiles(); // guarda o mapa do trajeto antes de arrancar
   stopAutoTravel();
+  travel.gestoEm=0; travel.ultimoFix=0; travel.semSinal=false; travel.follow=true;
+  travel.fora=null; travel.foraPos=null; travel.foraDesde=0; travel.foraOff0=0;
   document.body.classList.add("traveling");
   if(state.mapaRota) Mapa.magro(state.mapaRota,true); // rico a planear, magro a conduzir
+  /* fase 1 da câmara: a inclinação e a âncora entram JÁ, antes do primeiro
+     fix — quem arranca vê logo o ecrã de condução, não o mapa de planear */
+  if(state.mapaRota) Mapa.camara(state.mapaRota,{pitch:CAM_CFG.pitch, zoom:CAM_CFG.zoom,
+    ancoraBaixo:CAM_CFG.ancoraBaixo, ms:CAM_CFG.easeMs});
+  pintarNavPainel(0);
+  if(travel.vigia) clearInterval(travel.vigia);
+  travel.vigia=setInterval(navVigiarSinal,1000);
   $("#travel-bar").style.display="flex";
   $("#tb-next").textContent=t("🧭 Modo viagem ligado");
   $("#tb-sub").textContent=t("à procura do teu GPS…");
@@ -7094,7 +7805,14 @@ function stopTravel(msg){
   store.del("travel");
   travelNotifyClose();
   if(state.mapaRota) Mapa.magro(state.mapaRota,false); // o mapa volta a engordar
-  if(state.mapaRota) Mapa.verRumo(state.mapaRota,0);   // o mapa volta a norte-acima
+  /* a câmara desfaz-se toda: norte acima, plano, sem âncora — o mapa de
+     planear não herda a inclinação de conduzir */
+  if(state.mapaRota) Mapa.camara(state.mapaRota,{rumo:0, pitch:0, ancoraBaixo:0, ms:CAM_CFG.easeMs});
+  if(travel.vigia){ clearInterval(travel.vigia); travel.vigia=null; }
+  if(travel.timerRecentrar){ clearTimeout(travel.timerRecentrar); travel.timerRecentrar=null; }
+  travel.semSinal=false; travel.fora=null; travel.foraPos=null;
+  const np=$("#nav-painel"); if(np) np.hidden=true;
+  const br=$("#btn-recentrar"); if(br) br.hidden=true;
   if(state.route&&state.mapaRota) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
   updateTravelButtons();
@@ -7135,9 +7853,21 @@ function onTravelPos(p){
           '<path d="M20 9.5 L26.6 25.5 L20 21.6 L13.4 25.5 Z" fill="#fff"/>'+
           '</svg></div>'});
     } else travel.marcador.mover(aqui);
-    // course-up: o mapa roda para o teu sentido de marcha (como o Google Maps)
-    if(Mapa.rodavel(hm)&&travel.courseUp!==false&&travel.heading!=null
-       &&(p.coords.speed==null||p.coords.speed>1.4)) Mapa.verRumo(hm,travel.heading);
+    /* CÂMARA DE CONDUÇÃO (dd-33 fase 1): um só easeTo com posição + rumo +
+       pitch + âncora. Abaixo de velRumoMin o heading do GPS dança (parado ao
+       semáforo, a arrancar): o rumo passa a ser o da ROTA no ponto projetado.
+       Um gesto do utilizador desliga o seguimento — e só ele. */
+    const lento=p.coords.speed!=null&&p.coords.speed<CAM_CFG.velRumoMin;
+    let rumoCam=travel.heading;
+    if(lento||travel.heading==null){
+      const rr=rumoDaRota(travel.geomIdx||0);
+      if(rr!=null) rumoCam=rr;
+    }
+    if(rumoCam!=null&&!isNaN(rumoCam)) travel.rumoCam=rumoCam;
+    if(travel.follow!==false){
+      Mapa.camara(hm,{centro:aqui, rumo:Mapa.rodavel(hm)&&travel.courseUp!==false?(travel.rumoCam??0):0,
+        pitch:CAM_CFG.pitch, zoom:CAM_CFG.zoom, ancoraBaixo:CAM_CFG.ancoraBaixo, ms:CAM_CFG.easeMs});
+    }
     /* A seta aponta sempre para onde vais. Com o mapa virado para o rumo B, o
        norte fica em −B no ecrã, portanto um rumo H desenha-se a H−B: em
        course-up dá zero (a seta fica a apontar para cima) e com o mapa
@@ -7147,23 +7877,43 @@ function onTravelPos(p){
       const el=travel.marcador.elemento()?.querySelector(".me-nav");
       if(el&&travel.heading!=null) el.style.transform=`rotate(${(travel.heading-Mapa.rumo(hm)).toFixed(1)}deg)`;
     }catch(e){}
-    if(travel.follow!==false&&!Mapa.contem(hm,aqui,{folga:-0.25})) Mapa.mover(hm,aqui);
+    /* (o antigo "mover só quando sai do ecrã" morreu aqui: a câmara acima já
+       centra a cada fix, e um segundo gesto de deslocação à parte partia o
+       easeTo a meio) */
   }
+  travel.ultimoFix=Date.now();
+  if(travel.semSinal){ travel.semSinal=false;
+    try{ travel.marcador?.elemento()?.classList.remove("esmaecido"); }catch(e){} }
   const {i:idx, off}=nearestSampleIdx(pos);
   const here=R.samples[idx];
   // paragem prolongada? (ex.: chegaste a casa ou a um hotel) → guarda da moto
   const spd=p.coords.speed;
   if(spd!=null&&spd<0.7) motoGuard.stat=(motoGuard.stat||0)+1; else motoGuard.stat=0;
   if(motoGuard.stat===8) motoGuardCheck(pos);
-  // deteção de desvio (estilo Google Maps): 3 leituras seguidas fora da rota → recalcula
+  /* ESCADA DO FORA-DE-ROTA (dd-32 §1-2, fase 1 do dd-33) — custo zero nos
+     dois primeiros degraus. Antes disto havia UM degrau só: três leituras
+     fora e recálculo (uma chamada paga, e uma rota nova quando bastava dizer
+     "volta 200 m para trás"). */
   const pj=travelProject(pos);
   const accKm=(p.coords.accuracy||0)/1000;
   const offTh=Math.max(0.06, accKm*1.5+0.02);
   const moving=spd==null||spd>0.8;
-  if(pj.off>offTh&&moving) travel.offHits=(travel.offHits||0)+1; else travel.offHits=0;
-  // desvio inequívoco (3× o limiar) → recalcula logo à 2ª leitura; marginal → à 3ª
-  const needHits=pj.off>offTh*3?2:3;
-  if(travel.offHits>=needHits&&!travel.rerouting&&now-(travel.lastReroute||0)>12){ rerouteFromHere(pos); return; }
+  const foraAgora=pj.off>offTh&&moving;
+  if(foraAgora){
+    if(!travel.foraDesde){ travel.foraDesde=now; travel.foraOff0=pj.off; }
+    travel.offHits=(travel.offHits||0)+1;
+    travel.fora=pj; travel.foraPos={lat:pos.lat,lon:pos.lon};
+  } else { travel.foraDesde=0; travel.foraOff0=0; travel.offHits=0; travel.fora=null; travel.foraPos=null; }
+  /* DEGRAU 1 — regressar à rota que já temos, com a geometria do cliente:
+     quanto e para onde. Resolve a maioria dos casos reais sem pedir nada. */
+  if(foraAgora) pintarNavPainel(pj.km);
+  /* DEGRAU 2 — histerese antes de chamar desvio: acima de desvioM, durante
+     desvioSeg, E com a distância a AUMENTAR. Uma rotunda, o ruído do GPS e
+     um túnel não passam este crivo; quem saiu mesmo, passa em 6 s. */
+  const afasta=pj.off>(travel.foraOff0||0)+0.02;
+  const tempoFora=travel.foraDesde?now-travel.foraDesde:0;
+  const desvio=foraAgora&&pj.off*1000>CAM_CFG.desvioM&&tempoFora>=CAM_CFG.desvioSeg&&afasta;
+  if(desvio&&!travel.rerouting&&now-(travel.lastReroute||0)>12){ rerouteFromHere(pos); return; }
   if(travel.rerouting){ travelNotify(); return; }
   if(off>4){ $("#tb-sub").textContent=t("estás a {d} km da rota — vou recalcular",{d:fmtN(off,1)}); travelNotify(); return; }
   // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
@@ -7180,6 +7930,7 @@ function onTravelPos(p){
     if(travel.marcador) travel.marcador.repor();
   }
   const kmNow=travel.kmDone||here.km;
+  pintarNavPainel(kmNow);   // o painel da fase 1 acompanha cada fix
   // 🗣️ indicações de condução (como o Google Maps): aviso a ~500 m e à chegada da manobra
   if(R.maneuvers?.length){
     const mi=R.maneuvers.findIndex(mv=>mv.km>kmNow+0.015&&mv.type!=="depart");
@@ -7221,7 +7972,7 @@ function onTravelPos(p){
         const key=`cam${nextCam.km.toFixed(1)}-${th}`;
         if(dc<=th&&dc>-0.05&&!travel.alerted.has(key)){
           travel.alerted.add(key);
-          buzz([180,80,180]);
+          avisar([180,80,180]);
           speak(nextCam.zone
             ? t("Zona de perigo dentro de {x}. Atenção à velocidade.",{x:t(lab)})
             : t("Radar de velocidade dentro de {x}.",{x:t(lab)})+(nextCam.max?" "+t("Limite {v}.",{v:String(nextCam.max).replace(/\D/g,"")}):""));
@@ -7246,7 +7997,7 @@ function onTravelPos(p){
     $("#tb-next").textContent=t("🌧️ Estás na zona de chuva ({x})",{x:rainLabel(here.cond.lvl).toLowerCase()});
     $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
     const key="in-"+Math.floor(here.km/3);
-    if(!travel.alerted.has(key)){ travel.alerted.add(key); buzz([250,100,250]); }
+    if(!travel.alerted.has(key)){ travel.alerted.add(key); avisar([250,100,250]); }
   } else if(next){
     const dist=Math.max(0,next.km-kmNow);
     const mins=Math.max(0,Math.round((next.travelSec-here.travelSec)/60));
@@ -7261,7 +8012,7 @@ function onTravelPos(p){
     const fire=(key,msg)=>{
       if(travel.alerted.has(key)) return false;
       travel.alerted.add(key);
-      buzz([300,120,300,120,300]);
+      avisar([300,120,300,120,300]);
       speak(msg);
       const bar=$("#travel-bar"); bar.classList.remove("alert"); void bar.offsetWidth; bar.classList.add("alert");
       return true;
@@ -7535,7 +8286,16 @@ function switchTab(name){
   tipHide();
   if(name==="rota"){ initRouteMap(); setTimeout(()=>state.mapaRota&&Mapa.redimensionar(state.mapaRota),60);
     oferecerFocoNaRota();              // o que se procurou no Agora já espera aqui (dd-06 §1a)
-    if(state.route) setTimeout(()=>drawRoute(false),80);
+    /* dd-57 §1: ao ATERRAR na Rota com rota calculada, ela cabe inteira no
+       ecrã. Era só um redesenho, e o mapa ficava onde estivesse — cortado e
+       descentrado, que é o primeiro ecrã que alguém vê depois de pedir uma
+       rota. Não reenquadra se o utilizador já mexeu no mapa: o gesto dele
+       manda (e só ele tira daqui). */
+    if(state.route) setTimeout(()=>{ drawRoute(false);
+      /* o enquadramento vai um tick DEPOIS do desenho: o drawRoute mexe nas
+         fontes e camadas do motor e um enquadramento no mesmo instante era
+         engolido (medido — o zoom não mexia). */
+      if(!state.rotaMexida) setTimeout(enquadrarRota,120); },80);
     if(!store.get("pin-tip")){ store.set("pin-tip",1);
       setTimeout(()=>toast(t("💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá."),8000),900); } }
   rotaMapaModo(name==="rota");   // A4.2: com rota calculada, o separador Rota É o mapa
@@ -7619,6 +8379,40 @@ function setTheme(t,{guardar=true}={}){
    nunca existe) havia só um toast de 7 segundos a morrer sozinho. Três
    estados, três mensagens; a linha vive nas definições pela mesma razão que
    a da voz: um toast é o vejo-te-agora, o estado continua verdadeiro. */
+/* ── VERSÃO NOVA (dd-55) ───────────────────────────────────────────────────
+   A captura do diretor: interruptor ANTIGO num ecrã largo DEPOIS da
+   publicação do novo. A página no servidor estava certa; a janela dele é que
+   estava aberta desde antes — e nada lho dizia. Uma janela aberta há horas
+   nunca renavega; com o sw byte-igual (o buraco da corrida #4) nem o ciclo
+   de update do sw dispara. Isto pergunta ao servidor, de hora a hora e ao
+   voltar ao ecrã, se o carimbo mudou — e OFERECE recarregar. Regras: nunca
+   recarrega sozinha; nunca aparece em viagem (travel.active); na bancada
+   (BUILD="trabalho") está morta. */
+const VNOVA={ultima:0, achada:null};
+async function checkVersao(){
+  if(BUILD==="trabalho") return;                      // bancada: nunca
+  if(Date.now()-VNOVA.ultima<55*60000) return;        // no máximo 1×/hora
+  VNOVA.ultima=Date.now();
+  try{
+    const r=await fetch("versao.json",{cache:"no-store"});
+    if(!r.ok) return;                                 // ainda sem versao.json no ar / offline
+    const j=await r.json();
+    if(j&&j.v&&j.v!==BUILD) VNOVA.achada=j.v;
+  }catch(e){}
+  renderVersaoNova();
+}
+function renderVersaoNova(){
+  const el=$("#versao-nova"); if(!el) return;
+  if(!VNOVA.achada||travel.active){ el.hidden=true; return; }
+  $("#vnova-txt").textContent=t("Há uma versão nova da app.");
+  $("#btn-vnova").textContent=t("Recarregar");
+  el.hidden=false;
+}
+$("#btn-vnova")?.addEventListener("click",()=>location.reload());
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ checkVersao(); renderVersaoNova(); } });
+setTimeout(checkVersao, 8*60000);                     // primeiro olhar ~8 min depois (arranque fica leve)
+setInterval(checkVersao, 60*60000);
+
 const pwa={ prompt:null, instalada:false, ios:/iphone|ipad|ipod/i.test(navigator.userAgent) };
 function estadoInstalacao(){
   if(matchMedia("(display-mode: standalone)").matches||navigator.standalone===true||pwa.instalada) return "instalada";
@@ -7662,6 +8456,13 @@ function init(){
   /* radares em países onde a lei pune o condutor: escolha informada dele,
      desligada por omissão. Quem nunca abriu as definições não é posto a
      infringir sem saber. */
+  /* som de aviso (dd-43 §2): mesmo componente .sw, ligado por omissão como o
+     papel propôs. Ao LIGAR toca uma vez — ouvir é a única forma de escolher */
+  const somOpt=$("#som-opt");
+  if(somOpt){
+    pintarSom();
+    somOpt.addEventListener("change",()=>setSom(somOpt.checked));
+  }
   const camOpt=$("#cam-opt");
   if(camOpt){
     if(store.get(CAM_OPT)===null&&store.get("cam-de")===1) store.set(CAM_OPT,1);  // preferência da versão antiga
@@ -7730,6 +8531,10 @@ function init(){
 
   $("#btn-trips").addEventListener("click",openTrips);
   $("#trips-close").addEventListener("click",closeTrips);
+  $("#btn-sitios").addEventListener("click",abrirSitios);
+  $("#sitios-close").addEventListener("click",fecharSitios);
+  $("#sitios-bg").addEventListener("click",fecharSitios);
+  pintarSitiosLinha();
   $("#trips-bg").addEventListener("click",closeTrips);
   planTripAlerts();
   $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open"); });
@@ -7813,6 +8618,7 @@ function init(){
   state.muted=store.get("muted")===1;
   const mb=$("#tb-mute"); if(mb){ mb.textContent=state.muted?"🔇":"🔊"; mb.addEventListener("click",()=>setMuted(!state.muted)); }
   $("#tb-stop").addEventListener("click",()=>stopTravel("Modo viagem terminado."));
+  $("#btn-recentrar").addEventListener("click",navRecentrar);   // dd-33 fase 1
   $("#btn-sentinel").addEventListener("click",toggleSentinel);
 
   // PWA: instalação + service worker (só quando servida por http/https)
