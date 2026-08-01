@@ -344,6 +344,21 @@ html[data-theme="dark"] .sw::before{background:#4a5568}
   border:1px solid var(--border);border-radius:12px;background:var(--surface2);
   font-size:13.5px;color:var(--muted)}
 .vnova .btn{flex:none;height:34px;padding:0 14px}
+/* `display:flex` numa classe vence a regra do browser para [hidden] — e a
+   barra aparecia SEMPRE, vazia, no topo do Agora, incluindo na primeira
+   abertura. A guarda não a apanhou porque lia a propriedade `.hidden` (que
+   estava certa) e não o que o utilizador vê. Terceira vez que presença ≠
+   comportamento; agora a régua mede a visibilidade real. */
+.vnova[hidden]{display:none}
+/* boas-vindas (porteiro 6): uma faixa, uma vez, dispensável */
+.bv{position:relative;padding:14px 40px 14px 16px}
+.bv[hidden]{display:none}
+.bv p{margin:0 0 10px;font-size:15px;line-height:1.45}
+.bv-acoes{display:flex;gap:8px;flex-wrap:wrap}
+.bv-acoes .btn{flex:1 1 auto;justify-content:center}
+.bv-x{position:absolute;top:8px;right:8px;width:32px;height:32px;border:none;background:transparent;
+  color:var(--muted);font-size:15px;cursor:pointer;border-radius:8px}
+.bv-x:hover{color:var(--text);background:var(--surface2)}
 input.sw{appearance:none;-webkit-appearance:none;margin:0}
 .sw .sw-knob{pointer-events:none}
 .foco-rota{width:100%;justify-content:center;font-size:15px;padding:12px 14px;margin-top:2px}
@@ -368,11 +383,22 @@ body.folha-aberta #rota-folha{transform:none}
    adiar a partida e o resumo do planeamento não servem quem já está a andar —
    e tapavam metade do ecrã por cima do mapa. Quem conduz tem o painel em cima
    e a barra de viagem em baixo. */
-body.traveling #rota-folha,body.traveling #rota-folha-grab,body.traveling #rota-faixa{display:none}
+/* dd-65 §2: em Modo viagem o cabeçalho da rota SAI também. Ficava por baixo
+   da faixa de manobra a dizer "Maastricht → Valkenburg" — o destino já está
+   escolhido, e quem conduz precisa da rua seguinte, não do título. Sobrepunha-
+   -se à faixa nas capturas do dd-68. */
+body.traveling #rota-folha,body.traveling #rota-folha-grab,body.traveling #rota-faixa,
+body.traveling #rota-topo{display:none}
 #rota-folha-grab{position:sticky;top:0;background:var(--surface);padding:10px 0 8px;cursor:pointer;z-index:2}
 #rota-folha-grab span{display:block;width:44px;height:4px;border-radius:2px;background:var(--border);margin:0 auto}
 body:not(.rota-mapa) #rota-folha, body:not(.rota-mapa) #rota-faixa,
 body:not(.rota-mapa) #rota-topo, body:not(.rota-mapa) #rota-legenda{display:none}
+/* o atributo `hidden` tem de vencer sempre: uma classe ou id com `display:`
+   sobrepõe-se à regra do browser e o elemento aparece na mesma — foi o que
+   aconteceu à barra de versão nova, que ficou visível e vazia no topo do
+   Agora. Regra geral, para não voltar a acontecer em nenhum destes. */
+#rota-topo[hidden],#rota-legenda[hidden],#rota-faixa[hidden],#nav-painel[hidden],
+#versao-nova[hidden],#rota-folha[hidden]{display:none}
 /* os controlos do mapa saem de debaixo do pill/legenda (topo-esquerda → direita),
    e a atribuição sobe para cima da faixa — visível é obrigatório (registo 20) */
 body.rota-mapa .maplibregl-ctrl-top-left{left:auto;right:10px}
@@ -527,38 +553,70 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
    distância ≥34 px a negro, via ≥16 px. Vive EM CIMA (a atenção sobe ao
    para-brisas); a barra de viagem continua em baixo. Fundo sólido: um painel
    translúcido sobre o mapa é ilegível ao sol. */
+/* dd-62 §5: o painel ocupava ~1/3 do ecrã. Metade disso — a seta é o
+   elemento dominante (é o que se lê de relance com capacete), a distância e
+   a rua à direita, e o "depois:" numa linha fina. */
+/* dd-65 §2 — FUNDO SÓLIDO DE ALTO CONTRASTE, o mesmo nos dois temas.
+   Era `--surface-solid`, ou seja BRANCO de dia: uma faixa branca sobre um mapa
+   claro perde as bordas ao sol, e é a faixa que tem de se ler de relance com
+   capacete. O escuro fixo é o que o Google faz e a razão é a mesma — não
+   depende do tema nem da luz do mapa por baixo. Os números estão medidos e
+   afirmados na guarda (`conducao-painel.mjs`): contraste WCAG do texto contra
+   este fundo, em claro e escuro. */
+:root{--nav-bg:#111a2c; --nav-ink:#ffffff; --nav-ink2:#c8d3e6; --nav-borda:rgba(255,255,255,.14)}
 #nav-painel{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top,0px));z-index:4100;
-  background:var(--surface-solid);border:1px solid var(--border);border-left:5px solid var(--accent);
-  border-radius:16px;padding:12px 14px;box-shadow:0 6px 30px rgba(0,0,0,.3)}
+  background:var(--nav-bg);color:var(--nav-ink);border:1px solid var(--nav-borda);border-left:5px solid var(--accent);
+  border-radius:14px;padding:7px 12px;box-shadow:0 6px 30px rgba(0,0,0,.38)}
 #nav-painel[hidden]{display:none}
 .nav-linha{display:flex;gap:12px;align-items:center;min-width:0}
-.nav-seta{font-size:38px;line-height:1;flex:none;width:46px;text-align:center}
-.nav-tx{min-width:0;flex:1}
-.nav-dist{font-size:34px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums}
-.nav-man{font-size:22px;font-weight:700;line-height:1.2;margin-top:2px}
-.nav-via{font-size:16px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nav-depois{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:16px;color:var(--ink2)}
-.nav-ceu{margin-top:8px;padding:8px 10px;border-radius:11px;font-size:16px;font-weight:700;
-  display:flex;gap:8px;align-items:center;
-  background:var(--lvl-soft,var(--surface2));border:1px solid var(--lvl-c,var(--border))}
-.nav-ceu[hidden]{display:none}
+.nav-seta{font-size:46px;line-height:1;flex:none;width:56px;text-align:center;color:var(--nav-ink)}
+.nav-tx{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center}
+.nav-dist{font-size:32px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;color:var(--nav-ink)}
+.nav-via{font-size:16px;color:var(--nav-ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25}
+/* o "Depois" é agora uma pastilha POR FORA da faixa (dd-65 §2), encostada ao
+   canto esquerdo dela para se ler como continuação e não como outra coisa */
+#nav-depois{position:fixed;left:14px;z-index:4090;max-width:min(74vw,340px);
+  background:var(--nav-bg);color:var(--nav-ink2);border:1px solid var(--nav-borda);
+  border-radius:0 0 12px 12px;border-top:none;padding:4px 12px 5px;
+  font-size:13.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  box-shadow:0 6px 18px rgba(0,0,0,.3)}
+#nav-depois[hidden]{display:none}
+/* a pastilha do tempo/estado: o SÍTIO ÚNICO. Cor pela gravidade, com o
+   contorno a fazer o trabalho quando o fundo é claro */
+#viagem-estado{position:fixed;left:10px;right:10px;z-index:4080;
+  background:var(--nav-bg);color:var(--nav-ink);border:1px solid var(--nav-borda);
+  border-left:5px solid var(--good);border-radius:12px;padding:7px 12px;
+  font-size:14.5px;line-height:1.32;box-shadow:0 6px 22px rgba(0,0,0,.32)}
+#viagem-estado[hidden]{display:none}
+#viagem-estado.lvl1{border-left-color:var(--warn)}
+#viagem-estado.lvl2{border-left-color:var(--serious)}
+#viagem-estado.lvl3{border-left-color:var(--crit)}
+#viagem-estado.estado{border-left-color:var(--muted)}
 #nav-painel.sem-sinal{border-left-color:var(--muted);opacity:.92}
 #btn-recentrar{position:fixed;right:12px;bottom:96px;z-index:4050;
   background:var(--surface-solid);box-shadow:0 4px 18px rgba(0,0,0,.28);font-weight:700}
 #btn-recentrar[hidden]{display:none}
 @media (max-width:380px){
   .nav-dist{font-size:30px} .nav-man{font-size:20px} .nav-seta{font-size:32px;width:40px}
+  #viagem-estado{font-size:13.5px}
 }
+/* dd-65 §2: UMA LINHA. `white-space:nowrap` não é decoração — é o que impede
+   que uma frase comprida faça a barra crescer para duas ou três linhas e coma
+   o mapa, que foi exatamente o que acontecia. O que não couber corta-se com
+   reticências; os números têm largura fixa (tabular) e cabem sempre. */
 #travel-bar{position:fixed;left:10px;right:10px;bottom:10px;z-index:4000;display:flex;gap:10px;align-items:center;
-  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
-  border:1px solid var(--border);border-radius:18px;
-  padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
-  box-shadow:0 -4px 30px rgba(0,0,0,.28),var(--glow);border-top:2px solid var(--accent)}
-#travel-bar .tb-main{flex:1;min-width:0}
-#travel-bar b{display:block;font-size:15px}
-#travel-bar span{display:block;font-size:12.5px;color:var(--ink2)}
+  background:var(--nav-bg);color:var(--nav-ink);border:1px solid var(--nav-borda);border-radius:16px;
+  padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -4px 30px rgba(0,0,0,.32);border-top:2px solid var(--accent)}
+#travel-bar .tb-main{flex:1;min-width:0;font-size:15px;font-weight:700;line-height:1.25;
+  font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#travel-bar #tb-off{flex:none;font-size:12.5px;color:var(--nav-ink2)}
 #travel-bar.alert{border-top-color:var(--crit);animation:tbpulse 1s ease 3}
-@keyframes tbpulse{0%,100%{background:var(--surface)}50%{background:var(--crit-soft)}}
+@keyframes tbpulse{0%,100%{background:var(--nav-bg)}50%{background:#3a1520}}
+/* o botão de terminar fica lá, discreto (dd-65 §2) */
+#travel-bar #tb-stop{flex:none;font-size:13px;padding:7px 11px;background:transparent;
+  color:var(--nav-ink);border:1px solid var(--nav-borda)}
+#travel-bar #tb-mute{flex:none;background:transparent;color:var(--nav-ink);border:1px solid var(--nav-borda)}
 body.traveling .wrap{padding-bottom:120px}
 footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
 .gear-chips .chip{font-size:13px;padding:8px 13px}
@@ -571,8 +629,35 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
 /* dupla classe: o CSS do próprio MapLibre usa .maplibregl-ctrl.maplibregl-ctrl-attrib
    (fundo branco meio opaco) e ganhava por especificidade — no tema escuro a
    barra ficava uma tira clara ilegível */
-.maplibregl-ctrl.maplibregl-ctrl-attrib{background:rgba(127,127,127,.12);color:var(--muted);font-size:9.5px}
-.maplibregl-ctrl.maplibregl-ctrl-attrib a{color:var(--muted)}
+/* dd-67 §3 — DISCRETA, NÃO ILEGÍVEL. O Ricardo pediu letra muito pequena; a
+   própria orientação da OSMF exige legibilidade comparável ao restante
+   conteúdo. **11 px** é o número escolhido e medido: é o corpo mais pequeno
+   que continua confortavelmente legível num telemóvel a um braço de
+   distância, e é maior do que os 9,5 px que estavam aqui (que ficavam do lado
+   errado da linha). A discrição vem da OPACIDADE, não do corpo — menos
+   gritante, igualmente legível, que é a troca que a orientação permite. */
+.maplibregl-ctrl.maplibregl-ctrl-attrib{background:rgba(127,127,127,.14);color:var(--ink2);
+  font-size:11px;line-height:1.35;opacity:.72;border-radius:6px;padding:1px 6px;
+  transition:opacity .35s ease,transform .35s ease;max-width:min(88vw,520px)}
+.maplibregl-ctrl.maplibregl-ctrl-attrib a{color:var(--ink2);text-decoration:underline}
+/* desvanecida: sai do ecrã E deixa de apanhar toques — nunca fica um
+   retângulo invisível por cima do traçado (dd-68 §3) */
+.maplibregl-ctrl.maplibregl-ctrl-attrib.atrib-fora{opacity:0;transform:translateY(4px);pointer-events:none}
+/* o ⓘ que FICA (dd-66 §3, dd-67 §4): pequeno de desenho, alvo de luva.
+   No mesmo canto da atribuição, e por cima dela em z para nunca ser tapado. */
+.atrib-info{position:absolute;left:6px;bottom:4px;z-index:30;
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  font-size:17px;line-height:1;color:var(--ink2);text-decoration:none;opacity:.62;
+  text-shadow:0 0 3px var(--surface-solid),0 0 6px var(--surface-solid)}
+.atrib-info:hover,.atrib-info:focus-visible{opacity:1}
+/* enquanto a atribuição está à vista, o ⓘ afasta-se para não a tapar */
+.maplibregl-ctrl-bottom-left:has(.maplibregl-ctrl-attrib:not(.atrib-fora)) ~ .atrib-info{opacity:0;pointer-events:none}
+/* em Modo viagem o ⓘ é ainda mais discreto — mas NUNCA ausente (dd-67 §5) */
+body.traveling .atrib-info{opacity:.38}
+body.traveling .atrib-info:hover,body.traveling .atrib-info:focus-visible{opacity:1}
+/* a atribuição vive acima da barra de viagem e nunca por baixo dela */
+body.traveling .maplibregl-ctrl-bottom-left{bottom:74px}
+body.traveling .atrib-info{bottom:78px}
 @media (max-width:720px){
   .hero{flex-direction:row}
   .score-ring{width:86px;height:86px}.score-num{font-size:28px}
@@ -942,6 +1027,20 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
       </div>
       <button class="btn" id="btn-gps" title="Usar a minha localização">📍<span class="gps-lab">GPS</span></button>
     </div>
+    <!-- PORTEIRO 6 (dd-43 §3): quem abre a app pela primeira vez tinha um
+         cartão de pesquisa, um interruptor a explicar-se em quatro linhas e
+         uma previsão para uma cidade que nunca escolheu — e nada que
+         dissesse o que isto É. Uma linha, UMA vez, com o gesto seguinte à
+         vista. Não é tutorial: não tem passos, não bloqueia nada, e some ao
+         primeiro gesto real (pesquisar, GPS, ou calcular uma rota). -->
+    <div class="card bv" id="boas-vindas" hidden>
+      <p id="bv-txt"></p>
+      <div class="bv-acoes">
+        <button class="btn primary" id="bv-onde" type="button"></button>
+        <button class="btn" id="bv-rota" type="button"></button>
+      </div>
+      <button class="bv-x" id="bv-fechar" type="button" aria-label="Fechar">✕</button>
+    </div>
     <div id="loc-estado-agora" class="loc-estado"></div>
     <div id="foco-chip" class="chips" hidden style="margin:2px 2px 0"></div>
     <!-- dd-55: uma janela aberta há horas não tem NENHUM sinal de que a app
@@ -952,13 +1051,30 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
       <span id="vnova-txt"></span>
       <button class="btn" id="btn-vnova" type="button"></button>
     </div>
+    <div id="confirmar-casa-slot"></div>
+    <div id="sanidade-slot"></div>
+    <div id="agora-content">
+      <div class="skel" style="height:150px;margin-bottom:14px"></div>
+      <div class="skel" style="height:220px"></div>
+    </div>
     <div class="card" id="sentinel-card">
       <div class="card-head">
         <h2>🔔 Sentinela meteorológica</h2>
         <span class="spacer"></span>
         <button class="sw" id="btn-sentinel" role="switch" aria-checked="false" aria-label="Sentinela: desligada"><span class="sw-knob"></span></button>
       </div>
-      <p class="h-sub" id="sentinel-status" style="margin-bottom:0">Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.</p>
+      <p class="h-sub" id="sentinel-status" style="margin-bottom:0">Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.</p>
+      <!-- PORTEIRO 7 (dd-43 §3): a promessa mais honesta e mais tranquilizadora
+           possível SEM MENTIR. A verdade técnica, medida a 30/07: a vigilância
+           é um temporizador na página; com a app fechada o sistema suspende-a
+           e nada corre. Dizê-lo de frente vale mais do que a frase antiga
+           ("minuto a minuto", sem ressalva), que prometia uma vigilância que
+           não existe — e nisso a Sentinela é o pior sítio possível para uma
+           promessa a mais: é a funcionalidade que existe para funcionar quando
+           ninguém está a olhar, e o silêncio é indistinguível do bom
+           funcionamento. A dobra segue o padrão dos radares (dd-43 §1): a
+           frase serve, a razão abre por gesto. -->
+      <div id="sentinel-como" class="small muted" hidden style="margin:8px 0 0"></div>
       <!-- Linha própria para o que aconteceu ao RECARREGAR, e não para o estado
            de agora. A primeira versão escrevia o "continuou ligada" no
            #sentinel-status, e o sentinelCheck() reescreve essa linha um segundo
@@ -967,12 +1083,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
            avisar — e este só apareceu porque o teste o foi ler tarde. -->
       <p class="h-sub" id="sentinel-nota" style="margin:8px 0 0" hidden></p>
     </div>
-    <div id="confirmar-casa-slot"></div>
-    <div id="sanidade-slot"></div>
-    <div id="agora-content">
-      <div class="skel" style="height:150px;margin-bottom:14px"></div>
-      <div class="skel" style="height:220px"></div>
-    </div>
+
   </section>
 
   <!-- ============ ROTA ============ -->
@@ -1096,7 +1207,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
   <footer>
     Dados gratuitos: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (previsões) ·
     <a href="https://project-osrm.org" target="_blank" rel="noopener">OSRM</a> &amp; <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> (rotas e pesquisa) ·
-    Mapas © CARTO<br>
+    Mapas © <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &amp; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a><br>
     Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa. 🏍️
   </footer>
 </div>
@@ -1136,19 +1247,38 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
     <div class="nav-seta" id="nav-seta">↑</div>
     <div class="nav-tx">
       <div class="nav-dist" id="nav-dist"></div>
-      <div class="nav-man" id="nav-man"></div>
       <div class="nav-via" id="nav-via"></div>
     </div>
   </div>
-  <div class="nav-depois" id="nav-depois" hidden></div>
-  <div class="nav-ceu" id="nav-ceu" hidden></div>
+  <!-- dd-62 §7: o aviso do tempo SAIU daqui. São categorias diferentes — o
+       painel diz para onde virar; o tempo vive num sítio só. Estava nos dois
+       e dizia coisas diferentes. -->
 </div>
+<!-- dd-65 §2: o "Depois" sai de DENTRO da faixa e vira pastilha pequena por
+     baixo dela, como o Google faz. Dentro, engordava a faixa de manobra —
+     que é o elemento que tem de ser lido de relance — com informação que só
+     interessa a quem tem tempo para a ler. -->
+<div id="nav-depois" hidden></div>
+<!-- dd-65 §2 + dd-62 §7: O SÍTIO ÚNICO DO TEMPO E DO ESTADO. Uma pastilha
+     própria: nem dentro da faixa de manobra, nem duplicada na barra de baixo.
+     Recebe o tempo (chuva à frente, caminho seco) E o estado (a recalcular,
+     sem sinal) — são a mesma categoria: "o que está a acontecer", por oposição
+     a "para onde virar" (a faixa) e "quanto falta" (a barra). -->
+<div id="viagem-estado" hidden role="status" aria-live="polite"></div>
+<!-- a manobra por extenso deixa de ocupar linha própria: a seta já a diz, e
+     o nome da rua estava escrito DUAS vezes ("Vira à esquerda para a X" + a
+     linha "X"). Fica a que serve de relance com capacete: a rua. O texto
+     completo vai por VOZ, que é onde ele serve mesmo (dd-62 §6). -->
+<div id="nav-man" hidden></div>
 <button class="btn" id="btn-recentrar" hidden>🎯 Recentrar</button>
-<div id="travel-bar" style="display:none" role="status" aria-live="assertive">
-  <div class="tb-main">
-    <b id="tb-next">🧭 Modo viagem ligado</b>
-    <span id="tb-sub">à espera de sinal GPS…</span>
-  </div>
+<!-- dd-65 §2: a barra de baixo é de UMA LINHA — tempo restante · distância ·
+     hora de chegada, e mais nada. Tinha duas linhas de prosa variável (o aviso
+     do tempo por cima, os números por baixo) e crescia para três quando a
+     frase do tempo dava a volta: um terço do ecrã a dizer o que já estava dito
+     noutro sítio. Os números vivem aqui porque são a única coisa que se olha
+     de propósito, e não de relance. -->
+<div id="travel-bar" style="display:none" role="status" aria-live="polite">
+  <div class="tb-main" id="tb-linha"></div>
   <span id="tb-off" style="display:none">📴 <span id="tb-off-t">offline</span></span>
   <button class="icon-btn" id="tb-mute" title="Silenciar/ligar a voz" aria-label="Silenciar ou ligar a voz">🔊</button>
   <button class="btn" id="tb-stop">🛑 Terminar</button>
@@ -1161,7 +1291,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 "use strict";
 /* =====================================================================
    Levante — meteorologia e rota para motociclistas
-   Dados: Open-Meteo · OSRM · Nominatim/OSM · CARTO
+   Dados: Open-Meteo · OSRM · Nominatim/OSM · OpenFreeMap/OpenMapTiles
    ===================================================================== */
 
 /* ---------------- CONFIG ---------------- */
@@ -1250,6 +1380,8 @@ function setLang(l){
   if(typeof pintarSitiosLinha==="function") pintarSitiosLinha();
   if(typeof renderSitios==="function"&&$("#sitios-drawer")?.classList.contains("open")) renderSitios();
   if(typeof pintarSom==="function") pintarSom();
+  if(typeof renderBoasVindas==="function") renderBoasVindas();
+  if(typeof repintarSentinelaComo==="function") repintarSentinelaComo();
   /* o painel de condução é tinta viva: em viagem, repinta na troca de língua
      (dd-48 §2 — nada fica na língua anterior, nem a conduzir) */
   if(typeof pintarNavPainel==="function"&&travel.active)
@@ -1348,19 +1480,27 @@ function applyStaticI18n(){
     if(note) note.textContent=t("Trovoada, gelo e neve dão sempre vermelho, por segurança.");
   }
   const sentSub=$("#sentinel-status");
-  if(sentSub&&!sentinel.on) sentSub.textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
+  if(sentSub&&!sentinel.on){ sentSub.textContent=t("Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
+    if(typeof pintarSentinelaComo==="function") pintarSentinelaComo(); }
   if(typeof sentinelaPinta==="function") sentinelaPinta(typeof sentinel!=="undefined"&&sentinel.on);
   const nb=$("#net-banner span:last-child");
   if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
   const ft=$("footer");
   if(ft){ ft.textContent="";
-    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM & OpenStreetMap · CARTO — "));
+    /* dd-60: o CARTO saiu do mapa no dd-16 §2 e continuava creditado aqui, com
+       o OpenFreeMap e o OpenMapTiles — que são quem serve mesmo os tiles — sem
+       nome nenhum no rodapé. Creditar quem não trabalha e calar quem trabalha é
+       falso nas duas pontas; o `lint-declarados` passou a mordê-lo. */
+    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM & OpenStreetMap · OpenFreeMap & OpenMapTiles — "));
     ft.append(document.createTextNode(t("Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️ "));
     const mkLink=(href,txt)=>{ const a=document.createElement("a"); a.href=href; a.target="_blank";
       a.rel="noopener"; a.textContent=t(txt); return a; };
     const nav=el("div","foot-links");
     nav.append(mkLink("./privacidade.html","Privacidade"), document.createTextNode(" · "),
-               mkLink("./termos.html","Termos de utilização"));
+               mkLink("./termos.html","Termos de utilização"), document.createTextNode(" · "),
+               /* dd-66 §3: a página de créditos vive ao lado das outras duas.
+                  O ⓘ do mapa é o caminho curto; isto é o caminho de sempre. */
+               mkLink("./creditos.html","Créditos e licenças"));
     ft.append(nav);
   }
   const tbStop=$("#tb-stop"); if(tbStop) tbStop.textContent=t("🛑 Terminar");
@@ -1388,7 +1528,7 @@ en:{
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
 "Vê se os teus sítios guardados batem certo":"Check that your saved places look right",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"An earlier version of the search could save a place with the wrong coordinates — up to thousands of kilometres off. That's fixed, but only you can confirm what's already saved on your device. I'll ask once.",
-"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"The Now forecast, the search anchor, the planner's From and the speed-camera notice all follow this home.","Redefinir por pesquisa":"Reset by search","Redefinir pelo GPS":"Reset by GPS","Redefinir por toque no mapa":"Reset by tapping the map","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Guardados":"Saved","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nothing saved yet. Plan a route and tap ⭐ to save the destination under your own name.","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","não invento onde estás. Sigo assim que voltar.":"I won't guess where you are. I'll follow as soon as it's back.","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
+"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"The Now forecast, the search anchor, the planner's From and the speed-camera notice all follow this home.","Redefinir por pesquisa":"Reset by search","Redefinir pelo GPS":"Reset by GPS","Redefinir por toque no mapa":"Reset by tapping the map","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Guardados":"Saved","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nothing saved yet. Plan a route and tap ⭐ to save the destination under your own name.","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"I tell you whether it's rideable — right now, where you are, and along the way to where you're going.","📍 Onde estou":"📍 Where I am","🗺️ O tempo no meu caminho":"🗺️ Weather on my route","Como funciona?":"How it works","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"If the phone suspends the app, the time without checks is stated when you return — never counted as watched.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"Watching with the app closed requires our own server plus push notifications (and, on iPhone, probably the native installable build). It's on the plan; it isn't built.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"On — checks the weather where you are while the app is open.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. When on, it checks the weather where you are while the app is open and alerts you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinel on — a check every ~2 minutes, with the app open.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"With the app open and on screen: a check every ~2 minutes, with voice, vibration and notification alerts.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimised or with the screen off, the phone suspends the app: during that time there are NO checks. No web app can do it without a server watching on its behalf.","Possível chuvisco em ~{d} do caminho":"Possible drizzle over ~{d} of the way","Possível chuvisco já no início do caminho":"Possible drizzle right at the start","{x} já aqui":"{x} right here","a rota está aqui ao lado":"the route is right beside you","Sem sinal GPS — a tentar.":"No GPS signal — retrying.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"No GPS signal — retrying. Your position may be out of date.","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
 "✔ Está tudo certo":"✔ All correct","A casa não está certa — corrigir":"Home isn't right — fix it",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Pick the right place in the search above — home only changes when you choose one.",
 "Ir para a pesquisa":"Go to the search","Apagar este registo":"Delete this entry",
@@ -1405,7 +1545,7 @@ en:{
 "Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Warnings for drizzle/moderate wind; red only in bad conditions.",
 "Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Only real rain, storms, ice or strong wind stop the trip.",
 "Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Storms, ice and snow are always red, for safety.",
-"Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. Turn it on and I'll watch the weather where you are, minute by minute, and alert you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.",
+
 "Ligar":"Turn on","🛑 Desligar":"🛑 Turn off","🛑 Terminar":"🛑 End",
 "Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"I can't reach the weather services. Check your connection and try again — or open the app in your browser.",
 "Dados gratuitos:":"Free data:",
@@ -1477,7 +1617,7 @@ en:{
 "Trajeto {x}":"Route {x}","seco ✅":"dry ✅","~{n} km 🌧️":"~{n} km 🌧️",
 "O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Route {x} gets much less rain — tap the button (or the grey line on the map) to switch.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Trip mode (rain alerts)","🛑 Terminar modo viagem":"🛑 End trip mode","📋 Copiar resumo":"📋 Copy summary",
-"Resumo copiado! 📋":"Summary copied! 📋","Não consegui copiar automaticamente.":"Couldn't copy automatically.",
+"Resumo copiado! 📋":"Summary copied! 📋","Cópia automática indisponível — seleciona e copia à mão.":"Automatic copy unavailable — select and copy by hand.",
 "🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 What if you leave later (or earlier)?",
 "Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Compare route rain for different departure times — tap to apply. No new downloads: it's instant.",
 "Se saíres às {h} apanhas {x}.":"Leaving at {h} you get {x}.","o trajeto praticamente seco":"an almost dry route","só ~{n} km de chuva":"only ~{n} km of rain",
@@ -1486,7 +1626,7 @@ en:{
 "Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Route segments needing attention, at the time you'll pass them.",
 "a identificar a zona…":"identifying the area…","perto de {p}":"near {p}","vento lateral":"crosswind","abranda e segura bem o guiador":"slow down and hold firm",
 "📸 Radares conhecidos no trajeto":"📸 Known speed cameras on the route",
-"Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"Couldn't fetch cameras right now — try recalculating shortly.",
+"Radares indisponíveis agora. Recalcula daqui a pouco.":"Speed cameras unavailable right now. Recalculate in a moment.",
 "A procurar radares fixos ao longo do caminho…":"Looking for fixed cameras along the way…",
 "Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"No known fixed cameras on this route (OpenStreetMap data). Mobile ones don't show — behave! 😉",
 "Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Fixed cameras (OpenStreetMap community data — may be incomplete; mobile units don't show). In Trip mode I warn you by voice at 1 km.",
@@ -1495,11 +1635,11 @@ en:{
 "🏁 Partida":"🏁 Start","🎯 Chegada":"🎯 Arrival","🛑 Paragem {n}: {p}":"🛑 Stop {n}: {p}","chegas ~{a} · voltas à estrada ~{b}":"arrive ~{a} · back on the road ~{b}",
 "Diz-me para onde queres ir 🙂":"Tell me where you want to go 🙂","A pensar…":"Thinking…",
 "À procura de \"{q}\" perto de ti…":"Looking for \"{q}\" near you…",
-"Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"I need to know where you are: allow GPS, or search your city in the Now tab and come back.",
+"Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"No location. Allow GPS, or search for your city in the Now tab.",
 "Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"Couldn't find \"{q}\" around here. Try adding the city (e.g. \"{q} London\").","perto de: {r}":"near: {r}","a tua posição":"your position","o mapa à vista":"the map in view",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculating the route to {p} and the weather along every stretch…",
 "A minha posição":"My location","a tua zona":"your area",
-"Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"Couldn't route you there — pick another place above or adjust the form.",
+"Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"No route there. Pick another place above or adjust the form.",
 "Não vás de moto nesta viagem":"Don't ride for this trip",
 "Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Storms, ice or snow are forecast on the way — really not one for the bike.",
 "Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Take the car/public transport — or wait: by {h} the route looks decent.",
@@ -1559,16 +1699,16 @@ en:{
 "Sentinela desligada.":"Sentinel off.",
 "distância?":"distance?",
 "🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 This browser cannot speak: directions come as text and vibration, with no sound.",
-"📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 This device gives no GPS access: type your town so I know where you are.",
+"📍 Este aparelho não dá acesso ao GPS. Escreve a tua cidade para ter previsão.":"📍 This device gives no GPS access. Type your city to get a forecast.",
 "🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ The last route's map came out incomplete ({d} of {t} pieces): with no signal you will hit gaps. Recalculate the route online to finish it.",
 "🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ The map came out incomplete ({d} of {t} pieces) — see settings.",
 "Versão {v}":"Version {v}",
 "🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 This device has no voice installed: directions come as text and vibration, with no sound.",
 "🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ There is no {n} voice on this phone — I speak English. You can install the voice in your system settings.",
-"O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.":"Your phone suspended the app and I went {m} min without checking — I couldn't warn you in that time. Checking now.",
-"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.":"On · {p} · last check {h} — {s} Current gusts: {g} km/h. I only watch while the app is open and on screen: minimise it or turn the screen off and your phone suspends me.",
+"O telemóvel suspendeu a app: {m} min sem verificações e sem avisos. A verificar agora.":"The phone suspended the app: {m} min with no checks and no alerts. Checking now.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só com a app aberta e no ecrã: minimizada ou com o ecrã apagado, o telemóvel suspende-a.":"On · {p} · last check {h} — {s} Current gusts: {g} km/h. Only with the app open and on screen: minimised or with the screen off, the phone suspends it.",
 "A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"The sentinel was switched off when the page reloaded — this device gives no access to your location. Tap to turn it back on.",
-"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Sentinel active — it stayed on since your last visit.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinel on — checking your area every ~2 minutes.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Sentinel active — it stayed on since your last visit.",
 
 "Previsão para {p}":"Forecast for {p}","Localização: {p}":"Location: {p}","Origem: {p}":"From: {p}",
 "A obter a tua posição… 📡":"Getting your position… 📡","O teu browser não suporta GPS — pesquisa a cidade.":"Your browser has no GPS — search the city.",
@@ -1576,7 +1716,7 @@ en:{
 "Máximo de 4 paragens.":"Maximum of 4 stops.","Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Stop (e.g. supermarket, petrol station, John's place…)",
 "Ditar por voz":"Voice input","Ditar a paragem por voz":"Dictate the stop by voice",
 "Voz não suportada neste browser — escreve o destino.":"Voice not supported in this browser — type instead.",
-"Não consegui ouvir — tenta de novo ou escreve.":"Couldn't hear you — try again or type.","Voz indisponível neste browser.":"Voice unavailable in this browser.",
+"Sem reconhecimento de voz — repete ou escreve o destino.":"Speech not recognised — repeat or type the destination.","Voz indisponível neste browser.":"Voice unavailable in this browser.",
 '🎤 "{q}" — escolhe a sugestão certa':'🎤 "{q}" — pick the right suggestion',
 "Indica {x}.":"Please fill in {x}.","a origem":"the origin","o destino":"the destination","a paragem":"the stop",
 "Não encontrei \"{q}\" — tenta \"cidade, país\".":"Couldn't find \"{q}\" — try \"city, country\".",
@@ -1597,13 +1737,13 @@ en:{
 "Este aparelho não dá acesso à localização.":"This device gives no access to location.",
 "O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"The phone can't get a position right now — system location off, no signal, or it took too long. It's not a permission problem: try again, preferably under open sky.",
 "📍 A localização está recusada para a Levante":"📍 Location is denied for Levante",
-"A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:":"The system prompt only appears once — I can't ask again. To turn it back on:",
+"A caixa do sistema só aparece uma vez e não pode ser repetida pela app. Para ligar outra vez:":"The system dialog appears only once and cannot be reopened by the app. To turn it on again:",
 "📍 Localização ligada.":"📍 Location is on.",
 "📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 Location is denied — the card next to the starting point shows the way back.",
 "📡 Sem posição agora — tenta a céu aberto.":"📡 No position right now — try under open sky.",
 "índice moto":"moto index","Remover paragem":"Remove stop","A opção mais seca":"The driest option",
 "Sentinela: ligada":"Sentinel: on","Sentinela: desligada":"Sentinel: off",
-"Ligada — a vigiar o tempo onde estás, minuto a minuto.":"On — watching the weather where you are, minute by minute.",
+
 "Sem chuva prevista até às {h}":"No rain expected until {h}","Sem chuva até às {h}":"No rain until {h}","chuva das {a} às {b}":"rain from {a} to {b}","chuva forte das {a} às {b}":"heavy rain from {a} to {b}","chuva possível das {a} às {b}":"possible rain from {a} to {b}","limpa depois das {h}":"clearing after {h}","sem dados de parte das horas":"data missing for some hours","Sem dados suficientes para prever as janelas de chuva de hoje.":"Not enough data to predict today's rain windows.",
 "⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ More options (stops, departure time, stay)","Hora de partida vazia = partes agora.":"Empty departure time = you leave now.",
 "Aqui ({p}): não mostro avisos de radar.":"Here ({p}): I show no speed-camera warnings.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Here ({p}): I show wide danger zones, not the exact spot.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Here ({p}): showing cameras is your choice — the switch is right below.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Here ({p}): I show fixed cameras on your route and warn you.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Fixed cameras: I follow the law of each country your route crosses.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"This country's law allows fixed-camera warnings — I read it before showing them.","Porquê?":"Why?","A decisão é tua. Vem desligado.":"The decision is yours. It ships switched off.",
@@ -1611,7 +1751,7 @@ en:{
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 You can install this as an app — “Install” button up top.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 To install: browser menu → “Add to Home Screen”, if your browser supports it.",
 "Calcula primeiro uma rota.":"Calculate a route first.","Este dispositivo não dá acesso ao GPS.":"This device doesn't provide GPS access.",
-"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"Couldn't fetch the forecast. Check your connection and try again.","Tentar de novo":"Try again",
+"Sem previsão. Verifica a ligação à internet e tenta de novo.":"No forecast. Check your internet connection and try again.","Tentar de novo":"Try again",
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
@@ -1630,7 +1770,7 @@ es:{
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
 "Vê se os teus sítios guardados batem certo":"Comprueba que tus sitios guardados están bien",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Una versión anterior de la búsqueda podía guardar un sitio con coordenadas equivocadas — hasta a miles de kilómetros. Ya está corregido, pero lo que quedó guardado en tu dispositivo solo tú puedes confirmarlo. Pregunto una vez.",
-"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La previsión de Ahora, el ancla de la búsqueda, el Desde del planificador y la frase de los radares siguen esta casa.","Redefinir por pesquisa":"Redefinir por búsqueda","Redefinir pelo GPS":"Redefinir por GPS","Redefinir por toque no mapa":"Redefinir tocando el mapa","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Guardados":"Guardados","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Aún no hay nada guardado. Calcula una ruta y toca ⭐ para guardar el destino con tu nombre.","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","não invento onde estás. Sigo assim que voltar.":"No me invento dónde estás. Sigo en cuanto vuelva.","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
+"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La previsión de Ahora, el ancla de la búsqueda, el Desde del planificador y la frase de los radares siguen esta casa.","Redefinir por pesquisa":"Redefinir por búsqueda","Redefinir pelo GPS":"Redefinir por GPS","Redefinir por toque no mapa":"Redefinir tocando el mapa","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Guardados":"Guardados","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Aún no hay nada guardado. Calcula una ruta y toca ⭐ para guardar el destino con tu nombre.","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Te digo si se puede ir en moto — ahora, donde estás, y a lo largo del camino hasta donde vas.","📍 Onde estou":"📍 Dónde estoy","🗺️ O tempo no meu caminho":"🗺️ El tiempo en mi ruta","Como funciona?":"¿Cómo funciona?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si el móvil suspende la app, el tiempo sin comprobaciones se indica al volver — nunca se da por vigilado.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La vigilancia con la app cerrada exige servidor propio y notificaciones push (y, en el iPhone, probablemente la versión instalable nativa). Está en el plan; no está hecho.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activada — comprueba el tiempo donde estás mientras la app esté abierta.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Desactivado. Activado, comprueba el tiempo donde estás mientras la app esté abierta y avisa por voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Centinela activado — comprobación cada ~2 minutos, con la app abierta.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Con la app abierta y en pantalla: comprobación cada ~2 minutos, con aviso por voz, vibración y notificación.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimizada o con la pantalla apagada, el móvil suspende la app: en ese tiempo NO hay comprobaciones. Ninguna app web puede hacerlo sin un servidor que vigile por ella.","Possível chuvisco em ~{d} do caminho":"Posible llovizna en ~{d} del camino","Possível chuvisco já no início do caminho":"Posible llovizna justo al inicio","{x} já aqui":"{x} aquí mismo","a rota está aqui ao lado":"la ruta está justo al lado","Sem sinal GPS — a tentar.":"Sin señal GPS — reintentando.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Sin señal GPS — reintentando. Tu posición puede estar desactualizada.","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
 "✔ Está tudo certo":"✔ Todo correcto","A casa não está certa — corrigir":"La casa no está bien — corregir",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Elige el sitio correcto en la búsqueda de arriba — la casa solo cambia cuando elijas uno.",
 "Ir para a pesquisa":"Ir a la búsqueda","Apagar este registo":"Borrar este registro",
@@ -1647,7 +1787,7 @@ es:{
 "Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Avisos con llovizna/viento moderado; rojo solo con malas condiciones.",
 "Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Solo lluvia seria, tormenta, hielo o viento fuerte frenan el viaje.",
 "Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Tormenta, hielo y nieve siempre dan rojo, por seguridad.",
-"Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Apagado. Actívalo y vigilo el tiempo donde estés, minuto a minuto, avisándote con voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.",
+
 "Ligar":"Activar","🛑 Desligar":"🛑 Apagar","🛑 Terminar":"🛑 Terminar",
 "Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"No consigo contactar los servicios meteorológicos. Revisa la conexión e inténtalo de nuevo.",
 "Dados gratuitos:":"Datos gratuitos:",
@@ -1715,7 +1855,7 @@ es:{
 "maioritariamente lateral":"mayormente lateral","de frente":"de cara","de costas":"de cola",
 "Trajeto {x}":"Ruta {x}","seco ✅":"seca ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"La Ruta {x} pilla mucha menos lluvia — toca el botón (o la línea gris del mapa) para cambiar.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Modo viaje (avisos de lluvia)","🛑 Terminar modo viagem":"🛑 Terminar modo viaje","📋 Copiar resumo":"📋 Copiar resumen",
-"Resumo copiado! 📋":"¡Resumen copiado! 📋","Não consegui copiar automaticamente.":"No pude copiar automáticamente.",
+"Resumo copiado! 📋":"¡Resumen copiado! 📋","Cópia automática indisponível — seleciona e copia à mão.":"Copia automática no disponible — selecciona y copia a mano.",
 "🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 ¿Y si sales más tarde (o antes)?",
 "Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Compara la lluvia para distintas horas de salida — toca para aplicar. Instantáneo.",
 "Se saíres às {h} apanhas {x}.":"Saliendo a las {h} pillas {x}.","o trajeto praticamente seco":"la ruta casi seca","só ~{n} km de chuva":"solo ~{n} km de lluvia",
@@ -1724,7 +1864,7 @@ es:{
 "Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Tramos que requieren atención, a la hora en que pasarás.",
 "a identificar a zona…":"identificando la zona…","perto de {p}":"cerca de {p}","vento lateral":"viento lateral","abranda e segura bem o guiador":"reduce y sujeta firme el manillar",
 "📸 Radares conhecidos no trajeto":"📸 Radares conocidos en la ruta",
-"Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"No pude consultar los radares — recalcula en un momento.",
+"Radares indisponíveis agora. Recalcula daqui a pouco.":"Radares no disponibles ahora. Recalcula en un momento.",
 "A procurar radares fixos ao longo do caminho…":"Buscando radares fijos por el camino…",
 "Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Ningún radar fijo conocido en esta ruta (datos OpenStreetMap). Los móviles no aparecen — ¡juicio! 😉",
 "Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Radares fijos (datos OpenStreetMap — puede estar incompleto; los móviles no aparecen). En Modo Viaje aviso por voz a 1 km.",
@@ -1732,10 +1872,10 @@ es:{
 "📸 Radar fixo":"📸 Radar fijo","— limite {v}":"— límite {v}","🏁 Partida":"🏁 Salida","🎯 Chegada":"🎯 Llegada","🛑 Paragem {n}: {p}":"🛑 Parada {n}: {p}",
 "chegas ~{a} · voltas à estrada ~{b}":"llegas ~{a} · vuelves a la carretera ~{b}",
 "Diz-me para onde queres ir 🙂":"Dime a dónde quieres ir 🙂","A pensar…":"Pensando…","À procura de \"{q}\" perto de ti…":"Buscando \"{q}\" cerca de ti…",
-"Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"Necesito saber dónde estás: permite el GPS o busca tu ciudad en Ahora.",
+"Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Sin ubicación. Permite el GPS, o busca tu ciudad en la pestaña Ahora.",
 "Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"No encontré \"{q}\" por aquí. Prueba añadiendo la ciudad (ej.: \"{q} Madrid\").","perto de: {r}":"cerca de: {r}","a tua posição":"tu posición","o mapa à vista":"el mapa a la vista",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculando la ruta hasta {p} y el tiempo en cada tramo…",
-"A minha posição":"Mi posición","a tua zona":"tu zona","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"No pude trazar ruta hasta ahí — elige otro sitio o ajusta el formulario.",
+"A minha posição":"Mi posición","a tua zona":"tu zona","Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"Sin ruta hasta allí. Elige otro de los sitios de arriba o ajusta el formulario.",
 "Não vás de moto nesta viagem":"No vayas en moto en este viaje",
 "Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Hay tormenta, hielo o nieve previstos — en moto mejor evitarlo.",
 "Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Ve en coche/transporte — o espera: a las {h} la ruta mejora.",
@@ -1787,22 +1927,22 @@ es:{
 "Sentinela desligada.":"Centinela apagado.",
 "distância?":"¿distancia?",
 "🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Este navegador no habla: las indicaciones van por escrito y vibración, sin sonido.",
-"📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 Este dispositivo no da acceso al GPS: escribe tu ciudad para que sepa dónde estás.",
+"📍 Este aparelho não dá acesso ao GPS. Escreve a tua cidade para ter previsão.":"📍 Este dispositivo no da acceso al GPS. Escribe tu ciudad para tener previsión.",
 "🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ El mapa de la última ruta quedó incompleto ({d} de {t} piezas): sin cobertura encontrarás huecos. Vuelve a calcular la ruta con internet para completarlo.",
 "🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ El mapa quedó incompleto ({d} de {t} piezas) — mira los ajustes.",
 "Versão {v}":"Versión {v}",
 "🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 Este dispositivo no tiene ninguna voz instalada: las indicaciones van por escrito y vibración, sin sonido.",
 "🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ No hay voz {n} en este teléfono — hablo en inglés. Puedes instalarla en los ajustes del sistema.",
-"O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.":"El teléfono suspendió la app y estuve {m} min sin comprobar — no pude avisarte en ese tiempo. Comprobando ahora.",
-"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.":"Activo · {p} · última comprobación {h} — {s} Rachas actuales: {g} km/h. Solo vigilo con la app abierta y en pantalla: si la minimizas o apagas la pantalla, el teléfono me suspende.",
+"O telemóvel suspendeu a app: {m} min sem verificações e sem avisos. A verificar agora.":"El móvil suspendió la app: {m} min sin comprobaciones ni avisos. Comprobando ahora.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só com a app aberta e no ecrã: minimizada ou com o ecrã apagado, o telemóvel suspende-a.":"Activado · {p} · última comprobación {h} — {s} Rachas actuales: {g} km/h. Solo con la app abierta y en pantalla: minimizada o con la pantalla apagada, el móvil la suspende.",
 "A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"El centinela se apagó al recargar la página — este dispositivo no da acceso a tu ubicación. Toca para volver a activarlo.",
-"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Centinela activo — siguió encendido desde tu última visita.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Centinela activado — vigilo tu zona cada ~2 minutos.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Centinela activo — siguió encendido desde tu última visita.",
 
 "Previsão para {p}":"Previsión para {p}","Localização: {p}":"Ubicación: {p}","Origem: {p}":"Origen: {p}","A obter a tua posição… 📡":"Obteniendo tu posición… 📡",
 "O teu browser não suporta GPS — pesquisa a cidade.":"Tu navegador no soporta GPS — busca la ciudad.","Sem acesso ao GPS — escreve a origem.":"Sin acceso al GPS — escribe el origen.",
 "Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"Sin GPS — usando {p}. Busca tu ciudad arriba.","Máximo de 4 paragens.":"Máximo 4 paradas.",
 "Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Parada (ej.: súper, gasolinera, casa de Juan…)","Ditar por voz":"Dictar por voz","Ditar a paragem por voz":"Dictar la parada por voz",
-"Voz não suportada neste browser — escreve o destino.":"Voz no soportada — escribe el destino.","Não consegui ouvir — tenta de novo ou escreve.":"No te oí — inténtalo de nuevo o escribe.",
+"Voz não suportada neste browser — escreve o destino.":"Voz no soportada — escribe el destino.","Sem reconhecimento de voz — repete ou escreve o destino.":"Voz no reconocida — repite o escribe el destino.",
 "Voz indisponível neste browser.":"Voz no disponible en este navegador.",'🎤 "{q}" — escolhe a sugestão certa':'🎤 "{q}" — elige la sugerencia correcta',
 "Indica {x}.":"Indica {x}.","a origem":"el origen","o destino":"el destino","a paragem":"la parada",
 "Não encontrei \"{q}\" — tenta \"cidade, país\".":"No encontré \"{q}\" — prueba \"ciudad, país\".",
@@ -1822,13 +1962,13 @@ es:{
 "Este aparelho não dá acesso à localização.":"Este dispositivo no da acceso a la ubicación.",
 "O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"El teléfono no consigue la posición ahora — ubicación del sistema apagada, sin señal, o tardó demasiado. No es un problema de permisos: inténtalo otra vez, mejor a cielo abierto.",
 "📍 A localização está recusada para a Levante":"📍 La ubicación está denegada para Levante",
-"A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:":"El diálogo del sistema solo aparece una vez — no puedo volver a pedirlo. Para activarla de nuevo:",
+"A caixa do sistema só aparece uma vez e não pode ser repetida pela app. Para ligar outra vez:":"El cuadro del sistema aparece solo una vez y la app no puede repetirlo. Para activarlo otra vez:",
 "📍 Localização ligada.":"📍 Ubicación activada.",
 "📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 La ubicación está denegada — la tarjeta junto al origen muestra el camino de vuelta.",
 "📡 Sem posição agora — tenta a céu aberto.":"📡 Sin posición ahora — inténtalo a cielo abierto.",
 "índice moto":"índice moto","Remover paragem":"Quitar parada","A opção mais seca":"La opción más seca",
 "Sentinela: ligada":"Centinela: activada","Sentinela: desligada":"Centinela: desactivada",
-"Ligada — a vigiar o tempo onde estás, minuto a minuto.":"Activada — vigilando el tiempo donde estás, minuto a minuto.",
+
 "Sem chuva prevista até às {h}":"Sin lluvia prevista hasta las {h}","Sem chuva até às {h}":"Sin lluvia hasta las {h}","chuva das {a} às {b}":"lluvia de {a} a {b}","chuva forte das {a} às {b}":"lluvia fuerte de {a} a {b}","chuva possível das {a} às {b}":"lluvia posible de {a} a {b}","limpa depois das {h}":"despeja después de las {h}","sem dados de parte das horas":"faltan datos de algunas horas","Sem dados suficientes para prever as janelas de chuva de hoje.":"No hay datos suficientes para prever las ventanas de lluvia de hoy.",
 "⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Más opciones (paradas, hora de salida, estancia)","Hora de partida vazia = partes agora.":"Hora de salida vacía = sales ahora.",
 "Aqui ({p}): não mostro avisos de radar.":"Aquí ({p}): no muestro avisos de radar.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Aquí ({p}): muestro zonas de peligro amplias, no el punto exacto.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Aquí ({p}): mostrar radares es elección tuya — el interruptor está aquí abajo.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Aquí ({p}): muestro los radares fijos en tu ruta y te aviso.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Radares fijos: sigo la ley de cada país por donde pasa la ruta.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"La ley de este país permite avisos de radares fijos — la leí antes de mostrarlos.","Porquê?":"¿Por qué?","A decisão é tua. Vem desligado.":"La decisión es tuya. Viene desactivado.",
@@ -1836,7 +1976,7 @@ es:{
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Se puede instalar como app — botón “Instalar” aquí arriba.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Para instalar: menú del navegador → “Añadir a pantalla de inicio”, si tu navegador lo permite.",
 "Calcula primeiro uma rota.":"Calcula primero una ruta.","Este dispositivo não dá acesso ao GPS.":"Este dispositivo no da acceso al GPS.",
-"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"No pude obtener la previsión. Revisa la conexión.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
+"Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
 "meteorologia para motociclistas · grátis para começar":"météo pour motards · gratuit pour commencer","Agora":"Maintenant","Rota":"Itinéraire",
@@ -1854,7 +1994,7 @@ fr:{
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
 "Vê se os teus sítios guardados batem certo":"Vérifie que tes lieux enregistrés sont corrects",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Une version précédente de la recherche pouvait enregistrer un lieu avec de mauvaises coordonnées — jusqu'à des milliers de kilomètres à côté. C'est corrigé, mais ce qui est déjà enregistré sur ton appareil, toi seul peux le confirmer. Je demande une fois.",
-"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La prévision de Maintenant, l'ancre de la recherche, le Départ du planificateur et la phrase des radars suivent ce domicile.","Redefinir por pesquisa":"Redéfinir par recherche","Redefinir pelo GPS":"Redéfinir par GPS","Redefinir por toque no mapa":"Redéfinir en touchant la carte","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Guardados":"Enregistrés","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Rien d'enregistré pour l'instant. Calcule un itinéraire et touche ⭐ pour enregistrer la destination sous ton nom.","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","não invento onde estás. Sigo assim que voltar.":"Je n'invente pas ta position. Je reprends dès son retour.","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
+"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La prévision de Maintenant, l'ancre de la recherche, le Départ du planificateur et la phrase des radars suivent ce domicile.","Redefinir por pesquisa":"Redéfinir par recherche","Redefinir pelo GPS":"Redéfinir par GPS","Redefinir por toque no mapa":"Redéfinir en touchant la carte","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Guardados":"Enregistrés","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Rien d'enregistré pour l'instant. Calcule un itinéraire et touche ⭐ pour enregistrer la destination sous ton nom.","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Je te dis si c'est roulable — maintenant, là où tu es, et tout au long du trajet.","📍 Onde estou":"📍 Où je suis","🗺️ O tempo no meu caminho":"🗺️ La météo sur mon trajet","Como funciona?":"Comment ça marche ?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si le téléphone suspend l'app, le temps sans vérification est indiqué au retour — jamais compté comme surveillé.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La surveillance app fermée exige un serveur propre et des notifications push (et, sur iPhone, probablement la version installable native). C'est au plan ; ce n'est pas fait.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activée — vérifie la météo là où tu es tant que l'app est ouverte.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Activée, elle vérifie la météo là où tu es tant que l'app est ouverte et prévient par la voix, la vibration et une notification quand la pluie arrive (ou s'arrête), que le vent monte ou qu'un orage approche.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinelle activée — vérification toutes les ~2 minutes, avec l'app ouverte.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Avec l'app ouverte et à l'écran : vérification toutes les ~2 minutes, avec alerte voix, vibration et notification.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimisée ou écran éteint, le téléphone suspend l'app : pendant ce temps il n'y a AUCUNE vérification. Aucune app web ne peut le faire sans un serveur qui surveille à sa place.","Possível chuvisco em ~{d} do caminho":"Bruine possible sur ~{d} du trajet","Possível chuvisco já no início do caminho":"Bruine possible dès le départ","{x} já aqui":"{x} ici même","a rota está aqui ao lado":"l'itinéraire est juste à côté","Sem sinal GPS — a tentar.":"Pas de signal GPS — nouvelle tentative.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Pas de signal GPS — nouvelle tentative. Ta position peut être obsolète.","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
 "✔ Está tudo certo":"✔ Tout est bon","A casa não está certa — corrigir":"Le domicile n'est pas bon — corriger",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Choisis le bon lieu dans la recherche au-dessus — le domicile ne change que quand tu choisis.",
 "Ir para a pesquisa":"Aller à la recherche","Apagar este registo":"Supprimer cette entrée",
@@ -1871,7 +2011,7 @@ fr:{
 "Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Alertes dès bruine/vent modéré ; rouge seulement par mauvaises conditions.",
 "Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Seules vraie pluie, orage, verglas ou vent fort stoppent le trajet.",
 "Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Orage, verglas et neige donnent toujours rouge, par sécurité.",
-"Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Active-la et je surveille la météo où tu es, minute par minute, avec alertes voix, vibration et notification quand la pluie arrive (ou s'arrête), le vent monte ou l'orage approche.",
+
 "Ligar":"Activer","🛑 Desligar":"🛑 Désactiver","🛑 Terminar":"🛑 Terminer",
 "Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser.":"Impossible de joindre les services météo. Vérifie ta connexion et réessaie.",
 "Dados gratuitos:":"Données gratuites :",
@@ -1939,7 +2079,7 @@ fr:{
 "maioritariamente lateral":"surtout latéral","de frente":"de face","de costas":"dans le dos",
 "Trajeto {x}":"Trajet {x}","seco ✅":"sec ✅","O Trajeto {x} apanha bem menos chuva — toca no botão (ou na linha cinzenta do mapa) para mudares de caminho.":"Le Trajet {x} prend bien moins de pluie — touche le bouton (ou la ligne grise) pour changer.",
 "🧭 Modo viagem (avisos de chuva)":"🧭 Mode trajet (alertes pluie)","🛑 Terminar modo viagem":"🛑 Terminer le mode trajet","📋 Copiar resumo":"📋 Copier le résumé",
-"Resumo copiado! 📋":"Résumé copié ! 📋","Não consegui copiar automaticamente.":"Copie automatique impossible.",
+"Resumo copiado! 📋":"Résumé copié ! 📋","Cópia automática indisponível — seleciona e copia à mão.":"Copie automatique indisponible — sélectionne et copie à la main.",
 "🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 Et si tu partais plus tard (ou plus tôt) ?",
 "Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Compare la pluie selon l'heure de départ — touche pour appliquer. Instantané.",
 "Se saíres às {h} apanhas {x}.":"En partant à {h} tu prends {x}.","o trajeto praticamente seco":"un trajet presque sec","só ~{n} km de chuva":"seulement ~{n} km de pluie",
@@ -1948,7 +2088,7 @@ fr:{
 "Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Tronçons à surveiller, à l'heure où tu y passeras.",
 "a identificar a zona…":"identification de la zone…","perto de {p}":"près de {p}","vento lateral":"vent latéral","abranda e segura bem o guiador":"ralentis et tiens bien le guidon",
 "📸 Radares conhecidos no trajeto":"📸 Radars connus sur le trajet",
-"Não consegui consultar os radares agora — tenta recalcular daqui a pouco.":"Impossible de consulter les radars — recalcule dans un instant.",
+"Radares indisponíveis agora. Recalcula daqui a pouco.":"Radars indisponibles pour l'instant. Recalcule dans un moment.",
 "A procurar radares fixos ao longo do caminho…":"Recherche des radars fixes en chemin…",
 "Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Aucun radar fixe connu sur ce trajet (données OpenStreetMap). Les mobiles n'apparaissent pas — prudence ! 😉",
 "Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Radars fixes (données OpenStreetMap — possiblement incomplet ; les mobiles n'apparaissent pas). En mode trajet, alerte vocale à 1 km.",
@@ -1956,10 +2096,10 @@ fr:{
 "📸 Radar fixo":"📸 Radar fixe","— limite {v}":"— limite {v}","🏁 Partida":"🏁 Départ","🎯 Chegada":"🎯 Arrivée","🛑 Paragem {n}: {p}":"🛑 Arrêt {n} : {p}",
 "chegas ~{a} · voltas à estrada ~{b}":"arrivée ~{a} · reprise de la route ~{b}",
 "Diz-me para onde queres ir 🙂":"Dis-moi où tu veux aller 🙂","A pensar…":"Je réfléchis…","À procura de \"{q}\" perto de ti…":"Recherche de « {q} » près de toi…",
-"Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.":"J'ai besoin de ta position : autorise le GPS ou cherche ta ville dans Maintenant.",
+"Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Pas de position. Autorise le GPS, ou cherche ta ville dans l'onglet Maintenant.",
 "Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"Je n'ai pas trouvé \"{q}\" par ici. Essaie d'ajouter la ville (ex. : \"{q} Lyon\").","perto de: {r}":"près de : {r}","a tua posição":"ta position","o mapa à vista":"la carte affichée",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calcul de l'itinéraire vers {p} et de la météo sur chaque tronçon…",
-"A minha posição":"Ma position","a tua zona":"ta zone","Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.":"Impossible de tracer l'itinéraire — choisis un autre lieu ou ajuste le formulaire.",
+"A minha posição":"Ma position","a tua zona":"ta zone","Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"Pas d'itinéraire jusque-là. Choisis un autre lieu ci-dessus ou ajuste le formulaire.",
 "Não vás de moto nesta viagem":"Ne prends pas la moto pour ce trajet",
 "Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Orage, verglas ou neige prévus en chemin — à éviter à moto.",
 "Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Prends la voiture/les transports — ou attends : à {h} le trajet devient correct.",
@@ -2011,22 +2151,22 @@ fr:{
 "Sentinela desligada.":"Sentinelle désactivée.",
 "distância?":"distance ?",
 "🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Ce navigateur ne parle pas : les indications passent par le texte et les vibrations, sans son.",
-"📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás.":"📍 Cet appareil ne donne pas accès au GPS : écris ta ville pour que je sache où tu es.",
+"📍 Este aparelho não dá acesso ao GPS. Escreve a tua cidade para ter previsão.":"📍 Cet appareil ne donne pas accès au GPS. Écris ta ville pour avoir une prévision.",
 "🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ La carte du dernier trajet est restée incomplète ({d} sur {t} morceaux) : sans réseau tu trouveras des trous. Recalcule le trajet en ligne pour la compléter.",
 "🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ La carte est restée incomplète ({d} sur {t} morceaux) — voir les réglages.",
 "Versão {v}":"Version {v}",
 "🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 Cet appareil n'a aucune voix installée : les indications passent par le texte et les vibrations, sans son.",
 "🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ Il n'y a pas de voix {n} sur ce téléphone — je parle anglais. Tu peux l'installer dans les réglages du système.",
-"O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.":"Ton téléphone a suspendu l'app et je suis resté {m} min sans vérifier — je n'ai pas pu t'avertir. Je vérifie maintenant.",
-"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.":"Activée · {p} · dernière vérification {h} — {s} Rafales actuelles : {g} km/h. Je ne surveille que si l'app est ouverte et à l'écran : si tu la réduis ou éteins l'écran, le téléphone me suspend.",
+"O telemóvel suspendeu a app: {m} min sem verificações e sem avisos. A verificar agora.":"Le téléphone a suspendu l'app : {m} min sans vérification ni alerte. Vérification en cours.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só com a app aberta e no ecrã: minimizada ou com o ecrã apagado, o telemóvel suspende-a.":"Activée · {p} · dernière vérification {h} — {s} Rafales actuelles : {g} km/h. Uniquement avec l'app ouverte et à l'écran : minimisée ou écran éteint, le téléphone la suspend.",
 "A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"La sentinelle a été désactivée au rechargement de la page — cet appareil ne donne pas accès à ta position. Touche pour la réactiver.",
-"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Sentinelle active — elle est restée allumée depuis ta dernière visite.","🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos.":"🔔 Sentinelle activée — je surveille ta zone toutes les ~2 minutes.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Sentinelle active — elle est restée allumée depuis ta dernière visite.",
 
 "Previsão para {p}":"Prévisions pour {p}","Localização: {p}":"Position : {p}","Origem: {p}":"Départ : {p}","A obter a tua posição… 📡":"Localisation en cours… 📡",
 "O teu browser não suporta GPS — pesquisa a cidade.":"Ton navigateur n'a pas de GPS — cherche la ville.","Sem acesso ao GPS — escreve a origem.":"Pas d'accès GPS — saisis le départ.",
 "Sem acesso ao GPS — a usar {p}. Pesquisa a tua cidade acima.":"Pas de GPS — {p} utilisé. Cherche ta ville ci-dessus.","Máximo de 4 paragens.":"Maximum 4 arrêts.",
 "Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Arrêt (ex. supermarché, station-service, chez Jean…)","Ditar por voz":"Dicter à la voix","Ditar a paragem por voz":"Dicter l'arrêt à la voix",
-"Voz não suportada neste browser — escreve o destino.":"Voix non prise en charge — saisis la destination.","Não consegui ouvir — tenta de novo ou escreve.":"Je n'ai pas entendu — réessaie ou écris.",
+"Voz não suportada neste browser — escreve o destino.":"Voix non prise en charge — saisis la destination.","Sem reconhecimento de voz — repete ou escreve o destino.":"Voix non reconnue — répète ou écris la destination.",
 "Voz indisponível neste browser.":"Voix indisponible dans ce navigateur.",'🎤 "{q}" — escolhe a sugestão certa':'🎤 « {q} » — choisis la bonne suggestion',
 "Indica {x}.":"Indique {x}.","a origem":"le départ","o destino":"la destination","a paragem":"l'arrêt",
 "Não encontrei \"{q}\" — tenta \"cidade, país\".":"« {q} » introuvable — essaie « ville, pays ».",
@@ -2046,13 +2186,13 @@ fr:{
 "Este aparelho não dá acesso à localização.":"Cet appareil ne donne pas accès à la position.",
 "O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"Le téléphone n'arrive pas à obtenir la position — localisation du système coupée, pas de signal, ou trop long. Ce n'est pas un problème d'autorisation : réessaie, de préférence à ciel ouvert.",
 "📍 A localização está recusada para a Levante":"📍 La position est refusée pour Levante",
-"A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:":"La fenêtre du système n'apparaît qu'une fois — je ne peux pas la redemander. Pour réactiver :",
+"A caixa do sistema só aparece uma vez e não pode ser repetida pela app. Para ligar outra vez:":"La boîte du système n'apparaît qu'une fois et l'app ne peut pas la relancer. Pour l'activer à nouveau :",
 "📍 Localização ligada.":"📍 Position activée.",
 "📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 La position est refusée — la carte près du départ montre le chemin.",
 "📡 Sem posição agora — tenta a céu aberto.":"📡 Pas de position — essaie à ciel ouvert.",
 "índice moto":"indice moto","Remover paragem":"Retirer l'arrêt","A opção mais seca":"L'option la plus sèche",
 "Sentinela: ligada":"Sentinelle : activée","Sentinela: desligada":"Sentinelle : désactivée",
-"Ligada — a vigiar o tempo onde estás, minuto a minuto.":"Activée — je surveille la météo là où tu es, minute par minute.",
+
 "Sem chuva prevista até às {h}":"Pas de pluie prévue jusqu'à {h}","Sem chuva até às {h}":"Pas de pluie jusqu'à {h}","chuva das {a} às {b}":"pluie de {a} à {b}","chuva forte das {a} às {b}":"forte pluie de {a} à {b}","chuva possível das {a} às {b}":"pluie possible de {a} à {b}","limpa depois das {h}":"éclaircie après {h}","sem dados de parte das horas":"données manquantes sur certaines heures","Sem dados suficientes para prever as janelas de chuva de hoje.":"Pas assez de données pour prévoir les fenêtres de pluie du jour.",
 "⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Plus d'options (arrêts, heure de départ, séjour)","Hora de partida vazia = partes agora.":"Heure de départ vide = tu pars maintenant.",
 "Aqui ({p}): não mostro avisos de radar.":"Ici ({p}) : je ne montre aucun avertissement radar.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Ici ({p}) : je montre des zones de danger élargies, pas le point exact.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Ici ({p}) : montrer les radars est ton choix — l'interrupteur est juste en dessous.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Ici ({p}) : je montre les radars fixes sur ton trajet et je te préviens.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Radars fixes : je suis la loi de chaque pays traversé par le trajet.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"La loi de ce pays autorise les avertissements de radars fixes — je l'ai lue avant de les montrer.","Porquê?":"Pourquoi ?","A decisão é tua. Vem desligado.":"La décision est à toi. Désactivé par défaut.",
@@ -2060,7 +2200,7 @@ fr:{
 "📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Tu peux l'installer comme app — bouton « Installer » juste au-dessus.",
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Pour installer : menu du navigateur → « Ajouter à l'écran d'accueil », si ton navigateur le permet.",
 "Calcula primeiro uma rota.":"Calcule d'abord un itinéraire.","Este dispositivo não dá acesso ao GPS.":"Cet appareil ne fournit pas de GPS.",
-"Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.":"Impossible d'obtenir les prévisions. Vérifie ta connexion.","Tentar de novo":"Réessayer","Idioma":"Langue","norte":"nord",
+"Sem previsão. Verifica a ligação à internet e tenta de novo.":"Pas de prévision. Vérifie la connexion internet et réessaie.","Tentar de novo":"Réessayer","Idioma":"Langue","norte":"nord",
 }};
 /* razões do índice + favoritos */
 Object.assign(I18N.en,{
@@ -2076,8 +2216,8 @@ Object.assign(I18N.en,{
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Plan manually (stops, departure time)",
 "🔄 Saíste da rota — a recalcular…":"🔄 Off route — recalculating…","um instante…":"one moment…","A tua posição":"Your position",
 "Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"No {n} voice is installed on this phone. I will speak English; you can add the voice in your system settings.","Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"This device has no speech voices installed — directions will be text and vibration only.","Rota recalculada.":"Route recalculated.","🔄 Rota recalculada a partir da tua posição.":"🔄 Route recalculated from your position.",
-"não consegui recalcular — verifica a ligação; volto a tentar":"couldn't recalculate — check your connection; I'll retry",
-"estás a {d} km da rota — vou recalcular":"you're {d} km off route — recalculating",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"recalculation failed — check the connection. The previous route is still on screen.",
+"a {d} km da rota — a recalcular":"{d} km off route — recalculating",
 "🏍️ A moto pode ficar cá fora":"🏍️ Your bike can stay outside","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ No rain expected {w}. Feel free to leave it out.",
 "🌧️ Abriga a moto":"🌧️ Put the bike under cover","Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.":"Rain expected around {h}. If you can, park the bike under cover.",
 "🌧️ Vai começar a chover":"🌧️ Rain is about to start","Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Rain around {h} — if the bike is outside, put it away now.",
@@ -2115,7 +2255,7 @@ Object.assign(I18N.en,{
 "🗓️ Agendada: {p} — vê no calendário (canto superior direito).":"🗓️ Scheduled: {p} — see the calendar (top right).",
 "🏍️ Viagem daqui a 1h30":"🏍️ Trip in 1h30","{p} às {h} — abre a app para veres o tempo antes de saíres.":"{p} at {h} — open the app to check the weather before leaving.",
 "ainda sem previsão":"no forecast yet","chuva forte/trovoada":"heavy rain/storm","chuva prevista":"rain expected","vento muito forte":"very strong wind","possível chuvisco":"possible drizzle","bom para ir":"good to go",
-"partida {h}":"departure {h}","🗓️ A abrir: {p}":"🗓️ Opening: {p}","Não consegui abrir esta viagem.":"Couldn't open this trip.",
+"partida {h}":"departure {h}","🗓️ A abrir: {p}":"🗓️ Opening: {p}","Viagem indisponível.":"Trip unavailable.",
 "⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ To arrive by {h} you should have left already — showing it from now.",
 "⏱️ Para chegares às {h}, parte às {d}.":"⏱️ To arrive by {h}, leave at {d}.",
 "🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voice muted — you still get vibration and notifications.",
@@ -2133,7 +2273,7 @@ Object.assign(I18N.en,{
 
 "Dados:":"Data:",
 "Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no sign-ups, no tracking. Your location and your destination are sent to the weather and routing services so they can answer you — and we keep none of it. Ride smart: on a red warning, stay home.",
-"Privacidade":"Privacy",
+"Privacidade":"Privacy","Créditos e licenças":"Credits & licences","Créditos e licenças do mapa":"Map credits and licences",
 "Termos de utilização":"Terms of use",
 
 "Unidades alteradas para {u}.":"Units changed to {u}.",
@@ -2171,8 +2311,8 @@ Object.assign(I18N.es,{
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Planificar manualmente (paradas, hora de salida)",
 "🔄 Saíste da rota — a recalcular…":"🔄 Saliste de la ruta — recalculando…","um instante…":"un momento…","A tua posição":"Tu posición",
 "Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"No hay voz {n} instalada en este teléfono. Hablaré en inglés; puedes añadirla en los ajustes del sistema.","Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Este dispositivo no tiene voces instaladas — las indicaciones serán solo texto y vibración.","Rota recalculada.":"Ruta recalculada.","🔄 Rota recalculada a partir da tua posição.":"🔄 Ruta recalculada desde tu posición.",
-"não consegui recalcular — verifica a ligação; volto a tentar":"no pude recalcular — revisa la conexión; volveré a intentar",
-"estás a {d} km da rota — vou recalcular":"estás a {d} km de la ruta — voy a recalcular",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"el recálculo falló — comprueba la conexión. La ruta anterior sigue en pantalla.",
+"a {d} km da rota — a recalcular":"a {d} km de la ruta — recalculando",
 "🏍️ A moto pode ficar cá fora":"🏍️ La moto puede quedarse fuera","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ Sin lluvia prevista {w}. Puedes dejarla fuera tranquilo.",
 "🌧️ Abriga a moto":"🌧️ Resguarda la moto","Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.":"Lluvia prevista hacia las {h}. Si puedes, déjala a cubierto.",
 "🌧️ Vai começar a chover":"🌧️ Va a empezar a llover","Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Lluvia hacia las {h} — si la moto está fuera, guárdala ahora.",
@@ -2210,7 +2350,7 @@ Object.assign(I18N.es,{
 "🗓️ Agendada: {p} — vê no calendário (canto superior direito).":"🗓️ Programado: {p} — míralo en el calendario (arriba a la derecha).",
 "🏍️ Viagem daqui a 1h30":"🏍️ Viaje en 1h30","{p} às {h} — abre a app para veres o tempo antes de saíres.":"{p} a las {h} — abre la app para ver el tiempo antes de salir.",
 "ainda sem previsão":"aún sin previsión","chuva forte/trovoada":"lluvia fuerte/tormenta","chuva prevista":"lluvia prevista","vento muito forte":"viento muy fuerte","possível chuvisco":"posible llovizna","bom para ir":"bueno para ir",
-"partida {h}":"salida {h}","🗓️ A abrir: {p}":"🗓️ Abriendo: {p}","Não consegui abrir esta viagem.":"No pude abrir este viaje.",
+"partida {h}":"salida {h}","🗓️ A abrir: {p}":"🗓️ Abriendo: {p}","Viagem indisponível.":"Viaje no disponible.",
 "⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Para llegar a las {h} ya deberías haber salido — te lo muestro desde ahora.",
 "⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Para llegar a las {h}, sal a las {d}.",
 "🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voz silenciada — sigues recibiendo vibración y notificaciones.",
@@ -2228,7 +2368,7 @@ Object.assign(I18N.es,{
 
 "Dados:":"Datos:",
 "Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas, sin registros, sin rastreo. Tu ubicación y tu destino se envían a los servicios de meteorología y de rutas para poder responderte — y no guardamos nada. Conduce con cabeza: con aviso rojo, quédate en casa.",
-"Privacidade":"Privacidad",
+"Privacidade":"Privacidad","Créditos e licenças":"Créditos y licencias","Créditos e licenças do mapa":"Créditos y licencias del mapa",
 "Termos de utilização":"Términos de uso",
 
 "Unidades alteradas para {u}.":"Unidades cambiadas a {u}.",
@@ -2266,8 +2406,8 @@ Object.assign(I18N.fr,{
 "✎ Planear manualmente (paragens, hora de partida)":"✎ Planifier manuellement (arrêts, heure de départ)",
 "🔄 Saíste da rota — a recalcular…":"🔄 Hors itinéraire — recalcul en cours…","um instante…":"un instant…","A tua posição":"Ta position",
 "Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"Aucune voix {n} n'est installée sur ce téléphone. Je parlerai anglais ; tu peux l'ajouter dans les réglages.","Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Cet appareil n'a aucune voix installée — les indications seront en texte et vibration seulement.","Rota recalculada.":"Itinéraire recalculé.","🔄 Rota recalculada a partir da tua posição.":"🔄 Itinéraire recalculé depuis ta position.",
-"não consegui recalcular — verifica a ligação; volto a tentar":"recalcul impossible — vérifie la connexion ; je réessaierai",
-"estás a {d} km da rota — vou recalcular":"tu es à {d} km de l'itinéraire — je recalcule",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"le recalcul a échoué — vérifie la connexion. L'itinéraire précédent reste à l'écran.",
+"a {d} km da rota — a recalcular":"à {d} km de l'itinéraire — recalcul en cours",
 "🏍️ A moto pode ficar cá fora":"🏍️ La moto peut rester dehors","✅ Sem chuva prevista {w}. Podes deixá-la fora à vontade.":"✅ Pas de pluie prévue {w}. Tu peux la laisser dehors.",
 "🌧️ Abriga a moto":"🌧️ Mets la moto à l'abri","Chuva prevista por volta das {h}. Se puderes, deixa a moto abrigada.":"Pluie prévue vers {h}. Si tu peux, gare-la à l'abri.",
 "🌧️ Vai começar a chover":"🌧️ La pluie arrive","Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Pluie vers {h} — si la moto est dehors, rentre-la maintenant.",
@@ -2305,7 +2445,7 @@ Object.assign(I18N.fr,{
 "🗓️ Agendada: {p} — vê no calendário (canto superior direito).":"🗓️ Planifié : {p} — regarde le calendrier (en haut à droite).",
 "🏍️ Viagem daqui a 1h30":"🏍️ Trajet dans 1h30","{p} às {h} — abre a app para veres o tempo antes de saíres.":"{p} à {h} — ouvre l'app pour vérifier la météo avant de partir.",
 "ainda sem previsão":"pas encore de prévision","chuva forte/trovoada":"pluie forte/orage","chuva prevista":"pluie prévue","vento muito forte":"vent très fort","possível chuvisco":"bruine possible","bom para ir":"bon pour rouler",
-"partida {h}":"départ {h}","🗓️ A abrir: {p}":"🗓️ Ouverture : {p}","Não consegui abrir esta viagem.":"Impossible d'ouvrir ce trajet.",
+"partida {h}":"départ {h}","🗓️ A abrir: {p}":"🗓️ Ouverture : {p}","Viagem indisponível.":"Trajet indisponible.",
 "⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Pour arriver à {h} tu aurais déjà dû partir — je te montre à partir de maintenant.",
 "⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Pour arriver à {h}, pars à {d}.",
 "🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voix coupée — tu reçois toujours vibrations et notifications.",
@@ -2323,7 +2463,7 @@ Object.assign(I18N.fr,{
 
 "Dados:":"Données :",
 "Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans comptes, sans inscription, sans pistage. Ta position et ta destination sont envoyées aux services météo et d'itinéraires pour pouvoir te répondre — et nous n'en gardons rien. Roule malin : en cas d'alerte rouge, reste chez toi.",
-"Privacidade":"Confidentialité",
+"Privacidade":"Confidentialité","Créditos e licenças":"Crédits et licences","Créditos e licenças do mapa":"Crédits et licences de la carte",
 "Termos de utilização":"Conditions d'utilisation",
 
 "Unidades alteradas para {u}.":"Unités changées en {u}.",
@@ -2481,7 +2621,15 @@ function bearing(a,b){ const d=Math.PI/180;
   return (Math.atan2(y,x)*180/Math.PI+360)%360; }
 const windArrow=(deg)=>["↓","↙","←","↖","↑","↗","→","↘"][Math.round(((deg%360)/45))%8];
 const debounce=(fn,ms)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
-function toast(msg,ms=3200){ const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+/* dd-62 §8: em Modo viagem, nada de sobreposições semi-apagadas por cima do
+   mapa. Quem conduz não lê toasts — e o que estava lá era pior do que ruído:
+   um toast antigo a dizer "não se espera chuva" ficava por trás do painel a
+   contradizê-lo. O que é permanente vive na faixa (7g-bis); o que é passageiro
+   não tem lugar na estrada. As mensagens continuam a existir para quem não
+   está a conduzir, e o modo viagem tem a sua própria barra. */
+function toast(msg,ms=3200){
+  if(typeof travel==="object"&&travel.active) return;
+  const t=$("#toast"); t.textContent=msg; t.classList.add("show");
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),ms); }
 function localDT(date){ const p=(n)=>String(n).padStart(2,"0");
   return `${date.getFullYear()}-${p(date.getMonth()+1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}`; }
@@ -3575,7 +3723,7 @@ function renderCameras(){
   const card=el("div","card");
   card.appendChild(el("h2",null,semEmoji(t("📸 Radares conhecidos no trajeto"))));
   if(R.camerasError){
-    card.appendChild(el("p","h-sub",t("Não consegui consultar os radares agora — tenta recalcular daqui a pouco.")));
+    card.appendChild(el("p","h-sub",t("Radares indisponíveis agora. Recalcula daqui a pouco.")));
     box.appendChild(card); return;
   }
   if(!R.cameras){ card.appendChild(el("p","h-sub",t("A procurar radares fixos ao longo do caminho…"))); box.appendChild(card); return; }
@@ -3759,13 +3907,47 @@ const VERDICT=[
    Campos null não testemunham (caem para 0): quem tem de aplicar a condição
    assimétrica é quem AGREGA — o nível 0 de uma amostra com `faltas` nunca
    pode virar "seco" afirmado (renderRouteSummary / renderDashboard). */
-function rainLevel(pr, pp, code, prof=PROFILES[state.profile]){
-  if(THUNDER.includes(code)||FREEZING.includes(code)||SNOW.includes(code)) return 3;
-  if(pr>=2.5) return 3;
-  if(pr>=0.8) return 2;
-  if(pr>=0.08) return 1;
-  if(pp>=prof.ppRisk) return 1;
+/* ═══ A ÚNICA RÉGUA DA CHUVA (dd-61 a) ═════════════════════════════════════
+   O defeito que o Ricardo apanhou no ar: o cartão dizia "chuvisco possível em
+   ~1 km" e a voz dizia que não chovia nas 12 horas seguintes. Duas cabeças,
+   uma a mentir. O inventário deu SETE caminhos a decidir "chove/não chove",
+   cada um com os seus números:
+
+     rainLevel (cartão/faixa/painel/troços)  pr≥0,08 · pp≥perfil
+     gearAdvice (equipamento)                pr>0,05 · pp≥40
+     fraseJanelaChuva (linha do Agora)       pr≥0,8 · pp≥60
+     dayVerdict (7 dias)                     ps≥0,8 · pp≥35
+     seca/óleo                               pr≥firstRainMm
+     findNextRain (guarda-da-mota E VOZ)     pr≥0,2 · pp≥65
+     Sentinela (alarmes nativos)             pr≥0,2 · pp≥70
+
+   Com pr=0,1 e pp=50: o cartão dizia chuvisco, a voz dizia seco. Não era um
+   erro de arredondamento — eram sete produtos diferentes a responder à mesma
+   pergunta. A partir daqui: **uma função decide, e todos bebem dela.**
+
+   `nivelChuva` é essa função. Quem só quer saber "vai chover?" chama
+   `vaiChover()`, que é `nivelChuva(...) >= 1` — nunca os seus próprios
+   números. Quem precisa de intensidade usa o nível. O perfil do utilizador
+   (conservador/equilibrado/tolerante) entra AQUI e em nenhum outro sítio,
+   senão volta a haver dois utilizadores dentro da mesma app.
+
+   `null` não testemunha, e continua a não testemunhar: uma hora sem dados
+   não anuncia chuva nem afirma o seco. */
+function nivelChuva(pr, pp, code, prof=PROFILES[state.profile]){
+  if(code!=null&&(THUNDER.includes(code)||FREEZING.includes(code)||SNOW.includes(code))) return 3;
+  if(pr!=null&&pr>=2.5) return 3;
+  if(pr!=null&&pr>=0.8) return 2;
+  if(pr!=null&&pr>=0.08) return 1;
+  if(pp!=null&&pp>=prof.ppRisk) return 1;
   return 0;
+}
+/* a pergunta binária, para quem não precisa de intensidade */
+function vaiChover(pr, pp, code, prof=PROFILES[state.profile]){
+  return nivelChuva(pr,pp,code,prof)>=1;
+}
+/* o nome antigo continua a servir — é o mesmo veredicto, não uma cópia */
+function rainLevel(pr, pp, code, prof=PROFILES[state.profile]){
+  return nivelChuva(pr,pp,code,prof);
 }
 const rainLabel=(lvl,pr)=>t(["Seco","Chuvisco possível","Chuva","Chuva forte / trovoada"][lvl]);
 
@@ -3778,7 +3960,7 @@ function gearAdvice(hs){ // hs: métricas das próximas ~n horas
      frio. O que não veio fica fora do conselho; o cartão do veredicto já
      carrega o aviso do buraco. */
   const fin=(f)=>hs.map(f).filter(v=>v!=null);
-  const anyRain=hs.some(m=>m.pr>0.05||m.pp>=40);
+  const anyRain=hs.some(m=>vaiChover(m.pr,m.pp,m.code));   // dd-61 a: mesma régua
   const heavyRain=hs.some(m=>m.pr>1);
   const ats=fin(m=>m.at);
   const minAt=ats.length?Math.min(...ats):null;
@@ -3873,7 +4055,7 @@ function voiceInto(btn,cb){
     const old=btn.textContent;
     btn.classList.add("rec"); btn.textContent="⏹";
     rec.onresult=(e)=>{ try{ cb(e.results[0][0].transcript); }catch(err){} };
-    rec.onerror=()=>toast(t("Não consegui ouvir — tenta de novo ou escreve."));
+    rec.onerror=()=>toast(t("Sem reconhecimento de voz — repete ou escreve o destino."));
     rec.onend=()=>{ btn.classList.remove("rec"); btn.textContent=old; activeRec=null; };
     rec.start();
   }catch(e){ activeRec=null; btn.classList.remove("rec"); toast(t("Voz indisponível neste browser.")); }
@@ -3951,7 +4133,7 @@ function setHome(loc, {silent=false, prov, deStore=false}={}){
     .then(wx=>{ state.wx=wx; renderDashboard(); loadSecaAgora(loc.lat,loc.lon); })
     .catch(()=>{ if(!silent){ box.textContent="";
       const b=el("div","banner err"); b.append(el("span",null,"⚠️"),
-        el("span",null,t("Não consegui obter a previsão. Verifica a ligação à internet e tenta novamente.")));
+        el("span",null,t("Sem previsão. Verifica a ligação à internet e tenta de novo.")));
       const r=el("button","btn",t("Tentar de novo")); r.style.marginTop="8px";
       r.addEventListener("click",()=>setHome(loc));
       box.appendChild(b); box.appendChild(r); } });
@@ -4025,7 +4207,7 @@ function renderLocEstado(alvo,tipo){
   const c=el("div","banner err");
   const tit=el("div"); tit.style.fontWeight="700";
   tit.textContent=t("📍 A localização está recusada para a Levante");
-  const p1=el("div",null,t("A caixa do sistema só aparece uma vez — não posso voltar a pedi-la. Para ligares outra vez:"));
+  const p1=el("div",null,t("A caixa do sistema só aparece uma vez e não pode ser repetida pela app. Para ligar outra vez:"));
   const p2=el("div"); p2.style.marginTop="4px"; p2.textContent=locCaminho();
   const col=el("div"); col.append(tit,p1,p2);
   c.append(el("span",null,"🔒"),col);
@@ -4090,10 +4272,13 @@ function fraseJanelaChuva(H,metrics,i0,prof){
   for(let i=i0;i<N;i++){
     const m=metrics[i];
     if(m.pr==null&&m.pp==null){ cls.push("?"); faltas++; continue; }
-    if((m.pr??0)>=JANELA_CFG.prForte||THUNDER.includes(m.code)) cls.push("F");
-    else if((m.pp??0)>=JANELA_CFG.ppProvavel||(m.pr??0)>=0.8) cls.push("C");
-    else if((m.pp??0)>=JANELA_CFG.ppPossivel||(m.pr??0)>=0.08) cls.push("P");
-    else cls.push("S");
+    /* dd-61 a: as faixas derivam da régua única — F = nível 3, C = nível 2,
+       P = nível 1, S = seco. Tinha aqui três limiares próprios (prForte,
+       ppProvavel, ppPossivel) que podiam dizer "seco" numa hora em que o
+       cartão dizia "chuvisco possível". O CFG fica como documentação dos
+       degraus, mas quem decide é o nivelChuva. */
+    const nv=nivelChuva(m.pr,m.pp,m.code,prof);
+    cls.push(nv>=3?"F":nv===2?"C":nv===1?"P":"S");
   }
   if(faltas>=(N-i0)/2) return {tipo:"sem-dados",txt:t("Sem dados suficientes para prever as janelas de chuva de hoje.")};
   const runs=[]; for(let k=0;k<cls.length;k++){
@@ -4473,7 +4658,15 @@ function renderDaily(wx){
    fonte openmaptiles); aqui só entra o extra que o estilo não conhece. */
 function baseMapa(){
   const escuro=document.documentElement.dataset.theme==="dark";
-  return { estilo:escuro?"./estilo-escuro.json":"./estilo-claro.json", zoomMax:19,
+  /* dd-60 — DECISÃO DO RICARDO (porteiro 5, aberto desde o rel-17):
+     **Liberty ajustado de dia, o escuro atual de noite.** O Liberty não tem
+     gémeo escuro mantido, e um par dia/noite de famílias diferentes é
+     prática honesta — o que tem de bater certo é o contraste, e esse é
+     medido pela guarda, não pela família do estilo.
+     Os dois ajustes do rel-17 vivem no ficheiro: `poi_transit` só a partir
+     do zoom 15 (não compete com os perigos) e o corredor-halo, que a
+     bandeira liga. */
+  return { estilo:escuro?"./estilo-escuro.json":"./estilo-liberty-ajustado.json", zoomMax:19,
     atribuicaoExtra:(typeof geoOn==="function"&&geoOn()?'<a href="https://www.geoapify.com/">Geoapify</a>':"") };
 }
 /* =====================================================================
@@ -4629,6 +4822,31 @@ const Mapa = (() => {
          não chegou — offline isso é a vida, não um erro da app. O que
          interessa (o estilo que não carrega) trata-se no base(). */
       m.on("error", () => {});
+      /* ═══ A HACHURA DO QUE NÃO ESTÁ DESCARREGADO ═══════════════════════
+         O estilo tem duas camadas sobre a `levante_falta` (o tile sintético
+         que o service worker devolve quando não guardou o tile a sério): um
+         tom liso e, por cima, `fill-pattern:"levante-falta"`. O PADRÃO É
+         UMA IMAGEM, e as imagens de um estilo não vêm no ficheiro — quem as
+         regista é o cliente. Ninguém as registava aqui: a camada do risco
+         existia desde o A2.2 e nunca desenhou nada na app. As sondas do
+         buraco desenhavam-na porque **eram elas** a registar a imagem, e
+         provavam o harness, não a app — regra 2, e ficou verde meses.
+         Sem o risco, um tile em falta era só um tom liso: legível como "aqui
+         não há nada" em vez de "isto não está descarregado", que é
+         precisamente a leitura errada para quem vai a meio da serra.
+         O ouvinte (e não um addImage à cabeça) é o que sobrevive ao
+         setStyle: mudar de tema limpa as imagens e o MapLibre volta a pedi-la
+         — e nessa altura já com a cor do tema novo. */
+      m.on("styleimagemissing", (e) => {
+        if (e.id !== "levante-falta" || m.hasImage("levante-falta")) return;
+        const escuro = document.documentElement.dataset.theme === "dark";
+        const P = 16, c = document.createElement("canvas"); c.width = c.height = P;
+        const g = c.getContext("2d");
+        g.strokeStyle = escuro ? "rgba(150,163,186,0.20)" : "rgba(108,122,142,0.20)";
+        g.lineWidth = 2; g.lineCap = "square";
+        for (const d of [-P, 0, P]) { g.beginPath(); g.moveTo(d, P); g.lineTo(d + P, 0); g.stroke(); }
+        try { m.addImage("levante-falta", g.getImageData(0, 0, P, P), { pixelRatio: 2 }); } catch (err) {}
+      });
       const h = { m, fontes: new Map(), marcadores: new Set(), pend: [], pronto: false, _rodar: !!rodar, _atrib: null };
       /* o MapLibre carrega estilos por fetch: entre um setStyle e o
          style.load, qualquer addSource rebenta. Tudo o que toca no estilo
@@ -4692,9 +4910,30 @@ const Mapa = (() => {
       if (h._atrib) { try { h.m.removeControl(h._atrib); } catch (e) {} }
       /* compact:false — a atribuição é uma obrigação de licença e no A4.2 é
          a única casa dela no ecrã-mapa: não se esconde atrás de um ⓘ */
+      /* ═══ ATRIBUIÇÃO (dd-66 + dd-67) — verificado nas orientações da OSMF
+         a 31/07/2026 (OSMF Attribution Guidelines, mapa interativo).
+
+         O que a licença permite, e é o que fazemos: os créditos aparecem num
+         canto do mapa e **podem desvanecer** — ao interagir com o mapa ou
+         automaticamente ao fim de ~5 s. Se colapsados, têm de continuar
+         **encontráveis**, "por exemplo num botão ⓘ no canto do mapa". Para
+         telemóvel, admite-se a atribuição a **uma interação de distância**.
+
+         Por isso: visíveis ao abrir, em BAIXO À ESQUERDA (o canto tradicional,
+         longe do polegar direito e do botão de recentrar, fora da faixa de
+         manobra e da barra); somem aos 5 s ou à primeira interação, o que
+         vier primeiro; e fica um **ⓘ sempre presente** que abre a página de
+         créditos. **A página é o DESTINO, nunca o esconderijo** — tê-la só na
+         página, sem sinal no mapa, não é conforme.
+
+         O que NUNCA: tapada por painéis, cortada, ou ausente do mapa E da
+         página ao mesmo tempo. Na captura do dd-68 §3 os créditos
+         atravessavam o mapa POR CIMA DA ROTA, a meio do ecrã — era o
+         `bottom-right` a cair na moldura do mapa em Modo viagem. */
       h._atrib = new maplibregl.AttributionControl(
         atribuicaoExtra ? { compact: false, customAttribution: atribuicaoExtra } : { compact: false });
-      h.m.addControl(h._atrib, "bottom-right");
+      h.m.addControl(h._atrib, "bottom-left");
+      maplibre_._atribuicaoDesvanece(h);
       try {
         const est = await (await fetch(estilo)).json();
         /* o MapLibre aceita glifos relativos mas exige sprite absoluto —
@@ -4721,6 +4960,47 @@ const Mapa = (() => {
         /* sem estilo (primeiro arranque offline, teste sem rede): fica o
            fundo liso do criar() — rota, marcadores e GPS funcionam à mesma */
       }
+    },
+    /* dd-66 §2/§3 + dd-67: o desvanecimento e o ⓘ que fica. O ⓘ é criado uma
+       vez por mapa e vive fora do controlo do MapLibre (que o substitui a cada
+       setStyle); o alvo de toque é de LUVA (44×44 CSS), mesmo com o desenho
+       pequeno — encolher o alvo até ao intocável é o mesmo que não atribuir. */
+    _atribuicaoDesvanece(h) {
+      const cont = h.m.getContainer();
+      const barra = () => cont.querySelector(".maplibregl-ctrl-attrib");
+      const esconder = () => { const b = barra(); if (b) b.classList.add("atrib-fora"); };
+      if (h._atribTimer) clearTimeout(h._atribTimer);
+      const b = barra(); if (b) b.classList.remove("atrib-fora");
+      /* 5 s OU a primeira interação — o que vier primeiro (dd-67 §1). Em Modo
+         viagem toca-se/arrasta-se quase de imediato: na prática sai em
+         segundos, que é exatamente o que o Ricardo pediu. */
+      h._atribTimer = setTimeout(esconder, 5000);
+      if (!h._atribLigado) {
+        h._atribLigado = true;
+        /* SÓ interação DE GENTE. A primeira versão ouvia `dragstart`/`zoomstart`
+           sem mais nada e a guarda apanhou-a: o nosso próprio `fitBounds` do
+           enquadramento — e o `easeTo` da câmara de condução — disparam esses
+           eventos, portanto os créditos desapareciam antes de alguém os ver.
+           Uma atribuição que some sozinha em 300 ms não é uma atribuição que
+           desvanece: é uma atribuição que não existe, e a orientação da OSMF
+           fala de **dispensa pelo utilizador**, não de movimentos da app.
+           O `originalEvent` é o que separa os dois: o MapLibre só o traz
+           quando o movimento nasce de um gesto. */
+        for (const ev of ["dragstart", "zoomstart", "rotatestart", "pitchstart"])
+          h.m.on(ev, (e) => { if (e && e.originalEvent) esconder(); });
+        for (const ev of ["touchstart", "mousedown"])
+          cont.addEventListener(ev, esconder, { passive: true, once: false });
+      }
+      if (!h._atribInfo) {
+        const i = document.createElement("a");
+        i.className = "atrib-info"; i.id = "atrib-info";
+        i.href = "./creditos.html"; i.target = "_blank"; i.rel = "noopener";
+        i.textContent = "ⓘ";
+        cont.appendChild(i);
+        h._atribInfo = i;
+      }
+      h._atribInfo.setAttribute("aria-label", t("Créditos e licenças do mapa"));
+      h._atribInfo.title = t("Créditos e licenças do mapa");
     },
     redimensionar(h) { h.m.resize(); },
 
@@ -4965,7 +5245,13 @@ const Mapa = (() => {
 
     /* ---- eventos, com nomes nossos ------------------------------------ */
     aoEvento(h, nome, cb) {
-      if (nome === "arrastar") { h.m.on("dragstart", (e) => cb(null, e)); return; }
+      /* SÓ o gesto de gente. O `dragstart` do MapLibre chega sem
+         `originalEvent` quando é a própria app a mexer a câmara, e quem ouve
+         este evento usa-o para decidir "o utilizador tomou conta do mapa" —
+         um `easeTo` nosso a passar por gesto tira o mapa do enquadramento
+         automático e deixa a rota cortada. É a mesma lição da atribuição
+         (dd-66), aprendida no mesmo dia e no mesmo ficheiro. */
+      if (nome === "arrastar") { h.m.on("dragstart", (e) => { if (e && e.originalEvent) cb(null, e); }); return; }
       if (nome === "mover") { h.m.on("moveend", (e) => cb(null, e)); return; }
       if (nome === "clique-longo") {
         /* contextmenu ouvido no CONTENTOR, como o motor antigo — o MapLibre
@@ -5477,6 +5763,32 @@ function enquadrarRota(tentativa=0){
   if((pequeno||cresceu)&&tentativa<24){
     requestAnimationFrame(()=>enquadrarRota(tentativa+1)); return;
   }
+  /* E QUANDO AS 24 TENTATIVAS SE ESGOTAM? Desistia em silêncio, e o mapa
+     ficava exatamente onde estava — a captura do Ricardo outra vez, agora só
+     em máquinas lentas. Vinte e quatro frames são ~400 ms com 60 fps, e menos
+     de nada quando o separador ainda está escondido: com a vista em
+     `display:none` o rAF nem sequer dispara, e a cadeia morre calada.
+     Um teto de tentativas é aceitável para não ficar a girar; **desistir sem
+     enquadrar não é.** Quando o teto chega e o contentor ainda não serve,
+     passa-se a esperar pelo facto em vez de pelo relógio: um `ResizeObserver`
+     de um tiro, que enquadra assim que o mapa tiver mesmo tamanho.
+     Apanhado pela guarda do dd-57 §1, que ficava vermelha uma corrida em três
+     nesta bancada — e uma régua que muda de cor sem o produto mudar ou está
+     mal feita ou está a apanhar algo real. Era real. */
+  if(pequeno||cresceu){
+    if(!enquadrarRota._obs&&typeof ResizeObserver==="function"){
+      const alvo=h.m.getContainer();
+      enquadrarRota._obs=new ResizeObserver(()=>{
+        const r=alvo.getBoundingClientRect();
+        if(r.height<150||r.width<150) return;
+        enquadrarRota._obs.disconnect(); enquadrarRota._obs=null;
+        enquadrarRota._h=null;                 // a próxima medição é a primeira
+        requestAnimationFrame(()=>enquadrarRota());
+      });
+      try{ enquadrarRota._obs.observe(alvo); }catch(e){ enquadrarRota._obs=null; }
+    }
+    return;
+  }
   const alt=(el)=>{ const n=$(el); if(!n||n.hidden) return 0;
     const r=n.getBoundingClientRect(); return r.height>0?r.height+10:0; };
   const margem={
@@ -5786,7 +6098,11 @@ function renderRouteSummary(){
   let headline, emoji;
   if(worst===0){ emoji="🟢"; headline=completo?t("Trajeto seco — boa viagem!")
     :t("Provavelmente seco — faltam-me dados em parte do caminho"); }
-  else if(worst===1){ emoji="🟡"; headline=t("Possível chuvisco em ~{n} km do caminho",{n:fmtN(riskKm,0)}); }
+  else if(worst===1){ emoji="🟡";
+    /* dd-61 c: "Possible drizzle in 0.0 km" — era daqui. Abaixo dos 20 m a
+       distância não se escreve: diz-se que é já. */
+    const dR=distTexto(riskKm);
+    headline=dR?t("Possível chuvisco em ~{d} do caminho",{d:dR}):t("Possível chuvisco já no início do caminho"); }
   else if(worst===2){ emoji="🟠"; headline=t("Vais apanhar chuva em ~{n} km ({p}% do trajeto)",{n:fmtN(wetKm,0),p:rnd(wetKm/R.totalKm*100)}); }
   else { emoji="🔴"; headline=t("Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.",{n:fmtN(wetKm,0)}); }
   const nStops=(R.pts?.length||2)-2;
@@ -5938,7 +6254,7 @@ function renderRouteSummary(){
       ...currentStretches().map(st=>`• km ${rnd(st.k0)}–${rnd(st.k1)} (~${fmtHM(st.t0)}): ${rainLabel(st.lvl)}${st.place?` — perto de ${st.place}`:""}`),
       `via Levante — dados Open-Meteo/OSM`];
     (navigator.clipboard?.writeText(lines.join("\n"))||Promise.reject())
-      .then(()=>toast(t("Resumo copiado! 📋"))).catch(()=>toast(t("Não consegui copiar automaticamente.")));
+      .then(()=>toast(t("Resumo copiado! 📋"))).catch(()=>toast(t("Cópia automática indisponível — seleciona e copia à mão.")));
   });
   const favD=el("button","btn",t("Guardar destino"));
   favD.addEventListener("click",()=>{
@@ -6017,7 +6333,10 @@ function computeWindStats(R){
    ===================================================================== */
 const HAZARD_CFG={
   drySpellDays:4,        // dias seguidos sem chuva para o óleo/borracha acumular no alcatrão
-  drySpellWetMm:1.0,     // ≥1 mm num dia conta como "a estrada foi lavada" (quebra a contagem)
+  drySpellWetMm:0.3,     // dd-61 b: QUALQUER chuva mensurável lava parte do óleo e quebra a
+                         // contagem. Era 1,0 e deixava passar os 0,5 mm de 29/07 em Maastricht
+                         // como "dia seco" — 7b: mais baixo cala avisos verdadeiros, mais alto
+                         // inventa passados. Num aviso de segurança, erra-se para o silêncio.
   firstRainMm:0.25,      // basta chuva fraca para reativar o filme de óleo — é aí que escorrega
   crossWindKmh:38,       // componente lateral a partir da qual a moto "anda de lado" (guiador firme)
   crossWindStrongKmh:55, // lateral forte: pontes/viadutos/camiões tornam-se perigosos — reduzir
@@ -6174,13 +6493,38 @@ function routeHazards(R){
    "Não veio" não é "veio seco": um dia sem dados PÁRA a contagem — o número
    é um mínimo construído só com dias reais, e sem histórico fica-se calado
    (dd-06 §2), nunca se inventa uma seca a partir de buracos (7g-ter). */
+/* dd-61 b — o aviso do óleo é um aviso de SEGURANÇA construído sobre uma
+   afirmação acerca do PASSADO ("primeira chuva em N dias"). O Ricardo apanhou
+   -o a mentir: dizia isso e tinha chovido. Fui medir o payload real
+   (Maastricht, 50.851/5.691, série diária do Open-Meteo):
+
+     19–24/07: 0,0 · 0,0 · 0,0 · 0,1 · 0,0 · 0,0
+     25/07: 2,3   26–28/07: 0,0   29/07: 0,5   30/07: 0,0
+
+   Duas coisas erradas, e nenhuma era o modelo:
+   1. **0,5 mm contava como dia seco** (o limiar era 1,0 mm). Meio milímetro
+      molha o alcatrão e leva parte do óleo — a estrada "foi lavada" e a app
+      continuava a contar dias secos por cima disso.
+   2. **Um `null` a meio da série interrompia a contagem em silêncio** e o que
+      já tinha sido contado valia à mesma. Uma série truncada afirmava um
+      passado que ninguém tinha medido.
+
+   Agora: qualquer chuva mensurável quebra a contagem; a série tem de estar
+   COMPLETA no período que se conta; e sem isso devolve-se `null` — que o
+   consumidor lê como "não sei", e cala-se. Calar é honesto; inventar não. */
 function diasSecos(s){
+  if(!Array.isArray(s)||!s.length) return null;
   let n=0;
-  for(let i=(s?.length||0)-1;i>=0;i--){
+  for(let i=s.length-1;i>=0;i--){
     const v=s[i];
-    if(v==null) break;
+    /* buraco na série: não se pode afirmar nada sobre este passado */
+    if(v==null) return null;
     if(v<HAZARD_CFG.drySpellWetMm) n++; else break;
   }
+  /* toda a série seca e sem uma única chuva a fechar a contagem: pode ser
+     verdade, mas também pode ser uma janela curta demais — só se afirma com
+     um dia molhado a delimitar o início */
+  if(n===s.length) return null;
   return n;
 }
 /* ── ÓLEO DA PRIMEIRA CHUVA NO AGORA (dd-06 §2) ─────────────────────────
@@ -6205,6 +6549,9 @@ async function loadSecaAgora(lat,lon){
     state.secaDias=diasSecos(j?.daily?.precipitation_sum);
     cacheEscrever(chave,{dias:state.secaDias},6*3600*1000);
   }catch(e){ state.secaDias=null; }               // sem histórico → silêncio
+  /* dd-61 b: `diasSecos` devolve null quando não pode afirmar (buraco na
+     série, ou série toda seca sem um dia molhado a delimitá-la). O `oleoAgora`
+     lê null como "não sei" e não mostra cartão nenhum. */
   if(state.wx) renderDashboard();
 }
 /* o cartão do Agora: ativo se houve seca E a primeira chuva está a cair (ou
@@ -6689,7 +7036,7 @@ function renderTrips(){
     row.addEventListener("click",()=>{
       closeTrips();
       if(state._restore&&state._restore(tr.hash)) toast(t("🗓️ A abrir: {p}",{p:tr.name}));
-      else toast(t("Não consegui abrir esta viagem."));
+      else toast(t("Viagem indisponível."));
     });
     box.appendChild(row);
   });
@@ -6720,7 +7067,7 @@ function renderFavRow(){
     c.appendChild(x);
     c.addEventListener("click",async ()=>{
       const pos=(await freshPos())||state.home;
-      if(!pos){ toast(t("Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.")); return; }
+      if(!pos){ toast(t("Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.")); return; }
       assistantGo(pos,{name:f.label, sub:f.sub||f.name, lat:f.lat, lon:f.lon},[]);
     });
     row.appendChild(c);
@@ -6917,7 +7264,7 @@ async function assistantAsk(){
   try{
     let pos=await freshPos();
     if(!pos&&state.home) pos={...state.home, name:state.home.name||t("a tua zona")};
-    if(!pos){ aiMsg("err",t("Preciso de saber onde estás: permite o GPS, ou pesquisa a tua cidade no separador Agora e volta cá.")); return; }
+    if(!pos){ aiMsg("err",t("Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.")); return; }
     /* NUNCA decidir o destino por ele. Antes disto, escrever "casa" fazia a app
        assumir o primeiro resultado, traçar a rota e responder "Vai de moto!" —
        para um restaurante que ninguém escolheu. Alguém lia o veredicto e saía
@@ -6945,7 +7292,7 @@ async function assistantGo(pos,cand,cands){
   $$(".stop-row").forEach(r=>r.remove());
   $("#rt-when").value=""; // partida = agora (dd-15 §2) — o assistente não escreve horas à socapa
   const ok=await computeRoute();
-  if(!ok){ aiMsg("err",t("Não consegui traçar uma rota até aí — escolhe outro dos sítios acima ou ajusta o formulário.")); return; }
+  if(!ok){ aiMsg("err",t("Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.")); return; }
   buildRecommendation(cand);
 }
 function tripTransitions(R){
@@ -7110,15 +7457,36 @@ function setaManobra(mv){
 }
 /* distância a contar, em unidades do utilizador e com a régua de quem conduz:
    metros redondos ao perto, décimas de km ao longe */
-/* métrico cru, para o t()/uconv converterem: metros abaixo de 1 km, senão km
-   com uma casa. UMA régua só — a primeira captura do fora-de-rota dizia
-   "0,39 km" em cima e "390 m" em baixo, no mesmo cartão. */
-function distCurta(km){ return km<1?`${Math.round(km*1000)} m`:`${fmtN(km,1)} km`; }
+/* ═══ A ÚNICA RÉGUA DAS DISTÂNCIAS (dd-61 c + dd-62 §2-3) ══════════════════
+   "Possible drizzle in 0.0 km" e um "0 km" em display gigante no painel de
+   condução. Zero não é distância — é a família do `??0`: valor desconhecido
+   ou irrelevante escrito como se fosse uma medida.
+
+   Uma régua, para TODO o ecrã (planeamento e condução):
+     ≥ 1 km   → km com uma casa      ("2,4 km")
+     < 1 km   → metros redondos      ("350 m")
+     < 20 m   → NADA — devolve null, e quem chama diz a coisa pelo nome
+                ("agora", "aqui", ou simplesmente não escreve número)
+     null/NaN → null, pela mesma razão
+
+   Devolve MÉTRICO CRU: o funil de unidades é o `t()`, e só ele — converter
+   aqui converteria duas vezes (a lição do confirmarCasa). */
+const DIST_MIN_M=20;                 // 7b: abaixo disto um número é ruído — já lá estás
+function distTexto(km){
+  if(km==null||!isFinite(km)) return null;
+  const m=Math.abs(km)*1000;
+  if(m<DIST_MIN_M) return null;
+  const red=Math.round(m/10)*10;         // metros redondos a 10
+  if(red<1000) return `${red} m`;        // (o arredondamento é que decide: 999 m → 1,0 km)
+  return `${fmtN(Math.abs(km),1)} km`;
+}
+/* o nome antigo, agora só um apelido da régua única */
+function distCurta(km){ return distTexto(km)||`${Math.round((km||0)*1000)} m`; }
+/* devolve MÉTRICO CRU e a conversão é de quem escreve no ecrã — chamar t()
+   aqui punha um segundo funil de unidades dentro de uma função de formato
+   (o lint-unidades apanha-o, e bem: dois funis convertem duas vezes) */
 function distManobra(km){
-  const m=km*1000;
-  if(m<30) return t("agora");
-  if(m<1000) return U.dist(Math.max(50,Math.round(m/50)*50)/1000,0);
-  return U.dist(km,1);
+  return distTexto(km);                 // null = <20 m: a manobra sem número (dd-62 §2)
 }
 /* rumo pela ROTA quando o GPS não é de fiar (parado ao semáforo, a arrancar) */
 function rumoDaRota(idx){
@@ -7142,18 +7510,34 @@ function manobrasAqui(kmNow){
    sem sinal > fora da rota > manobra. */
 function pintarNavPainel(kmNow,{semSinal=false}={}){
   const el=$("#nav-painel"); if(!el) return;
-  if(!travel.active){ el.hidden=true; return; }
+  if(!travel.active){ el.hidden=true; $("#nav-depois").hidden=true; empilharViagem(); return; }
   el.hidden=false;
   el.classList.toggle("sem-sinal",!!semSinal);
   if(!semSinal&&travel.fora){ pintarForaDeRota(travel.foraPos,travel.fora); return; }
   if(semSinal){
     /* 7g-ter: nunca extrapolar. Diz-se que não se sabe — e o que se sabia
        fica visível, esbatido, em vez de uma posição inventada. */
+    /* dd-63: estado + consequência, sem pedir desculpa. Instrumento, não
+       personagem — quem olha para uma seta parada tem de saber porquê. */
+    /* dd-63 + dd-65: a faixa tem UMA linha de rua, com corte por reticências —
+       a frase inteira lá dentro saía como "Sem sinal GPS — a tentar. A tua
+       p…", e o que se perdia era exatamente a CONSEQUÊNCIA, que é a metade
+       que o dd-63 exige. A faixa fica com o estado curto; a frase completa
+       vive na pastilha, que dá duas linhas e não corta. */
+    /* Repartição, e é a mesma do resto do ecrã: a FAIXA diz para onde virar,
+       a PASTILHA diz o que se passa. Escrever a frase nas duas era o defeito
+       do nome da rua (dd-62 §6) outra vez — e na faixa, que corta a uma linha,
+       saía "Sem sinal GPS — a tentar. A tua p…", perdendo justamente a
+       CONSEQUÊNCIA, que é a metade que o dd-63 exige.
+       Na faixa fica o 📡 (que diz tudo sem palavras) e a última rua conhecida,
+       esbatida — o que se sabia continua à vista, sem inventar posição (7g-ter).
+       A frase inteira vive na pastilha, que dá duas linhas e não corta. */
     $("#nav-seta").textContent="📡";
-    $("#nav-dist").textContent="—";
-    $("#nav-man").textContent=t("Sem sinal de GPS");
-    $("#nav-via").textContent=t("não invento onde estás. Sigo assim que voltar.");
-    $("#nav-depois").hidden=true; $("#nav-ceu").hidden=true;
+    $("#nav-dist").textContent="";
+    $("#nav-man").textContent=t("Sem sinal GPS — a tentar.");   // fora do ecrã: voz e leitores
+    $("#nav-depois").hidden=true;
+    pastilhaViagem(t("Sem sinal GPS — a tentar. A tua posição pode estar desatualizada."));
+    empilharViagem();
     return;
   }
   const {mv,prox}=manobrasAqui(kmNow);
@@ -7166,35 +7550,25 @@ function pintarNavPainel(kmNow,{semSinal=false}={}){
   } else {
     const d=Math.max(0,mv.km-kmNow);
     $("#nav-seta").textContent=setaManobra(mv);
-    $("#nav-dist").textContent=distManobra(d);
-    $("#nav-man").textContent=navPhrase(mv);
-    $("#nav-via").textContent=mv.road||"";
+    const dm=distManobra(d);
+    $("#nav-dist").textContent=dm?t("{d}",{d:dm}):t("agora");
+    /* dd-62 §6: a rua estava DUAS vezes ("Vira à esquerda para a X" + "X").
+       Fica a linha da rua — é o que serve de relance com capacete; a frase
+       completa da manobra vai por VOZ, que é onde ela serve mesmo. Sem rua
+       nos dados, a frase escrita ocupa o lugar (senão a linha ficava vazia). */
+    $("#nav-man").textContent=navPhrase(mv);          // fora do ecrã: alimenta a voz e os leitores
+    $("#nav-via").textContent=mv.road||navPhrase(mv);
     /* "depois:" só quando a seguinte está mesmo colada — senão é ruído */
     const dp=$("#nav-depois");
     if(prox&&(prox.km-mv.km)*1000<CAM_CFG.depoisM){
       dp.hidden=false;
-      dp.textContent=t("depois: {x}",{x:setaManobra(prox)+" "+navPhrase(prox)});
+      dp.textContent=t("depois: {x}",{x:(prox.road||navPhrase(prox))});
     } else dp.hidden=true;
   }
-  /* A FUSÃO — o que o Google não tem: o céu do troço que aí vem, com as
-     cores e as chaves que já passaram no contraste (dd-29/30). */
-  const ceu=$("#nav-ceu");
-  const R=state.route;
-  const s=R?.samples?.[Math.min(R.samples.length-1,(travel.geomIdx||0))];
-  const aqui=R?.samples?.find(x=>x.km>=kmNow+0.2&&x.cond&&x.cond.lvl>=1);
-  if(aqui){
-    ceu.hidden=false;
-    /* as cores vêm das classes do veredicto que JÁ passaram no contraste
-       (dd-29/30) — nada de tons novos inventados para o painel */
-    ceu.className="nav-ceu lvl"+aqui.cond.lvl;
-    const dKm=Math.max(0,aqui.km-kmNow);
-    /* métrico cru dentro do t() (o uconv converte para milhas se for o caso),
-       mas com o separador decimal da língua — fmtN, nunca toFixed */
-    ceu.textContent=`${aqui.cond.lvl>=2?"🌧️":"🌦️"} ${t("{x} daqui a {d}",{x:rainLabel(aqui.cond.lvl),d:`${fmtN(dKm,1)} km`})}`;
-  } else if(s&&s.cond&&s.cond.lvl===0){
-    ceu.hidden=false; ceu.className="nav-ceu lvl0";
-    ceu.textContent="☀️ "+t("Céu limpo à frente");
-  } else ceu.hidden=true;
+  /* dd-62 §7 + dd-65 §2: a fusão meteorológica saiu daqui para a PASTILHA.
+     Estava no painel E na barra, com números diferentes ("drizzle em 0,6 km"
+     contra "0,0 km") — três respostas no mesmo ecrã. Um sítio só. */
+  empilharViagem();
 }
 /* DEGRAU 1 do dd-32: "fora da rota · regressa ~200 m a nordeste". A geometria
    completa está no cliente — a distância e o rumo de regresso custam zero.
@@ -7207,13 +7581,15 @@ function pintarForaDeRota(pos,pj){
   const R=state.route; const alvo=pj.pe||R?.coords?.[pj.idx];
   el.hidden=false; el.classList.remove("sem-sinal");
   $("#nav-seta").textContent="↩";
-  $("#nav-dist").textContent=t("{d}",{d:distCurta(pj.off)});
+  $("#nav-dist").textContent=distTexto(pj.off)?t("{d}",{d:distTexto(pj.off)}):"";
   $("#nav-man").textContent=t("Fora da rota");
   $("#nav-via").textContent=alvo
-    ? t("regressa {d} a {r}",{d:distCurta(pj.off), r:rumoEmPalavras(bearing(pos,alvo))})
+    ? (distTexto(pj.off)
+        ? t("regressa {d} a {r}",{d:distTexto(pj.off), r:rumoEmPalavras(bearing(pos,alvo))})
+        : t("a rota está aqui ao lado"))
     : "";
   $("#nav-depois").hidden=true;
-  $("#nav-ceu").hidden=true;
+  empilharViagem();
 }
 
 /* espreitar e regressar: o gesto sai do seguimento; 10 s sem gesto e volta */
@@ -7282,13 +7658,60 @@ function travelProject(pos){
   const pe={lat:C[bi].lat+(C[j].lat-C[bi].lat)*bt, lon:C[bi].lon+(C[j].lon-C[bi].lon)*bt};
   return {idx:bt>0.5?j:bi, off:bd, km:(cum/R.geomKm)*R.totalKm, pe};
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   AS TRÊS CAIXAS DO ECRÃ DE CONDUÇÃO (dd-65 §2) — e a pergunta de cada uma
+
+     · a FAIXA      `#nav-painel`     → **para onde virar**
+     · a PASTILHA   `#viagem-estado`  → **o que está a acontecer** (tempo E estado)
+     · a BARRA      `#travel-bar`     → **quanto falta**
+
+   Nenhuma responde à pergunta de outra, e cada uma tem UM funil. Era a mistura
+   das três que fazia o mal: o "Depois" engordava a faixa que tem de se ler de
+   relance; o aviso do tempo vivia na barra E na faixa, com números diferentes;
+   e a barra, sendo prosa variável, crescia para três linhas quando a frase do
+   tempo dava a volta — um terço do ecrã a repetir o que já estava dito.
+
+   Os funis existem para que ninguém escreva nelas por fora. É o mesmo remédio
+   do `paraVoz()` e do `distTexto()`: onze chamadores e bastava um esquecer-se.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* as duas pastilhas são fixas e encostam-se por baixo da faixa: a faixa muda
+   de altura (uma linha ou duas), portanto a posição delas mede-se, não se
+   escreve à mão */
+function empilharViagem(){
+  const p=$("#nav-painel"), d=$("#nav-depois"), e=$("#viagem-estado");
+  if(!p||!d||!e) return;
+  const topo=p.hidden ? 8 : p.getBoundingClientRect().bottom;
+  d.style.top=topo+"px";
+  const depH=d.hidden?0:d.getBoundingClientRect().height;
+  e.style.top=(topo+depH+8)+"px";
+}
+/* O SÍTIO ÚNICO do tempo e do estado. `nivel` null = estado (cinzento);
+   0..3 = a gravidade do tempo, com a mesma escada de cores do resto da app. */
+function pastilhaViagem(txt,nivel){
+  const e=$("#viagem-estado"); if(!e) return;
+  if(!txt){ e.hidden=true; empilharViagem(); return; }
+  e.textContent=txt;
+  e.className=(nivel==null)?"estado":(nivel>=1?"lvl"+Math.min(3,nivel):"");
+  e.hidden=false;
+  empilharViagem();
+}
+/* A BARRA: uma linha, sempre a mesma forma — tempo restante · distância ·
+   hora de chegada. **Nunca prosa.** Sem argumentos, diz que ainda não sabe. */
+function barraViagem({restaSeg,remKm,chegada}={}){
+  const el=$("#tb-linha"); if(!el) return;
+  if(restaSeg==null&&remKm==null&&!chegada){ el.textContent=t("à procura do teu GPS…"); return; }
+  const partes=[];
+  if(restaSeg!=null) partes.push(fmtDur(Math.max(0,restaSeg)));
+  if(remKm!=null) partes.push(distTexto(remKm)??t("quase lá"));
+  if(chegada) partes.push("~"+chegada);
+  el.textContent=partes.join(" · ");
+}
 /* saíste do caminho? recalcula a rota a partir de onde estás (estilo Google Maps) */
 async function rerouteFromHere(pos){
   if(travel.rerouting||!state.route) return;
   travel.rerouting=true; travel.offHits=0;
   const R=state.route;
-  $("#tb-next").textContent=t("🔄 Saíste da rota — a recalcular…");
-  $("#tb-sub").textContent=t("um instante…");
+  pastilhaViagem(t("🔄 Saíste da rota — a recalcular…"));
   travel.lastNotif=0; travelNotify();
   buzz([90,50,90]);
   try{
@@ -7327,8 +7750,7 @@ async function rerouteFromHere(pos){
     buzz([120,60,120]);
     travel.lastNotif=0; travelNotify();
   }catch(e){
-    $("#tb-next").textContent=t("🧭 Modo viagem ligado");
-    $("#tb-sub").textContent=t("não consegui recalcular — verifica a ligação; volto a tentar");
+    pastilhaViagem(t("recálculo falhou — verifica a ligação. A rota anterior continua no ecrã."));
   }finally{
     travel.rerouting=false;
     travel.lastReroute=Date.now()/1000;
@@ -7339,7 +7761,11 @@ function travelNotify(){
   try{
     if(!("Notification" in window)||Notification.permission!=="granted") return;
     const now=Date.now(); if(now-travel.lastNotif<25000) return; travel.lastNotif=now;
-    const opts={body:`🎯 ${state.route?.d?.name??""}\n${$("#tb-next").textContent}\n${$("#tb-sub").textContent}`,
+    /* dd-65: a notificação continua a levar as duas informações, mas vai
+       buscá-las onde elas passaram a viver — a pastilha do estado e a linha
+       dos números. Ler `#tb-next`, que já não existe, daria "undefined" na
+       barra de notificações do telemóvel. */
+    const opts={body:`🎯 ${state.route?.d?.name??""}\n${$("#viagem-estado")?.hidden?"":($("#viagem-estado")?.textContent||"")}\n${$("#tb-linha")?.textContent||""}`,
       tag:"lev-travel", silent:true, requireInteraction:true, renotify:false};
     if(navigator.serviceWorker&&navigator.serviceWorker.controller){
       navigator.serviceWorker.ready.then(r=>r.showNotification(t("🏍️ Levante — em viagem"),opts)).catch(()=>{});
@@ -7362,7 +7788,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-07-31-2041-660294";
+const BUILD="2026-08-01-1303-7d076f";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -7413,7 +7839,10 @@ function findNextRain(wx, from, until){
     /* null não testemunha: uma hora sem dados não anuncia chuva nem estende
        o "seco até às X" — o guarda simplesmente não a pode usar */
     const pr=H.precipitation?.[k], pp=H.precipitation_probability?.[k];
-    if((pr!=null&&pr>=0.2)||(pp!=null&&pp>=65)||GUARD_WET.includes(H.weather_code?.[k]))
+    /* dd-61 a: a régua é a mesma do cartão. Tinha aqui pr≥0,2 e pp≥65 —
+       eram estes números que faziam a voz dizer "seco" sobre um cartão que
+       dizia "chuvisco possível". */
+    if(vaiChover(pr,pp,H.weather_code?.[k]))
       return Math.max(tt,from);
   }
   return null;
@@ -7577,7 +8006,7 @@ function estadoAparelho(){
       {n:VOZ_NOMES[state.lang]||state.lang}));
   }
   if(!navigator.geolocation)
-    linhas.push(t("📍 Este aparelho não dá acesso ao GPS: escreve a tua cidade para eu saber onde estás."));
+    linhas.push(t("📍 Este aparelho não dá acesso ao GPS. Escreve a tua cidade para ter previsão."));
   const m=estadoApp.mapa||store.get("mapa-parcial");
   if(m&&m.done<m.total)
     linhas.push(t("🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.",
@@ -7603,9 +8032,31 @@ if(window.speechSynthesis){
   speechSynthesis.addEventListener?.("voiceschanged",vozCarregar);
 }
 
+/* ═══ O QUE VAI PARA A VOZ (dd-62 §1) ══════════════════════════════════════
+   O Ricardo ouviu a app narrar o "✅" de um aviso. Um sintetizador lê o que
+   lhe derem: emoji viram palavras ("marca de verificação"), setas viram
+   "para a direita", e o til de "~2 km" vira "til". A limpeza tem de estar no
+   FUNIL, não em cada chamador — havia onze `speak()` espalhados e bastava um
+   esquecer-se. Agora ninguém pode falhar: passa tudo por aqui. */
+function paraVoz(txt){
+  return String(txt ?? "")
+    /* pictogramas, seletores de variação e junções */
+    .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu,"")
+    /* símbolos que a voz soletra: setas, marcas, matemática, moldura */
+    .replace(/[→←↑↓↔⇒⟶➜▶◀·•·⋯…«»“”„‟‹›|/\\_*#~^=+<>[\]{}]/gu," ")
+    /* travessões e hífenes de lista: pausa, não palavra */
+    .replace(/\s[—–-]\s/g,", ")
+    /* o que sobra fora de letras, números e pontuação falável, sai */
+    .replace(/[^\p{L}\p{N} ,.!?:%°ºª'’()-]/gu," ")
+    .replace(/\s{2,}/g," ")
+    .replace(/\s+([,.!?:])/g,"$1")
+    .trim();
+}
 function speak(txt){
   try{
     if(state.muted) return;
+    txt=paraVoz(txt);
+    if(!txt) return;                     // sobrou só símbolos: não se fala
     if(!("speechSynthesis" in window)){ vozAvisar(); return; }
     if(!voz.pronto) vozCarregar();
     /* reavalia sempre: a lista de vozes do sistema chega tarde e o idioma da
@@ -7780,16 +8231,17 @@ async function startTravel(){
   if(travel.vigia) clearInterval(travel.vigia);
   travel.vigia=setInterval(navVigiarSinal,1000);
   $("#travel-bar").style.display="flex";
-  $("#tb-next").textContent=t("🧭 Modo viagem ligado");
-  $("#tb-sub").textContent=t("à procura do teu GPS…");
+  pastilhaViagem(t("🧭 Modo viagem ligado"));
+  barraViagem();
   try{ travel.wakeLock=await navigator.wakeLock?.request?.("screen"); }catch(e){}
   try{ if("Notification" in window&&Notification.permission==="default") Notification.requestPermission(); }catch(e){}
   store.set("travel",{hash:location.hash||"", at:Date.now()});
   travel.watch=navigator.geolocation.watchPosition(onTravelPos,
-    ()=>{ $("#tb-sub").textContent=t("sem sinal GPS — continuo a tentar…"); },
+    ()=>{ pastilhaViagem(t("Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.")); },
     {enableHighAccuracy:true, maximumAge:3000, timeout:20000});
   speakT("Modo viagem ligado. Boa estrada.");
-  toast(t("🧭 Modo viagem: aviso-te da chuva à frente. O ecrã fica aceso."));
+  /* o toast de arranque morreu com o dd-62 §8 (já não passaria o filtro) —
+     e não faz falta: a barra de viagem diz o mesmo e fica lá */
   updateTravelButtons();
 }
 function stopTravel(msg){
@@ -7812,6 +8264,11 @@ function stopTravel(msg){
   if(travel.timerRecentrar){ clearTimeout(travel.timerRecentrar); travel.timerRecentrar=null; }
   travel.semSinal=false; travel.fora=null; travel.foraPos=null;
   const np=$("#nav-painel"); if(np) np.hidden=true;
+  /* dd-65: as duas pastilhas vivem FORA da faixa — esconder a faixa já não
+     as leva atrás. Uma pastilha de "chuva a 2 km" a sobreviver ao fim da
+     viagem seria um aviso vivo sobre um percurso que já não existe. */
+  const nd=$("#nav-depois"); if(nd) nd.hidden=true;
+  pastilhaViagem(null);
   const br=$("#btn-recentrar"); if(br) br.hidden=true;
   if(state.route&&state.mapaRota) drawRoute(false); // repõe as cores sem o cinzento
   if(msg) toast(msg);
@@ -7915,7 +8372,7 @@ function onTravelPos(p){
   const desvio=foraAgora&&pj.off*1000>CAM_CFG.desvioM&&tempoFora>=CAM_CFG.desvioSeg&&afasta;
   if(desvio&&!travel.rerouting&&now-(travel.lastReroute||0)>12){ rerouteFromHere(pos); return; }
   if(travel.rerouting){ travelNotify(); return; }
-  if(off>4){ $("#tb-sub").textContent=t("estás a {d} km da rota — vou recalcular",{d:fmtN(off,1)}); travelNotify(); return; }
+  if(off>4){ pastilhaViagem(t("a {d} km da rota — a recalcular",{d:fmtN(off,1)})); travelNotify(); return; }
   // progresso exato + pinta o já percorrido a cinzento (a cada ~5 s)
   if(pj.off<=offTh){ travel.geomIdx=pj.idx; travel.kmDone=pj.km; }
   if(now-travel.lastPaint>5){ travel.lastPaint=now; drawRoute(false); }
@@ -7994,15 +8451,15 @@ function onTravelPos(p){
   for(let k=idx;k<R.samples.length;k++){ if(R.samples[k].cond.lvl>=2){ next=R.samples[k]; break; } }
   if(!next) for(let k=idx;k<R.samples.length;k++){ if(R.samples[k].cond.lvl>=1){ nextWarn=R.samples[k]; break; } }
   if(here.cond.lvl>=2){
-    $("#tb-next").textContent=t("🌧️ Estás na zona de chuva ({x})",{x:rainLabel(here.cond.lvl).toLowerCase()});
-    $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
+    pastilhaViagem(t("🌧️ Estás na zona de chuva ({x})",{x:rainLabel(here.cond.lvl).toLowerCase()}),here.cond.lvl);
+    barraViagem({restaSeg:etaArr-now,remKm,chegada:fmtHM(etaArr)});
     const key="in-"+Math.floor(here.km/3);
     if(!travel.alerted.has(key)){ travel.alerted.add(key); avisar([250,100,250]); }
   } else if(next){
     const dist=Math.max(0,next.km-kmNow);
     const mins=Math.max(0,Math.round((next.travelSec-here.travelSec)/60));
-    $("#tb-next").textContent=t("🌧️ Chuva dentro de ~{m} min ({d} km)",{m:mins,d:fmtN(dist,1)});
-    $("#tb-sub").textContent=t("por volta das {h} · faltam {d} km até ao destino",{h:fmtHM(next.eta),d:fmtN(remKm,1)});
+    pastilhaViagem(t("🌧️ Chuva dentro de ~{m} min ({d} km)",{m:mins,d:fmtN(dist,1)}),next.cond.lvl);
+    barraViagem({restaSeg:etaArr-now,remKm,chegada:fmtHM(etaArr)});
     // dica de fuga: parar e deixar a célula passar?
     const esc=(delay)=>{ const c=sampleAt(next,next.eta+delay); return c&&rainLevel(c.pr,c.pp,c.code)<2; };
     const tip= esc(1200)?t("Dica: se parares uns vinte minutos, escapas a esta chuva.")
@@ -8021,11 +8478,11 @@ function onTravelPos(p){
     else if(mins<=5) fire(zone+"-m5",t("Atenção: chuva dentro de cerca de {m} minutos. {x}",{m:Math.max(1,mins),x:tip||t("Última oportunidade para parar num sítio seco.")}));
     else if(mins<=12) fire(zone+"-m12",t("Aviso antecipado: chuva dentro de cerca de {m} minutos, a {d} quilómetros. {x}",{m:mins,d:Math.round(dist),x:tip||t("Tens tempo para parar ou mudar de caminho na aplicação.")}));
   } else if(nextWarn){
-    $("#tb-next").textContent=t("⚠️ Possível chuvisco dentro de {d} km",{d:fmtN(Math.max(0,nextWarn.km-kmNow),1)});
-    $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
+    pastilhaViagem(t("⚠️ Possível chuvisco dentro de {d} km",{d:fmtN(Math.max(0,nextWarn.km-kmNow),1)}),1);
+    barraViagem({restaSeg:etaArr-now,remKm,chegada:fmtHM(etaArr)});
   } else {
-    $("#tb-next").textContent=t("✅ Caminho seco daqui até ao destino");
-    $("#tb-sub").textContent=t("faltam {d} km · chegada ~{h}",{d:fmtN(remKm,1),h:fmtHM(etaArr)});
+    pastilhaViagem(t("✅ Caminho seco daqui até ao destino"),0);
+    barraViagem({restaSeg:etaArr-now,remKm,chegada:fmtHM(etaArr)});
   }
   travelNotify(); // progresso na barra de notificações
 }
@@ -8073,7 +8530,7 @@ function sentinelDesatualizada(){
 function sentinelAcordou(){
   if(!sentinel.on||document.visibilityState!=="visible") return;
   if(sentinelDesatualizada())
-    sentinelNota(t("O telemóvel suspendeu a app e estive {m} min sem verificar — não te avisei nesse tempo. A ver agora.",
+    sentinelNota(t("O telemóvel suspendeu a app: {m} min sem verificações e sem avisos. A verificar agora.",
       {m:Math.round((Date.now()-sentinel.lastAt)/60000)}),{aviso:true, tipo:"atraso"});
   /* `recuperacao` para esta verificação NÃO apagar o aviso que acabou de ser
      posto. O aviso é sobre o PASSADO — houve tempo sem vigilância — e continua
@@ -8092,7 +8549,7 @@ async function sentinelCheck({recuperacao=false}={}){
   sentinel.checking=true;
   try{
     const pos=(await freshPos())||state.home;
-    if(!pos){ $("#sentinel-status").textContent=t("Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade."); return; }
+    if(!pos){ $("#sentinel-status").textContent=t("Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade."); return; } pintarSentinelaComo();
     const j=await fetchSentinelWx(pos.lat,pos.lon);
     const now=Date.now()/1000;
     const M=j.minutely_15||{}, times=M.time||[], prs=M.precipitation||[];
@@ -8130,9 +8587,10 @@ async function sentinelCheck({recuperacao=false}={}){
     else st=t("✅ Sem chuva à vista nas próximas 2 horas.");
     sentinel.lastAt=Date.now();
     if(!recuperacao&&sentinelNotaTipo()==="atraso") sentinelNota("");   // só o aviso de atraso sai, e não na própria recuperação
-    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só vigio com a app aberta e no ecrã: se minimizares ou apagares o ecrã, o telemóvel suspende-me.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:gust==null?"—":Math.round(gust)});
+    $("#sentinel-status").textContent=t("Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só com a app aberta e no ecrã: minimizada ou com o ecrã apagado, o telemóvel suspende-a.",{p:pos.name||t("A minha posição"),h:fmtHM(now),s:st,g:gust==null?"—":Math.round(gust)});
+    pintarSentinelaComo();
   }catch(e){
-    $("#sentinel-status").textContent=t("Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.");
+    $("#sentinel-status").textContent=t("Ligada — falhou a última verificação, volto a tentar daqui a ~2 min."); pintarSentinelaComo();
   }finally{ sentinel.checking=false; }
 }
 /* SEM PRAZO DE VALIDADE, ao contrário do Modo viagem, e a assimetria é o
@@ -8144,6 +8602,41 @@ async function sentinelCheck({recuperacao=false}={}){
    a corrigir: perguntar é melhor do que desligar em silêncio, mas não
    perguntar é melhor do que perguntar. */
 
+/* PORTEIRO 7 — a promessa da Sentinela, dita por inteiro num gesto.
+   Três parágrafos, por ordem do que tranquiliza: o que faz, o que NÃO faz, e
+   o que fica combinado quando voltares. O terceiro é o que torna o segundo
+   suportável — e já existe em código (o aviso do atraso, sentinelAcordou). */
+function sentinelaComoTexto(){
+  return [
+    t("Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação."),
+    t("Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela."),
+    t("Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado."),
+    t("Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito."),
+  ];
+}
+function pintarSentinelaComo(){
+  const alvo=$("#sentinel-status"); if(!alvo) return;
+  if(alvo.querySelector(".lg-q")) return;             // já lá está
+  const pq=document.createElement("button");
+  pq.className="lg-q"; pq.type="button"; pq.textContent=t("Como funciona?");
+  pq.addEventListener("click",()=>{
+    const d=$("#sentinel-como"); if(!d) return;
+    d.hidden=!d.hidden;
+    pq.setAttribute("aria-expanded",String(!d.hidden));
+    if(!d.hidden){ d.textContent="";
+      sentinelaComoTexto().forEach(p=>{ const n=el("p",null,p); n.style.margin="0 0 6px"; d.appendChild(n); }); }
+  });
+  pq.setAttribute("aria-expanded","false");
+  alvo.appendChild(document.createTextNode(" "));
+  alvo.appendChild(pq);
+}
+function repintarSentinelaComo(){
+  const d=$("#sentinel-como");
+  const pq=$("#sentinel-status .lg-q");
+  if(pq) pq.textContent=t("Como funciona?");
+  if(d&&!d.hidden){ d.textContent="";
+    sentinelaComoTexto().forEach(p=>{ const n=el("p",null,p); n.style.margin="0 0 6px"; d.appendChild(n); }); }
+}
 function sentinelaPinta(on){
   const b=$("#btn-sentinel"); if(!b) return;
   b.classList.toggle("on",!!on);
@@ -8152,6 +8645,9 @@ function sentinelaPinta(on){
      "Sentinela: ligada", nunca "Turn off" (dd-42 §3) */
   b.setAttribute("aria-label",on?t("Sentinela: ligada"):t("Sentinela: desligada"));
   b.title=on?t("Sentinela: ligada"):t("Sentinela: desligada");
+  /* a linha de estado é reescrita por vários caminhos (toggle, verificação,
+     retoma) e cada um deles levava o "Como funciona?" à frente — repõe-se */
+  if(typeof pintarSentinelaComo==="function") pintarSentinelaComo();
 }
 async function toggleSentinel(){
   const b=$("#btn-sentinel");
@@ -8159,7 +8655,8 @@ async function toggleSentinel(){
     sentinel.on=false; clearInterval(sentinel.timer); sentinel.timer=null;
     store.del("sentinel"); sentinelNota("");
     sentinelaPinta(false);
-    $("#sentinel-status").textContent=t("Desligada. Liga para eu vigiar o tempo onde estás, minuto a minuto, e avisar-te com voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
+    $("#sentinel-status").textContent=t("Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
+    pintarSentinelaComo();
     toast(t("Sentinela desligada."));
     return;
   }
@@ -8178,9 +8675,10 @@ async function toggleSentinel(){
   /* o estado escreve-se JÁ — o sentinelCheck() refina depois com o tempo
      atual, mas um interruptor verde ao lado de "Desligada." é uma
      contradição (apanhada numa captura da bancada sem rede) */
-  $("#sentinel-status").textContent=t("Ligada — a vigiar o tempo onde estás, minuto a minuto.");
+  $("#sentinel-status").textContent=t("Ligada — verifica o tempo onde estás enquanto a app estiver aberta.");
+  pintarSentinelaComo();
   try{ if("Notification" in window&&Notification.permission==="default") await Notification.requestPermission(); }catch(e){}
-  toast(t("🔔 Sentinela ligada — vigio a tua zona a cada ~2 minutos."));
+  toast(t("🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta."));
   sentinelCheck();
   sentinel.timer=setInterval(sentinelCheck,150000);
 }
@@ -8253,8 +8751,8 @@ function planNativeAlerts(){
     let i0=H.time.findIndex(t=>t>now-3600); if(i0<0)i0=0;
     /* null não testemunha: uma hora sem dados não é "seca" nem "molhada" —
        não dispara alarmes nem marca a transição seco→chuva */
-    const wetAt=(i)=>{ const pr=H.precipitation?.[i], pp=H.precipitation_probability?.[i];
-      return (pr!=null&&pr>=0.2)||(pp!=null&&pp>=70); };
+    /* dd-61 a: a MESMA régua do cartão (tinha pr≥0,2 e pp≥70 próprios) */
+    const wetAt=(i)=>vaiChover(H.precipitation?.[i], H.precipitation_probability?.[i], H.weather_code?.[i]);
     let prevWet=wetAt(i0);
     for(let i=i0+1;i<Math.min(i0+18,H.time.length);i++){
       const t=H.time[i], code=H.weather_code?.[i];
@@ -8413,6 +8911,23 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ checkVe
 setTimeout(checkVersao, 8*60000);                     // primeiro olhar ~8 min depois (arranque fica leve)
 setInterval(checkVersao, 60*60000);
 
+/* ── BOAS-VINDAS (porteiro 6 do dd-43 §3) ─────────────────────────────────
+   A pergunta era: alguém que abre a app pela primeira vez percebe em 10
+   segundos o que ela faz? Não percebia — via uma caixa de pesquisa, um
+   interruptor a explicar-se em quatro linhas e uma previsão para uma cidade
+   que nunca escolheu. Isto responde numa frase e mostra o gesto seguinte.
+   NÃO é um tutorial: um ecrã, sem passos, sem bloquear nada, dispensável, e
+   morre ao primeiro gesto real — nunca volta. */
+function bvFeito(){ return store.get("bv-visto")===1; }
+function bvFechar(){ store.set("bv-visto",1); const el=$("#boas-vindas"); if(el) el.hidden=true; }
+function renderBoasVindas(){
+  const el=$("#boas-vindas"); if(!el) return;
+  if(bvFeito()){ el.hidden=true; return; }
+  $("#bv-txt").textContent=t("Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.");
+  $("#bv-onde").textContent=t("📍 Onde estou");
+  $("#bv-rota").textContent=t("🗺️ O tempo no meu caminho");
+  el.hidden=false;
+}
 const pwa={ prompt:null, instalada:false, ios:/iphone|ipad|ipod/i.test(navigator.userAgent) };
 function estadoInstalacao(){
   if(matchMedia("(display-mode: standalone)").matches||navigator.standalone===true||pwa.instalada) return "instalada";
@@ -8531,6 +9046,14 @@ function init(){
 
   $("#btn-trips").addEventListener("click",openTrips);
   $("#trips-close").addEventListener("click",closeTrips);
+  /* porteiro 6: a faixa aparece uma vez e morre ao primeiro gesto real */
+  renderBoasVindas();
+  pintarSentinelaComo();   // porteiro 7: a promessa inteira, a um gesto
+  $("#bv-fechar").addEventListener("click",bvFechar);
+  $("#bv-onde").addEventListener("click",()=>{ bvFechar(); useGPS(false); });
+  $("#bv-rota").addEventListener("click",()=>{ bvFechar(); switchTab("rota"); });
+  $("#loc-search").addEventListener("input",()=>{ if(!bvFeito()&&$("#loc-search").value.trim().length>=2) bvFechar(); },{once:false});
+  $("#btn-gps").addEventListener("click",bvFechar);
   $("#btn-sitios").addEventListener("click",abrirSitios);
   $("#sitios-close").addEventListener("click",fecharSitios);
   $("#sitios-bg").addEventListener("click",fecharSitios);
