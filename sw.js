@@ -6,25 +6,60 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-const V = "levante-v12";
+const V = "levante-v13";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
 const TILES_ANTIGO = "vdm-tiles-v1";
 const TILE_MAX = 2600;          // ~40 MB; acima disto apagam-se os mais antigos
+/* dd-78/dd-74 (b): saíram os dois ficheiros do Leaflet no cdnjs. O Leaflet
+   morreu na A2.2 e o mapa é MapLibre há muito — mas o mal não era só guardar
+   uma biblioteca a mais: o `cache.addAll` **falha inteiro** se UM dos pedidos
+   não responder, e estes dois eram os únicos que saíam de casa. Um cdnjs lento
+   ou bloqueado e o service worker **não instalava** — a app ficava sem cache,
+   sem mapa offline e sem sinal de versão nova, por causa de uma biblioteca que
+   já não usamos. */
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./privacidade.html", "./termos.html",
+  /* dd-82: a página de créditos entra no shell, autorizada no mesmo pacote.
+     Era o item aberto do rel-58 §5: sem isto, o ⓘ do mapa levava a uma página
+     que só existia depois de aberta uma vez com rede — e a atribuição é
+     condição de licença, não um extra. O sítio dela é ao lado das outras duas
+     legais, que já cá estavam. */
+  "./creditos.html",
   "./paises.json",
-  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
-  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
 ];
-const TILE_HOSTS = /(^|\.)(basemaps\.cartocdn\.com|tiles?\.openfreemap\.org|tile\.openstreetmap\.org|tiles\.stadiamaps\.com)$/;
+/* dd-78/dd-74 (c): só o OpenFreeMap serve tiles nesta app. O CARTO saiu no
+   dd-16 §2 e o tile.openstreetmap.org e o stadiamaps nunca chegaram a entrar —
+   ficaram aqui da era raster. Um host a mais nesta lista não é inofensivo:
+   manda qualquer resposta desses domínios pelo caminho dos tiles, com a cache
+   de 2600 entradas e o tile-de-falta em vez do caminho normal. */
+const TILE_HOSTS = /(^|\.)(tiles?\.openfreemap\.org)$/;
 const isTile = (u) => TILE_HOSTS.test(u.host);
-/* tile cinzento-claro 256×256 quando não há rede nem cache (melhor que o vazio preto) */
-const BLANK_TILE = "data:image/svg+xml;base64," + btoa(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">' +
-  '<rect width="256" height="256" fill="#e8ecf3"/>' +
-  '<path d="M0 64H256M0 128H256M0 192H256M64 0V256M128 0V256M192 0V256" stroke="#dbe1ec" stroke-width="1"/></svg>');
+/* ═══ dd-78/dd-74 (a) — O TILE QUE FALTA, NO FORMATO QUE O MOTOR LÊ ════════
+   ISTO ERA O MAPA BRANCO. Aqui devolvia-se um **SVG 256×256** — a grelha
+   cinzenta da era raster — a um pedido de tile **VETORIAL**. O MapLibre pede
+   um protobuf, recebe SVG, não consegue interpretar e **não desenha nada**.
+   Sem rede, ou fora do corredor que estava descarregado, cada tile em falta
+   apagava o mapa: foi o que o Ricardo viu a meio de uma viagem (dd-78), e foi
+   o que ficou previsto por escrito no relatório 57 §2.
+
+   O que se devolve agora é o tile vetorial sintético de **42 bytes** — um
+   polígono que cobre o tile todo, numa camada `levante_falta` que só nós
+   conhecemos e que os dois estilos publicados pintam com um tom e uma
+   hachura. É o mecanismo que existe desde a A2.2 e que nunca chegou a
+   funcionar no ar por causa desta linha.
+   A diferença que isto faz para quem vai a conduzir: um tile que não temos
+   deixa de ser o vazio, e passa a dizer **"isto não está descarregado"** — que
+   é outra informação, e a certa. */
+const FALTA_MVT = "Gih4AgoNbGV2YW50ZV9mYWx0YRISGAMiDgkfHxrAQAAAwEC/QAAPKIAg";
+const FALTA_TIPO = "application/vnd.mapbox-vector-tile";
+function faltaResposta() {
+  const bin = atob(FALTA_MVT);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return new Response(buf, { headers: { "Content-Type": FALTA_TIPO } });
+}
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -63,9 +98,7 @@ async function tileResponse(req) {
     }
     return res;
   } catch (err) {
-    return new Response(await (await fetch(BLANK_TILE)).blob(), {
-      headers: { "Content-Type": "image/svg+xml" },
-    });
+    return faltaResposta();
   }
 }
 
@@ -75,8 +108,12 @@ self.addEventListener("fetch", (e) => {
   if (isTile(u)) { e.respondWith(tileResponse(e.request)); return; }
 
   const sameOrigin = u.origin === self.location.origin;
-  const isCDN = u.host === "cdnjs.cloudflare.com";
-  if (!sameOrigin && !isCDN) return;         // APIs meteo/rotas/radar: sempre rede (dados frescos)
+  /* dd-78/dd-74 (b), a segunda metade: o cdnjs saiu do SHELL e sai também
+     daqui. Era o par da mesma coisa — este ramo existia para servir e guardar
+     o Leaflet, e sem ele qualquer resposta do cdnjs passava a ser guardada na
+     cache do shell sem ninguém a pedir. Nada nosso vem de um CDN: o motor do
+     mapa, o estilo, os glifos, o sprite e a letra vêm todos de casa. */
+  if (!sameOrigin) return;                   // APIs meteo/rotas/radar: sempre rede (dados frescos)
   if (sameOrigin && /\/versao\.json$/.test(u.pathname)) return;  // frescura: sempre rede, NUNCA desta cache — em cache, diria para sempre "estás atualizado"
   const putCache = (res) => {
     const copy = res.clone();

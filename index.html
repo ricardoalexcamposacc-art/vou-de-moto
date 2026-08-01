@@ -306,6 +306,14 @@ body.rota-mapa #view-agora{display:none}
   border-radius:16px;padding:11px 13px;box-shadow:0 6px 22px rgba(0,0,0,.22);cursor:pointer}
 #rota-faixa.lvl0{--lvl-c:var(--good)} #rota-faixa.lvl1{--lvl-c:var(--warn)}
 #rota-faixa.lvl2{--lvl-c:var(--serious)} #rota-faixa.lvl3{--lvl-c:var(--crit)}
+/* dd-68 §2: enquanto se espera pela meteorologia a faixa NÃO usa nenhuma cor
+   da escada do veredicto — usa o cinzento, que é a cor de "não é um
+   veredicto". O ponto pulsa devagar para se ler como trabalho em curso e não
+   como um estado parado. */
+#rota-faixa.a-esperar{--lvl-c:#8b9099}
+#rota-faixa.a-esperar .fx-dot{animation:fxespera 1.4s ease-in-out infinite}
+@keyframes fxespera{0%,100%{opacity:.35}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){#rota-faixa.a-esperar .fx-dot{animation:none;opacity:.7}}
 #rota-faixa .big{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700}
 #rota-faixa .fx-dot{width:11px;height:11px;border-radius:50%;background:var(--lvl-c);flex:0 0 auto}
 #rota-faixa .fx-con{font-size:12.5px;color:var(--ink2);margin-top:3px}
@@ -2273,7 +2281,7 @@ Object.assign(I18N.en,{
 
 "Dados:":"Data:",
 "Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no sign-ups, no tracking. Your location and your destination are sent to the weather and routing services so they can answer you — and we keep none of it. Ride smart: on a red warning, stay home.",
-"Privacidade":"Privacy","Créditos e licenças":"Credits & licences","Créditos e licenças do mapa":"Map credits and licences",
+"A ver o tempo ao longo do trajeto…":"Checking the weather along the route…","Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"Restored your route to {d} from your last trip. Tap Trip mode when you want to set off.","Privacidade":"Privacy","Créditos e licenças":"Credits & licences","Créditos e licenças do mapa":"Map credits and licences",
 "Termos de utilização":"Terms of use",
 
 "Unidades alteradas para {u}.":"Units changed to {u}.",
@@ -2368,7 +2376,7 @@ Object.assign(I18N.es,{
 
 "Dados:":"Datos:",
 "Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas, sin registros, sin rastreo. Tu ubicación y tu destino se envían a los servicios de meteorología y de rutas para poder responderte — y no guardamos nada. Conduce con cabeza: con aviso rojo, quédate en casa.",
-"Privacidade":"Privacidad","Créditos e licenças":"Créditos y licencias","Créditos e licenças do mapa":"Créditos y licencias del mapa",
+"A ver o tempo ao longo do trajeto…":"Consultando el tiempo a lo largo de la ruta…","Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"Recuperé la ruta a {d} de tu último viaje. Toca Modo viaje cuando quieras salir.","Privacidade":"Privacidad","Créditos e licenças":"Créditos y licencias","Créditos e licenças do mapa":"Créditos y licencias del mapa",
 "Termos de utilização":"Términos de uso",
 
 "Unidades alteradas para {u}.":"Unidades cambiadas a {u}.",
@@ -2463,7 +2471,7 @@ Object.assign(I18N.fr,{
 
 "Dados:":"Données :",
 "Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sans comptes, sans inscription, sans pistage. Ta position et ta destination sont envoyées aux services météo et d'itinéraires pour pouvoir te répondre — et nous n'en gardons rien. Roule malin : en cas d'alerte rouge, reste chez toi.",
-"Privacidade":"Confidentialité","Créditos e licenças":"Crédits et licences","Créditos e licenças do mapa":"Crédits et licences de la carte",
+"A ver o tempo ao longo do trajeto…":"Consultation de la météo le long du trajet…","Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"J'ai repris le trajet vers {d} de ton dernier voyage. Touche Mode trajet quand tu veux partir.","Privacidade":"Confidentialité","Créditos e licenças":"Crédits et licences","Créditos e licenças do mapa":"Crédits et licences de la carte",
 "Termos de utilização":"Conditions d'utilisation",
 
 "Unidades alteradas para {u}.":"Unités changées en {u}.",
@@ -2636,6 +2644,10 @@ function localDT(date){ const p=(n)=>String(n).padStart(2,"0");
 function isoDate(epoch){ const d=new Date(epoch*1000); const p=(n)=>String(n).padStart(2,"0");
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
 const lvlColor=(l)=>getComputedStyle(document.documentElement).getPropertyValue(["--good","--warn","--serious","--crit"][l]).trim();
+/* dd-68 §2 — a cor de "ainda não sei". Fora da escada do veredicto de
+   propósito: não é um quinto nível, é a ausência de nível. O mesmo cinzento do
+   troço já percorrido, que é o outro sítio onde a cor não julga o tempo. */
+const COR_A_ESPERAR="#8b9099";
 const LVL_ICON=["✔","⚠","🌧","⛈"];
 const LVL_NAME=["Seco","Chuvisco / possível","Chuva","Forte / trovoada"];
 
@@ -5643,22 +5655,66 @@ async function computeRoute(){
     const wStart=Math.min(dep,Date.now()/1000)-7200;
     // cobre também o resto do dia no destino (estadia + regresso)
     const wEnd=Math.max(dep+maxTravel+(pts.length-2)*pauseSec+9*3600, dep+26*3600);
-    const wxs=await fetchRouteWx(allSamples, wStart, wEnd);
-    allSamples.forEach((s,i)=>{ s.wx=wxs[Math.min(i,wxs.length-1)]; });
+    /* ═══ A ROTA DESENHA-SE ASSIM QUE EXISTE (dd-68 §2) ═══════════════════
+       MEDIDO (tools/medir-rota.mjs): do clique, a rota chega aos 826 ms e o
+       ecrã ficava vazio até aos 1970 — mais de um segundo com a resposta na
+       mão e nada no mapa. E a perna que estica é a da meteorologia: é UMA
+       chamada multi-ponto que cresce com o comprimento do trajeto, e é por
+       isso que numa rede móvel, numa rota longa, dá os dez segundos de que o
+       Ricardo se queixou. A rota não estava à espera de ser desenhada —
+       estava à espera de saber o tempo que ia fazer.
 
+       O QUE ISTO **NÃO** PODE SER: desenhar cedo e deixar o veredicto dizer
+       "seco". Sem meteorologia o `sampleAt` devolve null, o `rainLevel` de
+       nulls dá 0, e 0 é a cor verde — nasceria um cartão verde sobre dados
+       que não existem, que é exatamente o defeito que o dd-61 matou. Por
+       isso a rota nasce com `aEsperar`, e enquanto essa bandeira estiver
+       levantada NINGUÉM afirma nada sobre chuva: o traçado é neutro, a faixa
+       diz que ainda está a perguntar, e o veredicto só aparece quando houver
+       com que o fazer. **Quem não sabe cala-se** — a regra do dd-61 aplicada
+       a um instante em vez de a um buraco na série. */
     const v0=variants[0];
+    if(!state._resumeTravel) state.rotaRetomada=false;   // dd-78: uma rota escolhida agora é dele outra vez
     state.route={o,d,pts,stops,dep,pauseSec,stayMin,shift:0,variants,active:0,
       coords:v0.coords,cum:v0.cum,geomKm:v0.geomKm,totalKm:v0.totalKm,
-      travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples,maneuvers:v0.maneuvers};
-    applyShift(0,true);
+      travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples,maneuvers:v0.maneuvers,
+      aEsperar:true};
+    rotaMapaModo(true);          // o ecrã-mapa entra JÁ, com o traçado dentro
+    applyShift(0,true);          // desenha e enquadra — sem dizer nada do tempo
+    renderDepartures();
+
+    /* e agora sim, o tempo — que se pinta POR CIMA de uma rota que já se vê */
+    const wxs=await fetchRouteWx(allSamples, wStart, wEnd);
+    allSamples.forEach((s,i)=>{ s.wx=wxs[Math.min(i,wxs.length-1)]; });
+    state.route.aEsperar=false;
+    applyShift(state.route.shift,false);   // o veredicto aparece; o enquadramento fica como está
     renderDepartures();
     renderCameras(); loadRouteCameras(); // radares fixos (assíncrono)
-    rotaMapaModo(true);                  // calcular É o gesto de entrar no ecrã-mapa (A4.2)
+    /* o `rotaMapaModo(true)` estava aqui e subiu para antes da meteorologia:
+       calcular É o gesto de entrar no ecrã-mapa (A4.2), e esse gesto não tem
+       de esperar por dados que ainda vêm a caminho */
     scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
     loadDrySpell(); // historial de dias secos → aviso de óleo na primeira chuva
     setTimeout(precacheRouteTiles,1200); // mapa offline do corredor da rota
     autoT.used=false;
-    if(state._resumeTravel&&!travel.active){ state._resumeTravel=false; setTimeout(startTravel,600); }
+    /* ═══ dd-78 — A APP NÃO COMEÇA A NAVEGAR SOZINHA ═══════════════════════
+       O relato: abriu a app, começou a andar de mota, e ela estava em Modo
+       viagem para um destino que nunca escolheu. A causa é esta linha, e o
+       que ela fazia era pior do que parece: uma viagem guardada até **12
+       horas antes** era restaurada em silêncio — o `tryRestore` preenche o
+       formulário, muda para o separador Rota e chama o `computeRoute`, tudo
+       sem perguntar — e daqui saía um `startTravel` 600 ms depois. Zero
+       gestos, zero confirmação. O destino de ontem à noite vira a navegação
+       de hoje de manhã.
+       **Retomar o trajeto é útil; arrancar a navegação por ele não é uma
+       decisão nossa.** A rota fica restaurada e à vista, com o "Modo viagem"
+       na faixa à espera do dedo dele — que é onde essa decisão sempre viveu. */
+    if(state._resumeTravel&&!travel.active){
+      state._resumeTravel=false;
+      state.rotaRetomada=true;
+      toast(t("Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.",
+        {d:state.route?.d?.name||""}),9000);
+    }
     else maybeAutoTravel(); // liga o Modo Viagem sozinho se detetar movimento
     try{ history.replaceState(null,"",
       "#r2="+pts.map(p=>`${p.lat.toFixed(4)},${p.lon.toFixed(4)},${encodeURIComponent(p.name)}`).join("~")
@@ -5824,7 +5880,14 @@ function drawRoute(fit){
     /* trovoada tracejada: o par chuva↔trovoada a 20% de brilho fica a ΔE 6,0
        em deuteranopia — cor sozinha não chega de noite; a forma desempata
        (guarda test/contraste.mjs, régua da codificação secundária) */
-    troços.push(linha(seg,{cor:lvlColor(nivelTroço),...(nivelTroço>=3?{trovoada:true}:{})}));
+    /* dd-68 §2: com a meteorologia ainda a caminho, o troço é NEUTRO. O
+       nível 0 pinta verde, e verde é uma afirmação — "este pedaço está seco".
+       Aqui ninguém sabe ainda, e a cor não pode dizer o que a frase se recusa
+       a dizer. Cinzento é o que já usamos para "isto não é um veredicto" (o
+       percorrido e as variantes fantasma). */
+    troços.push(linha(seg, R.aEsperar
+      ? {cor:COR_A_ESPERAR}
+      : {cor:lvlColor(nivelTroço),...(nivelTroço>=3?{trovoada:true}:{})}));
   }
   /* ═══ CORREDOR-HALO (dd-19, candidato c): atenua a base SÓ onde a rota
      respira — em vez de esvaziar o mapa inteiro, como o pálido fazia. Uma
@@ -5853,7 +5916,7 @@ function drawRoute(fit){
   Mapa.fonte(h,"variantes",{type:"FeatureCollection",features:
     (R.variants||[]).map((v,i)=>i===R.active?null:linha(v.coords,{i})).filter(Boolean)});
 
-  const amostras=R.samples.map((s,i)=>ponto(s,{i, cor:lvlColor(s.cond.lvl), borda:surf}))
+  const amostras=R.samples.map((s,i)=>ponto(s,{i, cor:R.aEsperar?COR_A_ESPERAR:lvlColor(s.cond.lvl), borda:surf}))
     .filter((_,i)=>i>0&&i<R.samples.length-1&&R.samples[i].stop==null);
   Mapa.fonte(h,"amostras",{type:"FeatureCollection",features:amostras});
 
@@ -6096,7 +6159,15 @@ function renderRouteSummary(){
   const completo=!buracos.length;
   const dep=R.dep+R.shift*60;
   let headline, emoji;
-  if(worst===0){ emoji="🟢"; headline=completo?t("Trajeto seco — boa viagem!")
+  /* dd-68 §2 — O ESTADO DE ESPERA. Vem ANTES de tudo o resto porque não é um
+     veredicto brando: é a recusa de dar um. Sem isto, uma rota desenhada cedo
+     cairia no `worst===0` e diria "Provavelmente seco — faltam-me dados em
+     parte do caminho" — que é falso de duas maneiras ao mesmo tempo: não
+     faltam dados de PARTE do caminho, faltam de todo; e não é "provavelmente
+     seco", é "ainda não perguntei". A honestidade não é dizer menos, é dizer
+     o que se sabe — e o que se sabe, neste instante, é o trajeto e as horas. */
+  if(R.aEsperar){ emoji="⏳"; headline=t("A ver o tempo ao longo do trajeto…"); }
+  else if(worst===0){ emoji="🟢"; headline=completo?t("Trajeto seco — boa viagem!")
     :t("Provavelmente seco — faltam-me dados em parte do caminho"); }
   else if(worst===1){ emoji="🟡";
     /* dd-61 c: "Possible drizzle in 0.0 km" — era daqui. Abaixo dos 20 m a
@@ -6115,13 +6186,20 @@ function renderRouteSummary(){
   const fx=$("#rota-faixa");
   if(fx){
     fx.textContent="";
-    fx.className=`lvl${worst}${completo?"":" incompleto"}`;
+    fx.className=R.aEsperar?"a-esperar":`lvl${worst}${completo?"":" incompleto"}`;
     fx.setAttribute("data-test","route-summary");
-    fx.dataset.nivel=String(worst); fx.dataset.completo=completo?"1":"0";
+    /* `nivel` fica a "-" enquanto se espera: quem ler o atributo à procura de
+       um veredicto encontra a ausência dele, não um zero que parece seco */
+    fx.dataset.nivel=R.aEsperar?"-":String(worst);
+    fx.dataset.completo=R.aEsperar?"0":(completo?"1":"0");
+    fx.dataset.aEsperar=R.aEsperar?"1":"0";
     const sh=el("div","summary-hero"), bigL=el("div","big");
     bigL.append(el("span","fx-dot"), el("span",null,semEmoji(headline)));
     sh.appendChild(bigL); fx.appendChild(sh);
-    let conselho=""; try{ conselho=semEmoji((gearAdvice(segs.map(s=>s.cond))||[])[0]||""); }catch(e){}
+    /* o conselho de equipamento é uma frase SOBRE O TEMPO: cala-se pela mesma
+       razão que o veredicto. "Equipamento habitual chega" sobre dados que não
+       existem é a mesma mentira, dita mais abaixo no cartão. */
+    let conselho=""; if(!R.aEsperar){ try{ conselho=semEmoji((gearAdvice(segs.map(s=>s.cond))||[])[0]||""); }catch(e){} }
     if(conselho) fx.appendChild(el("div","fx-con",conselho));
     fx.appendChild(el("div","fx-num",
       `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} · ${t("chegada")} ~${fmtHM(arrive)}`));
@@ -7788,7 +7866,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-01-1303-7d076f";
+const BUILD="2026-08-01-2018-1a1a93";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -7919,6 +7997,12 @@ function stopAutoTravel(){
   if(autoT.watch!=null){ try{navigator.geolocation.clearWatch(autoT.watch);}catch(e){} autoT.watch=null; }
 }
 function maybeAutoTravel(){
+  /* dd-78: e pela outra ponta — o arranque por velocidade só vale para uma
+     rota que ele escolheu NESTA sessão. Numa rota retomada, andar de mota
+     passava a ligar a navegação para o destino de ontem, que é exatamente o
+     relato. O caso para que isto foi feito (planear, pousar o telemóvel no
+     guiador, arrancar) continua inteiro; o outro morre. */
+  if(state.rotaRetomada) return;
   if(travel.active||autoT.used||autoT.watch!=null||!navigator.geolocation||!state.route) return;
   autoT.hits=0;
   autoT.watch=navigator.geolocation.watchPosition(p=>{
@@ -8067,6 +8151,19 @@ function speak(txt){
     if(!v) return;                       // sem voz nenhuma: fica o texto e a vibração
     const u=new SpeechSynthesisUtterance(txt);
     u.voice=v; u.lang=v.lang; u.rate=1.03;
+    /* ═══ dd-78 — MÚSICA A TOCAR (o que se pode fazer, e o que não) ═══════
+       O relato: com música a tocar não se ouvem as instruções. A causa não é
+       um defeito nosso — é um LIMITE da plataforma: **uma PWA não tem como
+       baixar o volume de outra app.** O ducking a sério é uma sessão de áudio
+       nativa (`AVAudioSession` com `.duckOthers` no iOS,
+       `requestAudioFocus(AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)` no Android), e
+       isso só existe na build com Capacitor. Não invento o que não tenho.
+       O que se pode fazer daqui, e faz-se: falar ao **volume máximo** (a
+       omissão do `SpeechSynthesisUtterance` é 1, mas escrevê-lo é o que
+       impede que uma alteração futura o baixe sem se dar por isso) e um
+       **tom curto antes da fala** — o ouvido separa uma instrução do fundo
+       musical muito melhor quando algo lhe marca o início. */
+    u.volume=1;
     speechSynthesis.speak(u);
   }catch(e){}
 }
