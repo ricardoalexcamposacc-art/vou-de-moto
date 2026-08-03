@@ -188,6 +188,15 @@ a{color:var(--accent)}
 .ac-item b{font-size:14px;font-weight:600}
 .ac-item span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ac-empty{padding:10px 12px;font-size:13px;color:var(--muted)}
+/* dd-141: o painel «Estado da ligação». O ponto é redundante com o texto de
+   propósito — quem não distingue verde de vermelho lê «respondeu»/«sem
+   resposta» na mesma linha, e nunca fica dependente da cor. */
+.saude-linha{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:12.5px}
+.saude-ponto{font-size:11px;line-height:1}
+.saude-ponto.bom{color:var(--good)}
+.saude-ponto.mau{color:var(--serious)}
+.saude-host{font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saude-estado{margin-left:auto;flex:none}
 /* ================= BUTTONS / CHIPS ================= */
 .btn{padding:10px 16px;border-radius:13px;border:1px solid var(--border);background:var(--surface2);
   cursor:pointer;font-weight:650;font-size:14px;display:inline-flex;align-items:center;gap:8px;
@@ -972,6 +981,12 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
           <button class="chip click" data-units="uk">mi · °C</button>
         </div>
         <p class="small muted" id="cred-line" style="margin:10px 0 0;font-variant-numeric:tabular-nums"></p>
+        <!-- dd-131 §3 + dd-141 §4: com este painel, a foto das 15:40 teria
+             dito o host culpado em 5 segundos, em vez de nos deixar a
+             adivinhar entre «a internet» e «a Geoapify». -->
+        <h3 style="margin-top:14px">📡 <span id="rede-title">Estado da ligação</span></h3>
+        <div id="saude-rede" data-test="saude-rede"></div>
+        <p class="small muted" id="rede-nota" style="margin:6px 0 0">Só serviços que já tentei contactar nesta sessão.</p>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
         <p class="small muted" id="cam-law-txt" style="margin:0 0 8px"></p>
         <div id="cam-law-why" class="small muted" hidden style="margin:-4px 0 8px"></div>
@@ -1031,7 +1046,10 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
   </div>
 
   <div id="net-banner" style="display:none" class="banner warn">
-    <span>📡</span><span id="net-txt"><b>Sem ligação aos serviços meteorológicos.</b> Verifica a tua internet — o mapa guardado, a rota e o GPS continuam a funcionar.</span>
+    <!-- dd-141: este texto por omissão é SÓ para a catástrofe de arranque
+         (o motor do mapa não chegou). Toda a saúde de rede é escrita pelo
+         pintor único a partir do registo por host — nunca aqui. -->
+    <span>📡</span><span id="net-txt">A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.</span>
     <button id="net-recarregar" class="btn" type="button" style="flex:none;margin-left:auto">Recarregar a app</button>
   </div>
 
@@ -1517,6 +1535,8 @@ function applyStaticI18n(){
     ["#btn-mais-op","txt","⚙️ Mais opções (paragens, hora de partida, estadia)"],
     ["#rt-mais .small.muted","txt","Hora de partida vazia = partes agora."],
     ["#lang-title","txt","Idioma"],
+    ["#rede-title","txt","Estado da ligação"],
+    ["#rede-nota","txt","Só serviços que já tentei contactar nesta sessão."],
     ["#btn-ver-mapa","txt","Ver o mapa"],
     ["#rt-voltar","aria","Voltar ao planeamento"],
     ["#rota-folha-grab","aria","Fechar a folha"],
@@ -1568,8 +1588,16 @@ function applyStaticI18n(){
   if(sentSub&&!sentinel.on){ sentSub.textContent=t("Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
     if(typeof pintarSentinelaComo==="function") pintarSentinelaComo(); }
   if(typeof sentinelaPinta==="function") sentinelaPinta(typeof sentinel!=="undefined"&&sentinel.on);
-  const nb=$("#net-txt");
-  if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
+  /* dd-141: ESTA LINHA ERA A TERCEIRA MÃO NA FAIXA. O repintor da língua
+     reescrevia aqui o TEXTO DA FAIXA DE REDE como se fosse um rótulo fixo —
+     e um rótulo é uma etiqueta, uma faixa destas é um VEREDICTO. Resultado:
+     qualquer serviço a falhar (ou só trocar de língua) punha «não consigo
+     contactar os serviços meteorológicos» por cima de um cartão de meteo
+     vivo. É a fotografia das 15:40, escrita numa linha.
+     A língua re-pergunta ao pintor; nunca decide o que a faixa diz. */
+  if(state.semMapa){ const nb=$("#net-txt");
+    if(nb) nb.textContent=t("A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega."); }
+  else if(typeof pintarSaudeRede==="function") pintarSaudeRede();
   const nr=$("#net-recarregar");
   if(nr){ nr.textContent=t("Recarregar a app"); }
   const ft=$("footer");
@@ -1670,7 +1698,15 @@ en:{
 "Melhora a partir das {h} ({d}).":"Improves from {h} ({d}).",
 "hoje":"today","amanhã":"tomorrow",
 "{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} around {h} ({d}). Avoid being on the road then.",
-"Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.":"No connection — I couldn't search. Check the internet and try again.",
+"Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.":"No connection — I couldn't reach the search service. Try again in a moment.",
+"Vários serviços sem resposta — a rede do aparelho pode estar em baixo. O que vês é a última leitura guardada.":"Several services aren't responding — the device's network may be down. What you see is the last saved reading.",
+"{s} não respondeu. O que vês é a última leitura guardada; o resto da app continua a funcionar.":"{s} didn't respond. What you see is the last saved reading; the rest of the app keeps working.",
+"O serviço meteorológico":"The weather service","O serviço de pesquisa":"The search service","O serviço de moradas":"The address service","O serviço de rotas":"The routing service","O serviço de radares":"The speed-camera service","Um serviço externo":"An external service",
+"Ainda não falei com nenhum serviço nesta sessão.":"I haven't contacted any service in this session yet.",
+"agora mesmo":"just now","há {m} min":"{m} min ago","respondeu":"responded","sem resposta":"no answer",
+"A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"The app didn't load completely — the map engine is missing. Check your connection and reload.",
+"Nada por perto — alarguei ao mundo.":"Nothing nearby — I widened the search to the whole world.",
+"Estado da ligação":"Connection status","Só serviços que já tentei contactar nesta sessão.":"Only services I've actually tried to reach this session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"No results for this search — check the spelling or try another name.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.",
 "Recarregar a app":"Reload the app",
@@ -1709,7 +1745,13 @@ en:{
 "Vais apanhar chuva em ~{n} km ({p}% do trajeto)":"You'll hit rain on ~{n} km ({p}% of the route)",
 "Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.":"Heavy rain/storm on the way — {n} km affected. Postpone if you can.",
 "paragem":"stop","paragens":"stops","em andamento":"riding time","partida":"departure","chegada":"arrival","por":"via",
-"pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°","rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d} wind",
+"pico {n} mm/h":"peak {n} mm/h","mínima no percurso {t}°":"route low {t}°",/* i18n, apanhado a OLHAR para a ficha da loja: em PT o descritor é um
+   complemento («vento DE COSTAS»), mas em inglês já é o substantivo
+   inteiro («tailwind») — o molde «{d} wind» produzia «tailwind wind»,
+   «headwind wind», «mostly crosswind wind». O molde inglês não repete a
+   palavra; ES/FR mantêm-na porque lá os descritores são complementos
+   («de cola», «dans le dos»). */
+"rajadas até {g} km/h · vento {d}":"gusts up to {g} km/h · {d}",
 "vento lateral até ~{g} km/h":"crosswind up to ~{g} km/h","perto do km {k}":"near km {k}","sobe até ~{m} m":"climbs to ~{m} m",
 "Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"I only show speed cameras in countries whose law I went and read, one by one. This one I did not — and since there are countries where the app itself is punished, I would rather show nothing than take the risk.","Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"I found one place. Tap it and I will plot the route and the weather along the way.","Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"I found {n} places. Tap the one you want and I will plot the route.","🏠 A minha casa":"🏠 My home","radar fixo":"fixed camera","Mostrar radares na Alemanha":"Show speed cameras in Germany","Radares ligados na Alemanha — por tua conta e risco.":"Speed cameras on in Germany — at your own risk.","Radares desligados na Alemanha.":"Speed cameras off in Germany.","Na Suíça a lei proíbe qualquer aviso sobre controlos de velocidade — e pune também quem o oferece, não só quem o usa. Por isso não mostro nada.":"Swiss law bans any warning about speed checks — and punishes whoever offers it, not only whoever uses it. So I show nothing there.","Na Alemanha é o condutor que é penalizado por usar avisos de radar em andamento — não quem publica a app. A decisão é tua.":"In Germany it is the rider who is fined for using speed camera warnings while riding — not whoever publishes the app. The decision is yours.","na {r}":"on the {r}","no teu trajeto":"on your route","radares fixos":"fixed cameras","🌙 chegada depois do pôr-do-sol":"🌙 arrival after sunset",
 "maioritariamente lateral":"mostly crosswind","de frente":"headwind","de costas":"tailwind",
@@ -1733,7 +1775,7 @@ en:{
 "📸 Radar fixo":"📸 Fixed speed camera","— limite {v}":"— limit {v}",
 "🏁 Partida":"🏁 Start","🎯 Chegada":"🎯 Arrival","🛑 Paragem {n}: {p}":"🛑 Stop {n}: {p}","chegas ~{a} · voltas à estrada ~{b}":"arrive ~{a} · back on the road ~{b}",
 "Diz-me para onde queres ir 🙂":"Tell me where you want to go 🙂","A pensar…":"Thinking…",
-"À procura de \"{q}\" perto de ti…":"Looking for \"{q}\" near you…",
+"À procura de \"{q}\"…":"Looking for \"{q}\"…",
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"No location. Allow GPS, or search for your city in the Now tab.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.","perto de: {r}":"near: {r}","a tua posição":"your position","o mapa à vista":"the map in view",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculating the route to {p} and the weather along every stretch…",
@@ -1754,9 +1796,9 @@ en:{
 "Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão.":"Some stretches risk drizzle; keep the rain suit handy.",
 "Sim — vai de moto!":"Yes — take the bike!","Trajeto seco até {p} a esta hora.":"Dry route to {p} at this time.",
 "Vento demasiado forte para ir descansado":"Wind too strong for a relaxed ride",
-"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Gusts up to {g} km/h, {d} wind{x} — punishing on a bike; if you go, keep speed moderate and don't squeeze past trucks.",
+"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Gusts up to {g} km/h, {d}{x} — punishing on a bike; if you go, keep speed moderate and don't squeeze past trucks.",
 ", com lateral forte perto do km {k}":", with strong crosswind near km {k}",
-"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Gusts up to {g} km/h, {d} wind{x} — firm grip on bridges and exposed stretches.",
+"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Gusts up to {g} km/h, {d}{x} — firm grip on bridges and exposed stretches.",
 " com lateral perto do km {k}":" with crosswind near km {k}",
 "Vento tranquilo: rajadas máximas de {g} km/h, {d}.":"Calm wind: gusts max {g} km/h, {d}.",
 "Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.":"Seriously cold (route low {t}°): winter gloves, thermal layer and windproof.",
@@ -1921,7 +1963,15 @@ es:{
 "A partir das {h}: {c} — se fores, volta antes disso.":"A partir de las {h}: {c} — si vas, vuelve antes.",
 "Melhora a partir das {h} ({d}).":"Mejora a partir de las {h} ({d}).","hoje":"hoy","amanhã":"mañana",
 "{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} hacia las {h} ({d}). Evita estar en carretera entonces.",
-"Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.":"Sin conexión — no pude buscar. Comprueba internet e inténtalo de nuevo.",
+"Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.":"Sin conexión — no pude contactar el servicio de búsqueda. Inténtalo de nuevo en un momento.",
+"Vários serviços sem resposta — a rede do aparelho pode estar em baixo. O que vês é a última leitura guardada.":"Varios servicios sin respuesta — la red del dispositivo puede estar caída. Lo que ves es la última lectura guardada.",
+"{s} não respondeu. O que vês é a última leitura guardada; o resto da app continua a funcionar.":"{s} no respondió. Lo que ves es la última lectura guardada; el resto de la app sigue funcionando.",
+"O serviço meteorológico":"El servicio meteorológico","O serviço de pesquisa":"El servicio de búsqueda","O serviço de moradas":"El servicio de direcciones","O serviço de rotas":"El servicio de rutas","O serviço de radares":"El servicio de radares","Um serviço externo":"Un servicio externo",
+"Ainda não falei com nenhum serviço nesta sessão.":"Todavía no he contactado con ningún servicio en esta sesión.",
+"agora mesmo":"ahora mismo","há {m} min":"hace {m} min","respondeu":"respondió","sem resposta":"sin respuesta",
+"A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"La app no cargó por completo — falta el motor del mapa. Revisa la conexión y recarga.",
+"Nada por perto — alarguei ao mundo.":"Nada cerca — amplié la búsqueda a todo el mundo.",
+"Estado da ligação":"Estado de la conexión","Só serviços que já tentei contactar nesta sessão.":"Solo servicios que ya he intentado contactar en esta sesión.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Sin resultados para esta búsqueda — revisa la escritura o prueba otro nombre.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — revisa la escritura o prueba otro nombre.",
 "Recarregar a app":"Recargar la app",
@@ -1981,7 +2031,7 @@ es:{
 "limite {v}":"límite {v}","+{n} radares adicionais no mapa.":"+{n} radares más en el mapa.","km {k} do teu trajeto":"km {k} de tu ruta","dados OpenStreetMap":"datos OpenStreetMap",
 "📸 Radar fixo":"📸 Radar fijo","— limite {v}":"— límite {v}","🏁 Partida":"🏁 Salida","🎯 Chegada":"🎯 Llegada","🛑 Paragem {n}: {p}":"🛑 Parada {n}: {p}",
 "chegas ~{a} · voltas à estrada ~{b}":"llegas ~{a} · vuelves a la carretera ~{b}",
-"Diz-me para onde queres ir 🙂":"Dime a dónde quieres ir 🙂","A pensar…":"Pensando…","À procura de \"{q}\" perto de ti…":"Buscando \"{q}\" cerca de ti…",
+"Diz-me para onde queres ir 🙂":"Dime a dónde quieres ir 🙂","A pensar…":"Pensando…","À procura de \"{q}\"…":"Buscando \"{q}\"…",
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Sin ubicación. Permite el GPS, o busca tu ciudad en la pestaña Ahora.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — comprueba la escritura o prueba otro nombre.","perto de: {r}":"cerca de: {r}","a tua posição":"tu posición","o mapa à vista":"el mapa a la vista",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculando la ruta hasta {p} y el tiempo en cada tramo…",
@@ -2156,7 +2206,15 @@ fr:{
 "A partir das {h}: {c} — se fores, volta antes disso.":"À partir de {h} : {c} — si tu pars, reviens avant.",
 "Melhora a partir das {h} ({d}).":"Ça s'améliore à partir de {h} ({d}).","hoje":"aujourd'hui","amanhã":"demain",
 "{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} vers {h} ({d}). Évite d'être sur la route à ce moment-là.",
-"Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.":"Pas de connexion — je n'ai pas pu chercher. Vérifie internet et réessaie.",
+"Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.":"Pas de connexion — je n'ai pas pu joindre le service de recherche. Réessaie dans un instant.",
+"Vários serviços sem resposta — a rede do aparelho pode estar em baixo. O que vês é a última leitura guardada.":"Plusieurs services ne répondent pas — le réseau de l'appareil est peut-être coupé. Ce que tu vois est la dernière lecture enregistrée.",
+"{s} não respondeu. O que vês é a última leitura guardada; o resto da app continua a funcionar.":"{s} n'a pas répondu. Ce que tu vois est la dernière lecture enregistrée ; le reste de l'app continue de fonctionner.",
+"O serviço meteorológico":"Le service météo","O serviço de pesquisa":"Le service de recherche","O serviço de moradas":"Le service d'adresses","O serviço de rotas":"Le service d'itinéraires","O serviço de radares":"Le service de radars","Um serviço externo":"Un service externe",
+"Ainda não falei com nenhum serviço nesta sessão.":"Je n'ai encore contacté aucun service dans cette session.",
+"agora mesmo":"à l'instant","há {m} min":"il y a {m} min","respondeu":"a répondu","sem resposta":"sans réponse",
+"A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"L'app n'a pas chargé complètement — le moteur de carte manque. Vérifie ta connexion et recharge.",
+"Nada por perto — alarguei ao mundo.":"Rien à proximité — j'ai élargi la recherche au monde entier.",
+"Estado da ligação":"État de la connexion","Só serviços que já tentei contactar nesta sessão.":"Uniquement les services que j'ai réellement essayé de joindre cette session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Aucun résultat pour cette recherche — vérifie l'orthographe ou essaie un autre nom.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Aucun résultat pour « {q} » — vérifie l'orthographe ou essaie un autre nom.",
 "Recarregar a app":"Recharger l'app",
@@ -2216,7 +2274,7 @@ fr:{
 "limite {v}":"limite {v}","+{n} radares adicionais no mapa.":"+{n} radars de plus sur la carte.","km {k} do teu trajeto":"km {k} de ton trajet","dados OpenStreetMap":"données OpenStreetMap",
 "📸 Radar fixo":"📸 Radar fixe","— limite {v}":"— limite {v}","🏁 Partida":"🏁 Départ","🎯 Chegada":"🎯 Arrivée","🛑 Paragem {n}: {p}":"🛑 Arrêt {n} : {p}",
 "chegas ~{a} · voltas à estrada ~{b}":"arrivée ~{a} · reprise de la route ~{b}",
-"Diz-me para onde queres ir 🙂":"Dis-moi où tu veux aller 🙂","A pensar…":"Je réfléchis…","À procura de \"{q}\" perto de ti…":"Recherche de « {q} » près de toi…",
+"Diz-me para onde queres ir 🙂":"Dis-moi où tu veux aller 🙂","A pensar…":"Je réfléchis…","À procura de \"{q}\"…":"Recherche de « {q} »…",
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Pas de position. Autorise le GPS, ou cherche ta ville dans l'onglet Maintenant.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Je n'ai pas trouvé \"{q}\" — vérifie l'orthographe ou essaie un autre nom.","perto de: {r}":"près de : {r}","a tua posição":"ta position","o mapa à vista":"la carte affichée",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calcul de l'itinéraire vers {p} et de la météo sur chaque tronçon…",
@@ -2776,25 +2834,23 @@ async function jfetch(url, timeout=14000, origem=null){
     const r=await fetch(url,{signal:ctl.signal});
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const j=await r.json();
-    state.netFails=0; state.netHosts&&state.netHosts.clear(); $("#net-banner").style.display="none";
+    /* dd-141 §2.1: a prova de vida é DESTE serviço e apaga o estado DESTE
+       serviço — nunca o dos outros. Zerar um contador global aqui era o que
+       escondia um serviço doente atrás de um serviço são. */
+    marcarRede(url,true);
     if(nome) contar(nome,url,false,origem);
     if(chave) cacheEscrever(chave,j,SERVICOS[nome].ttl);
     return j;
   }catch(e){
     state.netFails++;
-    /* dd-125: o watchdog conhece os HOSTS — falhas em serviços DISTINTOS é a
-       assinatura da rede do aparelho morta (não de um serviço em baixo), e a
-       faixa diz isso com todas as letras. O botão «Recarregar a app» está na
-       faixa (recarga verdadeira, não foco) — é o botão que o Ricardo pediu
-       às 01:14, e serve a família inteira destas avarias. */
-    try{ (state.netHosts??=new Set()).add(new URL(url).host); }catch(_e){}
-    if(state.netFails>=2){
-      $("#net-banner").style.display="flex";
-      if((state.netHosts?.size||0)>=2){
-        const nb=$("#net-txt");
-        if(nb) nb.textContent=t("Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.");
-      }
-    }
+    /* dd-125 + dd-141: o watchdog conhece os HOSTS — falhas em serviços
+       DISTINTOS é a assinatura da rede do aparelho morta (não de um serviço
+       em baixo), e a faixa diz isso com todas as letras. O botão «Recarregar
+       a app» está na faixa (recarga verdadeira, não foco) — é o botão que o
+       Ricardo pediu às 01:14, e serve a família inteira destas avarias.
+       O texto e a decisão de mostrar são AGORA do pintor, a partir do
+       registo por host: aqui só se conta o que aconteceu. */
+    marcarRede(url,false);
     throw e;
   }finally{ clearTimeout(th); }
 }
@@ -2863,6 +2919,112 @@ function svcDe(url){
     if(!x||!x.url) continue;
     if(url.startsWith(SERVICOS.proxy?SERVICOS.proxy+x.via:x.url.replace(/\/$/,""))) return k; }
   return null;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UMA SÓ VERDADE DE REDE, POR HOST (dd-141)
+
+   As duas fotografias do campo (15:40) mostraram o mesmo defeito por dois
+   lados: o Agora com um cartão VIVO a 35° e, por cima, «Sem ligação aos
+   serviços meteorológicos»; e a Rota a dizer «não consegui pesquisar» no
+   minuto em que o open-meteo respondia.
+
+   A causa era uma verdade GLOBAL: um contador único de falhas e um Set de
+   hosts. Daí saíam três mentiras diferentes:
+     · um serviço qualquer a falhar acendia uma faixa com texto de METEO;
+     · um serviço SÃO zerava o contador e ESCONDIA outro doente (a razão
+       por que a faixa da meteo nunca chegava a aparecer se a pesquisa
+       estivesse a funcionar entre as falhas);
+     · e o `jfetch` devolve a cache ANTES do ramo de sucesso, por isso com
+       a meteo servida da cache o sucesso nunca acontecia e a faixa ficava
+       pegajosa por cima de uma app que trabalhava bem.
+
+   A partir daqui há UM registo por host, e todas as superfícies derivam
+   dele — ninguém guarda cópia própria que envelhece. Um acerto de cache
+   NÃO marca vida (não houve rede nenhuma): a verdade só se atualiza com
+   tentativas REAIS, e é por isso que a faixa fala de «não consegui
+   ATUALIZAR» e nunca do estado da internet do aparelho.
+   ═══════════════════════════════════════════════════════════════════════ */
+const LIMIAR_FALHAS=2;
+/* dd-129 §2.2: o raio que ANTES excluía — hoje só decide se a app anuncia
+   que teve de alargar. Nenhum resultado é escondido por causa dele. */
+const PERTO_ANUNCIO=70;          // uma falha isolada é um soluço, não uma avaria
+const FAMILIAS=[
+  [/open-meteo/,             "meteo"],
+  [/geoapify/,               "pesquisa"],
+  [/photon|komoot/,          "pesquisa"],
+  [/nominatim|openstreetmap/,"moradas"],
+  [/osrm/,                   "rota"],
+  [/overpass/,               "radares"],
+];
+const ROTULO_FAM={ meteo:"O serviço meteorológico", pesquisa:"O serviço de pesquisa",
+  moradas:"O serviço de moradas", rota:"O serviço de rotas", radares:"O serviço de radares",
+  outro:"Um serviço externo" };
+function familiaDe(host){ for(const [re,fam] of FAMILIAS) if(re.test(host)) return fam; return "outro"; }
+function marcarRede(url,viva){
+  let host=null; try{ host=new URL(url,location.href).host; }catch(_e){ return; }
+  if(!host) return;
+  const s=(state.saude??={});
+  const a=s[host]||(s[host]={fam:familiaDe(host), falhas:0, quando:0});
+  if(viva) a.falhas=0; else a.falhas++;
+  a.quando=Date.now();
+  pintarSaudeRede();
+}
+/* Quem é que a faixa deve nomear. Duas portas, e as duas vêm de observações
+   diferentes que não se anulam:
+     · UM serviço com falhas seguidas é uma avaria daquele serviço
+       (LIMIAR_FALHAS: uma falha isolada é um soluço, e cala-se);
+     · DOIS serviços diferentes a falhar, mesmo uma vez cada, já é a
+       assinatura da rede do APARELHO — foi esta a observação do dd-125, e
+       perder-se-ia se cada host tivesse de chegar ao limiar sozinho. */
+function hostsEmFalha(){ const s=state.saude||{};
+  const falhados=Object.entries(s).filter(([,a])=>a.falhas>0).map(([h,a])=>({host:h,...a}));
+  const doente=falhados.some(a=>a.falhas>=LIMIAR_FALHAS);
+  return (doente||falhados.length>=2)?falhados:[]; }
+/* a ÚNICA mão que toca na faixa de rede — se aparecer outra, é uma segunda
+   verdade a nascer, e foi isso que produziu as fotos */
+function pintarSaudeRede(){
+  const b=$("#net-banner");
+  if(b&&!state.semMapa){
+    const doentes=hostsEmFalha();
+    /* sem rede nenhuma, quem fala é a faixa do offline — que diz mais e
+       melhor. Duas faixas a dizer o mesmo é ruído, não honestidade. */
+    if(!doentes.length||state.offline){ b.style.display="none"; }
+    else{
+      const fams=[...new Set(doentes.map(d=>d.fam))];
+      const nb=$("#net-txt");
+      if(nb){
+        const rot=t(ROTULO_FAM[fams[0]]||ROTULO_FAM.outro);
+        nb.textContent=fams.length>=2
+          ? t("Vários serviços sem resposta — a rede do aparelho pode estar em baixo. O que vês é a última leitura guardada.")
+          : t("{s} não respondeu. O que vês é a última leitura guardada; o resto da app continua a funcionar.",{s:rot});
+      }
+      b.style.display="flex";
+    }
+  }
+  pintarPainelRede();
+}
+function pintarPainelRede(){
+  const c=$("#saude-rede"); if(!c) return;
+  c.textContent="";
+  const s=state.saude||{}; const hosts=Object.keys(s).sort();
+  if(!hosts.length){ c.appendChild(el("div","small muted",t("Ainda não falei com nenhum serviço nesta sessão."))); return; }
+  for(const h of hosts){
+    const a=s[h];
+    const linha=el("div","saude-linha");
+    linha.setAttribute("data-test","saude-linha");
+    linha.setAttribute("data-host",h);
+    linha.setAttribute("data-ok",a.falhas===0?"sim":"nao");
+    linha.setAttribute("data-fam",a.fam);
+    const mins=a.quando?Math.round((Date.now()-a.quando)/60000):null;
+    const quando=mins===null?"":mins<1?t("agora mesmo"):t("há {m} min",{m:mins});
+    const bom=a.falhas===0;
+    linha.appendChild(el("span","saude-ponto"+(bom?" bom":" mau"),"●"));
+    linha.appendChild(el("span","saude-host",h));
+    linha.appendChild(el("span","saude-estado small muted",
+      (bom?t("respondeu"):t("sem resposta"))+(quando?" · "+quando:"")));
+    c.appendChild(linha);
+  }
 }
 
 /* ── célula de cache ──────────────────────────────────────────────────────
@@ -3679,12 +3841,52 @@ async function osrmRoute(points){ // points: [{lat,lon},...]
 }
 
 /* pesquisa de sítios perto de uma posição (ex.: "mediamarkt") */
-async function geocodeNear(q,pos,bounded){
-  // 1º Photon com viés de proximidade
+/* ═══════════════════════════════════════════════════════════════════════
+   dd-129 — A PROXIMIDADE ORDENA, NUNCA EXCLUI
+
+   O que estava aqui: `res.filter(r => haversine(pos,r) <= (bounded?70:400))`.
+   Um FILTRO. A frase do dono que o matou: «se eu quisesse procurar
+   Maastricht para fazer uma tour desde Portugal até Maastricht, não iria
+   funcionar». Tem razão, e a razão é estrutural — uma app de ROTA existe
+   para ir LONGE: o destino é, por definição, o sítio onde a pessoa NÃO
+   está. Um funil que esconde o distante trai a premissa do produto.
+
+   Mas o defeito oposto também já cá cantou (A3.5.1: o Jumbo do Sudão a
+   ganhar ao de Alfragide). Por isso a proximidade não desaparece — muda de
+   papel: deixa de ser porteiro e passa a ser critério de DESEMPATE.
+
+   A ordem, escrita para ser defensável (regra 7b):
+     1. o grau de correspondência do NOME ao que se escreveu (exato →
+        começa por → contém → o fornecedor achou por outra via);
+     2. dentro do mesmo grau, o mais PERTO primeiro;
+     3. em empate total, a ordem do fornecedor.
+   Assim «Maastricht» a 1 800 km é grau 0 e vem à frente de tudo; e duas
+   igrejas homónimas (grau igual) resolvem-se pela distância, que é o
+   dd-87 intacto.
+   ═══════════════════════════════════════════════════════════════════════ */
+function grauDeNome(r,alvo){
+  const n=normTxt(r.name||"").trim();
+  if(!n||!alvo) return 3;
+  if(n===alvo) return 0;
+  if(n.startsWith(alvo)) return 1;
+  if(n.includes(alvo)) return 2;
+  return 3;
+}
+function ordenarPelaDoutrina(res,pos,q){
+  const alvo=normTxt(q).trim();
+  const temRef=pos&&Number.isFinite(pos.lat)&&Number.isFinite(pos.lon);
+  res.forEach((r,i)=>{ r._grau=grauDeNome(r,alvo); r._ordem=i;
+    /* sem referência, a distância é DESCONHECIDA — nunca zero (a mentira
+       mais tranquilizadora que já aqui houve, curada no pesquisa-longe) */
+    r._d=temRef?haversine(pos,r):null; });
+  return res.sort((a,b)=> a._grau-b._grau
+    || ((Number.isFinite(a._d)?a._d:Infinity)-(Number.isFinite(b._d)?b._d:Infinity))
+    || a._ordem-b._ordem);
+}
+async function geocodeNear(q,pos){
   try{
-    const res=await photonSearch(q,pos,12);
-    const near=res.filter(r=>haversine(pos,r)<= (bounded?70:400));
-    if(near.length) return near;
+    const res=await photonSearch(q,pos,12);   // já leva viés de proximidade
+    if(res.length) return ordenarPelaDoutrina(res,pos,q);
   }catch(e){
     /* dd-131 §1: este `catch(e){}` mudo era o fundo do poço — a falha de
        transporte morria aqui e o assistente lá em cima só via []. O
@@ -4314,7 +4516,7 @@ function attachAC(input, list, onPick){
        pior que nenhuma. O zero-resultados nunca insinua limites de
        cobertura. */
     if(!items.length){ const d=el("div","ac-empty",
-        semLigacao?t("Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.")
+        semLigacao?t("Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.")
                   :t("Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome."));
       if(semLigacao) d.setAttribute("data-test","pesquisa-sem-ligacao");
       list.appendChild(d); }
@@ -8110,7 +8312,7 @@ async function assistantAsk(){
   const q=parseDest($("#ai-q").value);
   if(q.length<2){ toast(t("Diz-me para onde queres ir 🙂")); return; }
   btn.disabled=true; btn.textContent=t("A pensar…");
-  $("#ai-cands").textContent=""; aiMsg("info",t('À procura de "{q}" perto de ti…',{q}));
+  $("#ai-cands").textContent=""; aiMsg("info",t('À procura de "{q}"…',{q}));
   try{
     let pos=await freshPos();
     if(!pos&&state.home) pos={...state.home, name:state.home.name||t("a tua zona")};
@@ -8128,24 +8330,41 @@ async function assistantAsk(){
        perna (a proximidade ordena, não exclui — dd-129). */
     let semRede=false;
     const rede=(e)=>{ if(e?.semTransporte) semRede=true; return []; };
-    let res=await geocodeNear(q,pos,true).catch(rede);
-    if(!res.length) res=await geocodeNear(q,pos,false).catch(rede);
-    res.forEach(r=>r.dist=haversine(pos,r));
-    res.sort((a,b)=>a.dist-b.dist);
+    /* dd-129: UMA perna, global. Eram duas — «perto» (70 km) e, se desse
+       vazio, «menos perto» (400 km) — e ambas eram FILTROS: a partir de
+       Coimbra, Maastricht não existia em nenhuma das duas. Agora a busca é
+       global e a proximidade só ordena.
+       E o `res.sort((a,b)=>a.dist-b.dist)` que estava aqui desfazia essa
+       ordem: reordenava tudo por distância pura e voltava a enterrar o
+       destino distante. A ordem da doutrina fica. */
+    const res=await geocodeNear(q,pos).catch(rede);
+    res.forEach(r=>r.dist=Number.isFinite(r._d)?r._d:haversine(pos,r));
     const vistos=new Set(meus.map(m=>`${m.lat.toFixed(3)},${m.lon.toFixed(3)}`));
     const cands=[...meus.map(m=>({...m, dist:haversine(pos,m)})),
                  ...res.filter(r=>!vistos.has(`${r.lat.toFixed(3)},${r.lon.toFixed(3)}`))].slice(0,6);
     if(!cands.length){
       if(semRede){ console.warn(`assistente: falha de TRANSPORTE (não é «não existe») — "${q}"`);
-        aiMsg("err",t("Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.")); return; }
+        aiMsg("err",t("Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.")); return; }
       /* dd-125/dd-128 §3.2: a frase antiga dizia «por aqui» e ensinava
          «junta a cidade (ex.: Lisboa)» — a um homem em Maastricht, com a
          busca global JÁ feita na linha de cima. Ensinava um limite que não
          existe e uma cidade que não é a dele. Morre, e o exemplo com ela. */
       aiMsg("err",t('Não encontrei "{q}" — confirma a escrita ou tenta outro nome.',{q})); return; }
     renderCands(cands,pos,null);
-    aiMsg("info",cands.length===1?t("Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.")
-                                 :t("Encontrei {n} sítios. Toca no que queres para eu traçar a rota.",{n:cands.length}));
+    /* dd-129 §2.2: zero-perto ALARGA sozinho e DI-LO. O utilizador nunca é
+       mandado reescrever a pergunta para obter o que o motor já sabia
+       encontrar — mas também não se finge que 1 800 km é ali ao lado.
+       PERTO_ANUNCIO é o mesmo 70 que antes EXCLUÍA: mudou de ofício, de
+       porteiro para narrador. */
+    const houvePerto=cands.some(c=>Number.isFinite(c.dist)&&c.dist<=PERTO_ANUNCIO);
+    const temRef=Number.isFinite(pos?.lat);
+    /* o anúncio é um PREFIXO, não uma segunda frase gémea: duas frases que
+       dizem quase o mesmo são duas frases para manter e uma para esquecer
+       (foi o lint-textos que mo disse, e tinha razão). */
+    const alargou=(temRef&&!houvePerto)?t("Nada por perto — alarguei ao mundo.")+" ":"";
+    aiMsg("info", alargou+(cands.length===1
+      ? t("Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.")
+      : t("Encontrei {n} sítios. Toca no que queres para eu traçar a rota.",{n:cands.length})));
   } finally { btn.disabled=false; btn.textContent=t("Perguntar"); }
 }
 async function assistantGo(pos,cand,cands){
@@ -8750,7 +8969,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-03-1142-27d563";
+const BUILD="2026-08-03-1857-9065e0";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -10401,7 +10620,24 @@ function init(){
   setTimeout(retomaSentinela,300);
 }
 
-if(typeof L==="undefined"){
+/* ⚠️ ESTA LINHA PERGUNTAVA POR `L` — O LEAFLET. (dd-141, o achado do turno)
+   A app trocou o Leaflet pelo MapLibre há muito; `L` deixou de existir. A
+   guarda continuou lá a perguntar por um morto, e a resposta era SEMPRE
+   «não existe»: em TODOS os arranques, para TODOS os utilizadores, com a
+   rede perfeita, a app acendia a faixa de avaria e limpava o Agora.
+   É a fotografia das 15:40 do Ricardo (cartão vivo a 35° com a faixa de
+   «sem ligação» por cima) e é também a «app meio vazia» do dd-139 — não
+   era a rede dele nem o service worker: éramos nós, desde a migração do
+   motor. Uma guarda que pergunta pelo objeto errado responde sempre a
+   mesma coisa, e um alarme que toca sempre não é um alarme.
+   LEI: uma guarda de arranque nomeia a peça que a app USA HOJE — e tem de
+   ter os dois lados provados (com peça e sem peça), senão ninguém repara
+   que ela apodreceu. */
+if(typeof maplibregl==="undefined"){
+  /* catástrofe de arranque (o motor do mapa não chegou), não saúde de rede:
+     marca-se para o pintor do dd-141 NUNCA apagar esta faixa por cima de uma
+     app que não arrancou */
+  state.semMapa=true;
   $("#net-banner").style.display="flex";
   $("#agora-content").textContent="";
 }
