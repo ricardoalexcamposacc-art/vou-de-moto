@@ -1339,6 +1339,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 /* ---------------- CONFIG ---------------- */
 const DEFAULT_LOC = { name:"Lisboa", sub:"Portugal", lat:38.7223, lon:-9.1393 };
 const AUTO_GPS = true;               // pedir GPS ao abrir
+const ROTULO_PERFIL={conservador:"conservador", equilibrado:"equilibrado", tolerante:"tolerante"};
 const PROFILES = {
   conservador:{ wet:1.35, wind:1.20, tGood:80, tWarn:55, ppRisk:35 },
   equilibrado:{ wet:1.00, wind:1.00, tGood:70, tWarn:45, ppRisk:45 },
@@ -1706,6 +1707,8 @@ en:{
 "agora mesmo":"just now","há {m} min":"{m} min ago","respondeu":"responded","sem resposta":"no answer",
 "A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"The app didn't load completely — the map engine is missing. Check your connection and reload.",
 "Nada por perto — alarguei ao mundo.":"Nothing nearby — I widened the search to the whole world.",
+"Índice calculado com o perfil {p} — muda-o nas definições.":"Index calculated with the {p} profile — change it in settings.",
+"conservador":"cautious","equilibrado":"balanced","tolerante":"tolerant",
 "Estado da ligação":"Connection status","Só serviços que já tentei contactar nesta sessão.":"Only services I've actually tried to reach this session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"No results for this search — check the spelling or try another name.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.",
@@ -1971,6 +1974,8 @@ es:{
 "agora mesmo":"ahora mismo","há {m} min":"hace {m} min","respondeu":"respondió","sem resposta":"sin respuesta",
 "A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"La app no cargó por completo — falta el motor del mapa. Revisa la conexión y recarga.",
 "Nada por perto — alarguei ao mundo.":"Nada cerca — amplié la búsqueda a todo el mundo.",
+"Índice calculado com o perfil {p} — muda-o nas definições.":"Índice calculado con el perfil {p} — cámbialo en los ajustes.",
+"conservador":"conservador","equilibrado":"equilibrado","tolerante":"tolerante",
 "Estado da ligação":"Estado de la conexión","Só serviços que já tentei contactar nesta sessão.":"Solo servicios que ya he intentado contactar en esta sesión.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Sin resultados para esta búsqueda — revisa la escritura o prueba otro nombre.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — revisa la escritura o prueba otro nombre.",
@@ -2214,6 +2219,8 @@ fr:{
 "agora mesmo":"à l'instant","há {m} min":"il y a {m} min","respondeu":"a répondu","sem resposta":"sans réponse",
 "A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"L'app n'a pas chargé complètement — le moteur de carte manque. Vérifie ta connexion et recharge.",
 "Nada por perto — alarguei ao mundo.":"Rien à proximité — j'ai élargi la recherche au monde entier.",
+"Índice calculado com o perfil {p} — muda-o nas definições.":"Indice calculé avec le profil {p} — change-le dans les réglages.",
+"conservador":"prudent","equilibrado":"équilibré","tolerante":"tolérant",
 "Estado da ligação":"État de la connexion","Só serviços que já tentei contactar nesta sessão.":"Uniquement les services que j'ai réellement essayé de joindre cette session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Aucun résultat pour cette recherche — vérifie l'orthographe ou essaie un autre nom.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Aucun résultat pour « {q} » — vérifie l'orthographe ou essaie un autre nom.",
@@ -4983,6 +4990,24 @@ function renderDashboard(){
   const condTxt=t("{c} · {t}° em {p} — decisão para as próximas 3 h",
     {c:mNow.code==null?t("céu por confirmar"):wmoTxt(mNow.code), t:mNow.t==null?"—":rnd(mNow.t), p:state.home.name});
   main.append(title, el("div","hero-sub",condTxt));
+  /* ═══ dd-148: DE QUE PERFIL É ESTE NÚMERO? ═══
+     O dono leu 30 no desktop e 13 no telemóvel com os MESMOS dados, e tinha
+     razão em estranhar. Medido na bancada: a fórmula NÃO depende do ecrã
+     (30 = 30 em 1280 e em 390 px). O que difere é o PERFIL DE DECISÃO —
+     entrada legítima da fórmula, mas que vive no localStorage de CADA
+     origem e não atravessa de aparelho para aparelho. Com os dados exatos
+     que ele leu: conservador 13 · equilibrado 30 · tolerante 42.
+     São os números dele, aos pontos.
+     O índice nunca esteve errado: estava a responder a uma pergunta
+     diferente sem o dizer. Um índice sem o perfil ao lado é uma medida sem
+     unidade. Fora do predefinido, o ecrã nomeia-o. */
+  if(state.profile&&state.profile!=="equilibrado"){
+    const nomePerfil=t(ROTULO_PERFIL[state.profile]||state.profile);
+    const pl=el("div","hero-perfil small muted");
+    pl.setAttribute("data-test","perfil-do-indice");
+    pl.textContent=t("Índice calculado com o perfil {p} — muda-o nas definições.",{p:nomePerfil});
+    main.append(pl);
+  }
   /* dd-47 §3: o resto do dia numa linha, das horárias QUE JÁ PEDIMOS — zero
      chamadas novas. Honestidade por faixas (7g-ter): probabilidade não é
      certeza ao minuto, e dados em falta são silêncio honesto, nunca "sem
@@ -8969,7 +8994,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-03-1951-2ace01";
+const BUILD="2026-08-03-2107-fcd76e";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
