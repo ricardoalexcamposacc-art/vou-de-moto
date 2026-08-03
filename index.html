@@ -1031,7 +1031,8 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
   </div>
 
   <div id="net-banner" style="display:none" class="banner warn">
-    <span>📡</span><span><b>Sem ligação aos serviços meteorológicos.</b> Verifica a tua internet — o mapa guardado, a rota e o GPS continuam a funcionar.</span>
+    <span>📡</span><span id="net-txt"><b>Sem ligação aos serviços meteorológicos.</b> Verifica a tua internet — o mapa guardado, a rota e o GPS continuam a funcionar.</span>
+    <button id="net-recarregar" class="btn" type="button" style="flex:none;margin-left:auto">Recarregar a app</button>
   </div>
 
   <!-- ============ AGORA ============ -->
@@ -1058,6 +1059,9 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
       <button class="bv-x" id="bv-fechar" type="button" aria-label="Fechar">✕</button>
     </div>
     <div id="loc-estado-agora" class="loc-estado"></div>
+    <!-- dd-128 §3.1: o que a mudança de casa deixou para trás (permissões
+         são por origem e não atravessam). Permanente enquanto durar. -->
+    <div id="perm-migracao" hidden></div>
     <div id="foco-chip" class="chips" hidden style="margin:2px 2px 0"></div>
     <!-- dd-55: uma janela aberta há horas não tem NENHUM sinal de que a app
          mudou no servidor — foi assim que a captura do diretor mostrou o
@@ -1564,8 +1568,10 @@ function applyStaticI18n(){
   if(sentSub&&!sentinel.on){ sentSub.textContent=t("Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.");
     if(typeof pintarSentinelaComo==="function") pintarSentinelaComo(); }
   if(typeof sentinelaPinta==="function") sentinelaPinta(typeof sentinel!=="undefined"&&sentinel.on);
-  const nb=$("#net-banner span:last-child");
+  const nb=$("#net-txt");
   if(nb){ nb.textContent=t("Não estou a conseguir contactar os serviços meteorológicos. Verifica a ligação e tenta de novo — ou abre a app no browser."); }
+  const nr=$("#net-recarregar");
+  if(nr){ nr.textContent=t("Recarregar a app"); }
   const ft=$("footer");
   if(ft){ ft.textContent="";
     /* dd-60: o CARTO saiu do mapa no dd-16 §2 e continuava creditado aqui, com
@@ -1664,6 +1670,16 @@ en:{
 "Melhora a partir das {h} ({d}).":"Improves from {h} ({d}).",
 "hoje":"today","amanhã":"tomorrow",
 "{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} around {h} ({d}). Avoid being on the road then.",
+"Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.":"No connection — I couldn't search. Check the internet and try again.",
+"Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"No results for this search — check the spelling or try another name.",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.",
+"Recarregar a app":"Reload the app",
+"Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"I can't reach the internet — weather and search are offline. Check the device's network, or reload the app.",
+"praça":"square","parque":"park","rio":"river",
+"A app mudou de morada e o browser voltou a pedir autorização da localização — a tua casa veio contigo, a permissão não.":"The app changed address and the browser is asking for location permission again — your home came with you, the permission didn't.",
+"Autorizar a localização":"Allow location",
+"Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"Alerts are silent at the new address: notification permission doesn't cross a change of home. Until you grant it, watch and the Sentinel won't warn you.",
+"Voltar a autorizar os avisos":"Allow alerts again",
 "sensação {t}°":"feels {t}°","vento":"wind","rajadas":"gusts","humidade":"humidity","visibilidade":"visibility","UV máx":"UV max","sol":"sun",
 "Valores desta zona, ~{d} em redor":"Values for this area, ~{d} around",
 "🧤 Equipamento recomendado":"🧤 Recommended gear","Com base nas próximas 6 horas.":"Based on the next 6 hours.",
@@ -1719,7 +1735,7 @@ en:{
 "Diz-me para onde queres ir 🙂":"Tell me where you want to go 🙂","A pensar…":"Thinking…",
 "À procura de \"{q}\" perto de ti…":"Looking for \"{q}\" near you…",
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"No location. Allow GPS, or search for your city in the Now tab.",
-"Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"Couldn't find \"{q}\" around here. Try adding the city (e.g. \"{q} London\").","perto de: {r}":"near: {r}","a tua posição":"your position","o mapa à vista":"the map in view",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.","perto de: {r}":"near: {r}","a tua posição":"your position","o mapa à vista":"the map in view",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculating the route to {p} and the weather along every stretch…",
 "A minha posição":"My location","a tua zona":"your area",
 "Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"No route there. Pick another place above or adjust the form.",
@@ -1802,10 +1818,9 @@ en:{
 "Sem reconhecimento de voz — repete ou escreve o destino.":"Speech not recognised — repeat or type the destination.","Voz indisponível neste browser.":"Voice unavailable in this browser.",
 '🎤 "{q}" — escolhe a sugestão certa':'🎤 "{q}" — pick the right suggestion',
 "Indica {x}.":"Please fill in {x}.","a origem":"the origin","o destino":"the destination","a paragem":"the stop",
-"Não encontrei \"{q}\" — tenta \"cidade, país\".":"Couldn't find \"{q}\" — try \"city, country\".",
 "Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"Couldn't find a road route between these points. Make sure they're reachable by road.",
 "Rota demasiado curta.":"Route too short.","Algo correu mal. Tenta novamente.":"Something went wrong. Try again.","A calcular…":"Calculating…",
-"Sem resultados — tenta \"cidade, país\"":"No results — try \"city, country\"","coordenadas":"coordinates",
+"coordenadas":"coordinates",
 "Trajeto {x} aplicado 🗺️":"Route {x} applied 🗺️","Perfil: {p} ✔":"Profile: {p} ✔","Mapa indisponível — precisa de ligação à internet.":"Map unavailable — internet connection needed.",
 
 "Menu do browser → “Adicionar ao ecrã principal”.":"Browser menu → “Add to Home screen”.","Instalada! Procura o ícone no teu ecrã 🏍️":"Installed! Look for the icon on your home screen 🏍️","App instalada! 🏍️":"App installed! 🏍️","Há uma versão nova da app.":"There's a new version of the app.","Recarregar":"Reload",
@@ -1906,6 +1921,16 @@ es:{
 "A partir das {h}: {c} — se fores, volta antes disso.":"A partir de las {h}: {c} — si vas, vuelve antes.",
 "Melhora a partir das {h} ({d}).":"Mejora a partir de las {h} ({d}).","hoje":"hoy","amanhã":"mañana",
 "{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} hacia las {h} ({d}). Evita estar en carretera entonces.",
+"Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.":"Sin conexión — no pude buscar. Comprueba internet e inténtalo de nuevo.",
+"Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Sin resultados para esta búsqueda — revisa la escritura o prueba otro nombre.",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — revisa la escritura o prueba otro nombre.",
+"Recarregar a app":"Recargar la app",
+"Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"No puedo llegar a internet — el tiempo y la búsqueda están sin conexión. Revisa la red del dispositivo o recarga la app.",
+"praça":"plaza","parque":"parque","rio":"río",
+"A app mudou de morada e o browser voltou a pedir autorização da localização — a tua casa veio contigo, a permissão não.":"La app cambió de dirección y el navegador vuelve a pedir permiso de ubicación — tu casa vino contigo, el permiso no.",
+"Autorizar a localização":"Permitir la ubicación",
+"Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"Los avisos están mudos en la dirección nueva: el permiso de notificaciones no cruza el cambio de casa. Hasta que lo des, el vigilar y el Centinela no te avisan.",
+"Voltar a autorizar os avisos":"Volver a permitir los avisos",
 "sensação {t}°":"sensación {t}°","vento":"viento","rajadas":"rachas","humidade":"humedad","visibilidade":"visibilidad","UV máx":"UV máx","sol":"sol",
 "Valores desta zona, ~{d} em redor":"Valores de esta zona, ~{d} a la redonda",
 "🧤 Equipamento recomendado":"🧤 Equipación recomendada","Com base nas próximas 6 horas.":"Basado en las próximas 6 horas.",
@@ -1958,7 +1983,7 @@ es:{
 "chegas ~{a} · voltas à estrada ~{b}":"llegas ~{a} · vuelves a la carretera ~{b}",
 "Diz-me para onde queres ir 🙂":"Dime a dónde quieres ir 🙂","A pensar…":"Pensando…","À procura de \"{q}\" perto de ti…":"Buscando \"{q}\" cerca de ti…",
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Sin ubicación. Permite el GPS, o busca tu ciudad en la pestaña Ahora.",
-"Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"No encontré \"{q}\" por aquí. Prueba añadiendo la ciudad (ej.: \"{q} Madrid\").","perto de: {r}":"cerca de: {r}","a tua posição":"tu posición","o mapa à vista":"el mapa a la vista",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — comprueba la escritura o prueba otro nombre.","perto de: {r}":"cerca de: {r}","a tua posição":"tu posición","o mapa à vista":"el mapa a la vista",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calculando la ruta hasta {p} y el tiempo en cada tramo…",
 "A minha posição":"Mi posición","a tua zona":"tu zona","Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"Sin ruta hasta allí. Elige otro de los sitios de arriba o ajusta el formulario.",
 "Não vás de moto nesta viagem":"No vayas en moto en este viaje",
@@ -2030,10 +2055,9 @@ es:{
 "Voz não suportada neste browser — escreve o destino.":"Voz no soportada — escribe el destino.","Sem reconhecimento de voz — repete ou escreve o destino.":"Voz no reconocida — repite o escribe el destino.",
 "Voz indisponível neste browser.":"Voz no disponible en este navegador.",'🎤 "{q}" — escolhe a sugestão certa':'🎤 "{q}" — elige la sugerencia correcta',
 "Indica {x}.":"Indica {x}.","a origem":"el origen","o destino":"el destino","a paragem":"la parada",
-"Não encontrei \"{q}\" — tenta \"cidade, país\".":"No encontré \"{q}\" — prueba \"ciudad, país\".",
 "Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"No encontré ruta por carretera entre estos puntos.",
 "Rota demasiado curta.":"Ruta demasiado corta.","Algo correu mal. Tenta novamente.":"Algo salió mal. Inténtalo de nuevo.","A calcular…":"Calculando…",
-"Sem resultados — tenta \"cidade, país\"":"Sin resultados — prueba \"ciudad, país\"","coordenadas":"coordenadas","Trajeto {x} aplicado 🗺️":"Ruta {x} aplicada 🗺️","Perfil: {p} ✔":"Perfil: {p} ✔",
+"coordenadas":"coordenadas","Trajeto {x} aplicado 🗺️":"Ruta {x} aplicada 🗺️","Perfil: {p} ✔":"Perfil: {p} ✔",
 "Mapa indisponível — precisa de ligação à internet.":"Mapa no disponible — necesita internet.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menú del navegador → “Añadir a pantalla de inicio”.","Instalada! Procura o ícone no teu ecrã 🏍️":"¡Instalada! Busca el icono en tu pantalla 🏍️","App instalada! 🏍️":"¡App instalada! 🏍️","Há uma versão nova da app.":"Hay una versión nueva de la app.","Recarregar":"Recargar",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 En iPhone: botón Compartir → “Añadir a pantalla de inicio”.",
@@ -2132,6 +2156,16 @@ fr:{
 "A partir das {h}: {c} — se fores, volta antes disso.":"À partir de {h} : {c} — si tu pars, reviens avant.",
 "Melhora a partir das {h} ({d}).":"Ça s'améliore à partir de {h} ({d}).","hoje":"aujourd'hui","amanhã":"demain",
 "{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} vers {h} ({d}). Évite d'être sur la route à ce moment-là.",
+"Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.":"Pas de connexion — je n'ai pas pu chercher. Vérifie internet et réessaie.",
+"Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Aucun résultat pour cette recherche — vérifie l'orthographe ou essaie un autre nom.",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Aucun résultat pour « {q} » — vérifie l'orthographe ou essaie un autre nom.",
+"Recarregar a app":"Recharger l'app",
+"Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"Je n'arrive pas à joindre internet — la météo et la recherche sont hors ligne. Vérifie le réseau de l'appareil, ou recharge l'app.",
+"praça":"place","parque":"parc","rio":"rivière",
+"A app mudou de morada e o browser voltou a pedir autorização da localização — a tua casa veio contigo, a permissão não.":"L'app a changé d'adresse et le navigateur redemande l'autorisation de localisation — ton domicile t'a suivi, pas l'autorisation.",
+"Autorizar a localização":"Autoriser la localisation",
+"Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"Les alertes sont muettes à la nouvelle adresse : l'autorisation de notifications ne traverse pas le changement de maison. Tant que tu ne la donnes pas, la surveillance et la Sentinelle ne te préviennent pas.",
+"Voltar a autorizar os avisos":"Réautoriser les alertes",
 "sensação {t}°":"ressenti {t}°","vento":"vent","rajadas":"rafales","humidade":"humidité","visibilidade":"visibilité","UV máx":"UV max","sol":"soleil",
 "Valores desta zona, ~{d} em redor":"Valeurs de cette zone, ~{d} à la ronde",
 "🧤 Equipamento recomendado":"🧤 Équipement recommandé","Com base nas próximas 6 horas.":"Basé sur les 6 prochaines heures.",
@@ -2184,7 +2218,7 @@ fr:{
 "chegas ~{a} · voltas à estrada ~{b}":"arrivée ~{a} · reprise de la route ~{b}",
 "Diz-me para onde queres ir 🙂":"Dis-moi où tu veux aller 🙂","A pensar…":"Je réfléchis…","À procura de \"{q}\" perto de ti…":"Recherche de « {q} » près de toi…",
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Pas de position. Autorise le GPS, ou cherche ta ville dans l'onglet Maintenant.",
-"Não encontrei \"{q}\" por aqui. Tenta juntar a cidade (ex.: \"{q} Lisboa\").":"Je n'ai pas trouvé \"{q}\" par ici. Essaie d'ajouter la ville (ex. : \"{q} Lyon\").","perto de: {r}":"près de : {r}","a tua posição":"ta position","o mapa à vista":"la carte affichée",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Je n'ai pas trouvé \"{q}\" — vérifie l'orthographe ou essaie un autre nom.","perto de: {r}":"près de : {r}","a tua posição":"ta position","o mapa à vista":"la carte affichée",
 "A calcular a rota até {p} e o tempo em cada troço do caminho…":"Calcul de l'itinéraire vers {p} et de la météo sur chaque tronçon…",
 "A minha posição":"Ma position","a tua zona":"ta zone","Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"Pas d'itinéraire jusque-là. Choisis un autre lieu ci-dessus ou ajuste le formulaire.",
 "Não vás de moto nesta viagem":"Ne prends pas la moto pour ce trajet",
@@ -2256,10 +2290,9 @@ fr:{
 "Voz não suportada neste browser — escreve o destino.":"Voix non prise en charge — saisis la destination.","Sem reconhecimento de voz — repete ou escreve o destino.":"Voix non reconnue — répète ou écris la destination.",
 "Voz indisponível neste browser.":"Voix indisponible dans ce navigateur.",'🎤 "{q}" — escolhe a sugestão certa':'🎤 « {q} » — choisis la bonne suggestion',
 "Indica {x}.":"Indique {x}.","a origem":"le départ","o destino":"la destination","a paragem":"l'arrêt",
-"Não encontrei \"{q}\" — tenta \"cidade, país\".":"« {q} » introuvable — essaie « ville, pays ».",
 "Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"Pas d'itinéraire routier entre ces points.",
 "Rota demasiado curta.":"Trajet trop court.","Algo correu mal. Tenta novamente.":"Un problème est survenu. Réessaie.","A calcular…":"Calcul…",
-"Sem resultados — tenta \"cidade, país\"":"Aucun résultat — essaie « ville, pays »","coordenadas":"coordonnées","Trajeto {x} aplicado 🗺️":"Trajet {x} appliqué 🗺️","Perfil: {p} ✔":"Profil : {p} ✔",
+"coordenadas":"coordonnées","Trajeto {x} aplicado 🗺️":"Trajet {x} appliqué 🗺️","Perfil: {p} ✔":"Profil : {p} ✔",
 "Mapa indisponível — precisa de ligação à internet.":"Carte indisponible — connexion requise.",
 "Menu do browser → “Adicionar ao ecrã principal”.":"Menu du navigateur → « Ajouter à l'écran d'accueil ».","Instalada! Procura o ícone no teu ecrã 🏍️":"Installée ! Cherche l'icône sur ton écran 🏍️","App instalada! 🏍️":"App installée ! 🏍️","Há uma versão nova da app.":"Une nouvelle version de l'app est disponible.","Recarregar":"Recharger",
 "💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Sur iPhone : bouton Partager → « Sur l'écran d'accueil ».",
@@ -2743,13 +2776,25 @@ async function jfetch(url, timeout=14000, origem=null){
     const r=await fetch(url,{signal:ctl.signal});
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const j=await r.json();
-    state.netFails=0; $("#net-banner").style.display="none";
+    state.netFails=0; state.netHosts&&state.netHosts.clear(); $("#net-banner").style.display="none";
     if(nome) contar(nome,url,false,origem);
     if(chave) cacheEscrever(chave,j,SERVICOS[nome].ttl);
     return j;
   }catch(e){
     state.netFails++;
-    if(state.netFails>=2) $("#net-banner").style.display="flex";
+    /* dd-125: o watchdog conhece os HOSTS — falhas em serviços DISTINTOS é a
+       assinatura da rede do aparelho morta (não de um serviço em baixo), e a
+       faixa diz isso com todas as letras. O botão «Recarregar a app» está na
+       faixa (recarga verdadeira, não foco) — é o botão que o Ricardo pediu
+       às 01:14, e serve a família inteira destas avarias. */
+    try{ (state.netHosts??=new Set()).add(new URL(url).host); }catch(_e){}
+    if(state.netFails>=2){
+      $("#net-banner").style.display="flex";
+      if((state.netHosts?.size||0)>=2){
+        const nb=$("#net-txt");
+        if(nb) nb.textContent=t("Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.");
+      }
+    }
     throw e;
   }finally{ clearTimeout(th); }
 }
@@ -3042,15 +3087,23 @@ async function photonSearch(q,pos,limit=7){
   const mapa=(j)=>{ const a=atribDe(j);
     return (j?.features||[]).map(f=>{ const r=photonMap(f); if(a) r.atrib=a; return r; })
       .filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lon)); };
+  /* dd-122: TRANSPORTE caído não é zero-resultados. Um «HTTP 4xx/5xx» é o
+     servidor a falar; rede morta/timeout é ninguém a ouvir — só o segundo
+     marca. Se TODAS as pernas caíram de transporte e não há nada, a função
+     di-lo para cima em vez de devolver um [] que vira «Sem resultados». */
+  let redeCaiu=false;
+  const cai=(e)=>{ if(!/^HTTP \d/.test(e?.message||"")) redeCaiu=true; return null; };
   let perto=[];
   if(pos&&Number.isFinite(pos.lat)){
     const dLat=RAIO_PERTO_M/111320, dLon=RAIO_PERTO_M/(111320*Math.max(.05,Math.cos(pos.lat*Math.PI/180)));
-    perto=mapa(await pede({bbox:`${(pos.lon-dLon).toFixed(4)},${(pos.lat-dLat).toFixed(4)},${(pos.lon+dLon).toFixed(4)},${(pos.lat+dLat).toFixed(4)}`}).catch(()=>null));
+    perto=mapa(await pede({bbox:`${(pos.lon-dLon).toFixed(4)},${(pos.lat-dLat).toFixed(4)},${(pos.lon+dLon).toFixed(4)},${(pos.lat+dLat).toFixed(4)}`}).catch(cai));
   }
-  const mundo=perto.length<limit?mapa(await pede({}).catch(()=>null)):[];
+  const mundo=perto.length<limit?mapa(await pede({}).catch(cai)):[];
   const seen=new Set();
-  return [...perto,...mundo].filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
+  const res=[...perto,...mundo].filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
     if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,Math.max(limit,perto.length));
+  if(!res.length&&redeCaiu) throw Object.assign(new Error("pesquisa: transporte caiu"),{semTransporte:true});
+  return res;
 }
 
 /* --- pesquisa por CATEGORIA ("igreja ortodoxa", "bomba de gasolina"…) ---
@@ -3250,9 +3303,14 @@ function tipoSitio(r){
     city:"cidade",town:"cidade",municipality:"cidade",village:"aldeia",
     hamlet:"aldeia",suburb:"bairro",neighbourhood:"bairro",quarter:"bairro",
     district:"bairro",street:"rua",house:"morada",building:"morada",
-    postcode:"morada",locality:"aldeia"};
+    postcode:"morada",locality:"aldeia",square:"praça"};
   if(k==="highway") return t("rua");
   if(k==="building") return t("morada");
+  /* dd-125 §3: a cobertura é universal e os tipos dizem-no — praça, parque
+     e rio tipados (o rio devolvia NULL: resultado sem cromo nenhum) */
+  if(k==="leisure"&&(v==="park"||v==="garden")) return t("parque");
+  if(k==="waterway") return v==="river"||v==="riverbank"?t("rio"):t("sítio");
+  if(k==="natural"&&v==="water") return t("rio");
   if(k==="place"&&GEO[v]) return t(GEO[v]);
   if(!k&&GEO[v]) return t(GEO[v]);                  // geoapify result_type
   const POI={place_of_worship:"igreja",fuel:"combustível",supermarket:"supermercado",
@@ -3278,8 +3336,21 @@ function refPesquisa(){
   try{ if(typeof travel!=="undefined"&&travel.active&&travel.marcador){
     const c=travel.marcador.centro();
     if(Number.isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("a tua posição")}; } }catch(e){}
+  /* ═══ dd-128 §3.2: UMA CASA DE RESERVA NÃO É UMA REFERÊNCIA ═══
+     O ecrã dele às 01:54: mapa em Coimbra, «não encontrei Ireneweg 30B POR
+     AQUI». A casa nova nasceu sem dados (as permissões e o storage não
+     atravessam origens) e a app adotou a DEFAULT_LOC — Lisboa — em
+     silêncio, como se fosse onde ele estava. A partir daí a pesquisa
+     perguntava «perto de Lisboa» a um homem em Maastricht, e a rua
+     holandesa não existia «por aqui».
+     Um valor de arranque é um sítio para MOSTRAR tempo enquanto ninguém
+     diz nada — nunca uma âncora para ordenar o mundo. Sem referência
+     verdadeira, a pesquisa é global e as distâncias dizem «distância?»
+     (é a lei do dd-129: a proximidade ordena, nunca exclui — e uma
+     proximidade FALSA é pior que nenhuma). */
+  const real=(x)=>x&&Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.prov?.como!=="reserva";
   for(const x of [state.home, store.get("home")])
-    if(x&&Number.isFinite(x.lat)&&Number.isFinite(x.lon)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
+    if(real(x)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
   try{ if(state.mapaRota&&state.mapaRota.m){ const c=Mapa.centro(state.mapaRota);
     if(c&&Number.isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("o mapa à vista")}; } }catch(e){}
   for(const x of [(getRecentes()||[])[0], (getFavs()||[])[0]])
@@ -3307,19 +3378,28 @@ async function geocode(q){
   // 1) OS TEUS SÍTIOS primeiro — favoritos e recentes, sem rede e sem créditos
   add(locaisLocais(q));
 
+  /* dd-122: se alguma perna cair de TRANSPORTE (não HTTP), lembra-se — e se
+     no fim não houver nada de nenhuma fonte, a pesquisa di-lo em vez de
+     entregar um [] que o ecrã leria como «Sem resultados». Os teus sítios
+     locais continuam a servir mesmo com a rede morta. */
+  let falhouRede=false;
+  const rede=(e)=>{ if(e?.semTransporte) falhouRede=true; return []; };
+
   // 2) categoria reconhecida → os mais PRÓXIMOS desse tipo (não por texto)
   const cat=here?detectPoiCat(q):null;
-  if(cat) add(await poiNear(cat,here).catch(()=>[]));
+  if(cat) add(await poiNear(cat,here).catch(rede));
 
   // 3) pesquisa por texto, com viés forte para a tua zona
-  add(await photonSearch(q, here).catch(()=>[]));
+  add(await photonSearch(q, here).catch(rede));
 
   // 4) nada? tenta com menos palavras (nomes longos falham inteiros)
   if(out.length<2){
     const words=q.trim().split(/\s+/);
     for(let n=words.length-1;n>=2&&out.length<4;n--)
-      add(await photonSearch(words.slice(0,n).join(" "), here).catch(()=>[]));
+      add(await photonSearch(words.slice(0,n).join(" "), here).catch(rede));
   }
+  if(!out.length&&falhouRede)
+    throw Object.assign(new Error("pesquisa: transporte caiu"),{semTransporte:true});
 
   /* 5) ordenar. Os teus sítios ganham SEMPRE, e ganham antes de a rede
      responder — um favorito nunca pode ficar atrás de um restaurante com nome
@@ -3487,11 +3567,16 @@ async function geoSearch(q,pos,limit=7){
   const mapa=(j)=>{ const a=atribDe(j);
     return (j?.features||[]).map(f=>{ const r=geoFeature(f); if(a) r.atrib=a; return r; })
       .filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lon)); };
-  const perto=temRef?mapa(await pede({filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${RAIO_PERTO_M}`}).catch(()=>null)):[];
+  /* dd-122: transporte caído ≠ zero-resultados (mesma régua do photonSearch) */
+  let redeCaiu=false;
+  const cai=(e)=>{ if(!/^HTTP \d/.test(e?.message||"")) redeCaiu=true; return null; };
+  const perto=temRef?mapa(await pede({filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${RAIO_PERTO_M}`}).catch(cai)):[];
   let mundo=[];
-  if(perto.length<limit) mundo=mapa(await pede({}).catch(()=>null));
+  if(perto.length<limit) mundo=mapa(await pede({}).catch(cai));
   const vistos=new Set(perto.map(r=>`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`));
-  return [...perto, ...mundo.filter(r=>!vistos.has(`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`))].slice(0,Math.max(limit,perto.length));
+  const res=[...perto, ...mundo.filter(r=>!vistos.has(`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`))].slice(0,Math.max(limit,perto.length));
+  if(!res.length&&redeCaiu) throw Object.assign(new Error("pesquisa: transporte caiu"),{semTransporte:true});
+  return res;
 }
 async function geoReverse(lat,lon){
   const j=await jfetch(geoURL("/v1/geocode/reverse",{
@@ -3600,7 +3685,13 @@ async function geocodeNear(q,pos,bounded){
     const res=await photonSearch(q,pos,12);
     const near=res.filter(r=>haversine(pos,r)<= (bounded?70:400));
     if(near.length) return near;
-  }catch(e){}
+  }catch(e){
+    /* dd-131 §1: este `catch(e){}` mudo era o fundo do poço — a falha de
+       transporte morria aqui e o assistente lá em cima só via []. O
+       marcador do dd-122 tem de ATRAVESSAR: quem não conseguiu perguntar
+       não pode dizer «não existe». Um HTTP nnn continua a não marcar. */
+    if(e?.semTransporte) throw e;
+  }
   // Sem reserva de Nominatim: a política do OpenStreetMap proíbe usá-lo em autocomplete.
   return [];
 }
@@ -4214,9 +4305,19 @@ function gearAdvice(hs){ // hs: métricas das próximas ~n horas
 function attachAC(input, list, onPick){
   let items=[], active=-1;
   const close=()=>{ list.classList.remove("open"); list.textContent=""; active=-1; };
-  const render=()=>{
+  const render=(semLigacao)=>{
     list.textContent="";
-    if(!items.length){ const d=el("div","ac-empty",t('Sem resultados — tenta "cidade, país"')); list.appendChild(d); }
+    /* dd-122: «Sem resultados» é uma afirmação sobre o MUNDO (o sítio não
+       existe); com o transporte caído a afirmação honesta é outra. */
+    /* dd-125: a dica «tenta "cidade, país"» MORREU — o Ricardo leu-a como
+       «a pesquisa só faz cidades e países», e uma dica que ensina errado é
+       pior que nenhuma. O zero-resultados nunca insinua limites de
+       cobertura. */
+    if(!items.length){ const d=el("div","ac-empty",
+        semLigacao?t("Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.")
+                  :t("Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome."));
+      if(semLigacao) d.setAttribute("data-test","pesquisa-sem-ligacao");
+      list.appendChild(d); }
     else { const ref=refPesquisa(); if(ref&&ref.rotulo)
       list.appendChild(el("div","ac-ref",t("perto de: {r}",{r:ref.rotulo}))); }
     items.forEach((it,i)=>{
@@ -4256,7 +4357,11 @@ function attachAC(input, list, onPick){
     const q=input.value.trim();
     if(q.length<3){ close(); return; }
     try{ const r=await geocode(q); if(input.value.trim()!==q) return; items=r; active=items.length?0:-1; render(); }
-    catch(e){ items=[]; render(); }
+    catch(e){ if(input.value.trim()!==q) return; items=[]; active=-1;
+      /* rasto (7g-ter): a diferença entre «não há» e «não consegui perguntar»
+         fica escrita, não só pintada */
+      if(e?.semTransporte) console.warn(`pesquisa: falha de TRANSPORTE (não é zero-resultados) — "${q}"`);
+      render(!!e?.semTransporte); }
   },350);
   input.addEventListener("input",()=>{
     input._picked=null;
@@ -4454,6 +4559,62 @@ function renderLocEstado(alvo,tipo){
       p.onchange=()=>{ if(p.state!=="denied"){ locSaida.grava(null); renderLocEstado(alvo,null); toast(t("📍 Localização ligada.")); } };
     });
   }catch(e){}
+}
+/* ═══ dd-128 §3.1 — AS PERMISSÕES NÃO ATRAVESSAM A MUDANÇA DE CASA ═══════
+   Permissões de browser são POR ORIGEM. A ponte levou os dados dele para a
+   casa nova; a localização e as notificações que ele tinha concedido ao
+   github.io ficaram lá — e NADA na app o disse. Consequências vividas:
+   sem GPS a app caiu na âncora de arranque (as 01:54, os 1780 km), e o
+   vigiar/sentinela **morreu em silêncio**, que é o pior dos dois porque
+   ninguém dá por ele até o aviso não chegar.
+
+   O que isto faz: só fala quando há PROVA de uso real anterior (uma casa
+   posta por GPS; a sentinela ligada) e a permissão está agora por
+   conceder. Nunca pede sozinho — a lei da casa é gesto primeiro (dd-96);
+   o cartão é permanente enquanto a condição durar (7g-bis) e o botão é
+   que abre a caixa do sistema. Se não houver prova de uso anterior, cala-se:
+   uma instalação nova não tem nada a recuperar. */
+function permissoesPerdidas(){
+  const casa=store.get("home");
+  return {
+    geo: casa?.prov?.como==="gps",                       // a casa nasceu de um GPS concedido
+    /* a prova lê-se do STORE, não do objeto em memória: é o store que a
+       ponte carrega para a casa nova, e ao arranque a sentinela ainda não
+       foi retomada (apanhado pela guarda — a prova tem de sobreviver à
+       travessia, não ao ciclo de arranque) */
+    notif: !!store.get("sentinel")?.on                     // a sentinela só se liga com gesto
+        || (getTrips()||[]).some(t2=>t2.vg&&t2.vg.on),     // ou uma rota em «vigiar»
+  };
+}
+async function avisarPermissoesPerdidas(){
+  const box=$("#perm-migracao"); if(!box) return;
+  box.textContent=""; box.hidden=true;
+  const prova=permissoesPerdidas();
+  const linhas=[];
+  if(prova.geo){
+    let est=null; try{ est=(await navigator.permissions?.query({name:"geolocation"}))?.state; }catch(e){}
+    /* «prompt» = por conceder. «denied» já tem o cartão do dd-41 e não é
+       isto; «granted» não há nada a dizer. Sem Permissions API, cala-se —
+       não se adivinha (7g-ter). */
+    if(est==="prompt") linhas.push({ico:"📍", txt:t("A app mudou de morada e o browser voltou a pedir autorização da localização — a tua casa veio contigo, a permissão não."),
+      botao:t("Autorizar a localização"), acao:()=>useGPS(false)});
+  }
+  if(prova.notif&&typeof Notification!=="undefined"&&Notification.permission==="default"){
+    linhas.push({ico:"🔔", txt:t("Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam."),
+      botao:t("Voltar a autorizar os avisos"), acao:()=>{ try{ Notification.requestPermission().then(()=>avisarPermissoesPerdidas()); }catch(e){} }});
+  }
+  if(!linhas.length) return;
+  for(const l of linhas){
+    const b=el("div","banner warn"); b.setAttribute("data-test","perm-migracao");
+    const col=el("div");
+    col.appendChild(el("div",null,l.txt));
+    const bt=el("button","btn",l.botao); bt.style.marginTop="8px";
+    bt.addEventListener("click",()=>{ l.acao(); });
+    col.appendChild(bt);
+    b.append(el("span",null,l.ico),col);
+    box.appendChild(b);
+  }
+  box.hidden=false;
 }
 async function preencherOrigemOmissao(){
   /* dd-54 §2 (decisão da A4.2 registada no r24): o caso comum é A→B agora —
@@ -4742,6 +4903,9 @@ function renderDashboard(){
      fechada é a casa NATIVA com ordem própria. A canalização
      (scheduleNativeAlerts) fica viva à espera disso. */
   limparAgendadoresSemGesto();
+  /* dd-128 §3.1: o que a mudança de casa deixou para trás — dito onde ele
+     olha primeiro, e só com prova de uso anterior */
+  avisarPermissoesPerdidas();
 }
 
 /* ---- cronologia 24 h (barras: altura = índice, cor = estado) ---- */
@@ -5814,7 +5978,7 @@ async function resolveInput(input, label){
     throw erroDito(t("Ainda não sei onde estás — sem isso não consigo traçar a rota. Permite a localização, ou escreve a origem e escolhe-a na lista."));
   if(q.length<3) throw erroDito(t("Indica {x}.",{x:t(label)}));
   const r=(await geocode(q)).filter(coordsBoas);
-  if(!r.length) throw erroDito(t('Não encontrei "{q}" — tenta "cidade, país".',{q}));
+  if(!r.length) throw erroDito(t('Não encontrei "{q}" — confirma a escrita ou tenta outro nome.',{q}));
   input._picked=r[0];
   return r[0];
 }
@@ -7896,9 +8060,27 @@ function parseDest(q){
 function freshPos(){
   return new Promise(res=>{
     if(!navigator.geolocation) return res(null);
+    /* ═══ dd-131: TETO DE RELÓGIO NOSSO, por cima do teto do fornecedor ═══
+       APANHADO NA BANCADA a reproduzir os 52 minutos dele: se o
+       getCurrentPosition não chamar NENHUM dos dois callbacks, esta Promise
+       nunca resolve e o assistente fica «A pensar…» para sempre, com o
+       botão morto e sem saída. E não é hipótese: o prompt de permissão da
+       casa nova (dd-128 — permissões não migram) é precisamente um estado
+       em que a API pode ficar calada indefinidamente, porque o relógio do
+       `timeout` só começa DEPOIS de a permissão ser concedida.
+       7b: 8 s = os 6,5 s pedidos ao fornecedor + margem para o callback
+       aterrar; só dispara quando a API não respondeu de todo. Disparar não
+       inventa posição nenhuma — segue-se sem ela (a casa guardada serve),
+       e fica rasto na consola. */
+    let feito=false;
+    const acaba=(v)=>{ if(feito) return; feito=true; res(v); };
+    const relogio=setTimeout(()=>{
+      console.warn("posição: a API não chamou sucesso NEM erro em 8 s — sigo sem ela (permissão por responder?)");
+      acaba(null);
+    },8000);
     navigator.geolocation.getCurrentPosition(
-      p=>res({lat:p.coords.latitude, lon:p.coords.longitude, name:t("A minha posição"), sub:""}),
-      ()=>res(null), {timeout:6500, maximumAge:30000});
+      p=>{ clearTimeout(relogio); acaba({lat:p.coords.latitude, lon:p.coords.longitude, name:t("A minha posição"), sub:""}); },
+      ()=>{ clearTimeout(relogio); acaba(null); }, {timeout:6500, maximumAge:30000});
       /* dd-85 §1d: eram 2 minutos = 3 km a 90 km/h na PRIMEIRA CURVA do
          trajeto. A conta (tolerância ~200 m ÷ 25 m/s) dá 8 s; fica 30 como
          EXCEÇÃO ASSUMIDA (rel-69 §2) — 8 s obrigava a esperar sempre que se
@@ -7939,14 +8121,28 @@ async function assistantAsk(){
        de casa a caminho do sítio errado. Agora mostra-se a lista e espera-se
        por um toque, sempre, mesmo quando há um só candidato. */
     const meus=locaisLocais(q);
-    let res=await geocodeNear(q,pos,true).catch(()=>[]);
-    if(!res.length) res=await geocodeNear(q,pos,false).catch(()=>[]);
+    /* dd-131 §1: o assistente era o SEGUNDO caminho a vestir transporte de
+       «não existe» — `catch(()=>[])` em ambas as pernas, e depois a frase
+       dizia «não encontrei». Agora o marcador do dd-122 atravessa também
+       aqui: rede morta tem mensagem própria, e a busca global é a segunda
+       perna (a proximidade ordena, não exclui — dd-129). */
+    let semRede=false;
+    const rede=(e)=>{ if(e?.semTransporte) semRede=true; return []; };
+    let res=await geocodeNear(q,pos,true).catch(rede);
+    if(!res.length) res=await geocodeNear(q,pos,false).catch(rede);
     res.forEach(r=>r.dist=haversine(pos,r));
     res.sort((a,b)=>a.dist-b.dist);
     const vistos=new Set(meus.map(m=>`${m.lat.toFixed(3)},${m.lon.toFixed(3)}`));
     const cands=[...meus.map(m=>({...m, dist:haversine(pos,m)})),
                  ...res.filter(r=>!vistos.has(`${r.lat.toFixed(3)},${r.lon.toFixed(3)}`))].slice(0,6);
-    if(!cands.length){ aiMsg("err",t('Não encontrei "{q}" por aqui. Tenta juntar a cidade (ex.: "{q} Lisboa").',{q})); return; }
+    if(!cands.length){
+      if(semRede){ console.warn(`assistente: falha de TRANSPORTE (não é «não existe») — "${q}"`);
+        aiMsg("err",t("Sem ligação — não consegui pesquisar. Verifica a internet e tenta de novo.")); return; }
+      /* dd-125/dd-128 §3.2: a frase antiga dizia «por aqui» e ensinava
+         «junta a cidade (ex.: Lisboa)» — a um homem em Maastricht, com a
+         busca global JÁ feita na linha de cima. Ensinava um limite que não
+         existe e uma cidade que não é a dele. Morre, e o exemplo com ela. */
+      aiMsg("err",t('Não encontrei "{q}" — confirma a escrita ou tenta outro nome.',{q})); return; }
     renderCands(cands,pos,null);
     aiMsg("info",cands.length===1?t("Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.")
                                  :t("Encontrei {n} sítios. Toca no que queres para eu traçar a rota.",{n:cands.length}));
@@ -8554,7 +8750,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-02-2305-bc49a6";
+const BUILD="2026-08-03-1142-27d563";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -10026,6 +10222,8 @@ function init(){
   $("#trips-bg").addEventListener("click",closeTrips);
   planTripAlerts();
   $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open"); });
+  /* dd-125: recarga VERDADEIRA, não foco — o botão da família das avarias de rede */
+  $("#net-recarregar")?.addEventListener("click",()=>location.reload());
   document.addEventListener("click",(e)=>{ if(!pop.contains(e.target)&&e.target.id!=="btn-settings") pop.classList.remove("open"); });
   document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") pop.classList.remove("open"); });
   const sp=store.get("profile");
@@ -10179,6 +10377,11 @@ function init(){
 
   // localização inicial
   const HOME0=store.get("home")||DEFAULT_LOC;
+  /* dd-128 §3.1: o aviso das permissões perdidas NASCE NO ARRANQUE, não
+     dentro do renderDashboard — apanhado pela guarda: pendurado no
+     dashboard, só aparecia se a meteorologia CARREGASSE, e na noite dele
+     não carregava. Um aviso sobre permissões não pode depender da rede. */
+  avisarPermissoesPerdidas();
   if(AUTO_GPS&&navigator.geolocation&&!restored){
     /* dd-41 §1: a caixa do sistema NUNCA ao arrancar. O GPS de arranque só
        corre quando a permissão JÁ está concedida — aí não há caixa nenhuma.
