@@ -984,7 +984,8 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
         <!-- dd-131 §3 + dd-141 §4: com este painel, a foto das 15:40 teria
              dito o host culpado em 5 segundos, em vez de nos deixar a
              adivinhar entre «a internet» e «a Geoapify». -->
-        <h3 style="margin-top:14px">📡 <span id="rede-title">Estado da ligação</span></h3>
+        <h3 style="margin-top:14px">📡 <span id="rede-title">Estado da app</span></h3>
+        <div id="saude-pecas" data-test="saude-pecas"></div>
         <div id="saude-rede" data-test="saude-rede"></div>
         <p class="small muted" id="rede-nota" style="margin:6px 0 0">Só serviços que já tentei contactar nesta sessão.</p>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
@@ -1004,6 +1005,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
           <button class="chip click" data-lang="en">EN</button>
           <button class="chip click" data-lang="es">ES</button>
           <button class="chip click" data-lang="fr">FR</button>
+          <button class="chip click" data-lang="auto" id="lang-auto">Língua do telemóvel</button>
         </div>
         <!-- O estado da voz vive AQUI, e não só num toast de 8 segundos. Um
              toast é o vejo-te-agora; não serve para uma condição que continua
@@ -1401,7 +1403,25 @@ const store={
 const PONTE={casaNova:"https://getlevante.com",
   casaVelha:"ricardoalexcamposacc-art.github.io",
   chaves:["home","favs","recentes","trips","historico","profile","lang","units",
-          "theme","som","muted","sentinel","cc","cam-de","guarda","geoapify-key"]};
+          "theme","som","muted","sentinel","cc","cam-de","guarda","geoapify-key",
+          /* dd-156 §1.3: as ROTAS GUARDADAS estavam de fora. Até 12 rotas com o
+             nome que o dono lhes deu — dados dele, não estado da app — e o
+             cutover para getlevante.com deitava-as fora sem avisar. Encontrado
+             pelo varrimento da família «preferências que não viajam», não por
+             alguém se ter lembrado. */
+          "favRoutes"]};
+/* O OUTRO LADO DA MESMA LEI (dd-149 · dd-156 §1.3): o que NÃO viaja, e porquê.
+   Uma chave escrita pela app que não esteja nem em `PONTE.chaves` nem aqui é
+   uma preferência que se perde na mudança de casa — e o `varrer-familias`
+   rebenta por causa dela. Estar aqui é uma decisão; estar de fora era esquecimento. */
+const PONTE_NAO_VIAJA={
+  "sanidade":"a confirmação dos dados antigos refaz-se na casa nova — perguntar outra vez é mais honesto do que herdar um «sim» dado noutro sítio",
+  "travel":"modo de viagem a decorrer: estado do momento, não preferência",
+  "bv-visto":"aviso já visto uma vez; reaparecer uma vez na casa nova não custa nada a ninguém",
+  "pin-tip":"dica do pino no mapa, idem",
+  "loc-desfecho":"desfecho da última tentativa de localização: diagnóstico do momento",
+  "mapa-parcial":"estado de desenho do mapa, recalculado em cada arranque",
+};
 function pontePayload(){
   const dados={};
   for(const k of PONTE.chaves){ const v=store.get(k); if(v!=null) dados[k]=v; }
@@ -1446,11 +1466,23 @@ if(_ponte&&_ponte.veio.length){
    ===================================================================== */
 const LOCALES={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR"};
 const SPEECH_LANGS={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR"};
+/* ═══ dd-147: A LÍNGUA DE ORIGEM DO CÓDIGO NÃO É A LÍNGUA DE RECURSO ═══
+   O PT é a fonte do `t()` — e isso é certo para quem escreve. Mas o recurso
+   de EXIBIÇÃO tem de ser o EN: só vê português quem pede português.
+   A ordem é: (a) escolha explícita → (b) língua do aparelho, se suportada →
+   (c) EN. O `"auto"` é uma escolha válida e quer dizer «segue o telemóvel».
+   ⚠️ O `||"pt"` que estava aqui era o último sítio por onde o português
+   entrava sem ninguém o pedir: com `navigator.language` vazio, a app abria
+   em PT a um desconhecido. */
+function linguaDoAparelho(){
+  const cands=(navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||""]);
+  for(const c of cands){ const n=String(c).slice(0,2).toLowerCase(); if(LOCALES[n]) return n; }
+  return null;
+}
 state.lang=(function(){
   const s=store.get("lang");
-  if(s&&LOCALES[s]) return s;
-  const n=(navigator.language||"pt").slice(0,2).toLowerCase();
-  return LOCALES[n]?n:"en";
+  if(s&&s!=="auto"&&LOCALES[s]) return s;
+  return linguaDoAparelho()||"en";
 })();
 function LOC(){ return LOCALES[state.lang]||"pt-PT"; }
 function t(s,vars){
@@ -1459,13 +1491,22 @@ function t(s,vars){
   return typeof uconv==="function"?uconv(out):out;
 }
 function setLang(l){
+  /* dd-147 §3.3: «língua do telemóvel» é uma escolha como as outras — e a
+     única que continua a obedecer ao aparelho depois de guardada. */
+  if(l==="auto"){ store.set("lang","auto"); const d=linguaDoAparelho()||"en"; if(d!==state.lang) return setLangReal(d); l=d; }
+  return setLangReal(l);
+}
+function setLangReal(l){
   if(!LOCALES[l]) return;
   voz.avisado=false;                 // idioma novo, aviso novo se faltar voz
   if(typeof vozEscolher==="function"){ state.lang=l; vozEscolher(); }
-  state.lang=l; store.set("lang",l);
+  state.lang=l;
+  if(store.get("lang")!=="auto") store.set("lang",l);
   document.documentElement.lang=l;
   applyStaticI18n();
-  $$("#lang-row .chip").forEach(c=>c.classList.toggle("sel",c.dataset.lang===l));
+  { const esc=store.get("lang");
+    $$("#lang-row .chip").forEach(c=>c.classList.toggle("sel",
+      esc==="auto"?c.dataset.lang==="auto":c.dataset.lang===l)); }
   if(state.wx) renderDashboard();
   if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); }
   renderFavRow();
@@ -1505,6 +1546,22 @@ function pintarAtribuicao(){
   pe.appendChild(sp);
 }
 function applyStaticI18n(){
+  /* ═══ dd-147: OS ATRIBUTOS CRUS ERAM A ÚLTIMA PORTA DO PORTUGUÊS ═══
+     `title`, `aria-label` e `placeholder` nunca passavam pelo t(). Não
+     apareciam na auditoria (não são chamadas a t() nem entradas da tabela)
+     e não apareciam no ecrã — mas o leitor de ecrã de um holandês lia-os
+     em português, e a dica de rato também. Foi a guarda que os apanhou,
+     não a contagem: uma auditoria conta o que sabe procurar.
+     Agora traduzem-se TODOS por varrimento, e a chave original fica
+     guardada no próprio nó para a troca de língua se poder repetir. */
+  $$("[title],[aria-label],[placeholder]").forEach(n=>{
+    for(const a of ["title","aria-label","placeholder"]){
+      if(!n.hasAttribute(a)) continue;
+      const g="data-i18n-"+a;
+      if(!n.hasAttribute(g)) n.setAttribute(g,n.getAttribute(a));
+      n.setAttribute(a,t(n.getAttribute(g)));
+    }
+  });
   const map=[
     [".brand-sub","txt","meteorologia para motociclistas · grátis para começar"],
     ["#tab-agora","txt2","🏍️ ","Agora"], ["#tab-rota","txt2","🗺️ ","Rota"],
@@ -1536,7 +1593,8 @@ function applyStaticI18n(){
     ["#btn-mais-op","txt","⚙️ Mais opções (paragens, hora de partida, estadia)"],
     ["#rt-mais .small.muted","txt","Hora de partida vazia = partes agora."],
     ["#lang-title","txt","Idioma"],
-    ["#rede-title","txt","Estado da ligação"],
+    ["#lang-auto","txt","Língua do telemóvel"],
+    ["#rede-title","txt","Estado da app"],
     ["#rede-nota","txt","Só serviços que já tentei contactar nesta sessão."],
     ["#btn-ver-mapa","txt","Ver o mapa"],
     ["#rt-voltar","aria","Voltar ao planeamento"],
@@ -1625,6 +1683,8 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
+"demorou de mais":"timed out",
+"Estado da app":"App status","presente":"present","em falta":"MISSING","a mais — não devia estar aqui":"extra — shouldn't be here","fora, como deve ser":"gone, as it should be","o motor do mapa":"the map engine","a porta única do mapa":"the map's single door","a tradução":"translation","as tuas preferências":"your preferences","falar com os serviços":"talking to the services","Leaflet, que saiu no A2.2":"Leaflet, which left in A2.2",
 "meteorologia para motociclistas · grátis para começar":"weather for motorcyclists · free to start",
 "Agora":"Now","Rota":"Route",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Search city or address… (e.g. London, Lisbon)",
@@ -1709,6 +1769,158 @@ en:{
 "Nada por perto — alarguei ao mundo.":"Nothing nearby — I widened the search to the whole world.",
 "Índice calculado com o perfil {p} — muda-o nas definições.":"Index calculated with the {p} profile — change it in settings.",
 "conservador":"cautious","equilibrado":"balanced","tolerante":"tolerant",
+"Tempo em cada paragem":"Weather at each stop",
+"o resto do dia":"the rest of the day",
+"só passo lá":"just passing through",
+"Partir às":"Leave at",
+"Chegar às":"Arrive at",
+"🗓️ Viagens planeadas":"🗓️ Planned rides",
+"Dados:":"Data:",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"No accounts, no logs, no tracking. Your location and destination go to the weather and routing services to get you the answer — and we keep none of it. Ride with your head: if the verdict is red, stay home.",
+"sem nome":"unnamed",
+"⭐ guardado por ti":"⭐ saved by you",
+"🕘 pesquisaste isto há pouco":"🕘 you searched this recently",
+"igreja":"church",
+"alojamento":"accommodation",
+"café":"café",
+"restaurante":"restaurant",
+"supermercado":"supermarket",
+"farmácia":"pharmacy",
+"hospital":"hospital",
+"combustível":"fuel",
+"estacionamento":"parking",
+"casa":"home",
+"({n} radares deste trajeto não são mostrados.)":"({n} speed cameras on this route are not shown.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"I don't show speed cameras on this route — see why below.",
+"zona km {a}–{b}":"zone km {a}–{b}",
+"zona de perigo":"danger zone",
+"Trovoada prevista — risco elevado":"Thunderstorms forecast — high risk",
+"Chuva/chuvisco gelado — piso traiçoeiro":"Freezing rain/drizzle — treacherous surface",
+"Neve — não é dia de duas rodas":"Snow — not a day for two wheels",
+"Chuva forte ({n} mm/h)":"Heavy rain ({n} mm/h)",
+"Chuva ({n} mm/h)":"Rain ({n} mm/h)",
+"Chuvisco / chuva fraca ({n} mm/h)":"Drizzle / light rain ({n} mm/h)",
+"{p}% de probabilidade de chuva":"{p}% chance of rain",
+"Rajadas até {g} km/h":"Gusts up to {g} km/h",
+"Vento sustentado forte":"Strong sustained wind",
+"Temperatura negativa — risco de gelo no piso":"Below-zero temperature — risk of ice on the road",
+"Sensação de {t}° — frio extremo":"Feels like {t}° — extreme cold",
+"Sensação de {t}° — frio a sério":"Feels like {t}° — seriously cold",
+"Fresco (sensação {t}°)":"Chilly (feels like {t}°)",
+"Calor extremo (sensação {t}°)":"Extreme heat (feels like {t}°)",
+"Muito calor (sensação {t}°)":"Very hot (feels like {t}°)",
+"Risco de gelo em zonas de sombra e pontes":"Risk of ice in shaded areas and on bridges",
+"Visibilidade reduzida ({v})":"Reduced visibility ({v})",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"First rain after {n} dry days: the oil built up in the tarmac lifts and the road turns to soap for the first half hour. Brake early and gently, avoid road markings and manhole covers.",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 No internet — the saved map and route keep working. GPS needs no network.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet is back — updating the forecast.",
+"Créditos e licenças do mapa":"Map credits and licences",
+"Ponto no mapa":"Point on the map",
+"Ir para aqui":"Go here",
+"Partir daqui":"Start from here",
+"Adicionar como paragem":"Add as a stop",
+"📍 Partida definida: {p}":"📍 Start set: {p}",
+"➕ Paragem adicionada: {p}":"➕ Stop added: {p}",
+"🏁 A calcular rota para {p}…":"🏁 Calculating the route to {p}…",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ To arrive at {h} you should already have left — I'll show you from now on.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ To arrive at {h}, leave at {d}.",
+"Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"I've restored the route to {d} from your last ride. Tap Ride mode when you're ready to go.",
+"⚠️ Zona de perigo":"⚠️ Danger zone",
+"por volta do km {k}":"around km {k}",
+"Em França a lei não permite indicar o ponto exato.":"French law does not allow showing the exact point.",
+"até ao fim do dia":"until the end of the day",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ In {p} after you arrive: dry {d} — an easy ride back.",
+"seco":"dry",
+"chuvisco":"drizzle",
+"🌧️ chuva":"🌧️ rain",
+"⛈️ chuva forte":"⛈️ heavy rain",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ In {p} after you arrive: {x}",
+"🌧️ O tempo vai mudar em {p}":"🌧️ The weather is going to turn in {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Rain around {h} where you are or will be. If you're still out, plan the ride back or get the bike under cover.",
+"A ver o tempo ao longo do trajeto…":"Checking the weather along the route…",
+"Guardar destino":"Save destination",
+"Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Name for this favourite? (e.g. Home, Work, John's place)",
+"Guardado: {p} ⭐":"Saved: {p} ⭐",
+"Guardar rota":"Save route",
+"Nome da rota?":"Name for this route?",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"Set a departure (or arrival) time in the future first — then schedule it.",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind up to ~{g} km/h near km {k} — firm on the bars; extra care on bridges, viaducts and when overtaking lorries.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind of ~{g0} to ~{g1} km/h between km {a} and km {b} — firm on the bars; extra care on bridges, viaducts and when overtaking lorries.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Crosswind up to ~{g} km/h between km {a} and km {b} — firm on the bars; extra care on bridges, viaducts and when overtaking lorries.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"At ~{v} km/h it really feels like {c}° (air at {t}°) — hands go numb and reactions slow. Winter gloves, layers, and stop to warm up halfway if the ride is long.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Air at {t}° with {h}% humidity near km {k}: the road can be freezing even with the air above zero — bridges, viaducts and shaded stretches first. Upright and smooth through the bends.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Fog or a fogging visor likely near km {k} (~{h}) — pinlock or visor cracked open, dipped beams on (never full) and double your distance.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Low sun straight ahead near km {k} (~{h}) — it dazzles you and the traffic behind. Dark visor or peak, more distance, and assume cars can't see you.",
+"⚠️ Perigos específicos de mota":"⚠️ Motorcycle-specific hazards",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Beyond the rain: road surface, wind, wind-chill at speed, visibility and sun — with thresholds set for two wheels.",
+"km {a}–{b}":"km {a}–{b}",
+"km {a}":"km {a}",
+"⚠️ Perigo no teu trajeto":"⚠️ Hazard on your route",
+"ainda sem previsão":"no forecast yet",
+"chuva forte/trovoada":"heavy rain/thunderstorms",
+"chuva prevista":"rain forecast",
+"vento muito forte":"very strong wind",
+"possível chuvisco":"possible drizzle",
+"bom para ir":"good to go",
+"Apagar":"Delete",
+"🗓️ A abrir: {p}":"🗓️ Opening: {p}",
+"Viagem indisponível.":"Ride unavailable.",
+"partida {h}":"departure {h}",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Tip: save your home, usual fuel stops and routes — I'll recognise them in whatever you type.",
+"Apagado: {p}":"Deleted: {p}",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Careful: first rain after dry days — treacherous surface",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Over in {p}: rain around {h}. If you linger, the ride back would be wet — decide now whether the car is worth it, or take the rain suit and I'll warn you ~40 min before it turns.",
+"Ida seca — mas vai chover em {p} depois de chegares":"Dry on the way — but it will rain in {p} after you arrive",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Over in {p}: possible drizzle through the day — a waterproof in the bag and you're covered.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Over in {p}: dry {x} — an easy ride back.",
+"durante a tua estadia":"during your stay",
+"{d}":"{d}",
+"quase lá":"almost there",
+"🔄 Saíste da rota — a recalcular…":"🔄 You've left the route — recalculating…",
+"A tua posição":"Your position",
+"🔄 Rota recalculada a partir da tua posição.":"🔄 Route recalculated from your position.",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"recalculation failed — check the connection. The previous route is still on screen.",
+"🏍️ A moto pode ficar cá fora":"🏍️ The bike can stay outside",
+"🌧️ Abriga a moto":"🌧️ Get the bike under cover",
+"até à tua próxima viagem ({h})":"until your next ride ({h})",
+"nas próximas {n} horas":"in the next {n} hours",
+"🌧️ Vai começar a chover":"🌧️ It's about to start raining",
+"Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Rain around {h} — if the bike is outside, put it away now.",
+"Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"This device has no voice installed — directions will come as text and vibration only.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"There's no {n} voice installed on this phone. I'll speak English; you can install the voice in your system settings.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voice muted — you'll still get vibration and notifications.",
+"🔊 Voz ligada.":"🔊 Voice on.",
+"a {d} km da rota — a recalcular":"{d} km off the route — recalculating",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Danger zone in {x}. Watch your speed.",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 Don't know the name of the place? Press and hold a point on the map (or right-click on a computer) and I'll take you there.",
+"Rota para {p}":"Route to {p}",
+"Esta sessão: {p} pedidos em {m} min · {c} poupados pela cache · {k} créditos":"This session: {p} requests in {m} min · {c} saved by the cache · {k} credits",
+"Unidades alteradas para {u}.":"Units changed to {u}.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Route map saved ({n} tiles) — works even without internet.",
+"offline":"offline",
+"Unidades":"Units",
+"Avisos de radar":"Speed camera alerts",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Plan manually (stops, departure time)",
+"Língua do telemóvel":"Phone language",
+"Instalar como app":"Install as an app",
+"Viagens planeadas":"Planned rides",
+"Alternar tema claro/escuro":"Toggle light/dark theme",
+"Alternar tema":"Toggle theme",
+"Definições":"Settings",
+"Secções":"Sections",
+"Pesquisar localização":"Search for a place",
+"Usar a minha localização":"Use my location",
+"Fechar":"Close",
+"Para onde vais?":"Where are you going?",
+"Trocar origem e destino":"Swap start and destination",
+"Paragens intermédias":"Intermediate stops",
+"Quanto tempo ficas em cada paragem":"How long you stay at each stop",
+"Partir ou chegar a uma hora":"Leave at or arrive by a time",
+"Quanto tempo contas ficar no destino":"How long you expect to stay at the destination",
+"Tempo no destino":"Time at the destination",
+"Usar GPS como origem":"Use GPS as the starting point",
+"Silenciar/ligar a voz":"Mute/unmute the voice",
+"Silenciar ou ligar a voz":"Mute or unmute the voice",
 "Estado da ligação":"Connection status","Só serviços que já tentei contactar nesta sessão.":"Only services I've actually tried to reach this session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"No results for this search — check the spelling or try another name.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.",
@@ -1898,6 +2110,8 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
+"demorou de mais":"tardó demasiado",
+"Estado da app":"Estado de la app","presente":"presente","em falta":"FALTA","a mais — não devia estar aqui":"de más — no debería estar aquí","fora, como deve ser":"fuera, como debe ser","o motor do mapa":"el motor del mapa","a porta única do mapa":"la puerta única del mapa","a tradução":"la traducción","as tuas preferências":"tus preferencias","falar com os serviços":"hablar con los servicios","Leaflet, que saiu no A2.2":"Leaflet, que salió en A2.2",
 "meteorologia para motociclistas · grátis para começar":"meteorología para motociclistas · gratis para empezar","Agora":"Ahora","Rota":"Ruta",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Buscar ciudad o dirección… (ej.: Madrid, Lisboa)",
 "📲 Instalar":"📲 Instalar","🔔 Sentinela meteorológica":"🔔 Centinela meteorológico","✨ Assistente de viagem":"✨ Asistente de viaje",
@@ -1976,6 +2190,159 @@ es:{
 "Nada por perto — alarguei ao mundo.":"Nada cerca — amplié la búsqueda a todo el mundo.",
 "Índice calculado com o perfil {p} — muda-o nas definições.":"Índice calculado con el perfil {p} — cámbialo en los ajustes.",
 "conservador":"conservador","equilibrado":"equilibrado","tolerante":"tolerante",
+"Tempo em cada paragem":"Tiempo en cada parada",
+"o resto do dia":"el resto del día",
+"só passo lá":"solo paso por allí",
+"Partir às":"Salir a las",
+"Chegar às":"Llegar a las",
+"🗓️ Viagens planeadas":"🗓️ Viajes planeados",
+"Dados:":"Datos:",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Sin cuentas, sin registros, sin rastreo. Tu ubicación y tu destino se envían a los servicios de meteorología y rutas para darte la respuesta — y no los guardamos. Conduce con cabeza: si el aviso es rojo, quédate en casa.",
+"sem nome":"sin nombre",
+"⭐ guardado por ti":"⭐ guardado por ti",
+"🕘 pesquisaste isto há pouco":"🕘 lo buscaste hace poco",
+"igreja":"iglesia",
+"alojamento":"alojamiento",
+"café":"café",
+"restaurante":"restaurante",
+"supermercado":"supermercado",
+"farmácia":"farmacia",
+"hospital":"hospital",
+"combustível":"combustible",
+"estacionamento":"aparcamiento",
+"casa":"casa",
+"({n} radares deste trajeto não são mostrados.)":"({n} radares de esta ruta no se muestran.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"En esta ruta no muestro radares — mira abajo por qué.",
+"zona km {a}–{b}":"zona km {a}–{b}",
+"zona de perigo":"zona de peligro",
+"Trovoada prevista — risco elevado":"Tormenta prevista — riesgo alto",
+"Chuva/chuvisco gelado — piso traiçoeiro":"Lluvia/llovizna helada — firme traicionero",
+"Neve — não é dia de duas rodas":"Nieve — no es día de dos ruedas",
+"Chuva forte ({n} mm/h)":"Lluvia fuerte ({n} mm/h)",
+"Chuva ({n} mm/h)":"Lluvia ({n} mm/h)",
+"Chuvisco / chuva fraca ({n} mm/h)":"Llovizna / lluvia débil ({n} mm/h)",
+"{p}% de probabilidade de chuva":"{p}% de probabilidad de lluvia",
+"Rajadas até {g} km/h":"Rachas de hasta {g} km/h",
+"Vento sustentado forte":"Viento sostenido fuerte",
+"Temperatura negativa — risco de gelo no piso":"Temperatura bajo cero — riesgo de hielo en el firme",
+"Sensação de {t}° — frio extremo":"Sensación de {t}° — frío extremo",
+"Sensação de {t}° — frio a sério":"Sensación de {t}° — frío de verdad",
+"Fresco (sensação {t}°)":"Fresco (sensación {t}°)",
+"Calor extremo (sensação {t}°)":"Calor extremo (sensación {t}°)",
+"Muito calor (sensação {t}°)":"Mucho calor (sensación {t}°)",
+"Risco de gelo em zonas de sombra e pontes":"Riesgo de hielo en zonas de sombra y puentes",
+"Visibilidade reduzida ({v})":"Visibilidad reducida ({v})",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Primera lluvia tras {n} días secos: el aceite acumulado en el asfalto se suelta y el firme se vuelve jabón la primera media hora. Frena pronto y suave, evita pinturas y tapas de alcantarilla.",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Sin internet — el mapa y la ruta guardados siguen funcionando. El GPS no necesita red.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet de vuelta — actualizando la meteorología.",
+"Créditos e licenças do mapa":"Créditos y licencias del mapa",
+"Ponto no mapa":"Punto en el mapa",
+"Ir para aqui":"Ir aquí",
+"Partir daqui":"Salir desde aquí",
+"Adicionar como paragem":"Añadir como parada",
+"📍 Partida definida: {p}":"📍 Salida definida: {p}",
+"➕ Paragem adicionada: {p}":"➕ Parada añadida: {p}",
+"🏁 A calcular rota para {p}…":"🏁 Calculando la ruta a {p}…",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Para llegar a las {h} ya deberías haber salido — te lo muestro desde ahora.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Para llegar a las {h}, sal a las {d}.",
+"Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"He recuperado la ruta a {d} de tu último viaje. Toca Modo viaje cuando quieras arrancar.",
+"⚠️ Zona de perigo":"⚠️ Zona de peligro",
+"por volta do km {k}":"hacia el km {k}",
+"Em França a lei não permite indicar o ponto exato.":"En Francia la ley no permite indicar el punto exacto.",
+"até ao fim do dia":"hasta el final del día",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ En {p} después de llegar: seco {d} — vuelta tranquila.",
+"seco":"seco",
+"chuvisco":"llovizna",
+"🌧️ chuva":"🌧️ lluvia",
+"⛈️ chuva forte":"⛈️ lluvia fuerte",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ En {p} después de llegar: {x}",
+"🌧️ O tempo vai mudar em {p}":"🌧️ El tiempo va a cambiar en {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Lluvia hacia las {h} donde estás o vas a estar. Si sigues por ahí, prepara la vuelta o resguarda la moto.",
+"A ver o tempo ao longo do trajeto…":"Mirando el tiempo a lo largo de la ruta…",
+"Guardar destino":"Guardar destino",
+"Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"¿Nombre del favorito? (ej.: Casa, Trabajo, Casa de Juan)",
+"Guardado: {p} ⭐":"Guardado: {p} ⭐",
+"Guardar rota":"Guardar ruta",
+"Nome da rota?":"¿Nombre de la ruta?",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"Define primero una hora de salida (o llegada) en el futuro — luego agenda.",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral de hasta ~{g} km/h cerca del km {k} — firme en el manillar; cuidado especial en puentes, viaductos y al adelantar camiones.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral de ~{g0} a ~{g1} km/h entre el km {a} y el km {b} — firme en el manillar; cuidado especial en puentes, viaductos y al adelantar camiones.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Viento lateral de hasta ~{g} km/h entre el km {a} y el km {b} — firme en el manillar; cuidado especial en puentes, viaductos y al adelantar camiones.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"A ~{v} km/h la sensación real es {c}° (aire a {t}°) — las manos se entumecen y la reacción se retrasa. Guantes de invierno, capas, y para a calentarte a mitad si el viaje es largo.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Aire a {t}° con {h}% de humedad cerca del km {k}: el firme puede estar helándose aunque el aire esté sobre cero — puentes, viaductos y zonas de sombra primero. Recto y suave en las curvas.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Niebla o visera empañada probable cerca del km {k} (~{h}) — pinlock o visera entreabierta, luces de cruce (nunca largas) y el doble de distancia.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Sol bajo de frente cerca del km {k} (~{h}) — te deslumbra a ti y a quien viene detrás. Visera oscura o visorina, más distancia, y cuenta con que los coches no te vean.",
+"⚠️ Perigos específicos de mota":"⚠️ Peligros específicos de moto",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Más allá de la lluvia: firme, viento, frío en marcha, visibilidad y sol — con umbrales pensados para dos ruedas.",
+"km {a}–{b}":"km {a}–{b}",
+"km {a}":"km {a}",
+"⚠️ Perigo no teu trajeto":"⚠️ Peligro en tu ruta",
+"ainda sem previsão":"aún sin previsión",
+"chuva forte/trovoada":"lluvia fuerte/tormenta",
+"chuva prevista":"lluvia prevista",
+"vento muito forte":"viento muy fuerte",
+"possível chuvisco":"posible llovizna",
+"bom para ir":"bueno para salir",
+"Apagar":"Borrar",
+"🗓️ A abrir: {p}":"🗓️ Abriendo: {p}",
+"Viagem indisponível.":"Viaje no disponible.",
+"partida {h}":"salida {h}",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Consejo: guarda tu casa, gasolineras habituales y rutas — las reconoceré en lo que escribas.",
+"Apagado: {p}":"Borrado: {p}",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Cuidado: primera lluvia tras días secos — firme traicionero",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Allí en {p}: lluvia hacia las {h}. Si te demoras, la vuelta sería mojada — decide ya si compensa el coche, o lleva el traje y te aviso ~40 min antes de que cambie.",
+"Ida seca — mas vai chover em {p} depois de chegares":"Ida seca — pero va a llover en {p} después de llegar",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Allí en {p}: posible llovizna a lo largo del día — un impermeable en la maleta y vas cubierto.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Allí en {p}: seco {x} — vuelta tranquila.",
+"durante a tua estadia":"durante tu estancia",
+"{d}":"{d}",
+"quase lá":"casi allí",
+"🔄 Saíste da rota — a recalcular…":"🔄 Te has salido de la ruta — recalculando…",
+"A tua posição":"Tu posición",
+"🔄 Rota recalculada a partir da tua posição.":"🔄 Ruta recalculada desde tu posición.",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"el recálculo falló — revisa la conexión. La ruta anterior sigue en pantalla.",
+"🏍️ A moto pode ficar cá fora":"🏍️ La moto puede quedarse fuera",
+"🌧️ Abriga a moto":"🌧️ Resguarda la moto",
+"até à tua próxima viagem ({h})":"hasta tu próximo viaje ({h})",
+"nas próximas {n} horas":"en las próximas {n} horas",
+"🌧️ Vai começar a chover":"🌧️ Va a empezar a llover",
+"Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Lluvia hacia las {h} — si la moto está fuera, guárdala ahora.",
+"Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Este dispositivo no tiene ninguna voz instalada — las indicaciones irán solo por escrito y vibración.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"No hay voz {n} instalada en este teléfono. Hablaré en inglés; puedes instalar la voz en los ajustes del sistema.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voz silenciada — seguirás recibiendo vibración y notificaciones.",
+"🔊 Voz ligada.":"🔊 Voz activada.",
+"a {d} km da rota — a recalcular":"a {d} km de la ruta — recalculando",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Zona de peligro en {x}. Atención a la velocidad.",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 ¿No sabes el nombre del sitio? Mantén el dedo en un punto del mapa (o clic derecho en el PC) y te llevo allí.",
+"Rota para {p}":"Ruta a {p}",
+"Esta sessão: {p} pedidos em {m} min · {c} poupados pela cache · {k} créditos":"Esta sesión: {p} peticiones en {m} min · {c} ahorradas por la caché · {k} créditos",
+"Unidades alteradas para {u}.":"Unidades cambiadas a {u}.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Mapa de la ruta guardado ({n} piezas) — funciona incluso sin internet.",
+"offline":"sin conexión",
+"Unidades":"Unidades",
+"Avisos de radar":"Avisos de radar",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Planificar manualmente (paradas, hora de salida)",
+"~{n} km 🌧️":"~{n} km 🌧️",
+"Língua do telemóvel":"Idioma del teléfono",
+"Instalar como app":"Instalar como app",
+"Viagens planeadas":"Viajes planeados",
+"Alternar tema claro/escuro":"Cambiar tema claro/oscuro",
+"Alternar tema":"Cambiar tema",
+"Definições":"Ajustes",
+"Secções":"Secciones",
+"Pesquisar localização":"Buscar ubicación",
+"Usar a minha localização":"Usar mi ubicación",
+"Fechar":"Cerrar",
+"Para onde vais?":"¿A dónde vas?",
+"Trocar origem e destino":"Intercambiar origen y destino",
+"Paragens intermédias":"Paradas intermedias",
+"Quanto tempo ficas em cada paragem":"Cuánto tiempo te quedas en cada parada",
+"Partir ou chegar a uma hora":"Salir o llegar a una hora",
+"Quanto tempo contas ficar no destino":"Cuánto tiempo cuentas quedarte en el destino",
+"Tempo no destino":"Tiempo en el destino",
+"Usar GPS como origem":"Usar GPS como origen",
+"Silenciar/ligar a voz":"Silenciar/activar la voz",
+"Silenciar ou ligar a voz":"Silenciar o activar la voz",
 "Estado da ligação":"Estado de la conexión","Só serviços que já tentei contactar nesta sessão.":"Solo servicios que ya he intentado contactar en esta sesión.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Sin resultados para esta búsqueda — revisa la escritura o prueba otro nombre.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — revisa la escritura o prueba otro nombre.",
@@ -2143,6 +2510,8 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
+"demorou de mais":"trop lent",
+"Estado da app":"État de l'app","presente":"présent","em falta":"MANQUANT","a mais — não devia estar aqui":"en trop — ne devrait pas être là","fora, como deve ser":"parti, comme il se doit","o motor do mapa":"le moteur de la carte","a porta única do mapa":"la porte unique de la carte","a tradução":"la traduction","as tuas preferências":"tes préférences","falar com os serviços":"parler aux services","Leaflet, que saiu no A2.2":"Leaflet, parti en A2.2",
 "meteorologia para motociclistas · grátis para começar":"météo pour motards · gratuit pour commencer","Agora":"Maintenant","Rota":"Itinéraire",
 "Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Rechercher une ville ou adresse… (ex. Paris, Lyon)",
 "📲 Instalar":"📲 Installer","🔔 Sentinela meteorológica":"🔔 Sentinelle météo","✨ Assistente de viagem":"✨ Assistant de trajet",
@@ -2221,6 +2590,159 @@ fr:{
 "Nada por perto — alarguei ao mundo.":"Rien à proximité — j'ai élargi la recherche au monde entier.",
 "Índice calculado com o perfil {p} — muda-o nas definições.":"Indice calculé avec le profil {p} — change-le dans les réglages.",
 "conservador":"prudent","equilibrado":"équilibré","tolerante":"tolérant",
+"Tempo em cada paragem":"Météo à chaque arrêt",
+"o resto do dia":"le reste de la journée",
+"só passo lá":"je ne fais que passer",
+"Partir às":"Partir à",
+"Chegar às":"Arriver à",
+"🗓️ Viagens planeadas":"🗓️ Trajets prévus",
+"Dados:":"Données :",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Pas de comptes, pas de journaux, pas de pistage. Ta position et ta destination sont envoyées aux services météo et d'itinéraire pour obtenir la réponse — et nous n'en gardons rien. Roule avec ta tête : si le verdict est rouge, reste chez toi.",
+"sem nome":"sans nom",
+"⭐ guardado por ti":"⭐ enregistré par toi",
+"🕘 pesquisaste isto há pouco":"🕘 tu as cherché ça récemment",
+"igreja":"église",
+"alojamento":"hébergement",
+"café":"café",
+"restaurante":"restaurant",
+"supermercado":"supermarché",
+"farmácia":"pharmacie",
+"hospital":"hôpital",
+"combustível":"carburant",
+"estacionamento":"stationnement",
+"casa":"maison",
+"({n} radares deste trajeto não são mostrados.)":"({n} radars de ce trajet ne sont pas affichés.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"Je n'affiche pas de radars sur ce trajet — voir pourquoi ci-dessous.",
+"zona km {a}–{b}":"zone km {a}–{b}",
+"zona de perigo":"zone de danger",
+"Trovoada prevista — risco elevado":"Orages prévus — risque élevé",
+"Chuva/chuvisco gelado — piso traiçoeiro":"Pluie/bruine verglaçante — chaussée traître",
+"Neve — não é dia de duas rodas":"Neige — pas un jour pour deux roues",
+"Chuva forte ({n} mm/h)":"Forte pluie ({n} mm/h)",
+"Chuva ({n} mm/h)":"Pluie ({n} mm/h)",
+"Chuvisco / chuva fraca ({n} mm/h)":"Bruine / pluie faible ({n} mm/h)",
+"{p}% de probabilidade de chuva":"{p}% de probabilité de pluie",
+"Rajadas até {g} km/h":"Rafales jusqu'à {g} km/h",
+"Vento sustentado forte":"Vent soutenu fort",
+"Temperatura negativa — risco de gelo no piso":"Température négative — risque de verglas",
+"Sensação de {t}° — frio extremo":"Ressenti {t}° — froid extrême",
+"Sensação de {t}° — frio a sério":"Ressenti {t}° — vraiment froid",
+"Fresco (sensação {t}°)":"Frais (ressenti {t}°)",
+"Calor extremo (sensação {t}°)":"Chaleur extrême (ressenti {t}°)",
+"Muito calor (sensação {t}°)":"Très chaud (ressenti {t}°)",
+"Risco de gelo em zonas de sombra e pontes":"Risque de verglas dans les zones ombragées et sur les ponts",
+"Visibilidade reduzida ({v})":"Visibilité réduite ({v})",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Première pluie après {n} jours secs : l'huile accumulée dans le bitume remonte et la route devient savon pendant la première demi-heure. Freine tôt et en douceur, évite les marquages et les plaques d'égout.",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Pas d'internet — la carte et l'itinéraire enregistrés continuent de fonctionner. Le GPS n'a pas besoin de réseau.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet est de retour — mise à jour de la météo.",
+"Créditos e licenças do mapa":"Crédits et licences de la carte",
+"Ponto no mapa":"Point sur la carte",
+"Ir para aqui":"Aller ici",
+"Partir daqui":"Partir d'ici",
+"Adicionar como paragem":"Ajouter comme arrêt",
+"📍 Partida definida: {p}":"📍 Départ défini : {p}",
+"➕ Paragem adicionada: {p}":"➕ Arrêt ajouté : {p}",
+"🏁 A calcular rota para {p}…":"🏁 Calcul de l'itinéraire vers {p}…",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Pour arriver à {h} tu aurais déjà dû partir — je te montre à partir de maintenant.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Pour arriver à {h}, pars à {d}.",
+"Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"J'ai repris l'itinéraire vers {d} de ton dernier trajet. Touche Mode trajet quand tu veux partir.",
+"⚠️ Zona de perigo":"⚠️ Zone de danger",
+"por volta do km {k}":"vers le km {k}",
+"Em França a lei não permite indicar o ponto exato.":"La loi française n'autorise pas à indiquer le point exact.",
+"até ao fim do dia":"jusqu'à la fin de la journée",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ À {p} après ton arrivée : sec {d} — retour tranquille.",
+"seco":"sec",
+"chuvisco":"bruine",
+"🌧️ chuva":"🌧️ pluie",
+"⛈️ chuva forte":"⛈️ forte pluie",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ À {p} après ton arrivée : {x}",
+"🌧️ O tempo vai mudar em {p}":"🌧️ Le temps va tourner à {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Pluie vers {h} là où tu es ou seras. Si tu es encore dehors, prépare le retour ou mets la moto à l'abri.",
+"A ver o tempo ao longo do trajeto…":"Je regarde la météo le long du trajet…",
+"Guardar destino":"Enregistrer la destination",
+"Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Nom du favori ? (ex. : Maison, Travail, Chez Jean)",
+"Guardado: {p} ⭐":"Enregistré : {p} ⭐",
+"Guardar rota":"Enregistrer l'itinéraire",
+"Nome da rota?":"Nom de l'itinéraire ?",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"Définis d'abord une heure de départ (ou d'arrivée) dans le futur — ensuite planifie.",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral jusqu'à ~{g} km/h près du km {k} — ferme sur le guidon ; prudence accrue sur les ponts, viaducs et en doublant les camions.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral de ~{g0} à ~{g1} km/h entre le km {a} et le km {b} — ferme sur le guidon ; prudence accrue sur les ponts, viaducs et en doublant les camions.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Vent latéral jusqu'à ~{g} km/h entre le km {a} et le km {b} — ferme sur le guidon ; prudence accrue sur les ponts, viaducs et en doublant les camions.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"À ~{v} km/h le ressenti réel est {c}° (air à {t}°) — les mains s'engourdissent et les réflexes ralentissent. Gants d'hiver, couches, et arrête-toi pour te réchauffer à mi-parcours si le trajet est long.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Air à {t}° avec {h}% d'humidité près du km {k} : la chaussée peut geler même avec l'air au-dessus de zéro — ponts, viaducs et zones ombragées d'abord. Droit et souple dans les virages.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Brouillard ou visière embuée probable près du km {k} (~{h}) — pinlock ou visière entrouverte, feux de croisement (jamais de route) et distance doublée.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Soleil bas de face près du km {k} (~{h}) — il t'éblouit et éblouit ceux qui te suivent. Visière teintée ou casquette, plus de distance, et pars du principe que les voitures ne te voient pas.",
+"⚠️ Perigos específicos de mota":"⚠️ Dangers spécifiques à la moto",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Au-delà de la pluie : chaussée, vent, froid en roulant, visibilité et soleil — avec des seuils pensés pour deux roues.",
+"km {a}–{b}":"km {a}–{b}",
+"km {a}":"km {a}",
+"⚠️ Perigo no teu trajeto":"⚠️ Danger sur ton trajet",
+"ainda sem previsão":"pas encore de prévision",
+"chuva forte/trovoada":"forte pluie/orages",
+"chuva prevista":"pluie prévue",
+"vento muito forte":"vent très fort",
+"possível chuvisco":"bruine possible",
+"bom para ir":"bon pour partir",
+"Apagar":"Supprimer",
+"🗓️ A abrir: {p}":"🗓️ Ouverture : {p}",
+"Viagem indisponível.":"Trajet indisponible.",
+"partida {h}":"départ {h}",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Astuce : enregistre ta maison, tes stations habituelles et tes itinéraires — je les reconnaîtrai dans ce que tu écris.",
+"Apagado: {p}":"Supprimé : {p}",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Attention : première pluie après des jours secs — chaussée traître",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Là-bas à {p} : pluie vers {h}. Si tu t'attardes, le retour sera mouillé — décide maintenant si la voiture vaut le coup, ou prends la combinaison et je te préviens ~40 min avant que ça tourne.",
+"Ida seca — mas vai chover em {p} depois de chegares":"Aller au sec — mais il pleuvra à {p} après ton arrivée",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Là-bas à {p} : bruine possible dans la journée — un imperméable dans la valise et c'est réglé.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Là-bas à {p} : sec {x} — retour tranquille.",
+"durante a tua estadia":"pendant ton séjour",
+"{d}":"{d}",
+"quase lá":"presque arrivé",
+"🔄 Saíste da rota — a recalcular…":"🔄 Tu as quitté l'itinéraire — recalcul…",
+"A tua posição":"Ta position",
+"🔄 Rota recalculada a partir da tua posição.":"🔄 Itinéraire recalculé depuis ta position.",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"le recalcul a échoué — vérifie la connexion. L'itinéraire précédent reste à l'écran.",
+"🏍️ A moto pode ficar cá fora":"🏍️ La moto peut rester dehors",
+"🌧️ Abriga a moto":"🌧️ Mets la moto à l'abri",
+"até à tua próxima viagem ({h})":"jusqu'à ton prochain trajet ({h})",
+"nas próximas {n} horas":"dans les {n} prochaines heures",
+"🌧️ Vai começar a chover":"🌧️ Il va se mettre à pleuvoir",
+"Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Pluie vers {h} — si la moto est dehors, rentre-la maintenant.",
+"Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Cet appareil n'a aucune voix installée — les indications seront uniquement écrites et vibrées.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"Aucune voix {n} n'est installée sur ce téléphone. Je parlerai anglais ; tu peux installer la voix dans les réglages du système.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Voix coupée — tu recevras toujours vibration et notifications.",
+"🔊 Voz ligada.":"🔊 Voix activée.",
+"a {d} km da rota — a recalcular":"à {d} km de l'itinéraire — recalcul",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Zone de danger dans {x}. Attention à ta vitesse.",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 Tu ne connais pas le nom du lieu ? Appuie longuement sur un point de la carte (ou clic droit sur ordinateur) et je t'y emmène.",
+"Rota para {p}":"Itinéraire vers {p}",
+"Esta sessão: {p} pedidos em {m} min · {c} poupados pela cache · {k} créditos":"Cette session : {p} requêtes en {m} min · {c} économisées par le cache · {k} crédits",
+"Unidades alteradas para {u}.":"Unités changées en {u}.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Carte du trajet enregistrée ({n} tuiles) — fonctionne même sans internet.",
+"offline":"hors ligne",
+"Unidades":"Unités",
+"Avisos de radar":"Alertes radar",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Planifier manuellement (arrêts, heure de départ)",
+"~{n} km 🌧️":"~{n} km 🌧️",
+"Língua do telemóvel":"Langue du téléphone",
+"Instalar como app":"Installer comme app",
+"Viagens planeadas":"Trajets prévus",
+"Alternar tema claro/escuro":"Basculer thème clair/sombre",
+"Alternar tema":"Basculer le thème",
+"Definições":"Réglages",
+"Secções":"Sections",
+"Pesquisar localização":"Rechercher un lieu",
+"Usar a minha localização":"Utiliser ma position",
+"Fechar":"Fermer",
+"Para onde vais?":"Où vas-tu ?",
+"Trocar origem e destino":"Inverser départ et destination",
+"Paragens intermédias":"Arrêts intermédiaires",
+"Quanto tempo ficas em cada paragem":"Combien de temps tu restes à chaque arrêt",
+"Partir ou chegar a uma hora":"Partir ou arriver à une heure",
+"Quanto tempo contas ficar no destino":"Combien de temps tu comptes rester à destination",
+"Tempo no destino":"Temps à destination",
+"Usar GPS como origem":"Utiliser le GPS comme départ",
+"Silenciar/ligar a voz":"Couper/activer la voix",
+"Silenciar ou ligar a voz":"Couper ou activer la voix",
 "Estado da ligação":"État de la connexion","Só serviços que já tentei contactar nesta sessão.":"Uniquement les services que j'ai réellement essayé de joindre cette session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Aucun résultat pour cette recherche — vérifie l'orthographe ou essaie un autre nom.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Aucun résultat pour « {q} » — vérifie l'orthographe ou essaie un autre nom.",
@@ -2857,7 +3379,11 @@ async function jfetch(url, timeout=14000, origem=null){
        Ricardo pediu às 01:14, e serve a família inteira destas avarias.
        O texto e a decisão de mostrar são AGORA do pintor, a partir do
        registo por host: aqui só se conta o que aconteceu. */
-    marcarRede(url,false);
+    /* dd-131 §3.3: o TIPO importa mais do que o facto. «HTTP 503» é o
+       serviço em baixo; «sem resposta» é a rede do aparelho ou o runtime
+       preso; «demorou de mais» é o meio-termo. Uma captura deste painel
+       responde em 5 segundos a uma pergunta que custou uma noite. */
+    marcarRede(url,false,tipoDeFalha(e));
     throw e;
   }finally{ clearTimeout(th); }
 }
@@ -2968,12 +3494,23 @@ const ROTULO_FAM={ meteo:"O serviço meteorológico", pesquisa:"O serviço de pe
   moradas:"O serviço de moradas", rota:"O serviço de rotas", radares:"O serviço de radares",
   outro:"Um serviço externo" };
 function familiaDe(host){ for(const [re,fam] of FAMILIAS) if(re.test(host)) return fam; return "outro"; }
-function marcarRede(url,viva){
+/* dd-131 §3.3: três famílias de falha, e são três avarias diferentes.
+   O `AbortError` do nosso próprio relógio é «demorou de mais»; um
+   `TypeError` do fetch é o pedido que NEM SAIU (DNS morto, rede do
+   aparelho em baixo, runtime encalhado — a assinatura dos 52 minutos); e
+   `HTTP nnn` é o serviço a responder que não pode. */
+function tipoDeFalha(e){
+  const m=String(e&&e.message||e||"");
+  if(/^HTTP /.test(m)) return m;
+  if(e&&e.name==="AbortError") return "demorou de mais";
+  return "sem resposta";
+}
+function marcarRede(url,viva,tipo){
   let host=null; try{ host=new URL(url,location.href).host; }catch(_e){ return; }
   if(!host) return;
   const s=(state.saude??={});
-  const a=s[host]||(s[host]={fam:familiaDe(host), falhas:0, quando:0});
-  if(viva) a.falhas=0; else a.falhas++;
+  const a=s[host]||(s[host]={fam:familiaDe(host), falhas:0, quando:0, tipo:null});
+  if(viva){ a.falhas=0; a.tipo=null; } else { a.falhas++; a.tipo=tipo||"sem resposta"; }
   a.quando=Date.now();
   pintarSaudeRede();
 }
@@ -3011,7 +3548,62 @@ function pintarSaudeRede(){
   }
   pintarPainelRede();
 }
+/* ══ PROVAS DE VIDA NO ARRANQUE (dd-156 §1.2) ══════════════════════════════
+   Registo declarativo das peças que a app USA HOJE, verificado no arranque
+   nas DUAS direções: uma peça EXIGIDA que falte é defeito, e uma peça
+   PROIBIDA que exista também é.
+
+   O `L` do Leaflet é o caso que fez nascer isto. A guarda do motor perguntava
+   por ele; o motor mudou; a pergunta deixou de ter sentido e ficou VERDE em
+   toda a bateria durante semanas. Uma régua que só sabe perguntar pelo que já
+   não existe não é uma régua. Aqui a app apanha-se a si própria: se o Leaflet
+   voltar a entrar pela porta das traseiras, esta linha acende.
+
+   NÃO ENVIA NADA PARA LADO NENHUM. É leitura do próprio arranque, dentro do
+   aparelho, e alimenta o painel «Estado da app». Sem servidor, sem telemetria,
+   sem recolha — a promessa da ficha da loja mantém-se inteira.                */
+const PECAS=[
+  {id:"maplibregl", porque:"o motor do mapa",        exige:()=>typeof maplibregl!=="undefined"&&typeof maplibregl.Map==="function"},
+  {id:"Mapa",       porque:"a porta única do mapa",  exige:()=>typeof Mapa==="object"&&typeof Mapa.criar==="function"},
+  {id:"i18n",       porque:"a tradução",             exige:()=>typeof t==="function"&&typeof I18N==="object"},
+  {id:"store",      porque:"as tuas preferências",   exige:()=>typeof store==="object"&&typeof store.get==="function"},
+  {id:"fetch",      porque:"falar com os serviços",  exige:()=>typeof fetch==="function"},
+  {id:"Leaflet",    porque:"Leaflet, que saiu no A2.2", proibe:()=>typeof L!=="undefined"},
+];
+function provasDeVida(){
+  const r=PECAS.map(p=>{
+    let estado,bom;
+    try{
+      if(p.proibe){ const ha=!!p.proibe(); estado=ha?"a mais":"fora"; bom=!ha; }
+      else { const ha=!!p.exige(); estado=ha?"presente":"em falta"; bom=ha; }
+    }catch(e){ estado=p.proibe?"fora":"em falta"; bom=!p.proibe; }
+    return {id:p.id,porque:p.porque,estado,bom};
+  });
+  state.pecas=r;
+  /* a bancada lê isto; a app não o envia a lado nenhum */
+  try{ window.__pecas=r; document.documentElement.setAttribute("data-pecas",r.every(x=>x.bom)?"ok":"defeito"); }catch(e){}
+  return r;
+}
+function pintarPecas(){
+  const c=$("#saude-pecas"); if(!c) return;
+  c.textContent="";
+  for(const p of state.pecas||[]){
+    const linha=el("div","saude-linha");
+    linha.setAttribute("data-test","peca-linha");
+    linha.setAttribute("data-peca",p.id);
+    linha.setAttribute("data-ok",p.bom?"sim":"nao");
+    linha.appendChild(el("span","saude-ponto"+(p.bom?" bom":" mau"),"●"));
+    linha.appendChild(el("span","saude-host",p.id));
+    const dito=p.estado==="presente"?t("presente")
+              :p.estado==="em falta"?t("em falta")
+              :p.estado==="a mais"?t("a mais — não devia estar aqui")
+              :t("fora, como deve ser");
+    linha.appendChild(el("span","saude-estado small muted",t(p.porque)+" · "+dito));
+    c.appendChild(linha);
+  }
+}
 function pintarPainelRede(){
+  pintarPecas();
   const c=$("#saude-rede"); if(!c) return;
   c.textContent="";
   const s=state.saude||{}; const hosts=Object.keys(s).sort();
@@ -3028,8 +3620,13 @@ function pintarPainelRede(){
     const bom=a.falhas===0;
     linha.appendChild(el("span","saude-ponto"+(bom?" bom":" mau"),"●"));
     linha.appendChild(el("span","saude-host",h));
+    /* dd-131 §3.3: o painel diz O QUE correu mal, não só que correu mal.
+       `HTTP 503` não se traduz — é um código, e um código traduzido deixa
+       de servir para procurar. */
+    const dito=bom?t("respondeu"):(/^HTTP /.test(a.tipo||"")?a.tipo:t(a.tipo||"sem resposta"));
     linha.appendChild(el("span","saude-estado small muted",
-      (bom?t("respondeu"):t("sem resposta"))+(quando?" · "+quando:"")));
+      dito+(quando?" · "+quando:"")));
+    linha.setAttribute("data-tipo",bom?"":(a.tipo||"sem resposta"));
     c.appendChild(linha);
   }
 }
@@ -4511,6 +5108,17 @@ function gearAdvice(hs){ // hs: métricas das próximas ~n horas
 /* =====================================================================
    AUTOCOMPLETE (Nominatim)
    ===================================================================== */
+/* A PORTA ÚNICA DA ATRIBUIÇÃO DE UM RESULTADO (dd-102 §2.11).
+   `atrib` chega em duas formas — string (a licença do Nominatim) ou objeto
+   (o datasource do Geoapify). A normalização vivia dentro do desenho da
+   lista, e por isso a lista fazia bem e mais ninguém: o resumo copiado
+   redistribuía os mesmos nomes de sítios sem levar a atribuição consigo.
+   É a família «segunda mão na mesma superfície» ao contrário — uma só mão a
+   saber a regra. Quem não traz atribuição continua a não inventar nenhuma. */
+function atribDoItem(it){
+  const a=it&&it.atrib;
+  return (typeof a==="string"?a:(a&&a.attribution))||null;
+}
 function attachAC(input, list, onPick){
   let items=[], active=-1;
   const close=()=>{ list.classList.remove("open"); list.textContent=""; active=-1; };
@@ -4554,8 +5162,7 @@ function attachAC(input, list, onPick){
        carregam; itens sem atrib (photon, coordenadas à mão) não inventam
        linha nenhuma. atrib é string (licence nominatim) ou objeto
        (datasource geoapify) — normaliza-se aqui, num sítio só. */
-    const atribs=[...new Set(items.map(it=>{const a=it.atrib;
-      return typeof a==="string"?a:a?.attribution;}).filter(Boolean))];
+    const atribs=[...new Set(items.map(atribDoItem).filter(Boolean))];
     if(atribs.length) list.appendChild(el("div","ac-atrib",atribs.join(" · ")));
     list.classList.add("open");
   };
@@ -4564,7 +5171,18 @@ function attachAC(input, list, onPick){
     input._picked=it; input._doFoco=false; addRecente(it); close(); onPick&&onPick(it); };
   const search=debounce(async ()=>{
     const q=input.value.trim();
-    if(q.length<3){ close(); return; }
+    /* DEFEITO APANHADO EM 04/08 (bloco 3): este `close()` apagava, 350 ms
+       depois, os sítios do PRÓPRIO DONO. O ouvinte do `input` mostra a camada
+       local aos 2 caracteres — a casa e os favoritos, de graça e sem rede — e
+       este temporizador vinha atrás fechar a lista, porque 2 < 3. Escrever
+       «Ca» fazia «Casa da Ana» aparecer e desaparecer sozinha.
+       O limiar dos 3 caracteres é da REDE, não do ecrã: abaixo dele não se
+       paga um pedido, mas o que já é nosso continua à vista. */
+    if(q.length<3){
+      const meus=q.length>=2?locaisLocais(q):[];
+      if(meus.length){ items=meus; active=0; render(); } else close();
+      return;
+    }
     try{ const r=await geocode(q); if(input.value.trim()!==q) return; items=r; active=items.length?0:-1; render(); }
     catch(e){ if(input.value.trim()!==q) return; items=[]; active=-1;
       /* rasto (7g-ter): a diferença entre «não há» e «não consegui perguntar»
@@ -7121,7 +7739,13 @@ function renderRouteSummary(){
          afirmação sem a reserva */
       ...(completo?[]:[`⚠️ ${t("Faltam dados em parte do caminho — confirma antes de sair.")}`]),
       ...currentStretches().map(st=>`• km ${rnd(st.k0)}–${rnd(st.k1)} (~${fmtHM(st.t0)}): ${rainLabel(st.lvl)}${st.place?` — perto de ${st.place}`:""}`),
-      `via Levante — dados Open-Meteo/OSM`];
+      /* dd-102 §2.11: a atribuição REDISTRIBUI-SE ONDE OS DADOS SE MOSTRAM —
+         e um resumo colado numa conversa é onde eles se mostram. O tempo é do
+         Open-Meteo; a rota vem do OSRM, que é OSM; os NOMES da origem, do
+         destino e das paragens vêm do fornecedor de pesquisa e trazem a
+         licença colada. Faltava aqui, e é redistribuição a sério. */
+      `via Levante — dados ${[...new Set(["Open-Meteo","OSM",
+        ...[R.o,R.d,...(R.stops||[])].map(atribDoItem).filter(Boolean)])].join(" · ")}`];
     (navigator.clipboard?.writeText(lines.join("\n"))||Promise.reject())
       .then(()=>toast(t("Resumo copiado! 📋"))).catch(()=>toast(t("Cópia automática indisponível — seleciona e copia à mão.")));
   });
@@ -8994,7 +9618,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-03-2107-fcd76e";
+const BUILD="2026-08-04-2106-293338";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -10350,10 +10974,12 @@ function renderInstalacao(){
 }
 
 function init(){
+  provasDeVida();          // dd-156 §1.2 — a app apanha-se a si própria
   // idioma + estáticos
   document.documentElement.lang=state.lang;
   applyStaticI18n();
-  $$("#lang-row .chip").forEach(c=>{ c.classList.toggle("sel",c.dataset.lang===state.lang);
+  $$("#lang-row .chip").forEach(c=>{ const esc=store.get("lang");
+    c.classList.toggle("sel",esc==="auto"?c.dataset.lang==="auto":c.dataset.lang===state.lang);
     c.addEventListener("click",()=>setLang(c.dataset.lang)); });
   // unidades: métrico, imperial ou o híbrido britânico (milhas com Celsius)
   state.units=store.get("units")||detectUnits();
