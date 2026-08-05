@@ -196,6 +196,9 @@ a{color:var(--accent)}
 .saude-ponto.bom{color:var(--good)}
 .saude-ponto.mau{color:var(--serious)}
 .saude-host{font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saude-tec{flex:none;opacity:.55;font-size:10.5px}
+#saude-resumo{font-size:13.5px;margin:2px 0 0}
+#saude-resumo[data-ok="nao"]{color:var(--serious)}
 .saude-estado{margin-left:auto;flex:none}
 /* ================= BUTTONS / CHIPS ================= */
 .btn{padding:10px 16px;border-radius:13px;border:1px solid var(--border);background:var(--surface2);
@@ -381,6 +384,7 @@ input.sw{appearance:none;-webkit-appearance:none;margin:0}
 .foco-rota{width:100%;justify-content:center;font-size:15px;padding:12px 14px;margin-top:2px}
 .chuva-janela{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.35}
 .ac-ref{font-size:11px;color:var(--muted);padding:5px 12px 3px;border-bottom:1px solid var(--border)}
+.ac-aviso{font-size:11.5px;line-height:1.35;padding:6px 12px;background:var(--warn-soft);border-bottom:1px solid var(--border);color:var(--ink2)}
 .loc-estado{margin:6px 2px 0}
 .loc-estado:empty{display:none}
 .loc-estado .banner{margin:6px 0 4px}
@@ -985,9 +989,19 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
              dito o host culpado em 5 segundos, em vez de nos deixar a
              adivinhar entre «a internet» e «a Geoapify». -->
         <h3 style="margin-top:14px">📡 <span id="rede-title">Estado da app</span></h3>
-        <div id="saude-pecas" data-test="saude-pecas"></div>
-        <div id="saude-rede" data-test="saude-rede"></div>
-        <p class="small muted" id="rede-nota" style="margin:6px 0 0">Só serviços que já tentei contactar nesta sessão.</p>
+        <!-- dd-173 §5: TRÊS CAMADAS. À superfície fica UMA linha em linguagem
+             de gente. O painel completo é diagnóstico e vive escondido atrás
+             de cinco toques no carimbo da versão — ninguém lá chega por
+             acaso, e qualquer pessoa lá chega se lhe dissermos como. -->
+        <p id="saude-resumo" data-test="saude-resumo" style="margin:2px 0 0"></p>
+        <div id="saude-fundo" hidden>
+          <p class="small muted" id="saude-porque" style="margin:8px 0 6px"></p>
+          <div id="saude-pecas" data-test="saude-pecas"></div>
+          <div id="saude-rede" data-test="saude-rede"></div>
+          <p class="small muted" id="rede-nota" style="margin:6px 0 0">Só serviços que já tentei contactar nesta sessão.</p>
+          <p class="small muted" id="diag-inclui" style="margin:8px 0 4px"></p>
+          <button class="btn" id="btn-diag" style="width:100%;justify-content:center"></button>
+        </div>
         <h3 style="margin-top:14px">📸 <span id="cam-title">Avisos de radar</span></h3>
         <p class="small muted" id="cam-law-txt" style="margin:0 0 8px"></p>
         <div id="cam-law-why" class="small muted" hidden style="margin:-4px 0 8px"></div>
@@ -1005,6 +1019,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
           <button class="chip click" data-lang="en">EN</button>
           <button class="chip click" data-lang="es">ES</button>
           <button class="chip click" data-lang="fr">FR</button>
+          <button class="chip click" data-lang="nl">NL</button>
           <button class="chip click" data-lang="auto" id="lang-auto">Língua do telemóvel</button>
         </div>
         <!-- O estado da voz vive AQUI, e não só num toast de 8 segundos. Um
@@ -1342,11 +1357,33 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 const DEFAULT_LOC = { name:"Lisboa", sub:"Portugal", lat:38.7223, lon:-9.1393 };
 const AUTO_GPS = true;               // pedir GPS ao abrir
 const ROTULO_PERFIL={conservador:"conservador", equilibrado:"equilibrado", tolerante:"tolerante"};
+/* ═══ O CALOR (dd-178) ═══════════════════════════════════════════════════
+   `tCalor` é o único botão de calor do perfil, e governa apenas QUANDO se
+   avisa. O CHÃO — o vermelho — está fora do perfil de propósito: a decisão
+   do dono, à letra, é «a temperatura é igual para todos». O perfil governa
+   quando se avisa, nunca quando se proíbe. */
 const PROFILES = {
-  conservador:{ wet:1.35, wind:1.20, tGood:80, tWarn:55, ppRisk:35 },
-  equilibrado:{ wet:1.00, wind:1.00, tGood:70, tWarn:45, ppRisk:45 },
-  tolerante:  { wet:0.70, wind:0.85, tGood:58, tWarn:32, ppRisk:60 },
+  conservador:{ wet:1.35, wind:1.20, tGood:80, tWarn:55, ppRisk:35, tCalor:30 },
+  equilibrado:{ wet:1.00, wind:1.00, tGood:70, tWarn:45, ppRisk:45, tCalor:32 },
+  tolerante:  { wet:0.70, wind:0.85, tGood:58, tWarn:32, ppRisk:60, tCalor:34 },
 };
+/* Sensação a partir da qual NENHUM perfil dá luz verde. 42 °C é o início da
+   banda «Perigo» da tabela oficial de índice de calor (NOAA/NWS): cãibras e
+   exaustão prováveis, golpe de calor provável com exposição continuada. O
+   número tem fonte e não foi escolhido à mão — a lei dos limiares (§10.7)
+   fica cumprida. Não obedece ao perfil e não tem interruptor. */
+const CALOR_VERMELHO = 42;
+/* Teto de pontos amostrados na rota principal (dd-179 M4). O porquê deste
+   número, com a medição toda, está ao lado da fórmula do K no buildVariant —
+   aqui só vive a constante, para a guarda lhe poder tocar. */
+const TETO_AMOSTRAS = 80;
+/* Bolbo húmido a partir do qual o calor é do tipo que a evaporação já não
+   resolve — é a régua fisiológica por trás do WBGT, e vem servida pela
+   Open-Meteo na MESMA chamada (zero pedidos novos, medido em 105 768/105 768
+   horas). Serve só para NOMEAR o tipo de calor, nunca para mudar o nível:
+   quem decide o nível é a sensação, e um segundo número a decidir o mesmo
+   seria a doença das sete réguas da chuva (dd-61 a) outra vez. */
+const BOLBO_ABAFADO = 28;
 const state = {
   profile:"equilibrado",
   theme:"dark",
@@ -1377,10 +1414,37 @@ const LS_PREFIX="levante-", LS_ANTIGO="vdm-";
     localStorage.setItem(LS_PREFIX+"migrado","1");
   }catch(e){ /* modo privado ou storage cheio: segue sem migrar */ }
 })();
+/* ═══ QUEIXAR — a família F2 (catch mudo) onde ela esconde uma PROMESSA ═════
+   dd-177 Bloco 7 · dd-178 §5. O varrimento contava 97 catches mudos; a
+   maioria é legítima (deteção de funcionalidade: «tens `vibrate`? não? segue»).
+   Mas MEDIDOS, catorze deles engoliam a falha de uma promessa feita ao
+   utilizador — e dois são o pior tipo:
+
+     · `store.set` — se o armazenamento estiver cheio ou bloqueado (modo
+       privado), TODAS as gravações da app falham em silêncio. A pessoa guarda
+       a casa, um favorito, uma viagem; a app diz «Guardado ⭐» e não guardou
+       nada. Não há sintoma até ao próximo arranque, quando tudo desapareceu.
+     · `LN.schedule` — a Sentinela promete avisar e os avisos nunca chegam a
+       ser agendados.
+
+   Isto não é uma funcionalidade nova: é a mesma forma do `degradarPesquisa`
+   (dd-168) — um registo interno e uma queixa honesta na consola. O que muda é
+   que a falha deixa de ser invisível a quem for procurar.
+
+   NÃO se põe nada no ecrã por agora: um aviso de armazenamento cheio a meio
+   de uma condução é ruído, e a decisão do que mostrar é do Ricardo. O que se
+   fecha aqui é o silêncio ABSOLUTO — hoje nem o programador o via. */
+const QUEIXAS={};
+function queixar(area, e){
+  try{
+    QUEIXAS[area]=(QUEIXAS[area]||0)+1;
+    if(QUEIXAS[area]===1) console.warn(`[levante] ${area} falhou e a app seguiu sem isso: ${e&&e.message||e}`);
+  }catch(_e){}
+}
 const store={
   get(k){ try{ return JSON.parse(localStorage.getItem(LS_PREFIX+k)); }catch(e){ return null; } },
-  set(k,v){ try{ localStorage.setItem(LS_PREFIX+k, JSON.stringify(v)); }catch(e){} },
-  del(k){ try{ localStorage.removeItem(LS_PREFIX+k); }catch(e){} },
+  set(k,v){ try{ localStorage.setItem(LS_PREFIX+k, JSON.stringify(v)); }catch(e){ queixar("gravar no aparelho",e); } },
+  del(k){ try{ localStorage.removeItem(LS_PREFIX+k); }catch(e){ queixar("apagar do aparelho",e); } },
 };
 
 /* ═══ PONTE DE MUDANÇA DE CASA (dd-98/99 · rel-72 §3 · dd-104 §1) ═══════════
@@ -1402,8 +1466,30 @@ const store={
      está nela não viaja, em nenhum dos sentidos. */
 const PONTE={casaNova:"https://getlevante.com",
   casaVelha:"ricardoalexcamposacc-art.github.io",
-  chaves:["home","favs","recentes","trips","historico","profile","lang","units",
+  chaves:["home","casa","favs","recentes","trips","historico","profile","lang","units",
           "theme","som","muted","sentinel","cc","cam-de","guarda","geoapify-key",
+          /* ═══ dd-184: A PONTE LEVAVA A CHAVE MORTA E DEIXAVA A VIVA ═══════
+             O `cam-de` acima é a chave ANTIGA do interruptor dos radares na
+             Alemanha. A chave que a app grava HOJE é `cam-restrito`
+             (`const CAM_OPT="cam-restrito"`), e não estava aqui. Medido ponta
+             a ponta: com o interruptor ligado, a carga da ponte levava dez
+             chaves e **o interruptor não era uma delas**.
+
+             ⚠️ É O PIOR TIPO DE PERDA que esta lista pode ter. Não é um dado
+             — é uma **decisão informada sobre uma lei**. A pessoa leu que na
+             Alemanha é o condutor que é penalizado por usar avisos de radar
+             em andamento, e decidiu. Perder isso não é perder um favorito:
+             é a app a **voltar a decidir por ela o que ela já tinha
+             decidido**, e a decidir para o lado desligado, em silêncio.
+
+             E o varredor F9 dizia ZERO: a chave é passada pela VARIÁVEL
+             `CAM_OPT` e ele só via literais. A régua e o defeito tinham o
+             mesmo ponto cego (§10.18, outra vez). Curado no mesmo bloco. */
+          "cam-restrito",
+          /* dd-170 §4: a `casa` nasceu neste turno e o varredor de famílias
+             apanhou-a a ficar para trás no MESMO minuto em que nasceu — a
+             mesma família das rotas guardadas, apanhada antes de custar
+             alguma coisa a alguém. É para isto que a régua existe. */
           /* dd-156 §1.3: as ROTAS GUARDADAS estavam de fora. Até 12 rotas com o
              nome que o dono lhes deu — dados dele, não estado da app — e o
              cutover para getlevante.com deitava-as fora sem avisar. Encontrado
@@ -1421,6 +1507,12 @@ const PONTE_NAO_VIAJA={
   "pin-tip":"dica do pino no mapa, idem",
   "loc-desfecho":"desfecho da última tentativa de localização: diagnóstico do momento",
   "mapa-parcial":"estado de desenho do mapa, recalculado em cada arranque",
+  /* dd-184: apanhado pelo F9 no MESMO minuto em que ele aprendeu a ver chaves
+     passadas por variável. É cache de moradas e nomes de sítios já procurados
+     — poupa pedidos ao Geoapify, não é escolha nem dado do dono. Reconstrói-se
+     sozinha à primeira pesquisa na casa nova, e levá-la seria arrastar cache
+     de uma origem para outra sem ninguém a pedir. */
+  "cache-texto":"cache de pesquisas já feitas: poupa pedidos, não é escolha nem dado — reconstrói-se sozinha",
 };
 function pontePayload(){
   const dados={};
@@ -1464,8 +1556,8 @@ if(_ponte&&_ponte.veio.length){
 /* =====================================================================
    IDIOMAS — PT (base), EN, ES, FR · escolha do utilizador + deteção
    ===================================================================== */
-const LOCALES={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR"};
-const SPEECH_LANGS={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR"};
+const LOCALES={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR", nl:"nl-NL"};
+const SPEECH_LANGS={pt:"pt-PT", en:"en-GB", es:"es-ES", fr:"fr-FR", nl:"nl-NL"};
 /* ═══ dd-147: A LÍNGUA DE ORIGEM DO CÓDIGO NÃO É A LÍNGUA DE RECURSO ═══
    O PT é a fonte do `t()` — e isso é certo para quem escreve. Mas o recurso
    de EXIBIÇÃO tem de ser o EN: só vê português quem pede português.
@@ -1490,23 +1582,58 @@ function t(s,vars){
   if(vars) for(const k in vars) out=out.split("{"+k+"}").join(vars[k]);
   return typeof uconv==="function"?uconv(out):out;
 }
+/* ═══ dd-173 §2 — A ESCOLHA DE LÍNGUA NÃO FICAVA GUARDADA ═════════════════
+   MEDIDO a 04/08: em «Língua do telemóvel», escolher EN mudava o ecrã para
+   inglês e **não escrevia nada no armazenamento**. Consequências, as duas
+   visíveis: o destaque continuava na «Língua do telemóvel», e à abertura
+   seguinte o aparelho mandava outra vez — a escolha evaporava-se.
+
+   A causa era uma linha no `setLangReal`, que decidia por adivinhação a
+   partir do armazenamento em vez de obedecer a quem a chamou.
+   Ela existia por boa razão — impedir que a resolução interna do modo
+   automático («auto» → «pt») apagasse o marcador «auto». Mas o
+   `setLangReal` **não tem como saber quem o chamou**: adivinhava a intenção
+   a partir do próprio armazenamento, que é o sítio onde a intenção ainda
+   não está escrita. Uma decisão que pertence a quem chama, tomada por quem
+   é chamado — e por isso tomada mal.
+
+   Cura: **quem chama DECLARA o que se guarda.** O modo automático guarda
+   «auto»; uma escolha explícita guarda a língua. Nenhum dos dois adivinha. */
+/* ═══ dd-173 §2 — UM PINTOR PARA A FILA DAS LÍNGUAS ══════════════════════
+   Havia duas mãos a pintar `#lang-row` (o arranque e o `setLangReal`), com o
+   mesmo código copiado — a família «segunda mão na mesma superfície». Passa
+   a haver uma.
+   E o chip do modo automático DIZ QUAL RESOLVEU: «Língua do telemóvel (PT)».
+   Sem isso, o modo automático é o único estado da app que não deixa ver o
+   que decidiu — e o utilizador não tem como saber se o aparelho foi
+   entendido. */
+function pintarFilaLinguas(){
+  const esc=store.get("lang");
+  const auto=esc==="auto";
+  $$("#lang-row .chip").forEach(c=>{
+    const cl=c.dataset.lang;
+    c.classList.toggle("sel", auto?cl==="auto":cl===state.lang);
+    if(cl==="auto")
+      c.textContent=t("Língua do telemóvel")+(auto?` (${String(state.lang||"").toUpperCase()})`:"");
+  });
+}
 function setLang(l){
   /* dd-147 §3.3: «língua do telemóvel» é uma escolha como as outras — e a
      única que continua a obedecer ao aparelho depois de guardada. */
-  if(l==="auto"){ store.set("lang","auto"); const d=linguaDoAparelho()||"en"; if(d!==state.lang) return setLangReal(d); l=d; }
-  return setLangReal(l);
+  if(l==="auto"){ const d=linguaDoAparelho()||"en"; return setLangReal(d,{escolha:"auto"}); }
+  return setLangReal(l,{escolha:l});
 }
-function setLangReal(l){
+function setLangReal(l,{escolha}={}){
   if(!LOCALES[l]) return;
   voz.avisado=false;                 // idioma novo, aviso novo se faltar voz
   if(typeof vozEscolher==="function"){ state.lang=l; vozEscolher(); }
   state.lang=l;
-  if(store.get("lang")!=="auto") store.set("lang",l);
+  /* dd-173 §2: guarda-se o que o CHAMADOR declarou. Sem declaração (chamadas
+     internas de repintura) não se escreve nada — nunca se adivinha. */
+  if(escolha!==undefined) store.set("lang",escolha);
   document.documentElement.lang=l;
   applyStaticI18n();
-  { const esc=store.get("lang");
-    $$("#lang-row .chip").forEach(c=>c.classList.toggle("sel",
-      esc==="auto"?c.dataset.lang==="auto":c.dataset.lang===l)); }
+  pintarFilaLinguas();
   if(state.wx) renderDashboard();
   if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); }
   renderFavRow();
@@ -1524,6 +1651,10 @@ function setLangReal(l){
   if(typeof pintarSitiosLinha==="function") pintarSitiosLinha();
   if(typeof renderSitios==="function"&&$("#sitios-drawer")?.classList.contains("open")) renderSitios();
   if(typeof pintarSom==="function") pintarSom();
+  /* dd-173 §3: estes dois nasciam em português e nunca eram repintados — a
+     auditoria de chaves contava-os como traduzidos porque a chave existe. */
+  if(typeof pintarGuarda==="function") pintarGuarda();
+  if(typeof pintarVersaoLinha==="function") pintarVersaoLinha();
   if(typeof renderBoasVindas==="function") renderBoasVindas();
   if(typeof repintarSentinelaComo==="function") repintarSentinelaComo();
   /* o painel de condução é tinta viva: em viagem, repinta na troca de língua
@@ -1593,7 +1724,7 @@ function applyStaticI18n(){
     ["#btn-mais-op","txt","⚙️ Mais opções (paragens, hora de partida, estadia)"],
     ["#rt-mais .small.muted","txt","Hora de partida vazia = partes agora."],
     ["#lang-title","txt","Idioma"],
-    ["#lang-auto","txt","Língua do telemóvel"],
+
     ["#rede-title","txt","Estado da app"],
     ["#rede-nota","txt","Só serviços que já tentei contactar nesta sessão."],
     ["#btn-ver-mapa","txt","Ver o mapa"],
@@ -1607,6 +1738,7 @@ function applyStaticI18n(){
     else if(kind==="ph") n.placeholder=t(a);
     else if(kind==="aria") n.setAttribute("aria-label",t(a));
   }
+  if(typeof pintarFilaLinguas==="function") pintarFilaLinguas();  // dd-173 §2: um pintor só
   const planTitle=$$("#view-rota .card h2")[1];
   if(planTitle) planTitle.textContent=t("Planear trajeto");
   const planSub=$$("#view-rota .card .h-sub")[1];
@@ -1810,6 +1942,13 @@ en:{
 "Calor extremo (sensação {t}°)":"Extreme heat (feels like {t}°)",
 "Muito calor (sensação {t}°)":"Very hot (feels like {t}°)",
 "Risco de gelo em zonas de sombra e pontes":"Risk of ice in shaded areas and on bridges",
+"Calor perigoso (sensação {t}°) — risco de golpe de calor":"Dangerous heat (feels {t}°) — risk of heat stroke",
+"Calor perigoso e abafado (sensação {t}°) — o suor já não arrefece":"Dangerous, muggy heat (feels {t}°) — sweat no longer cools you",
+"Sensação de {t}° — bebe e para mais vezes":"Feels like {t}° — drink up and stop more often",
+"Sensação de {t}°, abafado — bebe e para mais vezes":"Feels like {t}°, muggy — drink up and stop more often",
+"Sensação de {c}° e ar abafado no ponto mais quente do trajeto — o suor deixa de arrefecer e o golpe de calor instala-se sem aviso. Não é dia de fazer este percurso de mota.":"Feels like {c}° with muggy air at the hottest point of the route — sweat stops cooling you and heat stroke sets in without warning. Not a day to ride this one.",
+"Sensação de {c}° no ponto mais quente do trajeto — cãibras e exaustão são prováveis, e o golpe de calor também se a exposição continuar. Não é dia de fazer este percurso de mota.":"Feels like {c}° at the hottest point of the route — cramps and exhaustion are likely, and heat stroke too if exposure continues. Not a day to ride this one.",
+"Sensação de {c}° no ponto mais quente do trajeto — bebe antes de sair, pára mais vezes e usa equipamento ventilado. A sensação é medida à sombra: ao sol e de equipamento fechado é mais.":"Feels like {c}° at the hottest point of the route — drink before you go, stop more often and wear vented gear. That figure is measured in the shade: in direct sun and closed gear it is higher.",
 "Visibilidade reduzida ({v})":"Reduced visibility ({v})",
 "Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"First rain after {n} dry days: the oil built up in the tarmac lifts and the road turns to soap for the first half hour. Brake early and gently, avoid road markings and manhole covers.",
 "📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 No internet — the saved map and route keep working. GPS needs no network.",
@@ -1923,6 +2062,27 @@ en:{
 "Silenciar ou ligar a voz":"Mute or unmute the voice",
 "Estado da ligação":"Connection status","Só serviços que já tentei contactar nesta sessão.":"Only services I've actually tried to reach this session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"No results for this search — check the spelling or try another name.",
+"Motor do mapa":"Map engine",
+"Porta do mapa":"Map door",
+"Tradução":"Translation",
+"Preferências":"Preferences",
+"Ligação aos serviços":"Connection to services",
+"Motor antigo (tem de estar fora)":"Old engine (must be gone)",
+"⚠️ Falta uma peça da app — recarrega. Se continuar, copia o relatório de diagnóstico.":"⚠️ A part of the app is missing — reload. If it persists, copy the diagnostic report.",
+"✅ Tudo a funcionar.":"✅ Everything working.",
+"⚠️ Vários serviços não respondem — pode ser a ligação do telemóvel. O que já tens continua a funcionar.":"⚠️ Several services aren't answering — it may be your phone's connection. What you already have keeps working.",
+"⚠️ {s} não responde — o resto da app funciona.":"⚠️ {s} isn't answering — the rest of the app works.",
+"Mais {n} para abrir o diagnóstico":"{n} more to open diagnostics",
+"Isto é o painel de diagnóstico. Serve para perceber uma avaria — não precisas dele para usar a app.":"This is the diagnostics panel. It's for understanding a fault — you don't need it to use the app.",
+"O relatório inclui: versão, línguas, peças da app, e que serviços responderam ou falharam, com há quanto tempo. NÃO inclui a tua posição, moradas nem nomes de sítios teus. Nada é enviado — copias e colas onde quiseres.":"The report includes: version, languages, app parts, and which services answered or failed, and how long ago. It does NOT include your position, addresses or names of your saved places. Nothing is sent — you copy and paste it wherever you want.",
+"Copiar relatório de diagnóstico":"Copy diagnostic report",
+"Relatório copiado! 📋":"Report copied! 📋",
+"a minha posição":"my position",
+"ainda não a pedi nesta sessão":"haven't asked for it this session",
+"±{m} m":"±{m} m",
+"margem desconhecida":"accuracy unknown",
+"morada só ao nível da rua ou da cidade":"address only down to street or city",
+"A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"The main search service didn't answer ({m}) — these results come from the backup source.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.",
 "Recarregar a app":"Reload the app",
 "Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"I can't reach the internet — weather and search are offline. Check the device's network, or reload the app.",
@@ -2099,7 +2259,7 @@ en:{
 "índice moto":"moto index","Remover paragem":"Remove stop","A opção mais seca":"The driest option",
 "Sentinela: ligada":"Sentinel: on","Sentinela: desligada":"Sentinel: off",
 
-"Sem chuva prevista até às {h}":"No rain expected until {h}","Sem chuva até às {h}":"No rain until {h}","chuva das {a} às {b}":"rain from {a} to {b}","chuva forte das {a} às {b}":"heavy rain from {a} to {b}","chuva possível das {a} às {b}":"possible rain from {a} to {b}","limpa depois das {h}":"clearing after {h}","sem dados de parte das horas":"data missing for some hours","Sem dados suficientes para prever as janelas de chuva de hoje.":"Not enough data to predict today's rain windows.",
+"Sem chuva prevista até às {h}":"No rain expected until {h}","{h} de amanhã":"{h} tomorrow","Sem chuva até às {h}":"No rain until {h}","chuva das {a} às {b}":"rain from {a} to {b}","chuva forte das {a} às {b}":"heavy rain from {a} to {b}","chuva possível das {a} às {b}":"possible rain from {a} to {b}","limpa depois das {h}":"clearing after {h}","sem dados de parte das horas":"data missing for some hours","Sem dados suficientes para prever as janelas de chuva de hoje.":"Not enough data to predict today's rain windows.",
 "⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ More options (stops, departure time, stay)","Hora de partida vazia = partes agora.":"Empty departure time = you leave now.",
 "Aqui ({p}): não mostro avisos de radar.":"Here ({p}): I show no speed-camera warnings.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Here ({p}): I show wide danger zones, not the exact spot.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Here ({p}): showing cameras is your choice — the switch is right below.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Here ({p}): I show fixed cameras on your route and warn you.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Fixed cameras: I follow the law of each country your route crosses.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"This country's law allows fixed-camera warnings — I read it before showing them.","Porquê?":"Why?","A decisão é tua. Vem desligado.":"The decision is yours. It ships switched off.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ You already have the app — open it from your home screen.",
@@ -2231,6 +2391,13 @@ es:{
 "Calor extremo (sensação {t}°)":"Calor extremo (sensación {t}°)",
 "Muito calor (sensação {t}°)":"Mucho calor (sensación {t}°)",
 "Risco de gelo em zonas de sombra e pontes":"Riesgo de hielo en zonas de sombra y puentes",
+"Calor perigoso (sensação {t}°) — risco de golpe de calor":"Calor peligroso (sensación {t}°) — riesgo de golpe de calor",
+"Calor perigoso e abafado (sensação {t}°) — o suor já não arrefece":"Calor peligroso y bochornoso (sensación {t}°) — el sudor ya no refresca",
+"Sensação de {t}° — bebe e para mais vezes":"Sensación de {t}° — bebe y para más a menudo",
+"Sensação de {t}°, abafado — bebe e para mais vezes":"Sensación de {t}°, bochornoso — bebe y para más a menudo",
+"Sensação de {c}° e ar abafado no ponto mais quente do trajeto — o suor deixa de arrefecer e o golpe de calor instala-se sem aviso. Não é dia de fazer este percurso de mota.":"Sensación de {c}° y aire bochornoso en el punto más caluroso del trayecto — el sudor deja de refrescar y el golpe de calor llega sin avisar. No es día para hacer esta ruta en moto.",
+"Sensação de {c}° no ponto mais quente do trajeto — cãibras e exaustão são prováveis, e o golpe de calor também se a exposição continuar. Não é dia de fazer este percurso de mota.":"Sensación de {c}° en el punto más caluroso del trayecto — los calambres y el agotamiento son probables, y el golpe de calor también si sigue la exposición. No es día para hacer esta ruta en moto.",
+"Sensação de {c}° no ponto mais quente do trajeto — bebe antes de sair, pára mais vezes e usa equipamento ventilado. A sensação é medida à sombra: ao sol e de equipamento fechado é mais.":"Sensación de {c}° en el punto más caluroso del trayecto — bebe antes de salir, para más a menudo y usa equipación ventilada. Esa cifra se mide a la sombra: al sol y con equipación cerrada es mayor.",
 "Visibilidade reduzida ({v})":"Visibilidad reducida ({v})",
 "Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Primera lluvia tras {n} días secos: el aceite acumulado en el asfalto se suelta y el firme se vuelve jabón la primera media hora. Frena pronto y suave, evita pinturas y tapas de alcantarilla.",
 "📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Sin internet — el mapa y la ruta guardados siguen funcionando. El GPS no necesita red.",
@@ -2345,6 +2512,27 @@ es:{
 "Silenciar ou ligar a voz":"Silenciar o activar la voz",
 "Estado da ligação":"Estado de la conexión","Só serviços que já tentei contactar nesta sessão.":"Solo servicios que ya he intentado contactar en esta sesión.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Sin resultados para esta búsqueda — revisa la escritura o prueba otro nombre.",
+"Motor do mapa":"Motor del mapa",
+"Porta do mapa":"Puerta del mapa",
+"Tradução":"Traducción",
+"Preferências":"Preferencias",
+"Ligação aos serviços":"Conexión a los servicios",
+"Motor antigo (tem de estar fora)":"Motor antiguo (debe estar fuera)",
+"⚠️ Falta uma peça da app — recarrega. Se continuar, copia o relatório de diagnóstico.":"⚠️ Falta una pieza de la app — recarga. Si continúa, copia el informe de diagnóstico.",
+"✅ Tudo a funcionar.":"✅ Todo funcionando.",
+"⚠️ Vários serviços não respondem — pode ser a ligação do telemóvel. O que já tens continua a funcionar.":"⚠️ Varios servicios no responden — puede ser la conexión del móvil. Lo que ya tienes sigue funcionando.",
+"⚠️ {s} não responde — o resto da app funciona.":"⚠️ {s} no responde — el resto de la app funciona.",
+"Mais {n} para abrir o diagnóstico":"{n} más para abrir el diagnóstico",
+"Isto é o painel de diagnóstico. Serve para perceber uma avaria — não precisas dele para usar a app.":"Este es el panel de diagnóstico. Sirve para entender una avería — no lo necesitas para usar la app.",
+"O relatório inclui: versão, línguas, peças da app, e que serviços responderam ou falharam, com há quanto tempo. NÃO inclui a tua posição, moradas nem nomes de sítios teus. Nada é enviado — copias e colas onde quiseres.":"El informe incluye: versión, idiomas, piezas de la app, y qué servicios respondieron o fallaron, y hace cuánto. NO incluye tu posición, direcciones ni nombres de tus sitios guardados. No se envía nada — tú copias y pegas donde quieras.",
+"Copiar relatório de diagnóstico":"Copiar informe de diagnóstico",
+"Relatório copiado! 📋":"¡Informe copiado! 📋",
+"a minha posição":"mi posición",
+"ainda não a pedi nesta sessão":"aún no la he pedido en esta sesión",
+"±{m} m":"±{m} m",
+"margem desconhecida":"margen desconocido",
+"morada só ao nível da rua ou da cidade":"dirección solo a nivel de calle o ciudad",
+"A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"El servicio de búsqueda principal no respondió ({m}) — estos resultados vienen de la fuente de reserva.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — revisa la escritura o prueba otro nombre.",
 "Recarregar a app":"Recargar la app",
 "Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"No puedo llegar a internet — el tiempo y la búsqueda están sin conexión. Revisa la red del dispositivo o recarga la app.",
@@ -2500,7 +2688,7 @@ es:{
 "índice moto":"índice moto","Remover paragem":"Quitar parada","A opção mais seca":"La opción más seca",
 "Sentinela: ligada":"Centinela: activada","Sentinela: desligada":"Centinela: desactivada",
 
-"Sem chuva prevista até às {h}":"Sin lluvia prevista hasta las {h}","Sem chuva até às {h}":"Sin lluvia hasta las {h}","chuva das {a} às {b}":"lluvia de {a} a {b}","chuva forte das {a} às {b}":"lluvia fuerte de {a} a {b}","chuva possível das {a} às {b}":"lluvia posible de {a} a {b}","limpa depois das {h}":"despeja después de las {h}","sem dados de parte das horas":"faltan datos de algunas horas","Sem dados suficientes para prever as janelas de chuva de hoje.":"No hay datos suficientes para prever las ventanas de lluvia de hoy.",
+"Sem chuva prevista até às {h}":"Sin lluvia prevista hasta las {h}","{h} de amanhã":"{h} de mañana","Sem chuva até às {h}":"Sin lluvia hasta las {h}","chuva das {a} às {b}":"lluvia de {a} a {b}","chuva forte das {a} às {b}":"lluvia fuerte de {a} a {b}","chuva possível das {a} às {b}":"lluvia posible de {a} a {b}","limpa depois das {h}":"despeja después de las {h}","sem dados de parte das horas":"faltan datos de algunas horas","Sem dados suficientes para prever as janelas de chuva de hoje.":"No hay datos suficientes para prever las ventanas de lluvia de hoy.",
 "⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Más opciones (paradas, hora de salida, estancia)","Hora de partida vazia = partes agora.":"Hora de salida vacía = sales ahora.",
 "Aqui ({p}): não mostro avisos de radar.":"Aquí ({p}): no muestro avisos de radar.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Aquí ({p}): muestro zonas de peligro amplias, no el punto exacto.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Aquí ({p}): mostrar radares es elección tuya — el interruptor está aquí abajo.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Aquí ({p}): muestro los radares fijos en tu ruta y te aviso.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Radares fijos: sigo la ley de cada país por donde pasa la ruta.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"La ley de este país permite avisos de radares fijos — la leí antes de mostrarlos.","Porquê?":"¿Por qué?","A decisão é tua. Vem desligado.":"La decisión es tuya. Viene desactivado.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ Ya tienes la app — ábrela desde la pantalla de inicio.",
@@ -2631,6 +2819,13 @@ fr:{
 "Calor extremo (sensação {t}°)":"Chaleur extrême (ressenti {t}°)",
 "Muito calor (sensação {t}°)":"Très chaud (ressenti {t}°)",
 "Risco de gelo em zonas de sombra e pontes":"Risque de verglas dans les zones ombragées et sur les ponts",
+"Calor perigoso (sensação {t}°) — risco de golpe de calor":"Chaleur dangereuse (ressenti {t}°) — risque de coup de chaleur",
+"Calor perigoso e abafado (sensação {t}°) — o suor já não arrefece":"Chaleur dangereuse et lourde (ressenti {t}°) — la sueur ne refroidit plus",
+"Sensação de {t}° — bebe e para mais vezes":"Ressenti {t}° — bois et arrête-toi plus souvent",
+"Sensação de {t}°, abafado — bebe e para mais vezes":"Ressenti {t}°, lourd — bois et arrête-toi plus souvent",
+"Sensação de {c}° e ar abafado no ponto mais quente do trajeto — o suor deixa de arrefecer e o golpe de calor instala-se sem aviso. Não é dia de fazer este percurso de mota.":"Ressenti {c}° et air lourd au point le plus chaud du trajet — la sueur ne refroidit plus et le coup de chaleur arrive sans prévenir. Ce n’est pas un jour pour faire ce parcours à moto.",
+"Sensação de {c}° no ponto mais quente do trajeto — cãibras e exaustão são prováveis, e o golpe de calor também se a exposição continuar. Não é dia de fazer este percurso de mota.":"Ressenti {c}° au point le plus chaud du trajet — crampes et épuisement sont probables, et le coup de chaleur aussi si l’exposition continue. Ce n’est pas un jour pour faire ce parcours à moto.",
+"Sensação de {c}° no ponto mais quente do trajeto — bebe antes de sair, pára mais vezes e usa equipamento ventilado. A sensação é medida à sombra: ao sol e de equipamento fechado é mais.":"Ressenti {c}° au point le plus chaud du trajet — bois avant de partir, arrête-toi plus souvent et porte un équipement ventilé. Ce chiffre est mesuré à l’ombre : au soleil et en équipement fermé, c’est plus.",
 "Visibilidade reduzida ({v})":"Visibilité réduite ({v})",
 "Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Première pluie après {n} jours secs : l'huile accumulée dans le bitume remonte et la route devient savon pendant la première demi-heure. Freine tôt et en douceur, évite les marquages et les plaques d'égout.",
 "📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Pas d'internet — la carte et l'itinéraire enregistrés continuent de fonctionner. Le GPS n'a pas besoin de réseau.",
@@ -2745,6 +2940,27 @@ fr:{
 "Silenciar ou ligar a voz":"Couper ou activer la voix",
 "Estado da ligação":"État de la connexion","Só serviços que já tentei contactar nesta sessão.":"Uniquement les services que j'ai réellement essayé de joindre cette session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Aucun résultat pour cette recherche — vérifie l'orthographe ou essaie un autre nom.",
+"Motor do mapa":"Moteur de la carte",
+"Porta do mapa":"Porte de la carte",
+"Tradução":"Traduction",
+"Preferências":"Préférences",
+"Ligação aos serviços":"Connexion aux services",
+"Motor antigo (tem de estar fora)":"Ancien moteur (doit être parti)",
+"⚠️ Falta uma peça da app — recarrega. Se continuar, copia o relatório de diagnóstico.":"⚠️ Il manque un composant de l'app — recharge. Si ça persiste, copie le rapport de diagnostic.",
+"✅ Tudo a funcionar.":"✅ Tout fonctionne.",
+"⚠️ Vários serviços não respondem — pode ser a ligação do telemóvel. O que já tens continua a funcionar.":"⚠️ Plusieurs services ne répondent pas — c'est peut-être la connexion du téléphone. Ce que tu as déjà continue de fonctionner.",
+"⚠️ {s} não responde — o resto da app funciona.":"⚠️ {s} ne répond pas — le reste de l'app fonctionne.",
+"Mais {n} para abrir o diagnóstico":"Encore {n} pour ouvrir le diagnostic",
+"Isto é o painel de diagnóstico. Serve para perceber uma avaria — não precisas dele para usar a app.":"Ceci est le panneau de diagnostic. Il sert à comprendre une panne — tu n'en as pas besoin pour utiliser l'app.",
+"O relatório inclui: versão, línguas, peças da app, e que serviços responderam ou falharam, com há quanto tempo. NÃO inclui a tua posição, moradas nem nomes de sítios teus. Nada é enviado — copias e colas onde quiseres.":"Le rapport inclut : version, langues, composants de l'app, et quels services ont répondu ou échoué, et depuis combien de temps. Il n'inclut PAS ta position, ni adresses, ni noms de tes lieux enregistrés. Rien n'est envoyé — tu copies et colles où tu veux.",
+"Copiar relatório de diagnóstico":"Copier le rapport de diagnostic",
+"Relatório copiado! 📋":"Rapport copié ! 📋",
+"a minha posição":"ma position",
+"ainda não a pedi nesta sessão":"je ne l'ai pas encore demandée dans cette session",
+"±{m} m":"±{m} m",
+"margem desconhecida":"marge inconnue",
+"morada só ao nível da rua ou da cidade":"adresse au niveau de la rue ou de la ville seulement",
+"A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"Le service de recherche principal n'a pas répondu ({m}) — ces résultats viennent de la source de secours.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Aucun résultat pour « {q} » — vérifie l'orthographe ou essaie un autre nom.",
 "Recarregar a app":"Recharger l'app",
 "Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"Je n'arrive pas à joindre internet — la météo et la recherche sont hors ligne. Vérifie le réseau de l'appareil, ou recharge l'app.",
@@ -2900,7 +3116,7 @@ fr:{
 "índice moto":"indice moto","Remover paragem":"Retirer l'arrêt","A opção mais seca":"L'option la plus sèche",
 "Sentinela: ligada":"Sentinelle : activée","Sentinela: desligada":"Sentinelle : désactivée",
 
-"Sem chuva prevista até às {h}":"Pas de pluie prévue jusqu'à {h}","Sem chuva até às {h}":"Pas de pluie jusqu'à {h}","chuva das {a} às {b}":"pluie de {a} à {b}","chuva forte das {a} às {b}":"forte pluie de {a} à {b}","chuva possível das {a} às {b}":"pluie possible de {a} à {b}","limpa depois das {h}":"éclaircie après {h}","sem dados de parte das horas":"données manquantes sur certaines heures","Sem dados suficientes para prever as janelas de chuva de hoje.":"Pas assez de données pour prévoir les fenêtres de pluie du jour.",
+"Sem chuva prevista até às {h}":"Pas de pluie prévue jusqu'à {h}","{h} de amanhã":"{h} demain","Sem chuva até às {h}":"Pas de pluie jusqu'à {h}","chuva das {a} às {b}":"pluie de {a} à {b}","chuva forte das {a} às {b}":"forte pluie de {a} à {b}","chuva possível das {a} às {b}":"pluie possible de {a} à {b}","limpa depois das {h}":"éclaircie après {h}","sem dados de parte das horas":"données manquantes sur certaines heures","Sem dados suficientes para prever as janelas de chuva de hoje.":"Pas assez de données pour prévoir les fenêtres de pluie du jour.",
 "⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Plus d'options (arrêts, heure de départ, séjour)","Hora de partida vazia = partes agora.":"Heure de départ vide = tu pars maintenant.",
 "Aqui ({p}): não mostro avisos de radar.":"Ici ({p}) : je ne montre aucun avertissement radar.","Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Ici ({p}) : je montre des zones de danger élargies, pas le point exact.","Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Ici ({p}) : montrer les radars est ton choix — l'interrupteur est juste en dessous.","Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Ici ({p}) : je montre les radars fixes sur ton trajet et je te préviens.","Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Radars fixes : je suis la loi de chaque pays traversé par le trajet.","A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"La loi de ce pays autorise les avertissements de radars fixes — je l'ai lue avant de les montrer.","Porquê?":"Pourquoi ?","A decisão é tua. Vem desligado.":"La décision est à toi. Désactivé par défaut.",
 "✅ Já tens a app — abre-a do ecrã inicial.":"✅ Tu as déjà l'app — ouvre-la depuis l'écran d'accueil.",
@@ -2908,7 +3124,668 @@ fr:{
 "📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Pour installer : menu du navigateur → « Ajouter à l'écran d'accueil », si ton navigateur le permet.",
 "Calcula primeiro uma rota.":"Calcule d'abord un itinéraire.","Este dispositivo não dá acesso ao GPS.":"Cet appareil ne fournit pas de GPS.",
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Pas de prévision. Vérifie la connexion internet et réessaie.","Tentar de novo":"Réessayer","Idioma":"Langue","norte":"nord",
-}};
+},
+/* ═══ dd-167 — NEERLANDÊS, em construção por LOTES ═══════════════════════
+   O NL constrói-se aos poucos e **só entra no seletor a 100 %**. Enquanto
+   estiver incompleto, a app continua a oferecer quatro línguas e ninguém
+   vê um ecrã meio traduzido — é o que torna seguro fechar a janela a meio
+   do trabalho. O `lingua-de-recurso` continua a ser o INGLÊS (dd-147).
+   Vocabulário de motociclista, e **«je», nunca «u»**: quem anda de mota
+   trata-se por tu. */
+nl:{
+"norte":"noord",
+"nordeste":"noordoost",
+"este":"oost",
+"sudeste":"zuidoost",
+"sul":"zuid",
+"sudoeste":"zuidwest",
+"oeste":"west",
+"noroeste":"noordwest",
+"Seco":"Droog",
+"Chuvisco / possível":"Motregen / mogelijk",
+"Forte / trovoada":"Hevig / onweer",
+"Conservador":"Voorzichtig",
+"Equilibrado":"Evenwichtig",
+"Tolerante":"Soepel",
+"Qualquer risco relevante já pesa na decisão.":"Elk noemenswaardig risico weegt al mee in het oordeel.",
+"Avisos com chuvisco/vento moderado; vermelho só com condições más.":"Waarschuwing bij motregen of matige wind; rood alleen bij echt slechte omstandigheden.",
+"Só chuva a sério, trovoada, gelo ou vento forte travam a viagem.":"Alleen echte regen, onweer, ijzel of harde wind houden de rit tegen.",
+"Recarregar":"Herladen",
+"A app mudou-se para getlevante.com.":"De app is verhuisd naar getlevante.com.",
+"Ir, com os meus sítios":"Ga erheen, met mijn plekken",
+"Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Ik zeg je of je met de motor kunt — nu, waar je bent, en onderweg naar waar je heen gaat.",
+"📍 Onde estou":"📍 Waar ik ben",
+"🗺️ O tempo no meu caminho":"🗺️ Het weer op mijn route",
+"✅ Já tens a app — abre-a do ecrã inicial.":"✅ Je hebt de app al — open hem vanaf je beginscherm.",
+"📲 Dá para instalar como app — botão “Instalar” aqui em cima.":"📲 Je kunt hem als app installeren — knop “Installeren” hierboven.",
+"💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app.":"💡 Op de iPhone: knop Delen → “Zet op beginscherm” om de app te installeren.",
+"📲 Para instalar: menu do browser → “Adicionar ao ecrã principal”, se o teu browser o permitir.":"📲 Installeren: browsermenu → “Zet op beginscherm”, als je browser dat toestaat.",
+"Esta sessão: {p} pedidos em {m} min · {c} poupados pela cache · {k} créditos":"Deze sessie: {p} verzoeken in {m} min · {c} bespaard door de cache · {k} credits",
+"Radares ligados na Alemanha — por tua conta e risco.":"Flitspalen aan in Duitsland — op eigen risico.",
+"Radares desligados na Alemanha.":"Flitspalen uit in Duitsland.",
+"Unidades alteradas para {u}.":"Eenheden gewijzigd naar {u}.",
+"🗺️ O mapa ficou incompleto ({d} de {t} peças) — vê as definições.":"🗺️ De kaart is onvolledig ({d} van {t} stukjes) — kijk bij de instellingen.",
+"🗺️ Mapa do trajeto guardado ({n} peças) — funciona mesmo sem internet.":"🗺️ Kaart van de route opgeslagen ({n} stukjes) — werkt ook zonder internet.",
+"Perfil: {p} ✔":"Profiel: {p} ✔",
+"Previsão para {p}":"Verwachting voor {p}",
+"Menu do browser → “Adicionar ao ecrã principal”.":"Browsermenu → “Zet op beginscherm”.",
+"Instalada! Procura o ícone no teu ecrã 🏍️":"Geïnstalleerd! Zoek het icoon op je scherm 🏍️",
+"App instalada! 🏍️":"App geïnstalleerd! 🏍️",
+"🎤 \"{q}\" — escolhe a sugestão certa":"🎤 \"{q}\" — kies de juiste suggestie",
+"Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Ik vond \"{q}\" niet — controleer de spelling of probeer een andere naam.",
+"À procura de \"{q}\"…":"Zoeken naar \"{q}\"…",
+"Instalar como app":"Installeren als app",
+"Viagens planeadas":"Geplande ritten",
+"Alternar tema claro/escuro":"Wisselen tussen licht en donker thema",
+"Alternar tema":"Thema wisselen",
+"Definições":"Instellingen",
+"Secções":"Onderdelen",
+"Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)":"Zoek een stad of adres… (bijv.: Maastricht, Eindhoven, A2 Weert)",
+"Pesquisar localização":"Locatie zoeken",
+"Usar a minha localização":"Mijn locatie gebruiken",
+"Fechar":"Sluiten",
+"Para onde vais?":"Waar ga je heen?",
+"📍 Ponto de partida":"📍 Vertrekpunt",
+"Trocar origem e destino":"Vertrek en bestemming omwisselen",
+"🏁 Para onde vais?":"🏁 Waar ga je heen?",
+"Paragens intermédias":"Tussenstops",
+"Quanto tempo ficas em cada paragem":"Hoelang je bij elke stop blijft",
+"Partir ou chegar a uma hora":"Vertrekken of aankomen op een tijdstip",
+"Quanto tempo contas ficar no destino":"Hoelang je op de bestemming denkt te blijven",
+"Tempo no destino":"Tijd op de bestemming",
+"Usar GPS como origem":"Gps als vertrekpunt gebruiken",
+"Voltar ao planeamento":"Terug naar de planning",
+"Fechar a folha":"Het blad sluiten",
+"Silenciar/ligar a voz":"Stem dempen of aanzetten",
+"Silenciar ou ligar a voz":"Stem dempen of aanzetten",
+"meteorologia para motociclistas · grátis para começar":"weer voor motorrijders · gratis om te beginnen",
+"📲 Instalar":"📲 Installeren",
+"🔔 Sentinela meteorológica":"🔔 Weerwachter",
+"Som de aviso":"Waarschuwingsgeluid",
+"Tocar um som nos avisos":"Een geluid laten klinken bij waarschuwingen",
+"A moto cá fora":"De motor buiten",
+"Avisar se a moto pode ficar cá fora":"Waarschuw of de motor buiten kan blijven",
+"🎯 Recentrar":"🎯 Opnieuw centreren",
+"✨ Assistente de viagem":"✨ Ritassistent",
+"Diz para onde vais — encontro o sítio mais próximo de ti, traço a rota e digo-te se deves ir de moto, esperar, ir de outra forma e o que vestir.":"Zeg waar je heen gaat — ik zoek de plek die het dichtst bij je is, bereken de route en zeg je of je met de motor moet gaan, moet wachten, iets anders moet nemen, en wat je aan moet trekken.",
+"➕ Adicionar paragem":"➕ Stop toevoegen",
+"offline":"offline",
+"Unidades":"Eenheden",
+"Avisos de radar":"Flitspaalwaarschuwingen",
+"Mostrar radares na Alemanha":"Flitspalen tonen in Duitsland",
+"A decisão é tua. Vem desligado.":"De keuze is aan jou. Staat standaard uit.",
+"✎ Planear manualmente (paragens, hora de partida)":"✎ Handmatig plannen (stops, vertrektijd)",
+"⚙️ Mais opções (paragens, hora de partida, estadia)":"⚙️ Meer opties (stops, vertrektijd, verblijf)",
+"Hora de partida vazia = partes agora.":"Vertrektijd leeg = je vertrekt nu.",
+"Idioma":"Taal",
+"Estado da app":"Status van de app",
+"Só serviços que já tentei contactar nesta sessão.":"Alleen diensten die ik in deze sessie al probeerde te bereiken.",
+"Ver o mapa":"Kaart bekijken",
+"🔇 Este aparelho não tem nenhuma voz instalada: as indicações vão por escrito e vibração, sem som.":"🔇 Op dit toestel is geen stem geïnstalleerd: de aanwijzingen komen als tekst en trilling, zonder geluid.",
+"🗣️ Não há voz {n} neste telemóvel — falo em inglês. Podes instalar a voz nas definições do sistema.":"🗣️ Er is geen {n} stem op deze telefoon — ik spreek Engels. Je kunt de stem installeren via de instellingen van je toestel.",
+"📍 Este aparelho não dá acesso ao GPS. Escreve a tua cidade para ter previsão.":"📍 Dit toestel geeft geen toegang tot gps. Typ je stad in om een verwachting te krijgen.",
+"🗺️ O mapa do último trajeto ficou incompleto ({d} de {t} peças): sem rede vais encontrar buracos. Calcula a rota outra vez com internet para o completar.":"🗺️ De kaart van je laatste route is onvolledig ({d} van {t} stukjes): zonder netwerk kom je gaten tegen. Bereken de route opnieuw mét internet om hem compleet te maken.",
+"Este aparelho não tem nenhuma voz instalada — as indicações vão só por escrito e vibração.":"Op dit toestel is geen stem geïnstalleerd — de aanwijzingen komen alleen als tekst en trilling.",
+"Não há voz {n} instalada neste telemóvel. Vou falar em inglês; podes instalar a voz nas definições do sistema.":"Er is geen {n} stem op deze telefoon geïnstalleerd. Ik spreek Engels; je kunt de stem installeren via de instellingen van je toestel.",
+"🔇 Voz silenciada — continuas a receber vibração e notificações.":"🔇 Stem uitgezet — je krijgt nog steeds trilling en meldingen.",
+"🔊 Voz ligada.":"🔊 Stem aan.",
+"Som de aviso: ligado":"Waarschuwingsgeluid: aan",
+"Som de aviso: desligado":"Waarschuwingsgeluid: uit",
+"Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Klinkt bij gevaarwaarschuwingen en die van de Wachter. De stem voor afslagen gaat altijd voor; staat je telefoon op stil, dan hoor je het misschien niet — de trilling en de melding blijven.",
+"Só vibração e texto nos avisos.":"Alleen trilling en tekst bij waarschuwingen.",
+"Calcula primeiro uma rota.":"Bereken eerst een route.",
+"Este dispositivo não dá acesso ao GPS.":"Dit toestel geeft geen toegang tot gps.",
+"🧭 Modo viagem ligado":"🧭 Ritmodus aan",
+"Viagem":"Rit",
+"🧭 Modo viagem (avisos de chuva)":"🧭 Ritmodus (regenwaarschuwingen)",
+"📡 Posição imprecisa (±{m} m) — a seta, o mapa e os quilómetros esperam por sinal melhor":"📡 Onnauwkeurige positie (±{m} m) — de pijl, de kaart en de kilometers wachten op een beter signaal",
+"a {d} km da rota — a recalcular":"{d} km van de route — opnieuw berekenen",
+"Zona de perigo dentro de {x}. Atenção à velocidade.":"Gevarenzone over {x}. Let op je snelheid.",
+"Radar de velocidade dentro de {x}.":"Flitspaal over {x}.",
+"Limite {v}.":"Limiet {v}.",
+"🎉 Chegaste! Modo viagem terminado.":"🎉 Je bent er! Ritmodus beëindigd.",
+"🌧️ Estás na zona de chuva ({x})":"🌧️ Je zit in de regenzone ({x})",
+"🌧️ Chuva dentro de ~{m} min ({d} km)":"🌧️ Regen over ~{m} min ({d} km)",
+"🌧️ Chuva no caminho":"🌧️ Regen onderweg",
+"Dica: se parares uns vinte minutos, escapas a esta chuva.":"Tip: stop je twintig minuten, dan ontloop je deze regen.",
+"Dica: se parares uns quarenta minutos, escapas a esta chuva.":"Tip: stop je veertig minuten, dan ontloop je deze regen.",
+"Atenção: chuva já a seguir. Abranda e liga as luzes.":"Let op: regen vlak voor je. Rustiger aan en licht aan.",
+"Atenção: chuva dentro de cerca de {m} minutos. {x}":"Let op: regen over ongeveer {m} minuten. {x}",
+"Última oportunidade para parar num sítio seco.":"Laatste kans om droog te stoppen.",
+"Aviso antecipado: chuva dentro de cerca de {m} minutos, a {d} quilómetros. {x}":"Vroege waarschuwing: regen over ongeveer {m} minuten, op {d} kilometer. {x}",
+"Tens tempo para parar ou mudar de caminho na aplicação.":"Je hebt tijd om te stoppen of in de app een andere route te kiezen.",
+"⚠️ Possível chuvisco dentro de {d} km":"⚠️ Mogelijk motregen over {d} km",
+"⚠️ Possível chuvisco no caminho":"⚠️ Mogelijk motregen onderweg",
+"✅ Caminho seco daqui até ao destino":"✅ Droge route van hier tot de bestemming",
+"O telemóvel suspendeu a app: {m} min sem verificações e sem avisos. A verificar agora.":"De telefoon heeft de app onderbroken: {m} min zonder controles en zonder waarschuwingen. Ik controleer nu.",
+"Ligada, mas sem posição — ativa o GPS ou pesquisa a tua cidade.":"Aan, maar zonder positie — zet gps aan of zoek je stad op.",
+"Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Onweer verwacht rond {h}. Staat je motor op straat, zet hem weg.",
+"Chuva a chegar à tua zona dentro de cerca de {m} minutos.":"Regen komt jouw kant op over ongeveer {m} minuten.",
+"Boa notícia: a chuva deve parar dentro de {m} minutos.":"Goed nieuws: de regen zou over {m} minuten moeten stoppen.",
+"O vento subiu: rajadas de {g} quilómetros por hora.":"De wind is toegenomen: windstoten van {g} kilometer per uur.",
+"🌧️ A chover agora — deve parar ~{h}.":"🌧️ Het regent nu — zou rond {h} moeten stoppen.",
+"🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.":"🌧️ Het regent nu, en er is geen einde in zicht binnen ~2 uur.",
+"☁️ Chuva a caminho: ~{h}.":"☁️ Regen op komst: ~{h}.",
+"Sem chuva no que veio — faltam {n} dos 8 quartos de hora.":"Geen regen in wat binnenkwam — {n} van de 8 kwartieren ontbreken.",
+"✅ Sem chuva à vista nas próximas 2 horas.":"✅ Geen regen in zicht de komende 2 uur.",
+"Ligada · {p} · última verificação {h} — {s} Rajadas atuais: {g} km/h. Só com a app aberta e no ecrã: minimizada ou com o ecrã apagado, o telemóvel suspende-a.":"Aan · {p} · laatste controle {h} — {s} Windstoten nu: {g} km/u. Alleen met de app open en in beeld: geminimaliseerd of met het scherm uit onderbreekt de telefoon hem.",
+"Ligada — falhou a última verificação, volto a tentar daqui a ~2 min.":"Aan — de laatste controle mislukte, ik probeer het over ~2 min opnieuw.",
+"Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Met de app open en in beeld: elke ~2 minuten een controle, met waarschuwing via stem, trilling en melding.",
+"Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Geminimaliseerd of met het scherm uit onderbreekt de telefoon de app: in die tijd zijn er GEEN controles. Geen enkele web-app kan dat zonder een server die voor hem waakt.",
+"Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Onderbreekt de telefoon de app, dan wordt de tijd zonder controles bij terugkeer gemeld — hij wordt nooit als bewaakt opgegeven.",
+"Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"Bewaken met de app dicht vereist een eigen server en pushmeldingen (en op de iPhone waarschijnlijk de native installeerbare versie). Het staat in de planning; het is niet gebouwd.",
+"Como funciona?":"Hoe werkt het?",
+"Sentinela: ligada":"Wachter: aan",
+"Sentinela: desligada":"Wachter: uit",
+"Sentinela desligada.":"Wachter uit.",
+"Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Aan — controleert het weer waar je bent zolang de app open staat.",
+"🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Wachter aan — elke ~2 minuten een controle, met de app open.",
+"A Sentinela foi desligada ao recarregar a página — este dispositivo não dá acesso à localização. Toca para voltar a ligar.":"De Wachter is bij het herladen uitgezet — dit toestel geeft geen toegang tot je locatie. Tik om hem weer aan te zetten.",
+"🔔 Sentinela ativa — continuou ligada desde o teu último acesso.":"🔔 Wachter actief — hij is aan gebleven sinds je laatste bezoek.",
+"💡 Não sabes o nome do sítio? Mantém o dedo num ponto do mapa (ou clique direito no PC) e eu levo-te lá.":"💡 Weet je de naam van de plek niet? Houd je vinger op een punt op de kaart (of rechtsklik op de pc) en ik breng je erheen.",
+"Rota para {p}":"Route naar {p}",
+"Há uma versão nova da app.":"Er is een nieuwe versie van de app.",
+"A calcular a rota até {p} e o tempo em cada troço do caminho…":"Route naar {p} berekenen, met het weer op elk stuk onderweg…",
+"Sem rota até aí. Escolhe outro dos sítios acima ou ajusta o formulário.":"Geen route daarheen. Kies een andere plek hierboven of pas het formulier aan.",
+"Não vás de moto nesta viagem":"Ga deze rit niet met de motor",
+"Há trovoada, gelo ou neve previstos no caminho — de moto é mesmo para evitar.":"Er wordt onweer, ijzel of sneeuw verwacht onderweg — met de motor moet je dit echt vermijden.",
+"Vai de carro/transportes — ou espera: às {h} o trajeto já fica decente.":"Neem de auto of het ov — of wacht: om {h} is de route al redelijk.",
+"Vai de carro ou de transportes públicos; o risco não compensa.":"Neem de auto of het openbaar vervoer; het risico weegt niet op.",
+"Espera um pouco — sai às {h}":"Wacht even — vertrek om {h}",
+"Se saíres já, apanhas chuva em ~{n} km; às {h} vais {x}.":"Vertrek je nu, dan krijg je regen over ~{n} km; om {h} rijd je {x}.",
+"praticamente seco":"vrijwel droog",
+"só com ~{n} km molhados":"met maar ~{n} km nat wegdek",
+"Se não puderes esperar: fato de chuva completo e reduz a velocidade no molhado.":"Kun je niet wachten: volledig regenpak aan en snelheid omlaag op nat wegdek.",
+"De moto vais apanhar chuva — pondera outro transporte":"Met de motor ga je regen krijgen — overweeg iets anders",
+"Chuva em ~{n} km do trajeto ({p}%), e não melhora nas próximas 4 horas.":"Regen op ~{n} km van de route ({p}%), en het wordt de komende 4 uur niet beter.",
+"Se tiveres alternativa (carro, transportes), hoje é o dia de a usar. Se fores mesmo: fato de chuva completo, viseira limpa e o dobro da distância de travagem.":"Heb je een alternatief (auto, ov), dan is dit de dag om het te gebruiken. Ga je toch: volledig regenpak, schoon vizier en dubbele remafstand.",
+"Podes ir de moto — mas leva o fato de chuva":"Je kunt met de motor — maar neem je regenpak mee",
+"Há risco de chuvisco nalguns troços; segue com o fato de chuva à mão.":"Op sommige stukken kan het motregenen; houd je regenpak binnen handbereik.",
+"Provavelmente sim — mas faltam-me dados":"Waarschijnlijk wel — maar ik mis gegevens",
+"Não tenho dados de parte do caminho; no que verifiquei está seco. Os pormenores estão no resumo da rota.":"Voor een deel van de route heb ik geen gegevens; wat ik kon nakijken is droog. De details staan in het routeoverzicht.",
+"Sim — vai de moto!":"Ja — pak de motor!",
+"Trajeto seco até {p} a esta hora.":"Droge route naar {p} op dit tijdstip.",
+"Vento demasiado forte para ir descansado":"Te veel wind om ontspannen te rijden",
+"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Windstoten tot {g} km/u, wind {d}{x} — op de motor is dat zwaar; ga je toch, hou de snelheid gematigd en haal geen vrachtwagens krap in.",
+", com lateral forte perto do km {k}":", met harde zijwind rond km {k}",
+"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Windstoten tot {g} km/u, wind {d}{x} — stevig aan het stuur op bruggen en open stukken.",
+" com lateral perto do km {k}":" met zijwind rond km {k}",
+"Vento tranquilo: rajadas máximas de {g} km/h, {d}.":"Rustige wind: windstoten tot {g} km/u, {d}.",
+"Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.":"Echt koud (minimaal {t}° onderweg): winterhandschoenen, thermolaag en windstopper.",
+"Leva casaco quente: mínima de {t}° no percurso — em andamento sente-se bastante menos.":"Neem een warme jas mee: minimaal {t}° onderweg — in beweging voelt het een stuk kouder.",
+"Muito calor: hidrata-te antes de sair e usa equipamento ventilado.":"Erg warm: drink voor vertrek en draag geventileerde kleding.",
+"Temperatura amena (mín. {t}°) — equipamento habitual com casaco serve.":"Milde temperatuur (min. {t}°) — je gewone uitrusting met een jas volstaat.",
+"Chegas depois do pôr-do-sol — luzes verificadas e algo refletor.":"Je komt na zonsondergang aan — check je verlichting en draag iets reflecterends.",
+"Cuidado: primeira chuva depois de dias secos — piso traiçoeiro":"Let op: eerste regen na droge dagen — verraderlijk wegdek",
+"Lá em {p}: chuva por volta das {h}. Se te demorares, a volta seria molhada — decide já se compensa o carro, ou leva o fato e eu aviso-te ~40 min antes de virar.":"Daar in {p}: regen rond {h}. Blijf je langer, dan wordt de terugweg nat — beslis nu of de auto beter is, of neem je regenpak mee; ik waarschuw je ~40 min voordat het omslaat.",
+"Ida seca — mas vai chover em {p} depois de chegares":"Droge heenweg — maar het gaat regenen in {p} nadat je aankomt",
+"Lá em {p}: possível chuvisco ao longo do dia — impermeável na mala e ficas safo.":"Daar in {p}: mogelijk motregen gedurende de dag — regenjas in de koffer en je zit goed.",
+"Lá em {p}: provavelmente seco, mas faltam-me dados de parte dessas horas.":"Daar in {p}: waarschijnlijk droog, maar voor een deel van die uren mis ik gegevens.",
+"Lá em {p}: seco {x} — regresso tranquilo.":"Daar in {p}: droog {x} — rustige terugweg.",
+"durante a tua estadia":"tijdens je verblijf",
+"Ao longo do caminho: {x}.":"Onderweg: {x}.",
+"Sem sinal GPS — a tentar.":"Geen gps-signaal — bezig.",
+"Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Geen gps-signaal — bezig. Je positie kan verouderd zijn.",
+"Segue em frente":"Rechtdoor",
+"{d}":"{d}",
+"depois: {x}":"daarna: {x}",
+"Fora da rota":"Van de route af",
+"regressa {d} a {r}":"ga {d} terug naar {r}",
+"a rota está aqui ao lado":"de route ligt hier vlakbij",
+"à procura do teu GPS…":"je gps zoeken…",
+"quase lá":"bijna er",
+"🔄 Saíste da rota — a recalcular…":"🔄 Je bent van de route af — opnieuw berekenen…",
+"A tua posição":"Jouw positie",
+"🔄 Rota recalculada a partir da tua posição.":"🔄 Route opnieuw berekend vanaf je positie.",
+"recálculo falhou — verifica a ligação. A rota anterior continua no ecrã.":"herberekenen mislukt — controleer je verbinding. De vorige route blijft op het scherm.",
+"🏍️ Levante — em viagem":"🏍️ Levante — onderweg",
+"Versão {v}":"Versie {v}",
+"Mais {n} para abrir o diagnóstico":"Nog {n} keer om de diagnose te openen",
+"Isto é o painel de diagnóstico. Serve para perceber uma avaria — não precisas dele para usar a app.":"Dit is het diagnosepaneel. Het helpt een storing te begrijpen — je hebt het niet nodig om de app te gebruiken.",
+"O relatório inclui: versão, línguas, peças da app, e que serviços responderam ou falharam, com há quanto tempo. NÃO inclui a tua posição, moradas nem nomes de sítios teus. Nada é enviado — copias e colas onde quiseres.":"Het rapport bevat: versie, talen, onderdelen van de app, en welke diensten reageerden of faalden, met hoelang geleden. Het bevat NIET je positie, adressen of namen van jouw plekken. Er wordt niets verstuurd — je kopieert en plakt het waar je wilt.",
+"Copiar relatório de diagnóstico":"Diagnoserapport kopiëren",
+"Relatório copiado! 📋":"Rapport gekopieerd! 📋",
+"A moto cá fora: ligado":"Motor buiten: aan",
+"A moto cá fora: desligado":"Motor buiten: uit",
+"Quando chegas e paras num alojamento, digo-te se a moto pode ficar cá fora — e aviso se a chuva vier antes da tua próxima saída. Com a app aberta.":"Als je aankomt en stopt bij een accommodatie, zeg ik je of de motor buiten kan blijven — en ik waarschuw als de regen komt vóór je volgende rit. Met de app open.",
+"A app não fala da moto cá fora.":"De app zegt niets over de motor buiten laten staan.",
+"🏍️ A moto pode ficar cá fora":"🏍️ De motor kan buiten blijven",
+"✅ Podes deixar a mota cá fora cerca de {n} horas — sem chuva prevista até às {h}.":"✅ Je kunt de motor ongeveer {n} uur buiten laten staan — geen regen verwacht tot {h}.",
+"🌧️ Abriga a moto":"🌧️ Zet de motor onder dak",
+"Chuva prevista por volta das {h} — se puderes, deixa a moto abrigada.":"Regen verwacht rond {h} — zet de motor onder dak als dat kan.",
+"até à tua próxima viagem ({h})":"tot je volgende rit ({h})",
+"nas próximas {n} horas":"de komende {n} uur",
+"🌧️ Vai começar a chover":"🌧️ Het gaat regenen",
+"Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.":"Regen rond {h} — staat de motor buiten, zet hem nu weg.",
+"🏍️ Detetei que estás em andamento — Modo Viagem ligado.":"🏍️ Ik merk dat je onderweg bent — Ritmodus ingeschakeld.",
+"🔇 Este browser não fala: as indicações vão por escrito e vibração, sem som.":"🔇 Deze browser praat niet: de aanwijzingen komen als tekst en trilling, zonder geluid.",
+"~{n} km de chuva a qualquer hora até às {h}":"~{n} km regen op elk moment tot {h}",
+"ver horas":"uren bekijken",
+"🕒 E se saíres mais tarde (ou mais cedo)?":"🕒 En als je later (of eerder) vertrekt?",
+"Compara a chuva no trajeto para diferentes horas de partida — clica para aplicar. Sem novas descargas de dados: é instantâneo.":"Vergelijk de regen op de route voor verschillende vertrektijden — klik om toe te passen. Zonder nieuwe gegevens op te halen: het gaat meteen.",
+"? sem dados":"? geen gegevens",
+"A opção mais seca":"De droogste keuze",
+"Se saíres às {h} apanhas {x}.":"Vertrek je om {h}, dan krijg je {x}.",
+"o trajeto praticamente seco":"een vrijwel droge route",
+"só ~{n} km de chuva":"maar ~{n} km regen",
+"guardada antes desta versão":"bewaard vóór deze versie",
+"detetada pelo GPS":"door gps bepaald",
+"definida a partir de uma pesquisa":"ingesteld via een zoekopdracht",
+"valor de arranque — nunca escolhida por ti":"startwaarde — nooit door jou gekozen",
+"definida por ti":"door jou ingesteld",
+"país?":"land?",
+"Vê se os teus sítios guardados batem certo":"Controleer of je bewaarde plekken kloppen",
+"Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Een eerdere versie van de zoekfunctie kon een plek met verkeerde coördinaten opslaan — tot duizenden kilometers ernaast. Dat is opgelost, maar wat op jouw toestel is opgeslagen kun alleen jij bevestigen. Ik vraag het één keer.",
+"Apagar este registo":"Deze regel verwijderen",
+"sem casa guardada":"geen thuis bewaard",
+"Recentes":"Recent",
+"Favoritos":"Favorieten",
+"Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Kies de juiste plek in de zoekbalk hierboven — je thuis verandert pas als jij kiest.",
+"📍 A minha posição":"📍 Mijn positie",
+"Ir para a pesquisa":"Naar de zoekbalk",
+"✔ Está tudo certo":"✔ Alles klopt",
+"Obrigado — não volto a perguntar.":"Bedankt — ik vraag het niet nog eens.",
+"A casa não está certa — corrigir":"Mijn thuis klopt niet — corrigeren",
+"Se fechares sem responder, fica tudo como está e volto a perguntar na próxima abertura.":"Sluit je zonder te antwoorden, dan blijft alles zoals het is en vraag ik het de volgende keer opnieuw.",
+"ainda sem previsão":"nog geen verwachting",
+"chuva forte/trovoada":"zware regen of onweer",
+"chuva prevista":"regen verwacht",
+"vento muito forte":"zeer harde wind",
+"possível chuvisco":"mogelijk motregen",
+"faltam dados dessa hora":"gegevens voor dat uur ontbreken",
+"bom para ir":"goed om te gaan",
+"Vigiar: ligado":"Bewaken: aan",
+"Vigiar: desligado":"Bewaken: uit",
+"Vigio esta viagem enquanto a app está aberta e aviso se o tempo mudar; avisos com a app fechada ainda não.":"Ik bewaak deze rit zolang de app open staat en waarschuw als het weer omslaat; waarschuwen met de app dicht kan nog niet.",
+"Apagar":"Verwijderen",
+"🗓️ A abrir: {p}":"🗓️ Openen: {p}",
+"Viagem indisponível.":"Rit niet beschikbaar.",
+"Habituais":"Vaste plekken",
+"hoje, se fores agora":"vandaag, als je nu gaat",
+"Feitas":"Gereden",
+"limpar":"wissen",
+"Apagar todo o histórico":"De hele geschiedenis wissen",
+"Histórico limpo.":"Geschiedenis gewist.",
+"partida {h}":"vertrek {h}",
+"👁 A vigiar «{p}» — aviso-te se o tempo mudar (com a app aberta).":"👁 «{p}» wordt bewaakt — ik waarschuw je als het weer omslaat (met de app open).",
+"👁 {p}: o tempo mudou":"👁 {p}: het weer is omgeslagen",
+"⭐ Dica: guarda a tua casa, bombas habituais e rotas — eu percebo-os no que escreveres.":"⭐ Tip: bewaar je thuis, je vaste tankstations en je routes — ik herken ze in wat je typt.",
+"Apagado: {p}":"Verwijderd: {p}",
+"Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Geen locatie. Geef toegang tot gps, of zoek je stad op het tabblad Nu.",
+"Gerir os meus sítios":"Mijn plekken beheren",
+"Os meus sítios":"Mijn plekken",
+"A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"De verwachting op Nu, het ankerpunt van de zoekfunctie, het Van-veld van de planner en de zin over flitspalen volgen dit thuis.",
+"Redefinir por pesquisa":"Opnieuw instellen via zoeken",
+"Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Zoek de plek en kies hem — dan wordt dat je thuis.",
+"Redefinir pelo GPS":"Opnieuw instellen via gps",
+"Redefinir por toque no mapa":"Opnieuw instellen door de kaart aan te raken",
+"No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Op de kaart: houd je vinger op een punt (of rechtsklik op de pc) en kies “Als thuis gebruiken”.",
+"Guardados":"Bewaard",
+"Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nog niets bewaard. Bereken een route en tik op ⭐ om de bestemming onder je eigen naam te bewaren.",
+"Renomear":"Naam wijzigen",
+"Guardar":"Bewaren",
+"Renomeado: {p}":"Naam gewijzigd: {p}",
+"Apagar {p}?":"{p} verwijderen?",
+"Sim, apagar":"Ja, verwijderen",
+"Não":"Nee",
+"Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Geen recente plekken. Wat je in de zoekfunctie kiest verschijnt hier.",
+"Limpar todos os recentes":"Alle recente plekken wissen",
+"Apagar os {n} recentes?":"De {n} recente plekken verwijderen?",
+"Recentes limpos.":"Recente plekken gewist.",
+"Diz-me para onde queres ir 🙂":"Zeg me waar je heen wilt 🙂",
+"A pensar…":"Aan het denken…",
+"a tua zona":"jouw omgeving",
+"Nada por perto — alarguei ao mundo.":"Niets in de buurt — ik heb wereldwijd gezocht.",
+"Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.":"Ik vond één plek. Tik erop, dan bereken ik de route en kijk ik naar het weer onderweg.",
+"Encontrei {n} sítios. Toca no que queres para eu traçar a rota.":"Ik vond {n} plekken. Tik op de juiste, dan bereken ik de route.",
+"Perguntar":"Vragen",
+"até ao fim do dia":"tot het eind van de dag",
+"🅿️ Em {p} depois de chegares: provavelmente seco, mas faltam-me dados de parte dessas horas.":"🅿️ In {p} na aankomst: waarschijnlijk droog, maar voor een deel van die uren mis ik gegevens.",
+"🅿️ Em {p} depois de chegares: seco {d} — regresso tranquilo.":"🅿️ In {p} na aankomst: droog {d} — rustige terugrit.",
+"seco":"droog",
+"chuvisco":"motregen",
+"🌧️ chuva":"🌧️ regen",
+"⛈️ chuva forte":"⛈️ zware regen",
+"🅿️ Em {p} depois de chegares: {x}":"🅿️ In {p} na aankomst: {x}",
+"🌧️ O tempo vai mudar em {p}":"🌧️ Het weer gaat omslaan in {p}",
+"Chuva por volta das {h} onde estás/vais estar. Se ainda lá andas, prepara a volta ou abriga a moto.":"Regen rond {h} waar je bent of zult zijn. Ben je er nog, bereid de terugrit voor of zet de motor onder dak.",
+"O que significam as cores?":"Wat betekenen de kleuren?",
+"A cor de cada troço mostra o tempo previsto ":"De kleur van elk stuk toont het verwachte weer ",
+"à hora a que lá vais passar":"op het uur dat jij daar bent",
+", não o tempo de agora.":", niet het weer van nu.",
+"A ver o tempo ao longo do trajeto…":"Het weer langs de route bekijken…",
+"Trajeto seco — boa viagem!":"Droge route — goede rit!",
+"Provavelmente seco — faltam-me dados em parte do caminho":"Waarschijnlijk droog — voor een deel van de route mis ik gegevens",
+"Possível chuvisco em ~{d} do caminho":"Mogelijk motregen op ~{d} van de route",
+"Possível chuvisco já no início do caminho":"Mogelijk motregen al aan het begin van de route",
+"Vais apanhar chuva em ~{n} km ({p}% do trajeto)":"Je krijgt regen op ~{n} km ({p}% van de route)",
+"Chuva forte/trovoada no caminho — {n} km afetados. Adia se puderes.":"Zware regen of onweer onderweg — {n} km geraakt. Stel uit als het kan.",
+"chegada":"aankomst",
+"agora":"nu",
+"melhor: {h}":"beste: {h}",
+"🛑 Terminar modo viagem":"🛑 Ritmodus beëindigen",
+"Modo viagem":"Ritmodus",
+"paragem":"stop",
+"paragens":"stops",
+"em andamento":"onderweg",
+"partida":"vertrek",
+"Sem dados de {c} ao km {a}{h}.":"Geen gegevens over {c} bij km {a}{h}.",
+"Sem dados de {c} entre o km {a} e o km {b}{h}.":"Geen gegevens over {c} tussen km {a} en km {b}{h}.",
+"O resto do caminho verifiquei — sem isso não afirmo o seco.":"De rest van de route heb ik gecontroleerd — zonder dat beweer ik niet dat het droog is.",
+"pico {n} mm/h":"piek {n} mm/u",
+"mínima no percurso {t}°":"laagste op de route {t}°",
+"rajadas até {g} km/h · vento {d}":"windstoten tot {g} km/u · wind {d}",
+"vento lateral até ~{g} km/h":"zijwind tot ~{g} km/u",
+"sobe até ~{m} m":"stijgt tot ~{m} m",
+"radares fixos":"vaste flitspalen",
+"🌙 chegada depois do pôr-do-sol":"🌙 aankomst na zonsondergang",
+"Trajeto {x}":"Route {x}",
+"seco ✅":"droog ✅",
+"~{n} km 🌧️":"~{n} km 🌧️",
+"📋 Copiar resumo":"📋 Samenvatting kopiëren",
+"Faltam dados em parte do caminho — confirma antes de sair.":"Voor een deel van de route ontbreken gegevens — controleer voor je vertrekt.",
+"Resumo copiado! 📋":"Samenvatting gekopieerd! 📋",
+"Cópia automática indisponível — seleciona e copia à mão.":"Automatisch kopiëren lukt niet — selecteer en kopieer met de hand.",
+"Guardar destino":"Bestemming bewaren",
+"Nome do favorito? (ex.: Casa, Trabalho, Casa do João)":"Naam voor de favoriet? (bijv.: Thuis, Werk, Bij Jan)",
+"Guardado: {p} ⭐":"Bewaard: {p} ⭐",
+"Guardar rota":"Route bewaren",
+"Nome da rota?":"Naam van de route?",
+"🗓️ Guardar no calendário":"🗓️ In agenda zetten",
+"Define primeiro uma hora de partida (ou chegada) no futuro — depois agenda.":"Stel eerst een vertrek- of aankomsttijd in de toekomst in — daarna kun je hem inplannen.",
+"🗓️ Guardada no calendário: {p} — vê no 🗓️ no canto superior direito.":"🗓️ In de agenda gezet: {p} — te zien via de 🗓️ rechtsboven.",
+"Mais ações":"Meer acties",
+"direção desconhecida":"richting onbekend",
+"maioritariamente lateral":"grotendeels zijwind",
+"de frente":"tegenwind",
+"de costas":"meewind",
+"Vento lateral até ~{g} km/h perto do km {k} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Zijwind tot ~{g} km/u rond km {k} — stevig aan het stuur; extra opletten op bruggen, viaducten en bij het inhalen van vrachtwagens.",
+"Vento lateral de ~{g0} a ~{g1} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Zijwind van ~{g0} tot ~{g1} km/u tussen km {a} en km {b} — stevig aan het stuur; extra opletten op bruggen, viaducten en bij het inhalen van vrachtwagens.",
+"Vento lateral até ~{g} km/h entre o km {a} e o km {b} — firme no guiador; especial cuidado em pontes, viadutos e ao ultrapassar camiões.":"Zijwind tot ~{g} km/u tussen km {a} en km {b} — stevig aan het stuur; extra opletten op bruggen, viaducten en bij het inhalen van vrachtwagens.",
+"A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.":"Bij ~{v} km/u voelt het als {c}° (lucht {t}°) — je handen verkleumen en je reageert trager. Winterhandschoenen, laagjes, en stop onderweg om op te warmen als de rit lang is.",
+"Ar a {t}° com {h}% de humidade perto do km {k}: o piso pode estar a congelar mesmo com o ar acima de zero — pontes, viadutos e zonas à sombra primeiro. Direito e suave nas curvas.":"Lucht {t}° met {h}% vochtigheid rond km {k}: het wegdek kan bevriezen zelfs boven nul — bruggen, viaducten en schaduwplekken het eerst. Rechtop en soepel door de bochten.",
+"Nevoeiro/viseira a embaciar provável perto do km {k} (~{h}) — pinlock ou viseira entreaberta, médios ligados (nunca máximos) e distância a dobrar.":"Mist of beslagen vizier waarschijnlijk rond km {k} (~{h}) — pinlock of vizier op een kier, dimlicht aan (nooit grootlicht) en dubbele afstand houden.",
+"Sol baixo de frente perto do km {k} (~{h}) — encandeia-te a ti e a quem vem atrás. Viseira escura/pala, aumenta a distância e conta que os carros não te vejam.":"Laagstaande zon recht vooruit rond km {k} (~{h}) — verblindt jou én wie achter je rijdt. Donker vizier of zonneklep, meer afstand, en ga ervan uit dat auto's je niet zien.",
+"⚠️ Perigos específicos de mota":"⚠️ Gevaren die vooral voor motorrijders gelden",
+"Para além da chuva: piso, vento, frio em andamento, visibilidade e sol — com limiares pensados para duas rodas.":"Meer dan alleen regen: wegdek, wind, kou tijdens het rijden, zicht en zon — met drempels afgestemd op twee wielen.",
+"na {r}":"op de {r}",
+"km {a}–{b}":"km {a}–{b}",
+"km {a}":"km {a}",
+"⚠️ Perigo no teu trajeto":"⚠️ Gevaar op je route",
+"sem chuva nem vento perigoso no caminho":"geen regen of gevaarlijke wind onderweg",
+"🌧️💨 Onde apanhas chuva e vento":"🌧️💨 Waar je regen en wind krijgt",
+"Troços do trajeto com condições a merecer atenção, à hora a que lá passas.":"Stukken van de route die aandacht verdienen, op het uur dat jij er bent.",
+"a identificar a zona…":"de omgeving bepalen…",
+"vento lateral":"zijwind",
+"abranda e segura bem o guiador":"vaart minderen en het stuur stevig vasthouden",
+"seco a qualquer hora até às {h}":"droog op elk moment tot {h}",
+"sol":"zon",
+"Valores desta zona, ~{d} em redor":"Waarden voor deze omgeving, ~{d} rondom",
+"🧤 Equipamento recomendado":"🧤 Aanbevolen uitrusting",
+"Com base nas próximas 6 horas.":"Op basis van de komende 6 uur.",
+"visto às {h}":"gezien om {h}",
+"⏱️ Próximas 24 horas":"⏱️ Komende 24 uur",
+"melhor janela":"beste moment",
+"índice {v}":"index {v}",
+"Altura da barra = índice moto (quanto mais alta, melhor). Passa o rato para detalhes.":"Balkhoogte = motorindex (hoe hoger, hoe beter). Ga met de muis erover voor details.",
+"Altura da barra = índice moto (quanto mais alta, melhor). Toca numa barra para detalhes.":"Balkhoogte = motorindex (hoe hoger, hoe beter). Tik op een balk voor details.",
+"Altura da barra = índice moto (quanto mais alta, melhor). Sem janelas boas nas próximas horas.":"Balkhoogte = motorindex (hoe hoger, hoe beter). Geen goede momenten de komende uren.",
+"AGORA":"NU",
+"Condições":"Omstandigheden",
+"Temperatura":"Temperatuur",
+"sente-se {t}°":"voelt als {t}°",
+"Chuva":"Regen",
+"Rajadas":"Windstoten",
+"Sem dados":"Geen gegevens",
+"💨 vento — direção (seta) e rajadas em km/h · negrito = rajadas ≥ 45":"💨 wind — richting (pijl) en windstoten in km/u · vet = windstoten ≥ 45",
+"🌦️ Próximas 2 horas, ao quarto de hora":"🌦️ Komende 2 uur, per kwartier",
+"Chuva a partir de ~{h} — intensidade em azul (mais escuro = mais forte).":"Regen vanaf ~{h} — intensiteit in blauw (donkerder = heviger).",
+"Sem chuva no que veio — mas faltam {n} dos {m} quartos de hora.":"Geen regen in wat binnenkwam — maar {n} van de {m} kwartieren ontbreken.",
+"Sem chuva prevista nas próximas 2 horas — arranca à vontade.":"Geen regen verwacht de komende 2 uur — je kunt rustig vertrekken.",
+"Precipitação":"Neerslag",
+"sem dados":"geen gegevens",
+"📅 Próximos 7 dias":"📅 Komende 7 dagen",
+"Para planear a voltinha de fim de semana.":"Om je weekendritje te plannen.",
+"Bom? — faltam dados":"Goed? — gegevens ontbreken",
+"Máx / mín":"Max / min",
+"Prob. chuva":"Kans op regen",
+"Total chuva":"Totale regen",
+"Rajadas máx":"Max. windstoten",
+"📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede.":"📴 Geen internet — opgeslagen kaart en route blijven werken. Gps heeft geen netwerk nodig.",
+"📶 Internet de volta — a atualizar a meteorologia.":"📶 Internet terug — het weer wordt bijgewerkt.",
+"Créditos e licenças do mapa":"Kaartcredits en licenties",
+"Mapa indisponível — precisa de ligação à internet.":"Kaart niet beschikbaar — internetverbinding nodig.",
+"📍 A localização está recusada — o cartão junto à origem diz o caminho.":"📍 Locatie is geweigerd — de kaart bij het vertrekpunt legt uit hoe je dat oplost.",
+"📡 Sem posição agora — tenta a céu aberto.":"📡 Nu geen positie — probeer het in de open lucht.",
+"Ponto no mapa":"Punt op de kaart",
+"Ir para aqui":"Hierheen rijden",
+"Partir daqui":"Hiervandaan vertrekken",
+"Adicionar como paragem":"Toevoegen als stop",
+"Guardar este sítio":"Deze plek bewaren",
+"Casa":"Thuis",
+"Trabalho":"Werk",
+"Sítio":"Plek",
+"⭐ Guardado: {p} — o nome muda-se em Definições → Os meus sítios.":"⭐ Bewaard: {p} — de naam wijzig je bij Instellingen → Mijn plekken.",
+"🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Thuis bijgewerkt — vanaf nu voorspel ik voor deze plek.",
+"📍 Partida definida: {p}":"📍 Vertrekpunt ingesteld: {p}",
+"➕ Paragem adicionada: {p}":"➕ Stop toegevoegd: {p}",
+"🏁 A calcular rota para {p}…":"🏁 Route naar {p} berekenen…",
+"Não sei onde fica {x} — não tenho as coordenadas. Permite a localização, ou escolhe o sítio na lista de sugestões.":"Ik weet niet waar {x} ligt — ik heb geen coördinaten. Geef toegang tot je locatie, of kies de plek uit de suggesties.",
+"Ainda não sei onde estás — sem isso não consigo traçar a rota. Permite a localização, ou escreve a origem e escolhe-a na lista.":"Ik weet nog niet waar je bent — zonder dat kan ik geen route berekenen. Geef toegang tot je locatie, of typ het vertrekpunt en kies het uit de lijst.",
+"Indica {x}.":"Geef {x} op.",
+"Máximo de 4 paragens.":"Maximaal 4 stops.",
+"Paragem (ex.: Continente, bomba de gasolina, casa do João…)":"Stop (bijv.: Albert Heijn, tankstation, bij Jan thuis…)",
+"Remover paragem":"Stop verwijderen",
+"Ditar a paragem por voz":"Stop inspreken",
+"Trajeto {x} aplicado 🗺️":"Route {x} toegepast 🗺️",
+"A calcular…":"Bezig met berekenen…",
+"Não encontrei uma rota de estrada entre estes pontos. Confirma que são localidades acessíveis por estrada.":"Ik vond geen route over de weg tussen deze punten. Controleer of ze over de weg bereikbaar zijn.",
+"Rota demasiado curta.":"Route te kort.",
+"⏱️ Para chegares às {h} já devias ter saído — mostro-te a partir de agora.":"⏱️ Om {h} aan te komen had je al weg moeten zijn — ik toon het vanaf nu.",
+"⏱️ Para chegares às {h}, parte às {d}.":"⏱️ Om {h} aan te komen vertrek je om {d}.",
+"🧭 Modo viagem terminado — calculaste um trajeto novo.":"🧭 Ritmodus beëindigd — je hebt een nieuwe route berekend.",
+"Retomei o trajeto para {d} da tua última viagem. Toca em Modo viagem quando quiseres arrancar.":"Ik heb de route naar {d} van je vorige rit teruggehaald. Tik op Ritmodus wanneer je wilt vertrekken.",
+"Esta rota não saiu. Confirma a origem e o destino na lista de sugestões e tenta outra vez.":"Deze route lukte niet. Kies vertrekpunt en bestemming uit de suggesties en probeer opnieuw.",
+"Calcular rota e chuva":"Route en regen berekenen",
+"⚠️ Zona de perigo":"⚠️ Gevarenzone",
+"por volta do km {k}":"rond km {k}",
+"Em França a lei não permite indicar o ponto exato.":"In Frankrijk verbiedt de wet het aanwijzen van het exacte punt.",
+"📸 Radar fixo":"📸 Vaste flitspaal",
+"— limite {v}":"— limiet {v}",
+"km {k} do teu trajeto":"km {k} van je route",
+"dados OpenStreetMap":"gegevens OpenStreetMap",
+"🛑 Paragem {n}: {p}":"🛑 Stop {n}: {p}",
+"🏁 Partida":"🏁 Vertrek",
+"🎯 Chegada":"🎯 Aankomst",
+"chegas ~{a} · voltas à estrada ~{b}":"aankomst ~{a} · weer op weg ~{b}",
+"perto do km {k}":"bij km {k}",
+"💨 Rajadas fortes: cuidado extra em pontes, viadutos e ultrapassagens a pesados":"💨 Harde windstoten: extra opletten op bruggen, viaducten en bij het inhalen van vrachtwagens",
+"🌫️ Viseira com pinlock / anti-embaciamento e luzes sempre ligadas":"🌫️ Vizier met pinlock / anticondens en licht altijd aan",
+"🦺 Parte do período é de noite — colete ou elementos refletores ajudam":"🦺 Een deel van de periode is 's nachts — een hesje of reflecterende elementen helpen",
+"😎 Condições confortáveis — equipamento habitual chega":"😎 Comfortabele omstandigheden — je gewone uitrusting volstaat",
+"Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.":"Geen verbinding — ik kon de zoekdienst niet bereiken. Probeer het zo meteen opnieuw.",
+"Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Geen resultaten voor deze zoekopdracht — controleer de spelling of probeer een andere naam.",
+"perto de: {r}":"in de buurt van: {r}",
+"A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"De hoofdzoekdienst reageerde niet ({m}) — deze resultaten komen uit de reservebron.",
+"distância?":"afstand?",
+"Voz não suportada neste browser — escreve o destino.":"Spraak wordt in deze browser niet ondersteund — typ je bestemming.",
+"Sem reconhecimento de voz — repete ou escreve o destino.":"Geen spraakherkenning — herhaal het of typ je bestemming.",
+"Voz indisponível neste browser.":"Spraak niet beschikbaar in deze browser.",
+"Ditar por voz":"Inspreken",
+"🏠 Mudar a casa para {p}, a {d} de distância? Isto não veio de um gesto teu, por isso pergunto antes de gravar.":"🏠 Je thuis verplaatsen naar {p}, op {d} afstand? Dit kwam niet uit een handeling van jou, dus vraag ik het voordat ik iets opsla.",
+"Sim, mudar":"Ja, verplaatsen",
+"Não, manter a minha casa":"Nee, mijn thuis houden",
+"Sem previsão. Verifica a ligação à internet e tenta de novo.":"Geen verwachting. Controleer je internetverbinding en probeer opnieuw.",
+"Tentar de novo":"Opnieuw proberen",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e procura a Levante na lista (a app instalada tem entrada própria; se não aparecer, usa “Safari Websites”) → “Ao Usar a App”.":"Instellingen → Privacy en beveiliging → Locatievoorzieningen: zet de hoofdschakelaar aan en zoek Levante in de lijst (de geïnstalleerde app heeft een eigen regel; staat hij er niet, gebruik dan “Safari-websites”) → “Bij gebruik van app”.",
+"Definições → Privacidade e Segurança → Serviços de Localização: liga o interruptor geral e escolhe “Safari Websites” → “Ao Usar a App”. Depois, no Safari: botão aA (ou ⋯) junto ao endereço → Definições do Site → Localização → Permitir.":"Instellingen → Privacy en beveiliging → Locatievoorzieningen: zet de hoofdschakelaar aan en kies “Safari-websites” → “Bij gebruik van app”. Daarna in Safari: de knop aA (of ⋯) naast de adresbalk → Website-instellingen → Locatie → Sta toe.",
+"Abre o Chrome → menu ⋮ → Definições → Definições de sites → Localização → escolhe o site da Levante → Permitir. Se a Localização do telemóvel estiver desligada, liga-a primeiro nas Definições rápidas.":"Open Chrome → menu ⋮ → Instellingen → Site-instellingen → Locatie → kies de site van Levante → Sta toe. Staat de locatie van je telefoon uit, zet die dan eerst aan bij de snelle instellingen.",
+"Toca no ícone de informações do site, junto ao endereço → Permissões → Localização → Permitir. (Também em: menu → Definições → Definições de sites → Localização.)":"Tik op het info-icoon van de site naast de adresbalk → Machtigingen → Locatie → Sta toe. (Ook via: menu → Instellingen → Site-instellingen → Locatie.)",
+"✍️ Escrever a origem à mão funciona sempre — a rota não precisa de localização.":"✍️ Het vertrekpunt zelf typen werkt altijd — de route heeft geen locatie nodig.",
+"✍️ Escrever a cidade à mão funciona sempre — a previsão não precisa de localização.":"✍️ De stad zelf typen werkt altijd — de verwachting heeft geen locatie nodig.",
+"A caixa do sistema vai abrir: a posição serve para prever o tempo onde estás.":"Het systeemvenster gaat open: je positie dient om het weer te voorspellen waar je bent.",
+"Este aparelho não dá acesso à localização.":"Dit toestel geeft geen toegang tot je locatie.",
+"O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.":"De telefoon kan je positie nu niet geven — systeemlocatie uit, geen signaal, of het duurde te lang. Het is geen kwestie van toestemming: probeer het opnieuw, het liefst in de open lucht.",
+"📍 A localização está recusada para a Levante":"📍 De locatie is geweigerd voor Levante",
+"A caixa do sistema só aparece uma vez e não pode ser repetida pela app. Para ligar outra vez:":"Het systeemvenster verschijnt maar één keer en de app kan het niet opnieuw oproepen. Zo zet je het weer aan:",
+"📍 Localização ligada.":"📍 Locatie aan.",
+"A app mudou de morada e o browser voltou a pedir autorização da localização — a tua casa veio contigo, a permissão não.":"De app is verhuisd en de browser vraagt opnieuw toestemming voor je locatie — je thuis is meegekomen, de toestemming niet.",
+"Autorizar a localização":"Locatie toestaan",
+"Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"De waarschuwingen zijn stil op het nieuwe adres: de toestemming voor meldingen verhuist niet mee. Zolang je die niet geeft, waarschuwen «in de gaten houden» en de Schildwacht je niet.",
+"Voltar a autorizar os avisos":"Meldingen opnieuw toestaan",
+"A minha posição":"Mijn positie",
+"A obter a tua posição… 📡":"Bezig je positie te bepalen… 📡",
+"Origem: {p}":"Vertrek: {p}",
+"Localização: {p}":"Locatie: {p}",
+"Sem dados suficientes para prever as janelas de chuva de hoje.":"Niet genoeg gegevens om de regenvensters van vandaag te voorspellen.",
+"Sem chuva prevista até às {h}":"Geen regen verwacht tot {h}","{h} de amanhã":"{h} morgen",
+"Sem chuva até às {h}":"Geen regen tot {h}",
+"limpa depois das {h}":"klaart op na {h}",
+"sem dados de parte das horas":"geen gegevens voor een deel van de uren",
+"{r} por volta das {h} ({d}). Evita estar na estrada nesse período.":"{r} rond {h} ({d}). Zorg dat je dan niet op de weg zit.",
+"Primeira chuva depois de {n} dias secos: o óleo acumulado no alcatrão solta-se e o piso vira sabonete na primeira meia hora. Trava cedo e suave, evita pinturas e tampas de saneamento.":"Eerste regen na {n} droge dagen: de olie in het asfalt komt los en het wegdek wordt het eerste half uur glad als zeep. Rem vroeg en zacht, mijd wegmarkeringen en putdeksels.",
+"índice moto":"motorindex",
+"{c} · {t}° em {p} — decisão para as próximas 3 h":"{c} · {t}° in {p} — beslissing voor de komende 3 uur",
+"céu por confirmar":"lucht nog te bevestigen",
+"Índice calculado com o perfil {p} — muda-o nas definições.":"Index berekend met het profiel {p} — je verandert het in de instellingen.",
+"Sem chuva, vento controlado e temperatura agradável.":"Geen regen, wind onder controle en een aangename temperatuur.",
+"A partir das {h}: {c} — se fores, volta antes disso.":"Vanaf {h}: {c} — als je gaat, wees dan eerder terug.",
+"Melhora a partir das {h} ({d}).":"Het wordt beter vanaf {h} ({d}).",
+"Sem dados de {c} para as {h}.":"Geen gegevens over {c} voor {h}.",
+"O que verifiquei está bom, mas sem isso não afirmo o verde.":"Wat ik heb gecontroleerd is goed, maar zonder dat durf ik geen groen te zeggen.",
+"Os dados em falta não melhoravam esta resposta.":"De ontbrekende gegevens zouden dit antwoord niet beter maken.",
+"sensação {t}°":"gevoel {t}°",
+"rajadas":"windstoten",
+"UV máx":"UV max",
+"farmácia":"apotheek",
+"hospital":"ziekenhuis",
+"combustível":"tankstation",
+"estacionamento":"parkeren",
+"a tua posição":"je positie",
+"casa":"thuis",
+"o mapa à vista":"de kaart in beeld",
+"coordenadas":"coördinaten",
+"Radares fixos: sigo a lei de cada país por onde o trajeto passa.":"Flitspalen: ik volg de wet van elk land waar je route doorheen gaat.",
+"Só mostro radares nos países onde fui ler a lei, um a um. Neste não fui — e como há países onde é a própria app que é punida, prefiro não mostrar nada a arriscar.":"Ik toon flitspalen alleen in landen waar ik de wet zelf ben gaan lezen, stuk voor stuk. In dit land niet — en omdat er landen zijn waar de app zélf beboet wordt, toon ik liever niets dan risico te lopen.",
+"Aqui ({p}): não mostro avisos de radar.":"Hier ({p}): ik toon geen flitspaalwaarschuwingen.",
+"Aqui ({p}): mostro zonas de perigo alargadas, não o ponto exato.":"Hier ({p}): ik toon ruime gevarenzones, niet het exacte punt.",
+"Aqui ({p}): mostrar radares é escolha tua — o interruptor está aqui em baixo.":"Hier ({p}): flitspalen tonen is jouw keuze — de schakelaar staat hieronder.",
+"Aqui ({p}): mostro os radares fixos no trajeto e aviso-te.":"Hier ({p}): ik toon de vaste flitspalen op de route en waarschuw je.",
+"A lei deste país permite avisos de radares fixos — li-a antes de os mostrar.":"De wet van dit land staat waarschuwingen voor vaste flitspalen toe — ik heb hem gelezen voordat ik ze toonde.",
+"Porquê?":"Waarom?",
+"📸 Radares conhecidos no trajeto":"📸 Bekende flitspalen op de route",
+"Radares indisponíveis agora. Recalcula daqui a pouco.":"Flitspalen nu niet beschikbaar. Bereken zo meteen opnieuw.",
+"A procurar radares fixos ao longo do caminho…":"Bezig met zoeken naar vaste flitspalen langs de route…",
+"sem radares fixos conhecidos no trajeto":"geen bekende vaste flitspalen op de route",
+"({n} radares deste trajeto não são mostrados.)":"({n} flitspalen op deze route worden niet getoond.)",
+"Neste trajeto não mostro radares — ver abaixo porquê.":"Op deze route toon ik geen flitspalen — hieronder staat waarom.",
+"Nenhum radar fixo conhecido neste trajeto (dados OpenStreetMap). Radares móveis não aparecem — juízo! 😉":"Geen bekende vaste flitspaal op deze route (gegevens van OpenStreetMap). Mobiele controles zie je niet — dus blijf bij de les! 😉",
+"Radares fixos (dados da comunidade OpenStreetMap — pode não estar completo; radares móveis não aparecem). No Modo Viagem aviso-te por voz a 1 km.":"Vaste flitspalen (gegevens van de OpenStreetMap-gemeenschap — mogelijk niet compleet; mobiele controles zie je niet). In Ritmodus waarschuw ik je met stem op 1 km.",
+"zona km {a}–{b}":"zone km {a}–{b}",
+"zona de perigo":"gevarenzone",
+"limite {v}":"limiet {v}",
+"radar fixo":"vaste flitspaal",
+"no teu trajeto":"op je route",
+"+{n} radares adicionais no mapa.":"+{n} extra flitspalen op de kaart.",
+"estado do céu":"toestand van de lucht",
+"Trovoada prevista — risco elevado":"Onweer voorspeld — hoog risico",
+"Chuva/chuvisco gelado — piso traiçoeiro":"IJzel of ijzige motregen — verraderlijk wegdek",
+"Neve — não é dia de duas rodas":"Sneeuw — geen dag voor twee wielen",
+"chuva":"regen",
+"Chuva forte ({n} mm/h)":"Zware regen ({n} mm/u)",
+"Chuva ({n} mm/h)":"Regen ({n} mm/u)",
+"Chuvisco / chuva fraca ({n} mm/h)":"Motregen / lichte regen ({n} mm/u)",
+"{p}% de probabilidade de chuva":"{p}% kans op regen",
+"vento":"wind",
+"Rajadas até {g} km/h":"Windstoten tot {g} km/u",
+"Vento sustentado forte":"Aanhoudend harde wind",
+"temperatura":"temperatuur",
+"Temperatura negativa — risco de gelo no piso":"Temperatuur onder nul — kans op ijzel op de weg",
+"Sensação de {t}° — frio extremo":"Gevoelstemperatuur {t}° — extreme kou",
+"Sensação de {t}° — frio a sério":"Gevoelstemperatuur {t}° — serieus koud",
+"Fresco (sensação {t}°)":"Fris (gevoel {t}°)",
+"Calor extremo (sensação {t}°)":"Extreme hitte (gevoel {t}°)",
+"Muito calor (sensação {t}°)":"Erg warm (gevoel {t}°)",
+"Risco de gelo em zonas de sombra e pontes":"Kans op ijzel in de schaduw en op bruggen",
+"Calor perigoso (sensação {t}°) — risco de golpe de calor":"Gevaarlijke hitte (voelt als {t}°) — kans op een hitteberoerte",
+"Calor perigoso e abafado (sensação {t}°) — o suor já não arrefece":"Gevaarlijke, benauwde hitte (voelt als {t}°) — zweten koelt je niet meer af",
+"Sensação de {t}° — bebe e para mais vezes":"Voelt als {t}° — drink genoeg en stop vaker",
+"Sensação de {t}°, abafado — bebe e para mais vezes":"Voelt als {t}°, benauwd — drink genoeg en stop vaker",
+"Sensação de {c}° e ar abafado no ponto mais quente do trajeto — o suor deixa de arrefecer e o golpe de calor instala-se sem aviso. Não é dia de fazer este percurso de mota.":"Voelt als {c}° met benauwde lucht op het heetste punt van de route — zweten koelt niet meer en een hitteberoerte komt zonder waarschuwing. Geen dag om deze rit te maken.",
+"Sensação de {c}° no ponto mais quente do trajeto — cãibras e exaustão são prováveis, e o golpe de calor também se a exposição continuar. Não é dia de fazer este percurso de mota.":"Voelt als {c}° op het heetste punt van de route — kramp en uitputting liggen voor de hand, en een hitteberoerte ook als je blijft rijden. Geen dag om deze rit te maken.",
+"Sensação de {c}° no ponto mais quente do trajeto — bebe antes de sair, pára mais vezes e usa equipamento ventilado. A sensação é medida à sombra: ao sol e de equipamento fechado é mais.":"Voelt als {c}° op het heetste punt van de route — drink voor vertrek, stop vaker en draag geventileerde kleding. Dat cijfer geldt in de schaduw: in de volle zon en dichte kleding is het meer.",
+"humidade":"luchtvochtigheid",
+"visibilidade":"zicht",
+"Visibilidade reduzida ({v})":"Beperkt zicht ({v})",
+"nevoeiro":"mist",
+"🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Volledig regenpak (jas + broek + overschoenen)",
+"🌦️ Leva o fato de chuva na mala — vais precisar dele":"🌦️ Neem je regenpak mee — je gaat het nodig hebben",
+"🧊 Gelo possível: evita a madrugada, pontes e zonas de sombra":"🧊 IJzel mogelijk: vermijd de vroege ochtend, bruggen en schaduwplekken",
+"🥶 Luvas de inverno + forro térmico + proteção de pescoço":"🥶 Winterhandschoenen + thermische voering + nekwarmer",
+"🧥 Camadas quentes — a sensação térmica em andamento é bem mais baixa":"🧥 Warme lagen — de gevoelstemperatuur op de motor ligt een stuk lager",
+"🥵 Hidrata-te e faz pausas — casaco ventilado se tiveres":"🥵 Drink genoeg en las pauzes in — geventileerde jas als je die hebt",
+"🏠 Bem-vindo à casa nova — trouxe contigo: {x}.":"🏠 Welkom in je nieuwe huis — ik heb dit meegenomen: {x}.",
+"Língua do telemóvel":"Taal van je telefoon",
+"Planear trajeto":"Route plannen",
+"Vê exatamente em que troços do caminho vai chover — e a melhor hora para sair.":"Zie precies op welke stukken van de route het gaat regenen — en wanneer je het beste vertrekt.",
+"Paragens no caminho":"Stops onderweg",
+"até 4":"max. 4",
+"Tempo em cada paragem":"Tijd per stop",
+"fico 0 min":"0 min blijven",
+"fico 1 h":"1 uur blijven",
+"fico {n} min":"{n} min blijven",
+"o resto do dia":"de rest van de dag",
+"só passo lá":"ik rij er alleen langs",
+"Agora":"Nu",
+"Partir às":"Vertrek om",
+"Chegar às":"Aankomst om",
+"🗓️ Viagens planeadas":"🗓️ Geplande ritten",
+"Calcula uma rota com hora futura e toca em «🗓️ Guardar no calendário» para ela aparecer aqui, com o tempo previsto.":"Bereken een route met een vertrektijd in de toekomst en tik op «🗓️ In agenda zetten» om hem hier te zien, met het verwachte weer.",
+"Perfil de decisão":"Beslisprofiel",
+"Trovoada, gelo e neve dão sempre vermelho, por segurança.":"Onweer, ijzel en sneeuw geven altijd rood — voor je eigen veiligheid.",
+"Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Uit. Aan controleert hij het weer waar je bent zolang de app open staat, en waarschuwt met stem, trilling en melding wanneer de regen eraan komt (of stopt), de wind opsteekt of er onweer aankomt.",
+"A app não carregou por completo — falta o motor do mapa. Verifica a ligação e recarrega.":"De app is niet volledig geladen — de kaartmotor ontbreekt. Controleer je verbinding en herlaad.",
+"Recarregar a app":"App herladen",
+"Dados:":"Gegevens:",
+"Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.":"Geen accounts, geen registratie, geen tracking. Je locatie en je bestemming gaan naar de weer- en routediensten om je antwoord te geven — en wij bewaren ze niet. Rijd met je hoofd: bij een rode waarschuwing blijf je thuis.",
+"🛑 Terminar":"🛑 Stoppen",
+"hoje":"vandaag",
+"amanhã":"morgen",
+"Vários serviços sem resposta — a rede do aparelho pode estar em baixo. O que vês é a última leitura guardada.":"Meerdere diensten reageren niet — misschien ligt de verbinding van je toestel eruit. Wat je ziet is de laatst opgeslagen meting.",
+"{s} não respondeu. O que vês é a última leitura guardada; o resto da app continua a funcionar.":"{s} reageerde niet. Wat je ziet is de laatst opgeslagen meting; de rest van de app werkt gewoon.",
+"presente":"aanwezig",
+"em falta":"ONTBREEKT",
+"a mais — não devia estar aqui":"te veel — hoort hier niet",
+"fora, como deve ser":"weg, zoals het hoort",
+"a minha posição":"mijn positie",
+"ainda não a pedi nesta sessão":"nog niet opgevraagd in deze sessie",
+"agora mesmo":"zojuist",
+"há {m} min":"{m} min geleden",
+"±{m} m":"±{m} m",
+"margem desconhecida":"marge onbekend",
+"morada só ao nível da rua ou da cidade":"adres alleen op straat- of stadsniveau",
+"⚠️ Falta uma peça da app — recarrega. Se continuar, copia o relatório de diagnóstico.":"⚠️ Er ontbreekt een onderdeel van de app — herlaad. Blijft het? Kopieer dan het diagnoserapport.",
+"✅ Tudo a funcionar.":"✅ Alles werkt.",
+"⚠️ Vários serviços não respondem — pode ser a ligação do telemóvel. O que já tens continua a funcionar.":"⚠️ Meerdere diensten reageren niet — het kan de verbinding van je telefoon zijn. Wat je al hebt blijft werken.",
+"⚠️ {s} não responde — o resto da app funciona.":"⚠️ {s} reageert niet — de rest van de app werkt.",
+"Ainda não falei com nenhum serviço nesta sessão.":"Nog geen enkele dienst gesproken in deze sessie.",
+"respondeu":"reageerde",
+"sem nome":"naamloos",
+"🏠 A minha casa":"🏠 Mijn thuis",
+"⭐ guardado por ti":"⭐ door jou bewaard",
+"🕘 pesquisaste isto há pouco":"🕘 kort geleden gezocht",
+"rua":"straat",
+"morada":"adres",
+"parque":"park",
+"rio":"rivier",
+"sítio":"plek",
+"igreja":"kerk",
+"alojamento":"accommodatie",
+"café":"café",
+"restaurante":"restaurant",
+"supermercado":"supermarkt",
+},
+};
 /* razões do índice + favoritos */
 Object.assign(I18N.en,{
 "Chuva forte ({n} mm/h)":"Heavy rain ({n} mm/h)","Chuva ({n} mm/h)":"Rain ({n} mm/h)","Chuvisco / chuva fraca ({n} mm/h)":"Drizzle / light rain ({n} mm/h)",
@@ -3207,8 +4084,7 @@ const WMO = {
   71:["Neve fraca","🌨️","🌨️"],73:["Neve","🌨️","🌨️"],75:["Neve forte","❄️","❄️"],77:["Grãos de neve","🌨️","🌨️"],
   80:["Aguaceiros fracos","🌦️","🌧️"],81:["Aguaceiros","🌧️","🌧️"],82:["Aguaceiros violentos","⛈️","⛈️"],
   85:["Aguaceiros de neve","🌨️","🌨️"],86:["Aguaceiros de neve fortes","❄️","❄️"],
-  95:["Trovoada","⛈️","⛈️"],96:["Trovoada com granizo","⛈️","⛈️"],99:["Trovoada com granizo forte","⛈️","⛈️"],
-};
+  95:["Trovoada","⛈️","⛈️"],96:["Trovoada com granizo","⛈️","⛈️"],99:["Trovoada com granizo forte","⛈️","⛈️"],};
 const wmoTxt = (c)=> t((WMO[c]||["—","❓","❓"])[0]);
 const wmoIco = (c,day=1)=> (WMO[c]||["—","❓","❓"])[day?1:2];
 const THUNDER=[95,96,99], FREEZING=[56,57,66,67], SNOW=[71,73,75,77,85,86], FOG=[45,48];
@@ -3593,7 +4469,9 @@ function pintarPecas(){
     linha.setAttribute("data-peca",p.id);
     linha.setAttribute("data-ok",p.bom?"sim":"nao");
     linha.appendChild(el("span","saude-ponto"+(p.bom?" bom":" mau"),"●"));
-    linha.appendChild(el("span","saude-host",p.id));
+    /* dd-173 §5.3: o nome de gente à frente, o técnico em cinzento ao lado */
+    linha.appendChild(el("span","saude-host",t(PECA_HUMANA[p.id]||p.id)));
+    linha.appendChild(el("span","saude-tec small muted",p.id));
     const dito=p.estado==="presente"?t("presente")
               :p.estado==="em falta"?t("em falta")
               :p.estado==="a mais"?t("a mais — não devia estar aqui")
@@ -3602,8 +4480,107 @@ function pintarPecas(){
     c.appendChild(linha);
   }
 }
+/* dd-170 §3: a POSIÇÃO é uma peça da app como as outras, e é a única que
+   tinha uma margem de erro para declarar. Uma captura deste painel passa a
+   responder «porque é que a morada está diferente?» sem ninguém adivinhar. */
+function pintarPosicaoSaude(){
+  const c=$("#saude-pecas"); if(!c) return;
+  const linha=el("div","saude-linha");
+  linha.setAttribute("data-test","peca-linha");
+  linha.setAttribute("data-peca","posicao");
+  const p=posFresca(Infinity);
+  const bom=!!p&&Number.isFinite(p.acc)&&p.acc<=MORADA_RUA_M;
+  linha.setAttribute("data-ok",p?(bom?"sim":"nao"):"nao");
+  linha.appendChild(el("span","saude-ponto"+(bom?" bom":" mau"),"●"));
+  linha.appendChild(el("span","saude-host",t("a minha posição")));
+  let dito;
+  if(!p) dito=t("ainda não a pedi nesta sessão");
+  else{
+    const mins=Math.round(p.idade/60000);
+    const quando=mins<1?t("agora mesmo"):t("há {m} min",{m:mins});
+    /* margem desconhecida diz-se desconhecida — é o dd-61 outra vez: um
+       número em falta nunca cai para o valor mais tranquilizador */
+    dito=(Number.isFinite(p.acc)?t("±{m} m",{m:Math.round(p.acc)}):t("margem desconhecida"))+" · "+quando;
+    if(!bom) dito+=" · "+t("morada só ao nível da rua ou da cidade");
+  }
+  linha.appendChild(el("span","saude-estado small muted",dito));
+  linha.setAttribute("data-acc",p&&Number.isFinite(p.acc)?String(Math.round(p.acc)):"");
+  c.appendChild(linha);
+}
+/* ═══ dd-173 §5 — AS TRÊS CAMADAS DO «ESTADO DA APP» ══════════════════════
+   O painel anterior era honesto e ilegível: dizia «maplibregl · presente»,
+   «i18n · presente» a uma pessoa que só quer saber se a app está boa. Uma
+   informação verdadeira em linguagem que ninguém lê não informa ninguém.
+
+   CAMADA 1 — à superfície, UMA linha de gente: «Tudo a funcionar» ou o nome
+   do serviço que caiu, e a garantia de que o resto anda.
+   CAMADA 2 — o painel inteiro, ESCONDIDO, cinco toques no carimbo da versão
+   (o padrão das opções de programador do Android): ninguém lá chega por
+   acaso, qualquer pessoa lá chega se lhe dissermos como.
+   CAMADA 3 — lá dentro, nomes humanos com o técnico em cinzento ao lado. Os
+   SERVIÇOS mantêm o nome próprio (Open-Meteo, Geoapify, OpenFreeMap): são
+   públicos por obrigação de licença, e escondê-los seria o contrário do que
+   a licença pede. */
+/* ⚠️ Estas chaves passam pelo t() por VARIÁVEL (`t(PECA_HUMANA[p.id])`), e
+   por isso a auditoria de línguas NÃO as conta — é a classe dos «+103 por
+   variável» do relatório de inacabados. Quem acrescentar uma peça aqui tem
+   de acrescentar a chave aos três dicionários À MÃO. Foi a régua do ecrã
+   (test/texto-por-traduzir) que apanhou as três primeiras em português. */
+const PECA_HUMANA={
+  maplibregl:"Motor do mapa", Mapa:"Porta do mapa", i18n:"Tradução",
+  store:"Preferências", fetch:"Ligação aos serviços",
+  Leaflet:"Motor antigo (tem de estar fora)",
+};
+function resumoDaSaude(){
+  const pecasMal=(state.pecas||[]).filter(p=>!p.bom);
+  const doentes=hostsEmFalha();
+  if(pecasMal.length) return {ok:false, txt:t("⚠️ Falta uma peça da app — recarrega. Se continuar, copia o relatório de diagnóstico.")};
+  if(!doentes.length) return {ok:true, txt:t("✅ Tudo a funcionar.")};
+  const fams=[...new Set(doentes.map(d=>d.fam))];
+  if(fams.length>=2) return {ok:false, txt:t("⚠️ Vários serviços não respondem — pode ser a ligação do telemóvel. O que já tens continua a funcionar.")};
+  return {ok:false, txt:t("⚠️ {s} não responde — o resto da app funciona.",{s:t(ROTULO_FAM[fams[0]]||ROTULO_FAM.outro)})};
+}
+function pintarResumoSaude(){
+  const n=$("#saude-resumo"); if(!n) return;
+  const r=resumoDaSaude();
+  n.textContent=r.txt;
+  n.setAttribute("data-ok",r.ok?"sim":"nao");
+}
+/* ═══ O RELATÓRIO DE DIAGNÓSTICO — E O QUE ELE NUNCA LEVA ═════════════════
+   REGRA DURA (dd-173 §5.4): sem coordenadas, sem moradas, sem nomes de
+   sítios guardados. O relatório serve para perceber uma AVARIA, não para
+   descrever a vida de quem a teve. E o ecrã diz o que inclui ANTES de
+   copiar — pedir para copiar sem dizer o que vai lá dentro é pedir uma
+   assinatura em branco.
+   Nada é enviado a lado nenhum: é a pessoa que cola onde quiser. */
+function relatorioDiagnostico(){
+  /* NÃO chamar `L` a nada: `L.` é o nome do Leaflet e o `lint-motor`
+     vigia-o. Uma variável local com esse nome cegava a régua na vizinhança
+     inteira — apanhado pelo próprio linter, que é para isso que existe. */
+  const linhas=[];
+  linhas.push(`Levante — diagnóstico`);
+  linhas.push(`versão: ${BUILD}`);
+  try{ linhas.push(`sw: ${state.swV||"—"}`); }catch(e){}
+  linhas.push(`língua: ${state.lang} (guardada: ${store.get("lang")||"—"})`);
+  linhas.push(`unidades: ${state.units||"—"}`);
+  linhas.push(`peças:`);
+  for(const p of state.pecas||[]) linhas.push(`  ${p.bom?"ok":"MAL"} ${p.id} — ${p.estado}`);
+  const pf=posFresca(Infinity);
+  linhas.push(`posição: ${pf?`±${Number.isFinite(pf.acc)?Math.round(pf.acc):"?"} m, há ${Math.round(pf.idade/60000)} min`:"não pedida nesta sessão"}`);
+  linhas.push(`serviços:`);
+  const s=state.saude||{};
+  const hs=Object.keys(s).sort();
+  if(!hs.length) linhas.push(`  (nenhum contactado nesta sessão)`);
+  for(const h of hs){ const a=s[h];
+    const min=a.quando?Math.round((Date.now()-a.quando)/60000):null;
+    linhas.push(`  ${a.falhas===0?"ok":"MAL"} ${h} — ${a.falhas===0?"respondeu":(a.tipo||"sem resposta")}${min===null?"":` (há ${min} min)`}`);
+  }
+  return linhas.join("\n");
+}
 function pintarPainelRede(){
   pintarPecas();
+  pintarPosicaoSaude();
+  pintarResumoSaude();
   const c=$("#saude-rede"); if(!c) return;
   c.textContent="";
   const s=state.saude||{}; const hosts=Object.keys(s).sort();
@@ -3728,8 +4705,12 @@ async function fetchDashboardWx(lat,lon){
   const u=new URL(OM_BASE);
   u.search=new URLSearchParams({
     latitude:lat.toFixed(4), longitude:lon.toFixed(4),
-    current:"temperature_2m,apparent_temperature,relative_humidity_2m,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m",
-    hourly:"temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,visibility,relative_humidity_2m,is_day",
+    /* `wet_bulb_temperature_2m` (dd-178 B): vem na MESMA chamada, sem custo —
+       medido em 105 768/105 768 horas de arquivo. Distingue os 45° secos de
+       Phoenix dos 38° húmidos de Banguecoque, que hoje colapsavam no mesmo
+       ponto. Só NOMEIA o tipo de calor; quem decide o nível é a sensação. */
+    current:"temperature_2m,apparent_temperature,relative_humidity_2m,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,wet_bulb_temperature_2m",
+    hourly:"temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,visibility,relative_humidity_2m,is_day,wet_bulb_temperature_2m",
     minutely_15:"precipitation",
     daily:"weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,sunrise,sunset,uv_index_max",
     forecast_days:"7", timeformat:"unixtime", timezone:"auto",
@@ -3785,7 +4766,14 @@ async function fetchRouteWx(points, startEpoch, endEpoch){
   u.search=new URLSearchParams({
     latitude:points.map(p=>p.lat.toFixed(3)).join(","),
     longitude:points.map(p=>p.lon.toFixed(3)).join(","),
-    hourly:"temperature_2m,precipitation_probability,precipitation,weather_code,wind_gusts_10m,wind_direction_10m,relative_humidity_2m,visibility",
+    /* ⚠️ A `apparent_temperature` FALTAVA AQUI (dd-178 C) — e era o defeito
+       maior dos dois. O `hourMetrics` tem a ponte `at: … ?? temperature_2m`,
+       por isso a rota nunca soube o que era sensação térmica: mediu ar. Um
+       troço do Alentejo às 15h com 43° de sensação vinha como 38° de ar e
+       pintava-se de verde — a app a falhar exatamente onde promete valer,
+       porque a rota é o produto. O bolbo húmido entra pela mesma porta e
+       pelo mesmo preço: uma chamada só, multi-localização. */
+    hourly:"temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_gusts_10m,wind_direction_10m,relative_humidity_2m,visibility,wet_bulb_temperature_2m",
     start_date:isoDate(startEpoch), end_date:isoDate(endEpoch),
     timeformat:"unixtime", timezone:"auto",
   }).toString();
@@ -3823,6 +4811,31 @@ function portaLimpa(hn){
   return base;
 }
 
+/* ═══ dd-168 — A PESQUISA DEGRADA-SE, E DIZ QUE SE DEGRADOU ════════════════
+   MEDIDO A 04/08/2026, em produção. O campo «CORS Access-Control-Allow-Origin»
+   da chave da Geoapify continuava a apontar para a morada velha
+   (github.io). Os «Allowed HTTP referrers» estavam certos — mas é OUTRO campo,
+   e é este que manda no browser. A resposta chegava e era DEITADA FORA antes
+   de a app lhe tocar: nem HTTP nem corpo, só um TypeError. E a pesquisa
+   inteira morria, porque o `photonSearch` abria com
+   `if(geoOn()) return geoSearch(...)` — uma porta só de ida.
+
+   A porta AO LADO já fazia bem: o `revGeocode` tenta a Geoapify e, se ela
+   falhar, cai no Photon sem drama nenhum. A mesma casa com duas doutrinas
+   para a mesma avaria — a família «a regra só é sabida pela superfície onde
+   nasceu», outra vez.
+
+   A reserva NÃO É SECRETA. Um resultado de reserva sabe menos (a pesquisa por
+   categoria é outra, a ordenação é outra) e quem procura tem direito a saber
+   porque é que a lista mudou de cara — senão a conclusão natural é «a app
+   piorou». Guarda-se aqui o MOTIVO; o desenho da lista di-lo. Zera-se em cada
+   pesquisa nova: um aviso pegajoso seria a mesma mentira ao contrário. */
+const PESQUISA={degradada:null};
+function degradarPesquisa(motivo){
+  PESQUISA.degradada=motivo||"sem resposta";
+  try{ console.warn(`[levante] pesquisa degradada para a reserva: ${PESQUISA.degradada}`); }catch(_e){}
+}
+
 /* Photon (komoot) — pesquisa instantânea, tolerante a gralhas, com viés de proximidade */
 function photonMap(f){
   const p=f.properties||{};
@@ -3840,7 +4853,19 @@ function photonMap(f){
   return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value, key:p.osm_key};
 }
 async function photonSearch(q,pos,limit=7){
-  if(geoOn()) return geoSearch(q,pos,limit);
+  if(geoOn()){
+    try{ return await geoSearch(q,pos,limit); }
+    catch(e){
+      /* dd-168: só se degrada o que se sabe que É uma queda do fornecedor —
+         o `fornecedorCaiu` do geoSearch. Qualquer outro erro sobe inteiro:
+         uma reserva que engole erros que não entende é o `catch` mudo com
+         outra roupa. */
+      if(!e?.fornecedorCaiu) throw e;
+      degradarPesquisa(e.motivo||tipoDeFalha(e));
+      /* e segue para a via SEM CHAVE, aqui em baixo — que é a mesma que a app
+         usa quando não há chave nenhuma, e portanto já está provada. */
+    }
+  }
   /* a mesma cura do geoSearch (dd-46), na reserva sem chave: o viés lat/lon
      do Photon prefere mas não restringe — o PERTO pergunta-se com bbox */
   const pede=async (extra)=>{
@@ -3920,13 +4945,20 @@ function detectPoiCat(q){
   return {tag:cat.tag, geo:cat.geo, extra:den?den.extra:"", label:cat.label};
 }
 async function poiNear(cat,pos,radiusM=30000){
-  if(geoOn()) return geoPlaces(cat,pos,radiusM).catch((e)=>{
-    /* 7g-ter: era `catch(()=>[])` — foi este silêncio que escondeu o 400 das
-       categorias erradas durante semanas. O vazio continua a ser a resposta
-       (a pesquisa por texto segue), mas o PORQUÊ fica visível. */
-    try{ console.warn("[levante] pontos-de-interesse falhou:",cat.geo||cat.label,e?.message||e); }catch(_){}
-    return [];
-  });
+  if(geoOn()){
+    try{ return await geoPlaces(cat,pos,radiusM); }
+    catch(e){
+      /* 7g-ter: era `catch(()=>[])` — foi este silêncio que escondeu o 400 das
+         categorias erradas durante semanas. O vazio continua a ser a resposta
+         (a pesquisa por texto segue), mas o PORQUÊ fica visível. */
+      try{ console.warn("[levante] pontos-de-interesse falhou:",cat.geo||cat.label,e?.message||e); }catch(_){}
+      /* dd-168: e agora deixa de ser só visível na consola. Esta porta tinha
+         EXATAMENTE a doença da porta do lado — devolvia [] e a pesquisa por
+         categoria morria calada quando o fornecedor caía. O Overpass aqui em
+         baixo é a reserva que já existia e nunca era chamada com chave. */
+      degradarPesquisa(tipoDeFalha(e));
+    }
+  }
   const body=`[out:json][timeout:20];(`+
     ["node","way"].map(k=>`${k}(around:${radiusM},${pos.lat.toFixed(5)},${pos.lon.toFixed(5)})[${cat.tag}]${cat.extra};`).join("")+
     `);out center 40;`;
@@ -4009,7 +5041,7 @@ function locaisLocais(q){
      Agora e é a mesma que o guarda da mota usa. Nunca tinha sido procurada, e
      era por isso que escrever "casa" não a encontrava. Não se pede ao
      utilizador para a guardar de novo: procura-se onde ela já está. */
-  const casa=state.home;
+  const casa=aCasa();                 // dd-170 §4: a CASA, não o sítio no ecrã
   if(casa&&Number.isFinite(casa.lat)){
     const alias=[...(PALAVRAS_CASA[state.lang]||PALAVRAS_CASA.pt), ...PALAVRAS_CASA.pt];
     let pt=pontuaTexto(casa.name,nq)*0.9;
@@ -4096,12 +5128,76 @@ function tipoSitio(r){
   if(r._poi||["amenity","shop","tourism","leisure"].includes(k)) return t("sítio");
   return null;                                      // não se sabe → não se diz
 }
+/* ═══ ONDE ESTOU — UM REGISTO SÓ, COM MARGEM E IDADE (dd-170) ══════════════
+   A app sabia onde estava e não guardava. Cada pergunta ia buscar a posição
+   outra vez, usava-a e deitava-a fora — e a MARGEM DE ERRO, que vem colada a
+   cada leitura, era deitada fora sempre. Daí três defeitos de uma vez:
+
+     · a pesquisa ordenava a partir da CASA, nunca da posição, porque a
+       posição não existia em lado nenhum onde ela pudesse ir buscá-la;
+     · a morada mostrava «Ireneweg 36C» e, no arranque seguinte, «Ireneweg
+       38» — o número de porta é uma inferência a partir de um fix, e a
+       inferência mudava de opinião a cada arranque;
+     · e o painel «Estado da app» não podia dizer o que não estava escrito.
+
+   O Modo viagem já tinha a doutrina certa desde o dd-85 §1a («a margem de
+   erro manda, à cabeça do funil») — e ela nunca tinha saído do Modo viagem.
+   Aqui está uma vez, para toda a app. */
+const POS={lat:null, lon:null, acc:null, quando:0};
+const POS_IDADE_BOA=120000;                 // 2 min: acima disto pergunta-se outra vez
+function marcarPos(lat,lon,acc){
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
+  POS.lat=lat; POS.lon=lon;
+  POS.acc=Number.isFinite(acc)?acc:null;
+  POS.quando=Date.now();
+  if(typeof pintarSaudeRede==="function") pintarSaudeRede();
+}
+function posFresca(maxIdade=POS_IDADE_BOA){
+  if(!Number.isFinite(POS.lat)||!POS.quando) return null;
+  const idade=Date.now()-POS.quando;
+  if(idade>maxIdade) return null;
+  return {lat:POS.lat, lon:POS.lon, acc:POS.acc, idade};
+}
+/* ═══ ATÉ QUE NÍVEL É QUE UMA MORADA É UM FACTO — MEDIDO, NÃO ARBITRADO ════
+   `tools/medir-precisao-morada.mjs`, 04/08/2026: 8 pontos numa circunferência
+   de raio r à volta de cinco ruas residenciais (NL, DE, BE, PT), a contar
+   quantas moradas DIFERENTES a geocodificação inversa devolve. Mediana:
+
+       ±5 m → 2 moradas    ±15 m → 6    ±25 m → 7    ±40 m → 8
+       (ruas distintas: 1 até aos ~10 m · 2 até aos ~25 m · 3-6 acima de 30)
+
+   A leitura é dura e é esta: **o número de porta NUNCA é um facto vindo de
+   um fix.** Nem no melhor raio que um telemóvel alguma vez reporta (±5 m) o
+   número é único — seria preciso ≲3 m, que a cidade não dá. A RUA é um facto
+   até aos ~25 m; acima disso já há duas e mais.
+
+   Por isso não há limiar para mostrar o número: há limiar para mostrar a
+   RUA. O número volta a ser legítimo quando NÃO vem de um fix — quando a
+   pessoa escolheu a morada numa lista, que é outra proveniência e não passa
+   por aqui. É o 7g aplicado a moradas: menos e verdadeiro. */
+const MORADA_RUA_M=25;
+function nivelDaMorada(accM){
+  /* sem margem conhecida não se arrisca: uma leitura sem `accuracy` pode ser
+     de 5 m ou de 500, e supor a boa é a mentira tranquilizadora do costume */
+  if(!Number.isFinite(accM)) return "cidade";
+  return accM<=MORADA_RUA_M?"rua":"cidade";
+}
 function refPesquisa(){
   /* dd-46: última posição conhecida → casa → mapa à vista, por esta ordem —
      e a dizer honestamente com que referência se está a ordenar (rotulo) */
   try{ if(typeof travel!=="undefined"&&travel.active&&travel.marcador){
     const c=travel.marcador.centro();
     if(Number.isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("a tua posição")}; } }catch(e){}
+  /* ═══ dd-170: A MINHA POSIÇÃO ESTAVA A FALTAR NESTA ESCADA ═══
+     O ecrã dele: «perto de: Jumbo», com 0,0 para o Jumbo e 0,0 para «A minha
+     casa» — porque escolher o Jumbo tinha reescrito a casa, e a casa era o
+     primeiro degrau. Mas a raiz é anterior: **a posição real nunca esteve
+     nesta escada fora do Modo viagem.** A app tinha-a e não a usava.
+     Só entra se for FRESCA: uma posição de há uma hora ordenava o mundo a
+     partir de onde a pessoa já não está — que é o mesmo erro com outra
+     roupa. */
+  { const p=posFresca();
+    if(p) return {lat:p.lat, lon:p.lon, rotulo:t("a tua posição"), acc:p.acc, daPosicao:true}; }
   /* ═══ dd-128 §3.2: UMA CASA DE RESERVA NÃO É UMA REFERÊNCIA ═══
      O ecrã dele às 01:54: mapa em Coimbra, «não encontrei Ireneweg 30B POR
      AQUI». A casa nova nasceu sem dados (as permissões e o storage não
@@ -4115,6 +5211,9 @@ function refPesquisa(){
      (é a lei do dd-129: a proximidade ordena, nunca exclui — e uma
      proximidade FALSA é pior que nenhuma). */
   const real=(x)=>x&&Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.prov?.como!=="reserva";
+  /* dd-170 §4: a CASA antes do sítio no ecrã. Sem isto, procurar um sítio
+     fazia dele a âncora do mundo — «perto de: Jumbo». */
+  { const c=aCasa(); if(real(c)) return {lat:c.lat, lon:c.lon, rotulo:c.name||t("casa")}; }
   for(const x of [state.home, store.get("home")])
     if(real(x)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
   try{ if(state.mapaRota&&state.mapaRota.m){ const c=Mapa.centro(state.mapaRota);
@@ -4126,6 +5225,10 @@ function refPesquisa(){
 
 const geoCache=new Map();
 async function geocode(q){
+  /* dd-168: o aviso da degradação é DESTA pesquisa. Zera-se aqui, antes de
+     tudo — incluindo antes da cache, porque uma lista servida da cache não
+     está a degradar-se agora. */
+  PESQUISA.degradada=null;
   const key=q.trim().toLowerCase();
   if(geoCache.has(key)) return [...locaisLocais(q), ...geoCache.get(key)].slice(0,8);
   const m=q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;]\s*(-?\d{1,3}[.,]\d+)\s*$/);
@@ -4194,8 +5297,12 @@ async function geocode(q){
   if(!here) for(const r of out) r._semRef=true;
   const res=out.slice(0,8);
   /* a cache guarda só o que veio da rede: guardar os favoritos aqui faria com
-     que apagar ou renomear um deles continuasse a aparecer até recarregar */
-  if(res.length) geoCache.set(key,res.filter(r=>!r._fav&&!r._rec));
+     que apagar ou renomear um deles continuasse a aparecer até recarregar.
+     dd-168: e NÃO guarda o que veio da RESERVA — senão a mesma consulta
+     voltava minutos depois, já com o fornecedor de pé, a servir resultados de
+     reserva SEM o aviso. Uma degradação guardada em cache é uma degradação
+     escondida. */
+  if(res.length&&!PESQUISA.degradada) geoCache.set(key,res.filter(r=>!r._fav&&!r._rec));
   return res;
 }
 
@@ -4205,9 +5312,10 @@ const revCache=new Map();
    o Modo viagem nem se pergunta — quem vai a conduzir não está a ler nomes. */
 const REV_CELULA_KM=2;
 function revChave(lat,lon){ return celula(lat,lon,REV_CELULA_KM); }
-async function revGeocode(lat,lon){
+async function revGeocode(lat,lon,accM){
   if(geoOn()&&!(typeof travel==="object"&&travel.active)){
-    try{ const r=await geoReverse(lat,lon); return {name:r.name, sub:r.sub, atrib:r.atrib||null}; }catch(e){}
+    try{ const r=await geoReverse(lat,lon,accM);
+      return {name:r.name, sub:r.sub, atrib:r.atrib||null, nivel:r.nivel, acc:r.acc}; }catch(e){}
   }
   if(typeof travel==="object" && travel.active){
     const k=revChave(lat,lon), guardado=revCache.get(k);
@@ -4278,7 +5386,7 @@ function geoURL(caminho,params){
 }
 /* o Geoapify traduz as instruções; usamos essa tradução só quando não
    conseguimos classificar a manobra nós próprios */
-const GEO_LANG={pt:"pt",en:"en",es:"es",fr:"fr"};
+const GEO_LANG={pt:"pt",en:"en",es:"es",fr:"fr",nl:"nl"};
 
 /* ── ATRIBUIÇÃO QUE VIAJA COM OS DADOS (licença Geoapify, email 29/07) ────
    A resposta da geocodificação traz um campo attribution (Geoapify) ou
@@ -4289,10 +5397,42 @@ const GEO_LANG={pt:"pt",en:"en",es:"es",fr:"fr"};
 const atribDe=(j)=>(j&&(j.attribution||j.licence))||null;
 
 /* ── um resultado de pesquisa, no formato que a app já usa ──────────────── */
+/* ═══ dd-169 — O NOME DA PLACA À FRENTE, O EXÓNIMO ENTRE PARÊNTESES ═══════
+   Um motociclista navega por PLACAS. Mostrar «Mastrique» a quem vai ver
+   «Maastricht» pintado na estrada é trocar o mapa pelo dicionário.
+
+   MEDIDO a 05/08 contra a API real (`tools/medir-nomes-duplos.mjs`): a
+   Geoapify já devolve AS DUAS FORMAS na MESMA resposta, no campo
+   `other_names` — `other_names.name` é o nome oficial local, e o `name` do
+   topo é o exónimo já traduzido para a língua pedida:
+
+     Köln      · lang=pt → name «Colónia»   · other_names.name «Köln»
+     Antwerpen · lang=pt → name «Antuérpia» · other_names.name «Antwerpen»
+     Maastricht· lang=pt → name «Maastricht»· other_names.name AUSENTE
+
+   **Custo em pedidos: ZERO.** Não é preciso um segundo pedido para o
+   escolhido — dez resultados continuam a ser os mesmos dez pedidos.
+
+   As regras, à letra do dd-169:
+     · local à frente, exónimo entre parênteses;
+     · parênteses SÓ quando as formas diferem — nada de «Lisboa (Lisboa)»;
+     · onde a segunda forma não existir, mostra-se só a que existe, **sem
+       parênteses vazios e sem inventar** (o Photon não tem o campo).
+   À ENTRADA não se mexe: medido, «Cologne», «Colónia» e «Köln» encontram
+   todos a mesma cidade, e isso já era verdade. */
+function nomeDaPlaca(p){
+  const on=p&&p.other_names;
+  const local=on&&typeof on==="object"?(on.name||null):null;
+  const exo=p&&p.name||null;
+  if(!local) return exo;                       // sem forma local: fica a que há
+  if(!exo) return local;
+  const igual=(a,b)=>String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
+  return igual(local,exo)?local:`${local} (${exo})`;
+}
 function geoFeature(f){
   const p=f.properties||{};
   const rua=[p.street,portaLimpa(p.housenumber)].filter(Boolean).join(" ");
-  const nome=p.name||rua||p.address_line1||p.formatted||"—";
+  const nome=nomeDaPlaca(p)||rua||p.address_line1||p.formatted||"—";
   const sitio=p.city||p.town||p.village||p.county||p.state||"";
   let sub=[p.name?rua:"", sitio].filter(Boolean).join(", ")||p.address_line2||p.country||"";
   if(sub.trim().toLowerCase()===String(nome).trim().toLowerCase())
@@ -4333,25 +5473,54 @@ async function geoSearch(q,pos,limit=7){
   const mapa=(j)=>{ const a=atribDe(j);
     return (j?.features||[]).map(f=>{ const r=geoFeature(f); if(a) r.atrib=a; return r; })
       .filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lon)); };
-  /* dd-122: transporte caído ≠ zero-resultados (mesma régua do photonSearch) */
-  let redeCaiu=false;
-  const cai=(e)=>{ if(!/^HTTP \d/.test(e?.message||"")) redeCaiu=true; return null; };
+  /* dd-122: transporte caído ≠ zero-resultados (mesma régua do photonSearch).
+     dd-168: e um HTTP do FORNECEDOR também não é zero-resultados. As duas
+     avarias guardam-se SEPARADAS porque dizem coisas diferentes — `redeCaiu`
+     é ninguém a ouvir (o pedido nem saiu: CORS recusado, DNS morto, rede do
+     aparelho em baixo), `httpCaiu` é o serviço a responder que não pode
+     (401 chave inválida, 429 teto gasto, 5xx em baixo). O que as une, e é
+     novo, é que NENHUMA delas é uma afirmação sobre o mundo: as duas são
+     motivo para pedir à reserva, e é isso que o `fornecedorCaiu` diz. */
+  let redeCaiu=false, httpCaiu=null;
+  const cai=(e)=>{ const m=String(e?.message||"");
+    if(/^HTTP \d/.test(m)) httpCaiu=m; else redeCaiu=true; return null; };
   const perto=temRef?mapa(await pede({filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${RAIO_PERTO_M}`}).catch(cai)):[];
   let mundo=[];
   if(perto.length<limit) mundo=mapa(await pede({}).catch(cai));
   const vistos=new Set(perto.map(r=>`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`));
   const res=[...perto, ...mundo.filter(r=>!vistos.has(`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`))].slice(0,Math.max(limit,perto.length));
-  if(!res.length&&redeCaiu) throw Object.assign(new Error("pesquisa: transporte caiu"),{semTransporte:true});
+  if(!res.length&&(redeCaiu||httpCaiu))
+    throw Object.assign(new Error("pesquisa: "+(httpCaiu||"transporte caiu")),
+      {semTransporte:redeCaiu, fornecedorCaiu:true, motivo:httpCaiu||"sem resposta"});
   return res;
 }
-async function geoReverse(lat,lon){
+async function geoReverse(lat,lon,accM){
   const j=await jfetch(geoURL("/v1/geocode/reverse",{
     lat:lat.toFixed(5), lon:lon.toFixed(5), limit:"1", lang:GEO_LANG[state.lang]||"en",
   }),8000,"nome-da-posição");
   const f=(j.features||[])[0];
   if(!f) throw new Error("sem resultado");
+  const p=f.properties||{};
   const r=geoFeature(f);
-  return {name:r.name, sub:r.sub, cc:(f.properties?.country_code||"").toUpperCase(), atrib:r.atrib||atribDe(j)};
+  /* ═══ dd-170 §2: A MORADA CORTA-SE AO NÍVEL QUE A MARGEM SUPORTA ═══
+     O relato: «Ireneweg 36C» e, no arranque seguinte, «Ireneweg 38» — e
+     nenhuma das duas era a porta dele. O fornecedor faz o seu trabalho: dá a
+     morada mais próxima do ponto que lhe mandámos. O erro é NOSSO, por lhe
+     mandar um ponto com 15 m de margem e mostrar a resposta como se o ponto
+     fosse exato. Duas respostas diferentes para a mesma casa não são o
+     fornecedor a hesitar: é a margem a aparecer ao ecrã.
+     E o custo de cortar é zero: a meteorologia lê uma grelha de 1-2 km — o
+     número de porta nunca lhe serviu para nada. */
+  const nivel=nivelDaMorada(accM);
+  let name=r.name, sub=r.sub;
+  if(nivel!=="porta"){
+    const cidade=p.city||p.town||p.village||p.municipality||p.suburb||p.county||"";
+    const rua=p.street||"";
+    if(nivel==="rua"&&rua){ name=rua; sub=[cidade,p.country].filter(Boolean).join(", ")||sub; }
+    else if(cidade){ name=cidade; sub=[p.state,p.country].filter(Boolean).join(", ")||sub; }
+  }
+  return {name, sub, cc:(p.country_code||"").toUpperCase(),
+          atrib:r.atrib||atribDe(j), nivel, acc:Number.isFinite(accM)?accM:null};
 }
 async function geoPlaces(cat,pos,radiusM=30000){
   const j=await jfetch(geoURL("/v2/places",{
@@ -4488,6 +5657,7 @@ function ordenarPelaDoutrina(res,pos,q){
     || a._ordem-b._ordem);
 }
 async function geocodeNear(q,pos){
+  PESQUISA.degradada=null;                    // dd-168: também aqui, e pela mesma razão
   try{
     const res=await photonSearch(q,pos,12);   // já leva viés de proximidade
     if(res.length) return ordenarPelaDoutrina(res,pos,q);
@@ -4928,6 +6098,7 @@ function hourMetrics(H,i){
     code:g(H.weather_code), wind:g(H.wind_speed_10m),
     gust:g(H.wind_gusts_10m), dir:g(H.wind_direction_10m),
     vis:g(H.visibility), rh:g(H.relative_humidity_2m),
+    wb:g(H.wet_bulb_temperature_2m),   // dd-178 B — só nomeia o tipo de calor
     isDay:g(H.is_day), time:H.time[i],
   };
 }
@@ -4941,6 +6112,8 @@ function scoreHour(m, prof=PROFILES[state.profile]){
   const R=[]; // razões {icon,label,pen}
   const faltas=[]; // o que não veio e podia mudar a resposta
   let hard=false;
+  /* null · "cuidado" · "perigo" — a banda de calor desta hora (dd-178) */
+  let calor=null;
   const add=(pen,icon,label)=>{ if(pen>0) R.push({pen,icon,label}); return pen; };
   let pen=0;
   const code=m.code;
@@ -4981,8 +6154,49 @@ function scoreHour(m, prof=PROFILES[state.profile]){
       else if(at<=0) pen+=add(26+Math.min(14,-at*2),"🥶",t("Sensação de {t}° — frio extremo",{t:rnd(at)}));
       else if(at<=6) pen+=add(12+(6-at)*2.3,"🥶",t("Sensação de {t}° — frio a sério",{t:rnd(at)}));
       else if(at<=12) pen+=add((12-at)*1.3,"🧥",t("Fresco (sensação {t}°)",{t:rnd(at)}));
-      if(at>=36) pen+=add(20,"🥵",t("Calor extremo (sensação {t}°)",{t:rnd(at)}));
-      else if(at>=32) pen+=add((at-32)*3,"🥵",t("Muito calor (sensação {t}°)",{t:rnd(at)}));
+      /* ═══ A CURVA DO CALOR, SEM TETO (dd-178) ═══════════════════════════
+         ISTO ERA `if(at>=36) pen+=add(20,…)` — vinte pontos fixos que nunca
+         cresciam. Medido com o motor vivo: 36°, 40°, 45° e **50°** davam
+         todas índice 80 e «Vai de moto! · via verde», nos TRÊS perfis (80 é
+         exatamente o tGood do conservador). Contra arquivo real: 10 913 horas
+         (27 %) de um verão com sensação ≥36° pintadas de verde, 510 delas
+         ≥45°. Ninguém escreveu «acima de 36° o calor deixa de importar», mas
+         era o que a constante dizia — e a constante é que manda (§10.20).
+
+         DUAS BANDAS, e a de cima não obedece ao perfil:
+
+         · ≥ 42° (CALOR_VERMELHO) — vermelho nos três perfis. A penalização
+           passa dos 75 de propósito: `lvl` só cai a 3 com o score abaixo de
+           25, e o score é 100−pen. Cresce depois disso para o 45° não dizer
+           o mesmo que o 42°.
+         · entre o `tCalor` do perfil e os 42° — NÃO desce a amarelo por
+           causa do calor, mas TAMBÉM não deixa afirmar o verde a cheio.
+           **Zero pontos**, e uma bandeira: é exatamente a forma já em vigor
+           para dados em falta (`faltas`), que também não penalizam e também
+           matam o verde a cheio. Pontos aqui seriam veneno — somavam-se à
+           chuva e ao vento e fabricavam um amarelo que o equipamento da
+           pessoa podia desmentir, e a app não sabe o que ela leva vestido.
+
+         A ressalva do §2d fica no texto, uma vez, e não se repete a cada
+         hora: a tabela oficial pressupõe SOMBRA, REPOUSO e ROUPA LEVE, e a
+         OSHA diz à letra que não contabiliza sol direto, calor radiante,
+         esforço nem vestuário de proteção. Não se acrescenta número nenhum
+         por isso — um limiar sem medição ao lado é uma opinião com ar de
+         constante (§10.7). */
+      if(at>=CALOR_VERMELHO){
+        pen+=add(76+Math.min(22,(at-CALOR_VERMELHO)*2),"🥵",
+          m.wb!=null&&m.wb>=BOLBO_ABAFADO
+            ? t("Calor perigoso e abafado (sensação {t}°) — o suor já não arrefece",{t:rnd(at)})
+            : t("Calor perigoso (sensação {t}°) — risco de golpe de calor",{t:rnd(at)}));
+        calor="perigo";
+      } else if(at>=prof.tCalor){
+        calor="cuidado";
+        /* razão sem pontos: viaja no R para o ecrã a nomear, não pontua */
+        R.push({pen:0, icon:"🥵", label:
+          m.wb!=null&&m.wb>=BOLBO_ABAFADO
+            ? t("Sensação de {t}°, abafado — bebe e para mais vezes",{t:rnd(at)})
+            : t("Sensação de {t}° — bebe e para mais vezes",{t:rnd(at)})});
+      }
       // gelo escondido — só se avalia com temperatura; humidade em falta perto
       // de 0° é uma falta contextual (noutra estação não interessa nada)
       if(m.t<=3){
@@ -5015,7 +6229,7 @@ function scoreHour(m, prof=PROFILES[state.profile]){
      A razão da chuva já viaja em R; nulos não disparam o piso (rainLevel
      devolve 0 sem testemunhas — "não veio" continua a não testemunhar). */
   if(lvl===0 && rainLevel(m.pr, m.pp, m.code, prof)>0) lvl=1;
-  return {score, lvl, reasons:R.slice(0,3), hard, faltas};
+  return {score, lvl, reasons:R.slice(0,3), hard, faltas, calor};
 }
 
 const VERDICT=[
@@ -5119,6 +6333,28 @@ function atribDoItem(it){
   const a=it&&it.atrib;
   return (typeof a==="string"?a:(a&&a.attribution))||null;
 }
+/* ═══ dd-172 §2 — A LICENÇA REDISTRIBUI-SE EM TODAS AS SUPERFÍCIES ════════
+   MEDIDO a 05/08: das cinco superfícies que mostram nomes vindos do
+   fornecedor, só DUAS redistribuíam a licença — a lista da pesquisa e o
+   resumo copiado. As outras três (o cartão do Agora, a gaveta «Os meus
+   sítios», a linha da casa nas definições) pintavam o nome e calavam-se,
+   **com o `atrib` já guardado em cada item**. Estava lá, e não se mostrava.
+
+   É a mesma família do botão «Copiar resumo» (rel-102): uma regra que vive
+   dentro de uma superfície só é sabida por essa superfície. A cura não é
+   remendar três sítios — é haver UMA porta que pinta nome e licença
+   juntos, e um varrimento que apanha a QUARTA superfície que nascer amanhã
+   (`tools/varrer-familias.mjs`, família F10).
+
+   Devolve `null` quando nenhum item traz licença: **não se inventa
+   atribuição, e não se deixa uma linha vazia a fingir que há.** */
+function atribLinha(itens){
+  const a=[...new Set((itens||[]).map(atribDoItem).filter(Boolean))];
+  if(!a.length) return null;
+  const d=el("div","ac-atrib",a.join(" · "));
+  d.setAttribute("data-test","atrib-linha");
+  return d;
+}
 function attachAC(input, list, onPick){
   let items=[], active=-1;
   const close=()=>{ list.classList.remove("open"); list.textContent=""; active=-1; };
@@ -5137,6 +6373,16 @@ function attachAC(input, list, onPick){
       list.appendChild(d); }
     else { const ref=refPesquisa(); if(ref&&ref.rotulo)
       list.appendChild(el("div","ac-ref",t("perto de: {r}",{r:ref.rotulo}))); }
+    /* dd-168: esta lista veio da RESERVA, e diz-se. Sem esta linha a
+       degradação seria invisível: menos resultados, sem categorias, outra
+       ordenação — e a única leitura possível seria «a app piorou». O motivo
+       vem em cru (HTTP 401, sem resposta, demorou de mais) porque é o que
+       permite a alguém agir; um «ocorreu um erro» não vale nada. */
+    if(items.length&&PESQUISA.degradada){
+      const d=el("div","ac-aviso",t("A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.",{m:PESQUISA.degradada}));
+      d.setAttribute("data-test","pesquisa-degradada");
+      list.appendChild(d);
+    }
     items.forEach((it,i)=>{
       const d=el("div","ac-item"+(i===active?" active":"")+(it._fav?" fav-hit":""));
       d.setAttribute("role","option");
@@ -5274,6 +6520,44 @@ function confirmarCasa(loc){
   acoes.append(sim,nao); card.appendChild(acoes);
   slot.appendChild(card);
 }
+/* ═══ dd-170 §4 — A CASA E O SÍTIO NO ECRÃ SÃO DUAS COISAS ════════════════
+   MEDIDO a 04/08 (tools/medir-defeitos-0408.mjs): escolher um Jumbo na
+   pesquisa do Agora punha a casa dele NO JUMBO.
+
+     casa ANTES  : Maastricht (50.8514, 5.6910) · prov «escolha»
+     casa DEPOIS : Jumbo      (50.8450, 5.7000) · prov «pesquisa»
+
+   A partir daí tudo o que derivava da casa mentia junto: o cabeçalho dizia
+   «perto de: Jumbo», a linha «🏠 A minha casa» apontava para o supermercado
+   (0,0 km de si própria) e o botão «Rota para Jumbo →» punha o Jumbo na
+   ORIGEM e no DESTINO — uma rota de zero metros, que é a «rota vazia» que
+   ele viu.
+
+   UM slot fazia três trabalhos: o sítio cuja meteorologia está no ecrã, a
+   casa, e a âncora das distâncias. Separa-se o que nunca devia ter sido um
+   só: `state.home` continua a ser O SÍTIO NO ECRÃ (é o que a Agora mostra e
+   sempre foi); `state.casa` passa a ser A CASA, e **uma pesquisa nunca lhe
+   toca**. Uma casa posta por gesto explícito só cede a outro gesto
+   explícito — é o «deixa de oscilar» pedido, escrito como regra. */
+function definirCasa(loc,{explicito=false}={}){
+  if(!loc||!Number.isFinite(loc.lat)||!Number.isFinite(loc.lon)) return;
+  if(state.casa&&state.casa.prov?.como==="escolha"&&!explicito) return;
+  state.casa={name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon,
+              prov:loc.prov||(explicito?{como:"escolha", quando:Date.now()}:null)};
+  try{ store.set("casa",state.casa); }catch(e){}
+  if(typeof pintarSitiosLinha==="function") pintarSitiosLinha();
+}
+/* a casa a sério, com a ponte para quem ainda não tem o slot novo: quem já
+   tinha casa guardada continua a tê-la, sem gesto nenhum (dd-158 — uma
+   migração que exige trabalho ao utilizador é uma migração falhada) */
+function aCasa(){
+  if(state.casa&&Number.isFinite(state.casa.lat)) return state.casa;
+  try{ const g=store.get("casa"); if(g&&Number.isFinite(g.lat)){ state.casa=g; return g; } }catch(e){}
+  try{ const h=store.get("home");
+    if(h&&Number.isFinite(h.lat)&&h.prov?.como!=="pesquisa"&&h.prov?.como!=="reserva"){
+      state.casa=h; return h; } }catch(e){}
+  return null;
+}
 function setHome(loc, {silent=false, prov, deStore=false}={}){
   /* PROVENIÊNCIA (A3.5.35 pontos 4-6): cada escrita regista COMO nasceu —
      gps / pesquisa / escolha / reserva. Sem prov novo, preserva-se o que o
@@ -5287,6 +6571,11 @@ function setHome(loc, {silent=false, prov, deStore=false}={}){
   if(prov) loc.prov={como:prov, quando:Date.now()};
   else if(!loc.prov&&loc===DEFAULT_LOC) loc.prov={como:"reserva", quando:Date.now()};
   state.home=loc;
+  /* dd-170 §4: a CASA só se move com gesto de casa. `pesquisa` é «mostra-me
+     o tempo ali» e nunca foi outra coisa — era só o slot que não sabia. */
+  { const como=loc.prov?.como;
+    if(como==="escolha") definirCasa(loc,{explicito:true});
+    else if(como!=="pesquisa") definirCasa(loc); }
   /* adotar a casa que JÁ está no store (arranque) não a reescreve: reescrever
      normalizava o objeto e branqueava migrações — a guarda do rename viu-o */
   if(!deStore) store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
@@ -5462,20 +6751,30 @@ async function useGPS(fromRoute){
   if(est==="recusada"){ renderLocEstado(alvo,"recusada"); return; } // sem caixa possível: zero pedidos
   if(est==="nunca-pedida") renderLocEstado(alvo,"pedindo");
   else toast(t("A obter a tua posição… 📡"));
-  navigator.geolocation.getCurrentPosition(async pos=>{
+  /* dd-170 §1: a MELHOR leitura de uma janela curta, não a primeira que
+     chegar. É um gesto deliberado do utilizador — pode custar dois segundos
+     para não custar uma morada errada. */
+  let recusou=false;
+  melhorPos({aoFalhar:(err)=>{ recusou=!!(err&&err.code===1); }}).then(async best=>{
+    if(!best){
+      locSaida.grava(recusou?"recusada":"indisponivel");
+      renderLocEstado(alvo,recusou?"recusada":"indisponivel");
+      const fb=store.get("home")||DEFAULT_LOC;
+      if(!fromRoute && !state.wx) setHome(fb);   // a app continua a servir com a casa
+      return;
+    }
     locSaida.grava("ok"); renderLocEstado(alvo,null);
-    const {latitude:lat, longitude:lon}=pos.coords;
-    const n=await revGeocode(lat,lon);
-    const loc={name:n.name, sub:n.sub, lat, lon, atrib:n.atrib||null};
+    const {lat, lon, acc}=best;
+    const n=await revGeocode(lat,lon,acc);
+    const loc={name:n.name, sub:n.sub, lat, lon, atrib:n.atrib||null, acc:acc??null};
     if(fromRoute){ const o=$("#rt-o"); o.value=`📍 ${n.name}`; o._picked=loc; toast(t("Origem: {p}",{p:n.name})); }
     else { setHome(loc,{prov:"gps"}); toast(t("Localização: {p}",{p:n.name})); }
-  },err=>{
-    const recusou=err&&err.code===1;
-    locSaida.grava(recusou?"recusada":"indisponivel");
-    renderLocEstado(alvo,recusou?"recusada":"indisponivel");
+  }).catch(()=>{
+    locSaida.grava("indisponivel");
+    renderLocEstado(alvo,"indisponivel");
     const fb=store.get("home")||DEFAULT_LOC;
-    if(!fromRoute && !state.wx) setHome(fb); // a app continua a servir com a casa
-  },{enableHighAccuracy:true, timeout:9000, maximumAge:0});
+    if(!fromRoute && !state.wx) setHome(fb);
+  });
   /* dd-85 §1d (rel-69): era maximumAge:300000 — CINCO MINUTOS, que a 90 km/h
      são 7,5 km: podia responder com outra cidade ao gesto que quer dizer
      "onde estou AGORA". A idade máxima derivada = tolerância ÷ 25 m/s, e a
@@ -5495,6 +6794,10 @@ const JANELA_CFG={
   prForte:2.5,   // mm/h de "forte" — o MESMO degrau do rainLevel nível 3:
                  // uma régua só (7g-quater: réguas divergentes mentem).
 };
+/* O perfil do FACTO (dd-183): o mais sensível dos que existem, derivado da
+   coleção viva e nunca escrito à mão. É com ele que se decide o que se DIZ
+   sobre o tempo; o que se ACONSELHA continua a ser com o perfil da pessoa. */
+const PROF_DO_FACTO={ppRisk:Math.min(...Object.values(PROFILES).map(p=>p.ppRisk))};
 function fraseJanelaChuva(H,metrics,i0,prof){
   const N=Math.min(i0+JANELA_CFG.horas,metrics.length);
   if(N-i0<3) return null;
@@ -5507,15 +6810,48 @@ function fraseJanelaChuva(H,metrics,i0,prof){
        ppProvavel, ppPossivel) que podiam dizer "seco" numa hora em que o
        cartão dizia "chuvisco possível". O CFG fica como documentação dos
        degraus, mas quem decide é o nivelChuva. */
-    const nv=nivelChuva(m.pr,m.pp,m.code,prof);
+    /* ═══ O PERFIL NÃO DECIDE SE UM FACTO É DITO (dd-183) ═══════════════
+       ISTO ERA `nivelChuva(m.pr,m.pp,m.code,prof)`. Com os MESMOS dados
+       (45 % de probabilidade, 18h51), o ecrã do dono dizia:
+         conservador (79)  «chuva possível das 18h às 19h · limpa depois…»
+         equilibrado (84)  «chuva possível das 18h às 19h · limpa depois…»
+         tolerante   (88)  «Sem chuva prevista até às 12h»
+       O `nivelChuva` decide com o `prof.ppRisk` (35/45/60) e com pp=45 o
+       tolerante caía em «seco» — a frase FACTUAL desaparecia.
+
+       O perfil é um limiar de DECISÃO: governa o veredicto. «Chuva possível
+       das 18h às 19h» não é veredicto, é meteorologia. **O perfil pode mudar
+       o conselho; não pode mudar o que o tempo vai fazer.**
+
+       E era 7g-ter na forma mais pura: **o perfil mais tolerante recebia a
+       mensagem mais tranquilizadora.** Quem escolheu «tolerante» aceita mais
+       risco — não pediu para saber menos.
+
+       O limiar do FACTO é o mais sensível dos perfis, e é DERIVADO deles, não
+       escrito à mão: assim ninguém é informado de menos do que outro, e no dia
+       em que um perfil mudar de ppRisk isto acompanha sozinho (§10.21 — a
+       régua conta a coleção viva). O veredicto e o índice continuam a obedecer
+       ao perfil, que é para isso que ele existe. */
+    const nv=nivelChuva(m.pr,m.pp,m.code,PROF_DO_FACTO);
     cls.push(nv>=3?"F":nv===2?"C":nv===1?"P":"S");
   }
   if(faltas>=(N-i0)/2) return {tipo:"sem-dados",txt:t("Sem dados suficientes para prever as janelas de chuva de hoje.")};
   const runs=[]; for(let k=0;k<cls.length;k++){
     if(runs.length&&runs[runs.length-1].c===cls[k]) runs[runs.length-1].b=k;
     else runs.push({c:cls[k],a:k,b:k}); }
-  const h=(k)=>fmtH(H.time[i0+k]);
-  const hFim=(k)=>fmtH(H.time[Math.min(i0+k+1,H.time.length-1)]);
+  /* ═══ UMA HORA JÁ PASSADA NÃO INFORMA — INFORMA AO CONTRÁRIO (dd-183) ═══
+     «Sem chuva prevista até às 12h», às 18h51. Não estava calculada da
+     meia-noite: a janela é de 18 horas, portanto acaba às 12h **do dia
+     seguinte** — e o `fmtH` só formata hora e minuto. Quem lê às 18h51 vê uma
+     hora que já passou há sete horas e conclui que a frase está avariada, ou
+     pior, que a janela é minúscula.
+     A cura não é encurtar a janela (18 h é o horizonte útil de quem decide de
+     manhã, e está medido no JANELA_CFG): é DIZER o dia quando ele muda. */
+  const mesmoDia=(a,b)=>{ const A=new Date(a*1000), B=new Date(b*1000);
+    return A.getDate()===B.getDate()&&A.getMonth()===B.getMonth()&&A.getFullYear()===B.getFullYear(); };
+  const comDia=(epoch)=>mesmoDia(H.time[i0],epoch)?fmtH(epoch):t("{h} de amanhã",{h:fmtH(epoch)});
+  const h=(k)=>comDia(H.time[i0+k]);
+  const hFim=(k)=>comDia(H.time[Math.min(i0+k+1,H.time.length-1)]);
   const chuvosos=runs.filter(r=>"FCP".includes(r.c));
   let txt;
   if(!chuvosos.length) txt=t("Sem chuva prevista até às {h}",{h:hFim(cls.length-1)});
@@ -5560,7 +6896,12 @@ function renderDashboard(){
   const buracos=win.filter(x=>x.s.faltas.length)
     .map(x=>({t:x.m.time, campos:x.s.faltas}));
   const completo=!buracos.length;
-  const verdePorConfirmar=worst.s.lvl===0&&!completo;
+  /* dd-178 §2b: o calor de CUIDADO entra exatamente por aqui — não desce o
+     nível, mas tira o direito de afirmar o verde a cheio. «🟢 Vai de moto!»
+     a cheio ao lado de 38° de sensação é o ecrã a contradizer-se, que é a
+     família do 7g-ter: o rótulo mais tranquilizador do que os dados. */
+  const calorNaJanela=win.some(x=>x.s.calor==="cuidado");
+  const verdePorConfirmar=worst.s.lvl===0&&(!completo||calorNaJanela);
   const V=verdePorConfirmar?{t:"Provavelmente bom",tag:"por confirmar",e:"🟢"}:VERDICT[worst.s.lvl];
 
   box.textContent="";
@@ -5635,6 +6976,10 @@ function renderDashboard(){
   /* a linha discreta da proveniência da casa (A3.5.35 ponto 5): quem vir
      "definida a partir de uma pesquisa" percebe sozinho o que aconteceu */
   main.append(el("div","hero-prov","🏠 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
+  /* dd-172 §2: o NOME deste cartão veio do fornecedor de moradas. A linha de
+     proveniência acima («detetada pelo GPS») diz COMO o sítio foi escolhido —
+     não é a licença, e uma não substitui a outra. */
+  { const la=atribLinha([state.home]); if(la) main.append(la); }
   const ul=el("ul","reasons");
   if(worst.s.reasons.length){
     worst.s.reasons.forEach(r=>{ const li=el("li");
@@ -6933,7 +8278,41 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
     return { travel:cumLegDur[i]+(legs[i].duration||0)*frac, pause:i*pauseSec };
   };
   // amostragem por distância + pontos exatos das paragens
-  const K=dense?clamp(Math.ceil(totalKm/4)+2,10,44):clamp(Math.ceil(totalKm/8)+2,8,16);
+  /* ═══ O TETO DA AMOSTRAGEM (dd-179 M4, obra autorizada) ══════════════════
+     ERA 44, E DEIXAVA A ROTA CEGA. A fórmula pede um ponto a cada 4 km; o
+     teto de 44 defeitos isso em tudo o que passe de ~168 km, e o passo cresce
+     sem limite a partir daí. MEDIDO a 05/08 contra o perfil Copernicus sobre
+     o traçado REAL do OSRM (as fixtures estão em test/fixtures/altitude/,
+     com data e proveniência):
+
+       rota                  km   passo com K=44   cegueira   menor K que passa
+       Grenoble–Briançon    117       2,7 km          34 m         44  ✔ já passava
+       Genebra–Milão        319       7,4 km         258 m         60
+       Munique–Veneza       567      13,2 km       * 677 m *       60
+
+     PORQUÊ 80 E NÃO 60: 60 é o mínimo medido, e um mínimo sem margem é
+     frágil — a amostragem uniforme tem ALINHAMENTO, e medi-o: em
+     Munique–Veneza o K=120 cega 80 m e o K=100 cega 0 m. Um ponto a mais pode
+     cair ao lado do pico em vez de em cima dele. Com 80, as três rotas ficam
+     entre 0 e 77 m, e os 77 m residuais de Genebra–Milão são a granularidade
+     do PRÓPRIO perfil (não descem com mais pontos — medido até K=300).
+
+     O CUSTO, medido e não presumido: os PEDIDOS não mudam — é uma chamada
+     multi-localização em qualquer dos casos. O que cresce é a resposta:
+     161 KB aos 44 pontos, 262 KB aos 80. Um pedido com 200 pontos devolve
+     200 OK (655 KB), portanto 80 está muito abaixo de qualquer limite da API.
+
+     ⚠️ O 429 QUE APANHEI NÃO ERA UM TETO DE PONTOS. Numa passagem, 88 pontos
+     deram 429 e pareceu limite duro. Não era: o motivo dizia «Hourly API
+     request limit exceeded» e na sonda seguinte **44 pontos deram 429 e 200
+     pontos deram 200** — a quota horária era minha, gasta a medir. Lei 10.25.
+
+     AS ALTERNATIVAS FICAM EM 16, e é decisão por tomar, não esquecimento:
+     quem troca de alternativa passa a ser julgado com essa densidade (medido:
+     1063 m de cegueira em Genebra–Milão). Está registado como M-23 (b) à
+     espera do dono — subir três variantes de 16 para 80 triplica a descarga
+     de quem só vai usar uma. */
+  const K=dense?clamp(Math.ceil(totalKm/4)+2,10,TETO_AMOSTRAS):clamp(Math.ceil(totalKm/8)+2,8,16);
   const targets=[];
   for(let k=0;k<K;k++) targets.push({D:geomKm*k/(K-1), stop:null});
   for(let k=1;k<pts.length-1;k++) targets.push({D:legStartD[k], stop:k});
@@ -7135,11 +8514,18 @@ function sampleAt(s, eta){
   const tt=(ta!=null&&tb!=null)?lerp(ta,tb,f):(ta??tb??null);
   const gust=par(H.wind_gusts_10m);
   const dir=perto(H.wind_direction_10m);
+  /* dd-178 C: a sensação e o bolbo húmido passam a viajar com o troço. Antes
+     daqui o `cond` da rota só tinha `t` (ar), e todo o julgamento de calor na
+     rota era feito sobre o número errado. A sensação usa o PIOR das duas
+     horas vizinhas, como a chuva e a rajada — a mesma assimetria: no calor o
+     pior é o mais alto. */
+  const at=par(H.apparent_temperature)??tt;
+  const wb=par(H.wet_bulb_temperature_2m);
   if(pr==null&&pp==null) faltas.push(t("chuva"));
   if(code==null) faltas.push(t("estado do céu"));
   if(tt==null) faltas.push(t("temperatura"));
   if(gust==null) faltas.push(t("vento"));
-  return { pr, pp, code, t:tt, gust, dir, lvl:0, faltas };
+  return { pr, pp, code, t:tt, at, wb, gust, dir, lvl:0, faltas };
 }
 
 /* Que estrada cobre este troço do trajeto. Devolve o nome com maior
@@ -7989,6 +9375,27 @@ function routeHazards(R){
   }
   if(wc) H.push({sev:wc.ch<=cfg.chillSevereC?3:2,ico:"🥶",kind:"chill",km0:wc.km,km1:null,t0:wc.eta,t1:null,
     txt:t("A ~{v} km/h a sensação real é {c}° (ar a {t}°) — as mãos entorpecem e a reação atrasa. Luvas de inverno, camadas, e pára a aquecer a meio se a viagem for longa.",{v:rnd(wc.v),c:rnd(wc.ch),t:rnd(wc.t)})});
+  /* 3b) CALOR — O SÉTIMO PERIGO, e o espelho do `chill` (dd-178 C) ═════════
+     Dos seis perigos, DOIS eram do frio e ZERO do calor. Não foi decisão de
+     ninguém: é que a rota nunca teve `at` para julgar, e o que não se pode
+     medir não vira perigo. Agora que a sensação viaja no `cond`, o calor
+     entra pela mesma porta por onde o frio já entrava.
+     ⚠️ A mesma lição do dd-95 §2, do outro lado do termómetro: com `at` a
+     null, `null>=42` é FALSO — não fabrica perigo, que é a direção segura.
+     Mas o guarda explícito fica, porque a próxima pessoa a mexer aqui não
+     vai reler este comentário. */
+  let qt=null;
+  for(const s of segs){
+    const A=s.cond?.at;
+    if(!Number.isFinite(A)) continue;
+    if(A>=PROFILES[state.profile].tCalor&&(!qt||A>qt.at)) qt={at:A,wb:s.cond.wb,km:s.km,eta:s.eta};
+  }
+  if(qt) H.push({sev:qt.at>=CALOR_VERMELHO?3:2,ico:"🥵",kind:"calor",km0:qt.km,km1:null,t0:qt.eta,t1:null,
+    txt: qt.at>=CALOR_VERMELHO
+      ? (Number.isFinite(qt.wb)&&qt.wb>=BOLBO_ABAFADO
+          ? t("Sensação de {c}° e ar abafado no ponto mais quente do trajeto — o suor deixa de arrefecer e o golpe de calor instala-se sem aviso. Não é dia de fazer este percurso de mota.",{c:rnd(qt.at)})
+          : t("Sensação de {c}° no ponto mais quente do trajeto — cãibras e exaustão são prováveis, e o golpe de calor também se a exposição continuar. Não é dia de fazer este percurso de mota.",{c:rnd(qt.at)}))
+      : t("Sensação de {c}° no ponto mais quente do trajeto — bebe antes de sair, pára mais vezes e usa equipamento ventilado. A sensação é medida à sombra: ao sol e de equipamento fechado é mais.",{c:rnd(qt.at)})});
   // 4) GELO NO PISO com o ar ainda acima de zero (pontes e sombras primeiro)
   let fr=null;
   for(const s of segs){
@@ -8483,6 +9890,8 @@ function sanidadeRender(){
   };
   const h=store.get("home");
   const lc=h?linha("🏠",h.name,h,null):linha("🏠",t("sem casa guardada"),null,null);
+  /* dd-172 §2: este cartão mostra a casa PELO NOME — nome do fornecedor */
+  { const la=atribLinha([h]); if(la) slot.appendChild(la); }
   if(h) lc.querySelector(".san-tx").appendChild(el("span","san-pais"," · "+provTexto(h.prov)));
   card.appendChild(lc);
   const rec=getRecentes(), favs=getFavs();
@@ -8665,6 +10074,10 @@ function renderTrips(){
       box.appendChild(row);
     });
   }
+  /* dd-172 §2: as viagens guardadas e o histórico levam o NOME do destino
+     consigo — nome do fornecedor, licença colada. */
+  { const la=atribLinha([...(getTrips?getTrips():[]), ...getHistorico()]);
+    if(la) box.appendChild(la); }
 }
 function fmtDurTxt(tr){ const m=(tr.hash||"").match(/\|(\d+)\|/); return t("partida {h}",{h:fmtHM(tr.dep)}); }
 /* ═══ dd-97 §3 — O MOTOR DO VIGIAR, v1 honesta ═════════════════════════════
@@ -8761,6 +10174,8 @@ function renderFavRow(){
       if(state._restore) state._restore(r.hash); });
     row.appendChild(c);
   });
+  /* dd-172 §2: esta fila mostra favoritos e rotas guardadas PELO NOME */
+  { const la=atribLinha(getFavs()); if(la) row.appendChild(la); }
 }
 /* ═══ OS MEUS SÍTIOS (dd-48a, desenho do rel-45 §2) ════════════════════════
    A violação original: uma casa visível no cartão e NENHUMA porta para a
@@ -8779,6 +10194,8 @@ function pintarSitiosLinha(){
   const li=$("#sitios-casa-linha"); if(!li) return;
   const h=state.home||store.get("home");
   li.textContent=h?`🏠 ${h.name}${h.sub?" — "+h.sub:""} · ${provQuando(h.prov)}`:t("sem casa guardada");
+  /* dd-172 §2: o nome é do fornecedor; a licença vai colada, na mesma linha */
+  { const a=atribDoItem(h); if(a) li.textContent+=" · "+a; }
   const b=$("#btn-sitios"); if(b) b.textContent=t("Gerir os meus sítios");
 }
 function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
@@ -8787,6 +10204,11 @@ function fecharSitios(){ $("#sitios-drawer").classList.remove("open"); $("#sitio
 function renderSitios(){
   const box=$("#sitios-corpo"); if(!box) return;
   box.textContent="";
+  /* dd-172 §2: esta gaveta mostra a casa, os favoritos e os recentes — todos
+     com nome vindo do fornecedor e todos com o `atrib` guardado. A linha vai
+     no fim, uma só, com as licenças de tudo o que está à vista. */
+  const _atribDaGaveta=()=>{ const la=atribLinha([state.home||store.get("home"),
+      ...getFavs(), ...getRecentes()]); if(la) box.appendChild(la); };
   $("#sitios-head").textContent="📍 "+t("Os meus sítios");
 
   /* ── CASA: proveniência à vista + consequência dita + 3 caminhos ── */
@@ -8878,6 +10300,7 @@ function renderSitios(){
     });
     box.appendChild(lb);
   }
+  _atribDaGaveta();
 }
 
 /* input à balda → favorito ("vou a casa do joao" acerta em "Casa do João") */
@@ -8908,37 +10331,88 @@ function parseDest(q){
   s=s.replace(/\s+mais\s+pr[óo]xim[oa]s?\s*$/i,"");
   return s.trim();
 }
-function freshPos(){
+/* ═══ dd-170 §1: A MELHOR LEITURA DE UMA JANELA CURTA, NÃO A PRIMEIRA ══════
+   O `getCurrentPosition` devolve a PRIMEIRA leitura que o sistema tem à mão —
+   e a primeira é quase sempre a pior: o recetor ainda está a convergir, e em
+   cidade a primeira leitura chega com 30-80 m enquanto a de dois segundos
+   depois chega com 8-15. Pedir uma e ficar com ela é escolher o pior fix de
+   propósito.
+   Aqui abre-se uma janela curta com alta precisão, fica-se com a MELHOR
+   margem que aparecer, e sai-se mais cedo se já for boa que chegue. O preço é
+   ~2 s num gesto deliberado; o que se compra é a diferença entre «Ireneweg
+   36C» e a verdade. */
+const POS_JANELA_MS=2500;      // quanto se ouve
+const POS_ALVO_M=20;           // margem que já chega: sai-se assim que se atinge
+function melhorPos({janela=POS_JANELA_MS, alvo=POS_ALVO_M, teto=8000, aoFalhar=null}={}){
   return new Promise(res=>{
     if(!navigator.geolocation) return res(null);
-    /* ═══ dd-131: TETO DE RELÓGIO NOSSO, por cima do teto do fornecedor ═══
-       APANHADO NA BANCADA a reproduzir os 52 minutos dele: se o
-       getCurrentPosition não chamar NENHUM dos dois callbacks, esta Promise
-       nunca resolve e o assistente fica «A pensar…» para sempre, com o
-       botão morto e sem saída. E não é hipótese: o prompt de permissão da
-       casa nova (dd-128 — permissões não migram) é precisamente um estado
-       em que a API pode ficar calada indefinidamente, porque o relógio do
-       `timeout` só começa DEPOIS de a permissão ser concedida.
-       7b: 8 s = os 6,5 s pedidos ao fornecedor + margem para o callback
-       aterrar; só dispara quando a API não respondeu de todo. Disparar não
-       inventa posição nenhuma — segue-se sem ela (a casa guardada serve),
-       e fica rasto na consola. */
-    let feito=false;
-    const acaba=(v)=>{ if(feito) return; feito=true; res(v); };
-    const relogio=setTimeout(()=>{
-      console.warn("posição: a API não chamou sucesso NEM erro em 8 s — sigo sem ela (permissão por responder?)");
-      acaba(null);
-    },8000);
-    navigator.geolocation.getCurrentPosition(
-      p=>{ clearTimeout(relogio); acaba({lat:p.coords.latitude, lon:p.coords.longitude, name:t("A minha posição"), sub:""}); },
-      ()=>{ clearTimeout(relogio); acaba(null); }, {timeout:6500, maximumAge:30000});
-      /* dd-85 §1d: eram 2 minutos = 3 km a 90 km/h na PRIMEIRA CURVA do
-         trajeto. A conta (tolerância ~200 m ÷ 25 m/s) dá 8 s; fica 30 como
-         EXCEÇÃO ASSUMIDA (rel-69 §2) — 8 s obrigava a esperar sempre que se
-         abre o planeador. A metade que falta é a idade À VISTA acima de 15 s
-         («posição de há 2 min»), que é peça de interface e ESTACIONA à espera
-         do Ricardo — esticar o número sem o dizer é como eles se estragam. */
+    let melhor=null, feito=false, id=null, erroGuardado=null;
+    const fim=(v)=>{ if(feito) return; feito=true;
+      clearTimeout(relJanela); clearTimeout(relTeto);
+      try{ if(id!=null) navigator.geolocation.clearWatch(id); }catch(e){}
+      if(v) marcarPos(v.lat,v.lon,v.acc);
+      else if(erroGuardado&&aoFalhar) try{ aoFalhar(erroGuardado); }catch(_e){}
+      res(v||null); };
+    /* «melhor» e a margem mais pequena. Uma leitura SEM margem so serve se
+       nao houver nenhuma com margem — nao se sabe se e boa, e supor que sim
+       era a mentira tranquilizadora do costume (dd-61). */
+    const considerar=(p)=>{
+      const a=Number.isFinite(p.coords.accuracy)?p.coords.accuracy:null;
+      if(!Number.isFinite(p.coords.latitude)) return;
+      if(!melhor||(a!=null&&(melhor.acc==null||a<melhor.acc)))
+        melhor={lat:p.coords.latitude, lon:p.coords.longitude, acc:a,
+                name:t("A minha posição"), sub:""};
+      if(a!=null&&a<=alvo) fim(melhor);
+    };
+    const acaba=()=>{ if(feito) return; fim(melhor); };
+    const relJanela=setTimeout(acaba,janela);
+    /* o teto de relogio do dd-131: se NENHUMA via chamar callback nenhum
+       (permissao por responder), isto nao pode ficar preso para sempre */
+    const relTeto=setTimeout(()=>{
+      console.warn("posição: a API não respondeu em 8 s — sigo sem ela");
+      fim(null); },teto);
+    /* ═══ AS DUAS VIAS AO MESMO TEMPO, e a razao esta medida ═══
+       O pedido unico dispara JA: e a via que todas as plataformas servem, e
+       e o que garante que um gesto do utilizador tem resposta depressa. O
+       watch fica a refinar por cima dele durante a janela, e a melhor
+       margem ganha. Pedir so o watch atrasava o gesto 700 ms a espera de um
+       primeiro sinal que em algumas plataformas nunca chega — apanhado na
+       bancada pelo `localizacao-estados`, que tem exatamente esse ambiente.
+       Duas vias, UMA caixa de permissao: o browser pergunta por origem, nao
+       por chamada. */
+    try{
+      navigator.geolocation.getCurrentPosition(considerar,
+        (e)=>{ /* uma recusa e uma recusa para as duas vias: nao se espera
+                  pela janela para dar uma resposta que ja se tem, senao o
+                  cartao de recusa do dd-41 chegava 2,5 s atrasado */
+               erroGuardado=e; if(!melhor) fim(null); },
+        {enableHighAccuracy:true, timeout:Math.max(1500,teto-1500), maximumAge:0});
+    }catch(e){}
+    if(typeof navigator.geolocation.watchPosition!=="function") return;
+    try{
+      id=navigator.geolocation.watchPosition(considerar,
+        (e)=>{ erroGuardado=erroGuardado||e; },
+        {enableHighAccuracy:true, timeout:teto-500, maximumAge:0});
+    }catch(e){}
   });
+}
+async function freshPos(){
+  /* ═══ dd-170: A JANELA PAGA-SE UMA VEZ, NÃO A CADA PERGUNTA ═══
+     APANHADO NA BANCADA no mesmo turno: pôr a janela de amostragem à cabeça
+     do `freshPos` atrasou 2,5 s TODOS os caminhos que perguntam onde está —
+     incluindo o assistente, que a pessoa está a ver a pensar. Comprar
+     precisão com espera é certo num gesto deliberado (o botão do GPS) e
+     errado numa pergunta interna que já tem a resposta guardada.
+     Por isso: se já há posição fresca, devolve-se JÁ; a janela só abre
+     quando não há nada, e mesmo aí é mais curta do que a do gesto. */
+  const j=posFresca(30000);
+  if(j) return {lat:j.lat, lon:j.lon, acc:j.acc, name:t("A minha posição"), sub:""};
+  /* NÃO se encadeia aqui um segundo pedido único: o `melhorPos` JÁ dispara um
+     lá dentro, e encadeá-los somava dois relógios de 8 s — o assistente
+     ficava preso em «A pensar…» quase o dobro do tempo. Apanhado pelo
+     `pesquisa-cobertura`, que é a régua que o dd-131 deixou aqui exatamente
+     para isto. */
+  return await melhorPos({janela:1200});
 }
 function aiMsg(kind,text){
   const box=$("#ai-answer"); box.textContent="";
@@ -9014,6 +10488,9 @@ async function assistantAsk(){
     aiMsg("info", alargou+(cands.length===1
       ? t("Encontrei um sítio. Toca nele para eu traçar a rota e ver o tempo pelo caminho.")
       : t("Encontrei {n} sítios. Toca no que queres para eu traçar a rota.",{n:cands.length})));
+    /* dd-172 §2: os candidatos que o assistente desenha vieram do fornecedor
+       de pesquisa, tal como os da lista — a licença acompanha-os aqui também */
+    { const la=atribLinha(cands); if(la) $("#ai-cands").appendChild(la); }
   } finally { btn.disabled=false; btn.textContent=t("Perguntar"); }
 }
 async function assistantGo(pos,cand,cands){
@@ -9591,6 +11068,56 @@ const guardaMoto={on:store.get("guarda")!==0};
 function setGuardaMoto(v){ guardaMoto.on=!!v; store.set("guarda",v?1:0); pintarGuarda();
   if(!v){ if(motoGuard.timer){ clearTimeout(motoGuard.timer); motoGuard.timer=null; }
     motoGuard.cartao=null; scheduleNativeAlerts([],9100,10); } }
+/* dd-173 §3: a linha da versão era pintada UMA vez, no arranque, e ficava em
+   português para sempre a quem trocasse de língua. Ganha pintor próprio, para
+   poder ser chamada pelo repintor — é o mesmo defeito do parágrafo da moto. */
+function pintarVersaoLinha(){
+  const bv=$("#set-versao"); if(bv) bv.textContent=t("Versão {v}",{v:BUILD});
+}
+/* ═══ CAMADA 2 — cinco toques no carimbo da versão ═══════════════════════
+   O padrão das opções de programador do Android, e pela mesma razão: o
+   painel é diagnóstico, não interface. Escondê-lo num menu seria escondê-lo
+   de quem precisa; deixá-lo à vista seria pôr nomes de código à frente de
+   quem só quer saber se a app está boa. Cinco toques resolve as duas. */
+const TOQUES_DIAG=5;
+let diagToques=0, diagRelogio=null;
+function ligarToquesDiagnostico(){
+  const bv=$("#set-versao"); if(!bv||bv._diag) return;
+  bv._diag=true;
+  bv.style.cursor="pointer";
+  bv.addEventListener("click",()=>{
+    clearTimeout(diagRelogio);
+    diagRelogio=setTimeout(()=>{ diagToques=0; },1500);   // a contagem esquece-se sozinha
+    if(++diagToques<TOQUES_DIAG){
+      if(diagToques>=3) toast(t("Mais {n} para abrir o diagnóstico",{n:TOQUES_DIAG-diagToques}),1500);
+      return;
+    }
+    diagToques=0; clearTimeout(diagRelogio);
+    abrirDiagnostico();
+  });
+}
+function abrirDiagnostico(){
+  const f=$("#saude-fundo"); if(!f) return;
+  f.hidden=false;
+  const pq=$("#saude-porque");
+  if(pq) pq.textContent=t("Isto é o painel de diagnóstico. Serve para perceber uma avaria — não precisas dele para usar a app.");
+  const inc=$("#diag-inclui");
+  if(inc) inc.textContent=t("O relatório inclui: versão, línguas, peças da app, e que serviços responderam ou falharam, com há quanto tempo. NÃO inclui a tua posição, moradas nem nomes de sítios teus. Nada é enviado — copias e colas onde quiseres.");
+  const b=$("#btn-diag");
+  if(b){
+    b.textContent="📋 "+t("Copiar relatório de diagnóstico");
+    if(!b._lig){ b._lig=true;
+      b.addEventListener("click",()=>{
+        const txt=relatorioDiagnostico();
+        (navigator.clipboard?.writeText(txt)||Promise.reject())
+          .then(()=>toast(t("Relatório copiado! 📋")))
+          .catch(()=>toast(t("Cópia automática indisponível — seleciona e copia à mão.")));
+      });
+    }
+  }
+  pintarPainelRede();
+  try{ f.scrollIntoView({block:"nearest"}); }catch(e){}
+}
 function pintarGuarda(){
   const c=$("#guarda-opt"); if(!c) return;
   c.checked=guardaMoto.on;
@@ -9618,7 +11145,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-04-2106-293338";
+const BUILD="2026-08-05-2013-a14121";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -10722,7 +12249,7 @@ async function scheduleNativeAlerts(events, base=9000, span=100){
       smallIcon:"ic_stat_icon_config_sample", sound:null,
     }));
     if(notifications.length) await LN.schedule({notifications});
-  }catch(e){}
+  }catch(e){ queixar("agendar os avisos da Sentinela",e); }
 }
 /* dd-108: varredura ÚNICA dos fantasmas — os cinco intervalos de ids que os
    disparadores sem gesto usaram um dia (7h: remover o código sem cancelar os
@@ -10830,9 +12357,15 @@ function renderFocoChip(){
        passa à frente dos olhos antes de a app guiar alguém. */
     switchTab("rota");
     oferecerFocoNaRota();
+    /* dd-170 §4: a origem é A MINHA POSIÇÃO se a houver fresca, senão a
+       CASA — nunca o sítio no ecrã, que é o próprio destino. Era assim que
+       nascia a rota de Jumbo para Jumbo. */
     const o=$("#rt-o");
-    if(o&&!o._picked&&!o.value.trim()&&state.home&&Number.isFinite(state.home.lat)){
-      o._picked={...state.home}; o.value=state.home.name; // origem = a referência conhecida
+    if(o&&!o._picked&&!o.value.trim()){
+      const p=posFresca(), c=aCasa();
+      const orig=p?{lat:p.lat, lon:p.lon, name:t("A minha posição"), sub:""}
+                 :(c&&Number.isFinite(c.lat)?{...c}:null);
+      if(orig&&(!state.foco||haversine(orig,state.foco)>0.05)){ o._picked=orig; o.value=orig.name; }
     }
     computeRoute();
   });
@@ -10978,9 +12511,8 @@ function init(){
   // idioma + estáticos
   document.documentElement.lang=state.lang;
   applyStaticI18n();
-  $$("#lang-row .chip").forEach(c=>{ const esc=store.get("lang");
-    c.classList.toggle("sel",esc==="auto"?c.dataset.lang==="auto":c.dataset.lang===state.lang);
-    c.addEventListener("click",()=>setLang(c.dataset.lang)); });
+  $$("#lang-row .chip").forEach(c=>c.addEventListener("click",()=>setLang(c.dataset.lang)));
+  pintarFilaLinguas();
   // unidades: métrico, imperial ou o híbrido britânico (milhas com Celsius)
   state.units=store.get("units")||detectUnits();
   /* quantos pedidos esta sessão fez, e quantos a cache poupou. Serve para
@@ -11044,7 +12576,8 @@ function init(){
 
   // tema: sistema por defeito; a tua escolha fica memorizada
   if(matchMedia&&matchMedia("(prefers-color-scheme: light)").matches) setTheme("light",{guardar:false});
-  const bv=$("#set-versao"); if(bv) bv.textContent=t("Versão {v}",{v:BUILD});
+  pintarVersaoLinha();
+  ligarToquesDiagnostico();
   estadoAparelho();   // o que este aparelho não consegue fazer, dito onde dura
   const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth,{guardar:false});
   $("#btn-theme").addEventListener("click",()=>setTheme(state.theme==="dark"?"light":"dark"));
