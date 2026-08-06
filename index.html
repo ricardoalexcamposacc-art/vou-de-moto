@@ -1881,6 +1881,7 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
+"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Your home is saved {d} away from everything else you've saved. Is that really your home?","É":"It is","Não, esquecer":"No, forget it",
 "Bom, mas {n} de sensação":"Good, but {n} feels-like","Calor perigoso — {n}":"Dangerous heat — {n}",
 "demorou de mais":"timed out",
 "Estado da app":"App status","presente":"present","em falta":"MISSING","a mais — não devia estar aqui":"extra — shouldn't be here","fora, como deve ser":"gone, as it should be","o motor do mapa":"the map engine","a porta única do mapa":"the map's single door","a tradução":"translation","as tuas preferências":"your preferences","falar com os serviços":"talking to the services","Leaflet, que saiu no A2.2":"Leaflet, which left in A2.2",
@@ -2337,6 +2338,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
+"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Tu casa está guardada a {d} de todo lo demás que has guardado. ¿Es de verdad tu casa?","É":"Lo es","Não, esquecer":"No, olvídala",
 "Bom, mas {n} de sensação":"Bien, pero {n} de sensación","Calor perigoso — {n}":"Calor peligroso — {n}",
 "demorou de mais":"tardó demasiado",
 "Estado da app":"Estado de la app","presente":"presente","em falta":"FALTA","a mais — não devia estar aqui":"de más — no debería estar aquí","fora, como deve ser":"fuera, como debe ser","o motor do mapa":"el motor del mapa","a porta única do mapa":"la puerta única del mapa","a tradução":"la traducción","as tuas preferências":"tus preferencias","falar com os serviços":"hablar con los servicios","Leaflet, que saiu no A2.2":"Leaflet, que salió en A2.2",
@@ -2766,6 +2768,7 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
+"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Ta maison est enregistrée à {d} de tout le reste que tu as enregistré. C'est vraiment chez toi ?","É":"Oui, c'est ça","Não, esquecer":"Non, oublie-la",
 "Bom, mas {n} de sensação":"Bien, mais {n} ressentis","Calor perigoso — {n}":"Chaleur dangereuse — {n}",
 "demorou de mais":"trop lent",
 "Estado da app":"État de l'app","presente":"présent","em falta":"MANQUANT","a mais — não devia estar aqui":"en trop — ne devrait pas être là","fora, como deve ser":"parti, comme il se doit","o motor do mapa":"le moteur de la carte","a porta única do mapa":"la porte unique de la carte","a tradução":"la traduction","as tuas preferências":"tes préférences","falar com os serviços":"parler aux services","Leaflet, que saiu no A2.2":"Leaflet, parti en A2.2",
@@ -3202,6 +3205,7 @@ fr:{
    Vocabulário de motociclista, e **«je», nunca «u»**: quem anda de mota
    trata-se por tu. */
 nl:{
+"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Je thuis staat opgeslagen op {d} van al het andere dat je hebt bewaard. Is dat echt je thuis?","É":"Ja, klopt","Não, esquecer":"Nee, vergeet het",
 "Bom, mas {n} de sensação":"Goed, maar {n} gevoelstemperatuur","Calor perigoso — {n}":"Gevaarlijke hitte — {n}",
 "norte":"noord",
 "nordeste":"noordoost",
@@ -4930,8 +4934,7 @@ async function photonSearch(q,pos,limit=7){
          o `fornecedorCaiu` do geoSearch. Qualquer outro erro sobe inteiro:
          uma reserva que engole erros que não entende é o `catch` mudo com
          outra roupa. */
-      if(!e?.fornecedorCaiu) throw e;
-      degradarPesquisa(e.motivo||tipoDeFalha(e));
+      throw e;
       /* e segue para a via SEM CHAVE, aqui em baixo — que é a mesma que a app
          usa quando não há chave nenhuma, e portanto já está provada. */
     }
@@ -6604,6 +6607,92 @@ function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomp
    GUARDA GRITA OU CALA-SE? Grita: baixo demais faz perguntas visíveis a mais;
    nunca grava calado. */
 const LIMIAR_CASA_KM=300;
+/* ═══ dd-190 §1 — A CASA IMPLAUSÍVEL: 3000 km, E É PERGUNTA ═══════════════
+   O caso: a app do dono guardava «شمال دارفور, North Darfur, Sudão» como
+   CASA, a ~4500 km de Maastricht, onde estão todos os sítios dele. A
+   reparação por PROVENIÊNCIA (dd-185) fecha a porta às casas escritas por
+   uma pesquisa — mas **só apanha as que trazem `prov.como="pesquisa"`**.
+   Uma casa escrita por uma versão anterior à proveniência passa por essa
+   porta sem tocar na campainha, e foi por isso que o dono teve de a corrigir
+   à mão. Este detetor existe **só para esse legado**.
+
+   ⚠️ QUEM NÃO ENTRA AQUI, e é metade da regra:
+     · casas com proveniência de GESTO (`escolha`, `gps`) são **sagradas** —
+       a pessoa disse que é ali, e a app não discute com ela;
+     · casas com `prov.como="pesquisa"` já se reparam sozinhas — não se
+       pergunta duas vezes pela mesma coisa;
+     · **com menos de 2 sítios de referência o detetor NÃO CORRE.** Sem
+       referência não há implausibilidade — há só uma casa. Quem acabou de
+       instalar a app e guardou a casa numa viagem não leva pergunta nenhuma.
+
+   O LIMIAR: **3000 km**, e a medição ao lado (§10.7). A diagonal da Europa
+   continental anda pelos ~3400 km — Lisboa–Helsínquia são ≈3360 km em linha
+   reta. Uma viagem de mota europeia real, com a casa numa ponta e os
+   favoritos na outra, cabe **folgada abaixo** do limiar. O caso real
+   (Maastricht → Sudão) está a ≈4500 km, **folgado acima**. O limiar separa
+   os dois mundos com margem dos dois lados.
+
+   E A AÇÃO É UMA **PERGUNTA**, NUNCA UMA REPARAÇÃO. A assimetria manda
+   (7g-ter): apagar uma casa verdadeira é perda de dados; deixar uma falsa
+   custa um toque. Na dúvida, o silêncio ganha à ação. */
+const CASA_LONGE_KM = 3000;
+/* ⚠️ O DETETOR ESTÁ DESLIGADO, E A RAZÃO É UMA MEDIÇÃO QUE DESMENTE A CARTA.
+   A dd-190 §1 justifica os 3000 km assim: «Lisboa–Helsínquia ≈ 3360 em linha
+   reta — uma viagem de mota europeia real, com a casa numa ponta e favoritos
+   na outra, cabe folgada ABAIXO do limiar». **Não cabe: 3360 está 360 km
+   ACIMA de 3000.** Medi com o haversine desta app:
+
+     Lisboa → Helsínquia   3360 km      (a carta dá-a por abaixo; está acima)
+     Lisboa → Tampere      3383 km
+     Maastricht → Darfur   4278 km      (a carta estimou ~4500)
+     **Faro → Nordkapp     4264 km**    ← e é isto que fecha a questão
+
+   O «cabo a cabo» — Faro ao Cabo Norte — é **a** viagem de mota europeia, e
+   está a **14 km** do caso do Sudão. Não há limiar que apanhe um e deixe o
+   outro: os dois mundos que a carta queria separar **sobrepõem-se**.
+
+   Por isso a obra fica escrita, guardada e PROVADA no seu ficheiro, e o
+   detetor não corre até o Ricardo decidir. Ligar isto com os 3000 punha a
+   app a duvidar da casa de quem foi ao Cabo Norte — e uma pergunta errada a
+   quem tem razão gasta a confiança que a pergunta certa vai precisar.
+   Muda-se este `false` para `true` no dia em que houver número. */
+const CASA_LONGE_ATIVO = false;
+const CASA_PROV_DE_GESTO = new Set(["escolha", "gps"]);
+function casaImplausivel(){
+  if(!CASA_LONGE_ATIVO) return null;
+  try{
+    const c=state.home||store.get("home"); if(!c||!Number.isFinite(c.lat)) return null;
+    if(CASA_PROV_DE_GESTO.has(c.prov?.como)) return null;          // sagrada
+    if(CASA_PROV_MA.has(c.prov?.como)) return null;                // já reparada pelo dd-185
+    const refs=[...(getFavs?getFavs():[]), ...(getRecentes?getRecentes():[])]
+      .filter(x=>x&&Number.isFinite(x.lat)&&Number.isFinite(x.lon));
+    if(refs.length<2) return null;                                 // sem referência não há implausibilidade
+    /* a distância ao sítio MAIS PRÓXIMO de tudo o que ela guardou: se o mais
+       perto está a 4500 km, todos estão. Usar a média escondia um favorito
+       ao lado da casa no meio de dez do outro lado do mundo. */
+    const perto=Math.min(...refs.map(r=>haversine(c,r)));
+    return perto>CASA_LONGE_KM?{casa:c, km:Math.round(perto), refs:refs.length}:null;
+  }catch(e){ queixar("detetor da casa implausível",e); return null; }
+}
+function perguntarCasaImplausivel(){
+  const r=casaImplausivel(); if(!r) return false;
+  const slot=$("#confirmar-casa-slot"); if(!slot||slot.firstChild) return false;
+  const card=el("div","card"); card.id="casa-implausivel";
+  card.setAttribute("data-test","casa-implausivel");
+  card.appendChild(el("p",null,t("🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?",
+    {d:`${r.km} km`})));
+  const acoes=el("div","san-acoes");
+  const sim=el("button","btn primary",t("É"));
+  /* dizer «é» não é só fechar o cartão: passa a ser uma casa de GESTO, e
+     nunca mais se pergunta. Perguntar todos os dias a mesma coisa é a
+     maneira mais certa de ensinar alguém a carregar sem ler. */
+  sim.addEventListener("click",()=>{ slot.textContent=""; setHome(r.casa,{prov:"escolha"}); });
+  const nao=el("button","btn",t("Não, esquecer"));
+  nao.addEventListener("click",()=>{ slot.textContent=""; try{ store.del("home"); store.del("casa"); }catch(e){} location.reload(); });
+  acoes.append(sim,nao); card.appendChild(acoes);
+  slot.appendChild(card);
+  return true;
+}
 function confirmarCasa(loc){
   const slot=$("#confirmar-casa-slot"); if(!slot) return;
   slot.textContent="";
@@ -10183,14 +10272,37 @@ async function tripVerdict(tr){
     let i=H?.time?.findIndex(tt=>tt>tr.dep)??-1; if(i<1) i=Math.max(1,(H?.time?.length||1)-1);
     const pr=H?.precipitation?.[i-1]??null, pp=H?.precipitation_probability?.[i-1]??null,
           code=H?.weather_code?.[i-1]??null, gust=H?.wind_gusts_10m?.[i-1]??null;
+    /* ═══ dd-190 §2 — AS VIAGENS MARCADAS TAMBÉM ESTAVAM CEGAS AO CALOR ═════
+       O varrimento da classe do relatório 111 apanhou esta superfície: o
+       veredicto olhava para chuva, rajadas e código de tempo, e **não tinha
+       termo de calor nenhum** — a mesma assimetria que o dd-178 curou no
+       `scoreHour`, na rota e (no dd-186) na faixa dos 7 dias. Um veredicto
+       verde não se queixa, e por isso ninguém dava por ela.
+       A escada é a MESMA, e não se inventa número: 42° de SENSAÇÃO é chão nos
+       três perfis; o `tCalor` do perfil tira o verde a cheio; sem sensação, o
+       calor cala-se. O dado já vinha no pedido — o `fetchRouteWx` pede
+       `apparent_temperature` desde o dd-178. */
+    const at=H?.apparent_temperature?.[i-1]??null;
+    const profV=PROFILES[state.profile]||PROFILES.equilibrado;
+    const calorV=at==null?null:(at>=CALOR_VERMELHO?"perigo":(at>=profV.tCalor?"cuidado":null));
     const lvl=rainLevel(pr,pp,code,PROFILES[state.profile]);
     /* assimétrico: a má notícia sai com a evidência que houver; o 🟢 de uma
        viagem marcada exige a hora completa — antes, `??0` dava "bom para ir"
        a uma hora sem dados nenhuns */
     const furo=(pr==null&&pp==null)||code==null||gust==null;
-    const v=lvl>=3?{ico:"🔴",txt:t("chuva forte/trovoada")}:lvl===2?{ico:"🟠",txt:t("chuva prevista")}
+    /* o `U.temp` FORA do `t()` — dentro dele a conversão corria duas vezes e
+       o linte `unidades` apanhou-o, como já tinha apanhado o mesmo gesto meu
+       na faixa dos 7 dias há duas horas. Duas vezes o mesmo erro no mesmo
+       turno: a régua é que está a fazer o trabalho de memória por mim. */
+    const nCalor=at==null?null:U.temp(at);
+    const v=calorV==="perigo"?{ico:"🥵",txt:t("Calor perigoso — {n}",{n:nCalor}),calor:"perigo"}
+      :lvl>=3?{ico:"🔴",txt:t("chuva forte/trovoada")}:lvl===2?{ico:"🟠",txt:t("chuva prevista")}
       :(gust!=null&&gust>=60)?{ico:"💨",txt:t("vento muito forte")}:lvl===1?{ico:"🟡",txt:t("possível chuvisco")}
-      :furo?{ico:"❔",txt:t("faltam dados dessa hora")}:{ico:"🟢",txt:t("bom para ir")};
+      :furo?{ico:"❔",txt:t("faltam dados dessa hora")}
+      /* a banda de cuidado do dd-178: o dia não é mau, mas perde o direito de
+         ser afirmado a cheio — e diz o número, nunca só o ícone (§10.27) */
+      :calorV==="cuidado"?{ico:"🥵",txt:t("Bom, mas {n} de sensação",{n:nCalor}),calor:"cuidado"}
+      :{ico:"🟢",txt:t("bom para ir")};
     v.visto=now;                    // dd-97 §2: veredictos envelhecem — diz-se quando foi visto
     tripWx.set(tr.id,{at:now,v});
     return v;
@@ -10871,6 +10983,51 @@ function buildRecommendation(cand){
 /* =====================================================================
    MODO VIAGEM — geofencing de chuva em tempo real (com a app aberta)
    ===================================================================== */
+/* ═══ dd-188 §1 — A CHEGADA: O 350 NU MORRE ═════════════════════════════════
+   O caso real: o dono ouviu «Chegaste ao destino» a **~500 m** de Ireneweg 30,
+   numa rua urbana. A regra de então era `haversine < 0.35 km` — 350 metros
+   escritos à mão, sem medição ao lado, mais uma segunda condição por ÍNDICE
+   de amostra.
+
+   O QUE O RESEARCH FECHOU (código-fonte do OsmAnd, `AnnounceTimeDistances.java`):
+     · `POSITIONING_TOLERANCE = 12` m — o chão que absorve o erro de GPS;
+     · `ARRIVAL_DISTANCE = max(12, velocidade × 5 s) × fator` — ou seja
+       **cinco segundos de viagem**. Carro por omissão ≈ 63 m; bicicleta ≈ 14;
+       peão ≈ 12;
+     · GPS urbano em telemóvel: **7–13 m** de erro típico, a degradar para
+       dezenas de metros entre prédios (PLoS ONE 2019, Merry & Bettinger).
+
+   A REGRA NOVA, à letra da carta:
+     · **15 m de chão** — os 12 do OsmAnd mais margem para o multipath urbano;
+     · **80 m de teto** — a 60 km/h a fórmula dá 83; trava-se aos 80 porque o
+       destino é urbano. O OsmAnd não põe teto porque só ANUNCIA por voz; nós
+       PARAMOS a viagem, que é um gesto maior e merece mais aperto;
+     · **35 m sem velocidade** — o valor de parado-ou-devagar. Nunca o 350. */
+const CHEGADA_SEG = 5;         // os ~5 s de viagem do OsmAnd
+const CHEGADA_MIN = 15;        // 12 (POSITIONING_TOLERANCE) + margem urbana
+const CHEGADA_MAX = 80;        // teto nosso: paramos a viagem, não só anunciamos
+const CHEGADA_SEM_VEL = 35;    // GPS sem `speed` — parado ou devagar
+function raioChegada(velMps){
+  /* ⚠️ «SEM VELOCIDADE» ≠ «PARADO», e a primeira versão confundiu os dois.
+     A carta diz 35 m quando o GPS **não dá** `speed`; parado é velocidade
+     ZERO, que é um dado, e a fórmula trata dele sozinha — `clamp(0,15,80)`
+     dá o chão de 15 m. Dar 35 m a quem está parado alargava o raio no
+     momento em que ele devia estar mais apertado: à porta, sem andar.
+     O `< 0` está aqui porque há aparelhos que devolvem −1 para «não sei». */
+  if(!Number.isFinite(velMps)||velMps<0) return CHEGADA_SEM_VEL;
+  return Math.min(Math.max(velMps*CHEGADA_SEG, CHEGADA_MIN), CHEGADA_MAX);
+}
+/* ═══ HISTERESE E TRINCO (dd-188 §1c) ══════════════════════════════════════
+   Uma leitura não chega: o erro de GPS urbano põe um ponto a 40 m do sítio
+   onde a pessoa está, e a chegada é irreversível — para a viagem, cala a
+   navegação, fecha o ecrã. Declara-se com UMA das duas:
+     · **duas leituras consecutivas** dentro do raio, ou
+     · **uma leitura com `accuracy` reportada MENOR que o raio** — se o
+       aparelho garante que se enganou menos do que o raio, uma chega.
+   E com TRINCO: depois de declarada não se re-declara nem se desdeclara. O
+   estado é terminal para aquela viagem. Sem trinco, sair e voltar a entrar no
+   raio (uma rotunda ao pé do destino) repetia o anúncio. */
+const chegada={dentro:0, feito:false};
 const travel={active:false, watch:null, marcador:null, wakeLock:null, alerted:new Set(),
   lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0,
   offHits:0, rerouting:false, lastReroute:0,
@@ -11402,7 +11559,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-06-0038-5f45c2";
+const BUILD="2026-08-06-0141-53cb2d";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -11672,8 +11829,84 @@ if(window.speechSynthesis){
    "para a direita", e o til de "~2 km" vira "til". A limpeza tem de estar no
    FUNIL, não em cada chamador — havia onze `speak()` espalhados e bastava um
    esquecer-se. Agora ninguém pode falhar: passa tudo por aqui. */
-function paraVoz(txt){
-  return String(txt ?? "")
+/* ═══ dd-188 §2 — O LÉXICO DE VOZ: 5 LÍNGUAS, SINGULAR E PLURAL ═════════════
+   O research da carta fechou três coisas e nenhuma delas é opinião:
+     · o Web Speech API **não suporta SSML de forma fiável** — em Chrome e no
+       WebView do Android as tags são LIDAS EM VOZ ALTA («speak…»). O
+       `say-as interpret-as="unit"` está fora da mesa;
+     · os motores de TTS **não expandem abreviaturas de forma consistente**
+       entre línguas e fabricantes (Google/Samsung/iOS divergem);
+     · o OsmAnd resolve isto com léxicos de voz por língua, separados dos
+       textos de ecrã. É o padrão a copiar.
+
+   Logo: **a app expande tudo para palavras inteiras ANTES de chamar o
+   `speechSynthesis.speak()`. Nenhuma abreviatura chega ao sintetizador.**
+
+   ⚠️ AS 149 CHAVES DE ECRÃ NÃO SE TOCAM. Aos olhos, «km» é o certo — é mais
+   curto, é o que se espera, e o ecrã já está apertado. A voz é OUTRA
+   SUPERFÍCIE e tem o seu funil. Se a expansão vazar para o ecrã, é defeito, e
+   a guarda mede as duas direções.
+
+   ⚠️ PT-PT é «quilómetro», com acento agudo — «quilômetro» é PT-BR.
+   ⚠️ NL NÃO PLURALIZA unidades de medida depois de número: «5 kilometer»,
+   «2 uur». O plural em -s ou -en aqui é erro. Mas `minuut→minuten` e
+   `graad→graden` PLURALIZAM — é a tabela da carta, à letra, e é assim mesmo.
+
+   ⚠️ INTERPRETAÇÃO DECLARADA, para a revisão nativa (M-20) confirmar: a
+   tabela escreve «grau / graus Celsius» e «degree / degrees Celsius». Li o
+   «Celsius» como partilhado pelas duas formas (singular «grau Celsius»),
+   porque é a única leitura que dá uma frase válida nas duas colunas. ES, FR
+   e NL não levam «Celsius» na tabela e não o levam aqui. */
+const VOZ_UNID = {
+  pt:{ km:{um:"quilómetro",muitos:"quilómetros"}, m:{um:"metro",muitos:"metros"}, min:{um:"minuto",muitos:"minutos"}, h:{um:"hora",muitos:"horas"}, c:{um:"grau Celsius",muitos:"graus Celsius"} },
+  en:{ km:{um:"kilometer",muitos:"kilometers"},   m:{um:"meter",muitos:"meters"}, min:{um:"minute",muitos:"minutes"}, h:{um:"hour",muitos:"hours"}, c:{um:"degree Celsius",muitos:"degrees Celsius"} },
+  es:{ km:{um:"kilómetro",muitos:"kilómetros"},   m:{um:"metro",muitos:"metros"}, min:{um:"minuto",muitos:"minutos"}, h:{um:"hora",muitos:"horas"}, c:{um:"grado",muitos:"grados"} },
+  fr:{ km:{um:"kilomètre",muitos:"kilomètres"},   m:{um:"mètre",muitos:"mètres"}, min:{um:"minute",muitos:"minutes"}, h:{um:"heure",muitos:"heures"}, c:{um:"degré",muitos:"degrés"} },
+  nl:{ km:{um:"kilometer",muitos:"kilometer"},    m:{um:"meter",muitos:"meter"},  min:{um:"minuut",muitos:"minuten"}, h:{um:"uur",muitos:"uur"},     c:{um:"graad",muitos:"graden"} },
+};
+/* o plural decide-se pelo NÚMERO, não pela língua: 1 é singular, tudo o resto
+   é plural — e «1,5» é plural, como em «um vírgula cinco quilómetros». O
+   número não se converte: só a unidade. O sintetizador sabe ler «1,5» na
+   língua dele desde que a palavra ao lado esteja certa. */
+function expandirUnidades(txt, lang){
+  /* ⚠️ `lex`, não `L`. A primeira versão chamou-lhe `L` e o `lint-motor`
+     acusou seis «MOTOR À SOLTA»: ele procura `\bL\.[A-Za-z]`, que é o objeto
+     de topo do Leaflet, e `L.km` parece-lhe exatamente isso. A régua está
+     certa — é deliberadamente simples, sem lista de nomes — e quem tem de
+     ceder é o nome que escolhi. */
+  const lex = VOZ_UNID[lang] || VOZ_UNID.pt;
+  /* ⚠️ `{um,muitos}` e não `[um, muitos]`. Um par de textos entre parênteses
+     retos é, para o `auditar-linguas`, uma frase traduzível — e ele tem razão
+     em o pensar, porque é assim que os pares de tradução se escrevem nesta
+     casa. Com a forma de lista, «grau Celsius» e «graus Celsius» apareceram
+     como quatro chaves por traduzir nas quatro línguas. Nomear os campos diz
+     melhor o que são e não engana a régua. */
+  const pal = (n, par) => (Math.abs(parseFloat(String(n).replace(",", "."))) === 1 ? par.um : par.muitos);
+  return String(txt)
+    /* ⚠️ A ORDEM É REGRA, não estilo: `km` antes de `m` (senão «5 km» dava
+       «5 quilo-metro»), e `min` antes de `m` (senão «10 min» dava «10
+       metro-in»). Trocar duas linhas aqui parte a expansão em silêncio. */
+    .replace(/(\d+(?:[.,]\d+)?)\s*km\b/gu, (_, n) => `${n} ${pal(n, lex.km)}`)
+    .replace(/(\d+(?:[.,]\d+)?)\s*min\b/gu, (_, n) => `${n} ${pal(n, lex.min)}`)
+    /* ═══ «18h» COLADO ≠ «2 h» COM ESPAÇO ═══════════════════════════════
+       São duas coisas diferentes e a carta manda-as separadas, com este
+       comentário: sem espaço é HORA DO DIA («18h» → «18 horas»); com espaço
+       é DURAÇÃO («2 h» → «2 horas»). A palavra calha ser a mesma; o que não
+       pode calhar é confundirem-se, porque a hora do dia nunca leva decimal
+       e a duração leva. */
+    .replace(/(\d+)h\b/gu, (_, n) => `${n} ${pal(n, lex.h)}`)
+    .replace(/(\d+(?:[.,]\d+)?)\s+h\b/gu, (_, n) => `${n} ${pal(n, lex.h)}`)
+    /* graus: com o C e sem o C. A carta nomeia «°C»; a app escreve «22°» no
+       ecrã, medido — as duas formas são a mesma unidade e a expansão apanha
+       as duas, senão curava-se um caso que não existe. */
+    .replace(/(-?\d+(?:[.,]\d+)?)\s*°\s*C\b/gu, (_, n) => `${n} ${pal(n, lex.c)}`)
+    .replace(/(-?\d+(?:[.,]\d+)?)\s*°(?![\p{L}\p{N}])/gu, (_, n) => `${n} ${pal(n, lex.c)}`)
+    .replace(/(\d+(?:[.,]\d+)?)\s*m\b/gu, (_, n) => `${n} ${pal(n, lex.m)}`);
+}
+function paraVoz(txt, lingua){
+  /* a expansão vem PRIMEIRO: precisa do «°» e do «km», que a limpeza a seguir
+     pode comer. Um funil que limpa antes de traduzir traduz o que sobrou. */
+  return expandirUnidades(String(txt ?? ""), lingua || (typeof state === "object" ? state.lang : "pt"))
     /* pictogramas, seletores de variação e junções */
     .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu,"")
     /* símbolos que a voz soletra: setas, marcas, matemática, moldura */
@@ -11689,7 +11922,7 @@ function paraVoz(txt){
 function speak(txt){
   try{
     if(state.muted) return;
-    txt=paraVoz(txt);
+    txt=paraVoz(txt,state.lang);
     if(!txt) return;                     // sobrou só símbolos: não se fala
     if(!("speechSynthesis" in window)){ vozAvisar(); return; }
     if(!voz.pronto) vozCarregar();
@@ -11877,6 +12110,7 @@ async function startTravel(){
   stopAutoTravel();
   travel.gestoEm=0; travel.ultimoFix=0; travel.semSinal=false; travel.follow=true;
   travel.fora=null; travel.foraPos=null; travel.foraDesde=0; travel.foraOff0=0;
+  chegada.dentro=0; chegada.feito=false;   // dd-188 §1c: o trinco é por viagem
   document.body.classList.add("traveling");
   if(state.mapaRota) Mapa.magro(state.mapaRota,true); // rico a planear, magro a conduzir
   /* fase 1 da câmara: a inclinação e a âncora entram JÁ, antes do primeiro
@@ -12163,9 +12397,38 @@ function onTravelPos(p){
   const last=R.samples[R.samples.length-1];
   const remKm=Math.max(0,last.km-kmNow);
   const etaArr=now+Math.max(0,last.travelSec-here.travelSec);
-  if(haversine(pos,last)<0.35&&idx>=R.samples.length-2){
-    speakT("Chegaste ao destino. Boa!"); buzz([120,60,120]);
-    stopTravel(t("🎉 Chegaste! Modo viagem terminado.")); return;
+  /* ═══ dd-188 §1b/§1c/§1d — a chegada é GEOMÉTRICA, e só ═══════════════
+     ⚠️ A SEGUNDA CONDIÇÃO DE ANTES MORREU. Era `idx >= R.samples.length-2`:
+     disparava por ÍNDICE DE AMOSTRA, e a distância real disso **mudou
+     sozinha quando o teto de amostragem subiu de 44 para 80** (dd-179 M4) —
+     ficou mais apertada sem ninguém decidir. Um limiar que muda de valor
+     quando outra peça muda é a violação da §10.9. Foi removida por inteiro. */
+  /* ⚠️ O DESTINO É O DESTINO, NÃO A ÚLTIMA AMOSTRA — medido a 06/08, e é um
+     defeito que só aparece depois de apertar o raio. A conta de antes era
+     `haversine(pos, last)`, e o `last` é a ÚLTIMA AMOSTRA da rota, que cai
+     onde a amostragem calhar: na rota de ensaio de 1,02 km ficou a **92 m
+     do destino**. Com o limiar de 350 m isso desaparecia dentro da folga;
+     com um raio de 15 a 80 m passa a mandar — quem para à porta fica a 92 m
+     da referência e **nunca chega**, e quem passa 92 m antes chega cedo.
+     A referência passa a ser o destino que a pessoa escolheu (`R.d`), com a
+     última amostra como reserva se ele não tiver coordenadas. */
+  const destino=(R.d&&Number.isFinite(R.d.lat)&&Number.isFinite(R.d.lon))?R.d:last;
+  const dChegM=haversine(pos,destino)*1000;
+  const raioCh=raioChegada(p.coords.speed);
+  const accCh=Number.isFinite(p.coords.accuracy)?p.coords.accuracy:null;
+  if(!chegada.feito){
+    if(dChegM<=raioCh){
+      chegada.dentro++;
+      /* duas leituras seguidas, OU uma leitura que o aparelho garante melhor
+         do que o raio. As duas portas estão na carta e as duas fazem falta:
+         só a primeira atrasava a chegada de quem para em cima do destino;
+         só a segunda confiava num `accuracy` que nem todos os aparelhos dão. */
+      if(chegada.dentro>=2||(accCh!=null&&accCh<raioCh)){
+        chegada.feito=true;
+        speakT("Chegaste ao destino. Boa!"); buzz([120,60,120]);
+        stopTravel(t("🎉 Chegaste! Modo viagem terminado.")); return;
+      }
+    } else chegada.dentro=0;   // saiu do raio: a contagem recomeça
   }
   /* ═══ dd-89 §1.4 — NÚMEROS QUE NÃO PODEM SER VERDADE NÃO SE DIZEM ════════
      Violação: "Portugal · possível chuvisco em 3 274 km". A causa a sério
@@ -12836,6 +13099,7 @@ function init(){
   pintarVersaoLinha();
   ligarToquesDiagnostico();
   estadoAparelho();   // o que este aparelho não consegue fazer, dito onde dura
+  perguntarCasaImplausivel();   // dd-190 §1: uma pergunta, e só para o legado
   const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth,{guardar:false});
   $("#btn-theme").addEventListener("click",()=>setTheme(state.theme==="dark"?"light":"dark"));
 
