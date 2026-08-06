@@ -30,6 +30,48 @@
      transmite o IP do utilizador e impede a declaração de "nenhum dado recolhido"
      nas lojas. Ficheiro variável 400–800, licença SIL OFL 1.1. -->
 <style>
+/* ══════════════════════════════════════════════════════════════════════════
+   A ESCADA — três degraus, e o de cima é exclusivo
+
+   O que a medição encontrou antes desta obra (tools/medir-hierarquia.mjs,
+   iPhone de 390 px, perfil equilibrado, dia com chuva a caminho):
+
+     Agora   93 linhas de texto · 12 tamanhos distintos · o maior a 26 px
+     Rota    33 linhas de texto ·  7 tamanhos distintos · o maior a 15 px
+
+   Doze degraus com meio pixel entre eles não são uma hierarquia — são uma
+   lista. E na rota **a frase que decide** («Trajeto seco», «Chuva forte no
+   caminho») estava a 14,5 px, mais PEQUENA do que o título de uma secção
+   secundária a 15 px. Quando nada é grande, o que é grande por acidente
+   passa a mandar.
+
+   Três degraus, com salto que o olho vê (1,6×–2× entre cada um):
+
+     --t-sussurro   rótulos, unidades, eixos, proveniência
+     --t-corpo      tudo o que se lê
+     --t-veredito   o número do índice e a frase que decide. MAIS NADA.
+
+   O degrau de cima é EXCLUSIVO de propósito: antes desta obra havia 26
+   declarações acima dos 16 px e nenhuma delas mandava.
+
+   ─── QUEM NÃO OBEDECE À ESCADA, e porquê ──────────────────────────────────
+   1 · o PAINEL DE CONDUÇÃO (.nav-*): lê-se a 90 km/h, tem escala própria e
+       maior, e já está preso por guarda (dist >= 30 px, via >= 16 px);
+   2 · a ATRIBUIÇÃO DO MAPA (.maplibregl-ctrl-attrib): os 11 px foram
+       escolhidos e medidos por causa da orientação da OSMF — descer para o
+       sussurro seria desfazer uma decisão documentada;
+   3 · os GLIFOS (ícones, pins, emoji, ×): o tamanho deles é ALVO DE DEDO COM
+       LUVA, não corpo de leitura. Um ⓘ a 17 px não é uma afirmação
+       tipográfica — é um botão. A escada manda no que se LÊ.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --t-sussurro:11px;
+  --t-corpo:18px;
+  --t-veredito:30px;
+}
+@media (max-width:720px){ :root{ --t-sussurro:10.5px; --t-corpo:17px; --t-veredito:28px; } }
+@media (max-width:380px){ :root{ --t-sussurro:10px;   --t-corpo:16px; --t-veredito:26px; } }
+
 @font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;
   src:url(./inter-latin.woff2) format('woff2');
   unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
@@ -94,7 +136,7 @@ html[data-theme="dark"]{
 html,body{margin:0;padding:0}
 body{
   background:var(--page); color:var(--ink);
-  font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:var(--t-corpo);line-height:1.5;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased; min-height:100vh;
 }
 body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--page-grad);background-attachment:fixed}
@@ -113,10 +155,10 @@ a{color:var(--accent)}
 .app-head{display:flex;align-items:center;gap:12px;padding:18px 0 12px}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
 .brand svg{flex:none}
-.brand-name{font-size:21px;font-weight:800;letter-spacing:-.025em;white-space:nowrap;
+.brand-name{font-size:var(--t-corpo);font-weight:800;letter-spacing:-.025em;white-space:nowrap;
   background:linear-gradient(120deg,var(--ink) 30%,var(--accent) 78%,var(--accent2) 100%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.brand-sub{font-size:11px;color:var(--muted);margin-top:-2px;white-space:nowrap;
+.brand-sub{font-size:var(--t-sussurro);color:var(--muted);margin-top:-2px;white-space:nowrap;
   text-transform:uppercase;letter-spacing:.09em;font-weight:600}
 .head-actions{margin-left:auto;display:flex;gap:8px}
 .icon-btn{
@@ -133,7 +175,7 @@ a{color:var(--accent)}
   border-radius:16px;padding:5px;margin:6px 0 18px;box-shadow:var(--shadow),var(--card-top);
   position:sticky;top:10px;z-index:1500}
 .tab{flex:1;padding:10px 8px;border:0;border-radius:12px;background:transparent;cursor:pointer;
-  font-weight:650;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:7px;
+  font-weight:650;font-size:var(--t-corpo);color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:7px;
   transition:background .18s,color .18s,box-shadow .18s,transform .12s}
 .tab[aria-selected="true"]{background:var(--acc-grad);color:var(--accent-ink);box-shadow:var(--glow)}
 .tab:not([aria-selected="true"]):hover{background:var(--surface2)}
@@ -145,8 +187,8 @@ a{color:var(--accent)}
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   padding:18px;margin-bottom:16px;box-shadow:var(--shadow),var(--card-top);
   animation:cardIn .32s ease-out both}
-.card h2{margin:0 0 4px;font-size:15.5px;font-weight:750;letter-spacing:-.015em}
-.card .h-sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+.card h2{margin:0 0 4px;font-size:var(--t-corpo);font-weight:750;letter-spacing:-.015em}
+.card .h-sub{font-size:var(--t-corpo);color:var(--muted);margin:0 0 12px}
 /* A Sentinela desligada contra a vontade do utilizador não pode ser uma linha
    cinzenta entre outras: é a única altura em que aquele texto diz que uma coisa
    que ele ligou deixou de estar a funcionar. */
@@ -169,8 +211,8 @@ a{color:var(--accent)}
 .locbar{display:flex;gap:8px;align-items:center;position:relative}
 .locbar .field{flex:1}
 .loc-name{display:flex;flex-direction:column;min-width:0}
-.loc-name b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.loc-name span{font-size:12px;color:var(--muted)}
+.loc-name b{font-size:var(--t-corpo);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loc-name span{font-size:var(--t-corpo);color:var(--muted)}
 /* ================= INPUTS / AUTOCOMPLETE ================= */
 .field{position:relative}
 .field input[type="text"],.field input[type="search"],.field input[type="datetime-local"]{
@@ -178,31 +220,31 @@ a{color:var(--accent)}
   background:var(--surface2);color:var(--ink);transition:border-color .15s,box-shadow .15s;
 }
 .field input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:0 0 5px}
+.field label{display:block;font-size:var(--t-corpo);font-weight:600;color:var(--ink2);margin:0 0 5px}
 .ac-list{position:absolute;z-index:1200;left:0;right:0;top:calc(100% + 4px);
   background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;
   box-shadow:var(--shadow);max-height:264px;overflow-y:auto;display:none}
 .ac-list.open{display:block}
 .ac-item{padding:9px 12px;cursor:pointer;display:flex;flex-direction:column;gap:1px}
 .ac-item.active,.ac-item:hover{background:var(--accent-soft)}
-.ac-item b{font-size:14px;font-weight:600}
-.ac-item span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ac-empty{padding:10px 12px;font-size:13px;color:var(--muted)}
+.ac-item b{font-size:var(--t-corpo);font-weight:600}
+.ac-item span{font-size:var(--t-corpo);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-empty{padding:10px 12px;font-size:var(--t-corpo);color:var(--muted)}
 /* dd-141: o painel «Estado da ligação». O ponto é redundante com o texto de
    propósito — quem não distingue verde de vermelho lê «respondeu»/«sem
    resposta» na mesma linha, e nunca fica dependente da cor. */
-.saude-linha{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:12.5px}
+.saude-linha{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:var(--t-corpo)}
 .saude-ponto{font-size:11px;line-height:1}
 .saude-ponto.bom{color:var(--good)}
 .saude-ponto.mau{color:var(--serious)}
 .saude-host{font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.saude-tec{flex:none;opacity:.55;font-size:10.5px}
-#saude-resumo{font-size:13.5px;margin:2px 0 0}
+.saude-tec{flex:none;opacity:.55;font-size:var(--t-sussurro)}
+#saude-resumo{font-size:var(--t-corpo);margin:2px 0 0}
 #saude-resumo[data-ok="nao"]{color:var(--serious)}
 .saude-estado{margin-left:auto;flex:none}
 /* ================= BUTTONS / CHIPS ================= */
 .btn{padding:10px 16px;border-radius:13px;border:1px solid var(--border);background:var(--surface2);
-  cursor:pointer;font-weight:650;font-size:14px;display:inline-flex;align-items:center;gap:8px;
+  cursor:pointer;font-weight:650;font-size:var(--t-corpo);display:inline-flex;align-items:center;gap:8px;
   transition:filter .15s,transform .12s,box-shadow .18s}
 .btn:hover{filter:brightness(1.06)}
 .btn:active{transform:scale(.97)}
@@ -210,7 +252,7 @@ a{color:var(--accent)}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.55;cursor:default}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
-  border:1px solid var(--border);background:var(--surface2);font-size:12.5px;font-weight:570;color:var(--ink2);
+  border:1px solid var(--border);background:var(--surface2);font-size:var(--t-corpo);font-weight:570;color:var(--ink2);
   transition:border-color .15s,background .15s,transform .12s}
 .chip b{color:var(--ink);font-weight:720}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
@@ -230,15 +272,15 @@ a{color:var(--accent)}
   filter:drop-shadow(0 4px 14px color-mix(in srgb, var(--lvl-c,var(--accent)) 38%, transparent))}
 .score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .score-in{display:flex;flex-direction:column;align-items:center;line-height:1}
-.score-num{font-size:34px;font-weight:800;letter-spacing:-.03em}
-.score-lab{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;max-width:86%;text-align:center;line-height:1.15;overflow-wrap:break-word}
+.score-num{font-size:var(--t-veredito);font-weight:800;letter-spacing:-.03em}
+.score-lab{font-size:var(--t-sussurro);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;max-width:86%;text-align:center;line-height:1.15;overflow-wrap:break-word}
 .hero-main{min-width:0;flex:1}
 .hero-emoji{font-size:15px}
-.hero-title{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.hero-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
-.hero-sub{color:var(--ink2);font-size:14px;margin-top:3px}
+.hero-title{font-size:var(--t-veredito);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero-tag{font-size:var(--t-sussurro);font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
+.hero-sub{color:var(--ink2);font-size:var(--t-corpo);margin-top:3px}
 .reasons{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
-.reasons li{font-size:13.5px;color:var(--ink2);display:flex;gap:8px;align-items:baseline}
+.reasons li{font-size:var(--t-corpo);color:var(--ink2);display:flex;gap:8px;align-items:baseline}
 .reasons li .r-ico{flex:none;width:18px;text-align:center}
 .lvl0{--lvl-c:var(--good);--lvl-soft:var(--good-soft)}
 .lvl1{--lvl-c:var(--warn);--lvl-soft:var(--warn-soft)}
@@ -255,11 +297,11 @@ a{color:var(--accent)}
 .tl-bar{width:70%;max-width:24px;border-radius:4px 4px 0 0;min-height:3px}
 .tl-ico{font-size:10px;height:14px;line-height:14px}
 .tl-x{display:flex;gap:2px;min-width:620px;margin-top:4px}
-.tl-x span{flex:1;min-width:22px;text-align:center;font-size:10.5px;color:var(--muted)}
-.tl-now{position:absolute;top:-6px;font-size:9px;font-weight:700;color:var(--accent);letter-spacing:.05em}
+.tl-x span{flex:1;min-width:22px;text-align:center;font-size:var(--t-sussurro);color:var(--muted)}
+.tl-now{position:absolute;top:-6px;font-size:var(--t-sussurro);font-weight:700;color:var(--accent);letter-spacing:.05em}
 /* legend */
 .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
-.legend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:var(--t-corpo);color:var(--ink2)}
 .dot{width:10px;height:10px;border-radius:3px;flex:none}
 /* ================= NOWCAST ================= */
 .nowcast{display:flex;gap:2px;margin-top:10px}
@@ -267,17 +309,17 @@ a{color:var(--accent)}
   display:grid;place-items:center;font-size:10px;color:var(--muted)}
 .nc-cell.wet{border-color:transparent;color:#fff}
 .nc-x{display:flex;gap:2px;margin-top:4px}
-.nc-x span{flex:1;text-align:center;font-size:10.5px;color:var(--muted)}
+.nc-x span{flex:1;text-align:center;font-size:var(--t-sussurro);color:var(--muted)}
 /* ================= DAILY ================= */
 .daily{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:12px}
 .day-card{background:var(--surface2);border:1px solid var(--grid);border-radius:12px;padding:10px 6px;
   display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
-.day-card .d-name{font-size:11.5px;font-weight:700;text-transform:capitalize}
+.day-card .d-name{font-size:var(--t-sussurro);font-weight:700;text-transform:capitalize}
 .day-card .d-emoji{font-size:22px;line-height:1.2}
-.day-card .d-temp{font-size:12.5px}.day-card .d-temp b{font-weight:700}
+.day-card .d-temp{font-size:var(--t-corpo)}.day-card .d-temp b{font-weight:700}
 .day-card .d-temp span{color:var(--muted)}
-.day-card .d-meta{font-size:10.5px;color:var(--muted)}
-.day-verdict{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:650;
+.day-card .d-meta{font-size:var(--t-sussurro);color:var(--muted)}
+.day-verdict{display:inline-flex;align-items:center;gap:5px;font-size:var(--t-sussurro);font-weight:650;
   padding:2px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--border)}
 .day-verdict .dot{width:7px;height:7px;border-radius:50%}
 /* ================= ROUTE ================= */
@@ -289,8 +331,8 @@ a{color:var(--accent)}
 .route-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
 #map-route{height:440px;border-radius:12px;background:var(--surface2)}
 .map-card{padding:10px}
-.map-note{font-size:11.5px;color:var(--muted);margin:8px 4px 0}
-.hero-prov{font-size:11.5px;color:var(--muted);margin-top:2px}
+.map-note{font-size:var(--t-sussurro);color:var(--muted);margin:8px 4px 0}
+.hero-prov{font-size:var(--t-sussurro);color:var(--muted);margin-top:2px}
 /* ================= A4.2 — O MAPA É O ECRÃ ================= */
 .map-shell{position:relative}
 #map-route{height:300px;border-radius:14px;background:var(--surface2)}
@@ -304,14 +346,14 @@ body.rota-mapa #view-agora{display:none}
 #rota-topo{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:10px;right:auto;z-index:1600;
   display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);
   border-radius:999px;padding:7px 14px 7px 8px;box-shadow:0 3px 14px rgba(0,0,0,.18);max-width:76vw}
-#rota-topo button{background:none;border:0;font-size:15px;color:var(--ink);cursor:pointer;padding:2px 6px}
-#rota-topo span{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rota-topo button{background:none;border:0;font-size:var(--t-corpo);color:var(--ink);cursor:pointer;padding:2px 6px}
+#rota-topo span{font-size:var(--t-corpo);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #rota-legenda{position:absolute;top:calc(60px + env(safe-area-inset-top,0px));left:10px;z-index:1600;
   display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:7px 10px;font-size:11.5px;box-shadow:0 3px 14px rgba(0,0,0,.14)}
+  border-radius:12px;padding:7px 10px;font-size:var(--t-sussurro);box-shadow:0 3px 14px rgba(0,0,0,.14)}
 #rota-legenda .lg-item{display:flex;align-items:center;gap:6px;color:var(--ink2)}
 #rota-legenda .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
-#rota-legenda .lg-q{background:none;border:0;color:var(--muted);font-size:12px;cursor:pointer;
+#rota-legenda .lg-q{background:none;border:0;color:var(--muted);font-size:var(--t-corpo);cursor:pointer;
   align-self:flex-start;padding:0;margin-top:2px;text-decoration:underline}
 #rota-faixa{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));
   z-index:1600;background:var(--surface);border:1px solid var(--border);border-left:6px solid var(--lvl-c,var(--good));
@@ -326,10 +368,10 @@ body.rota-mapa #view-agora{display:none}
 #rota-faixa.a-esperar .fx-dot{animation:fxespera 1.4s ease-in-out infinite}
 @keyframes fxespera{0%,100%{opacity:.35}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#rota-faixa.a-esperar .fx-dot{animation:none;opacity:.7}}
-#rota-faixa .big{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700}
+#rota-faixa .big{display:flex;align-items:center;gap:8px;font-size:var(--t-veredito);font-weight:700}
 #rota-faixa .fx-dot{width:11px;height:11px;border-radius:50%;background:var(--lvl-c);flex:0 0 auto}
-#rota-faixa .fx-con{font-size:12.5px;color:var(--ink2);margin-top:3px}
-#rota-faixa .fx-num{font-size:12px;color:var(--muted);margin-top:4px}
+#rota-faixa .fx-con{font-size:var(--t-corpo);color:var(--ink2);margin-top:3px}
+#rota-faixa .fx-num{font-size:var(--t-corpo);color:var(--muted);margin-top:4px}
 /* ═══ INTERRUPTOR DESLIZANTE (dd-42): UM componente, usado em todo o lado.
    Estado que fica = interruptor; ação instantânea = botão (Modo viagem
    continua botão por isso). Posição do botão é a pista que não é cor. ═══ */
@@ -350,19 +392,19 @@ html[data-theme="dark"] .sw::before{background:#4a5568}
 /* Os meus sítios (dd-48a): linhas de gestão na gaveta */
 .sitio-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);min-width:0}
 .sitio-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.sitio-tx b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sitio-tx b{font-size:var(--t-corpo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sitio-tx .small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sitio-row .icon-btn{width:38px;height:38px;flex:none}
 .sitio-conf{display:flex;gap:8px;align-items:center;padding:8px 0;flex-wrap:wrap}
 .sitio-edit{display:flex;gap:6px;flex:1;min-width:0}
 .sitio-edit input{flex:1;min-width:0;height:38px;border-radius:10px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--text);padding:0 10px;font-size:14px}
+  background:var(--surface2);color:var(--text);padding:0 10px;font-size:var(--t-corpo)}
 .sitios-acoes{display:flex;flex-direction:column;gap:8px;margin:8px 0 2px}
 .sitios-acoes .btn{width:100%;justify-content:flex-start}
 /* dd-55: aviso discreto de versão nova — informa, nunca interrompe */
 .vnova{display:flex;align-items:center;gap:10px;margin:2px 2px 0;padding:9px 12px;
   border:1px solid var(--border);border-radius:12px;background:var(--surface2);
-  font-size:13.5px;color:var(--muted)}
+  font-size:var(--t-corpo);color:var(--muted)}
 .vnova .btn{flex:none;height:34px;padding:0 14px}
 /* `display:flex` numa classe vence a regra do browser para [hidden] — e a
    barra aparecia SEMPRE, vazia, no topo do Agora, incluindo na primeira
@@ -373,7 +415,7 @@ html[data-theme="dark"] .sw::before{background:#4a5568}
 /* boas-vindas (porteiro 6): uma faixa, uma vez, dispensável */
 .bv{position:relative;padding:14px 40px 14px 16px}
 .bv[hidden]{display:none}
-.bv p{margin:0 0 10px;font-size:15px;line-height:1.45}
+.bv p{margin:0 0 10px;font-size:var(--t-corpo);line-height:1.45}
 .bv-acoes{display:flex;gap:8px;flex-wrap:wrap}
 .bv-acoes .btn{flex:1 1 auto;justify-content:center}
 .bv-x{position:absolute;top:8px;right:8px;width:32px;height:32px;border:none;background:transparent;
@@ -381,17 +423,17 @@ html[data-theme="dark"] .sw::before{background:#4a5568}
 .bv-x:hover{color:var(--text);background:var(--surface2)}
 input.sw{appearance:none;-webkit-appearance:none;margin:0}
 .sw .sw-knob{pointer-events:none}
-.foco-rota{width:100%;justify-content:center;font-size:15px;padding:12px 14px;margin-top:2px}
-.chuva-janela{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.35}
-.ac-ref{font-size:11px;color:var(--muted);padding:5px 12px 3px;border-bottom:1px solid var(--border)}
-.ac-aviso{font-size:11.5px;line-height:1.35;padding:6px 12px;background:var(--warn-soft);border-bottom:1px solid var(--border);color:var(--ink2)}
+.foco-rota{width:100%;justify-content:center;font-size:var(--t-corpo);padding:12px 14px;margin-top:2px}
+.chuva-janela{font-size:var(--t-corpo);color:var(--ink2);margin-top:5px;line-height:1.35}
+.ac-ref{font-size:var(--t-sussurro);color:var(--muted);padding:5px 12px 3px;border-bottom:1px solid var(--border)}
+.ac-aviso{font-size:var(--t-sussurro);line-height:1.35;padding:6px 12px;background:var(--warn-soft);border-bottom:1px solid var(--border);color:var(--ink2)}
 .loc-estado{margin:6px 2px 0}
 .loc-estado:empty{display:none}
 .loc-estado .banner{margin:6px 0 4px}
 .loc-estado .small{color:var(--ink2);margin:2px 2px 6px}
 /* partida relativa (dd-14 §2): chips na faixa, sempre visíveis com rota viva */
 #rota-faixa .fx-partida{display:flex;gap:6px;margin:8px 0 2px;flex-wrap:wrap}
-#rota-faixa .fx-chip{font:600 12px/1 system-ui,sans-serif;padding:7px 10px;border-radius:999px;
+#rota-faixa .fx-chip{font-weight:600;font-size:var(--t-corpo);line-height:1;font-family:system-ui,sans-serif;padding:7px 10px;border-radius:999px;
   border:1px solid var(--border);background:var(--surface2);color:var(--ink);cursor:pointer}
 #rota-faixa .fx-chip.sel{background:var(--lvl-c);border-color:transparent;color:#fff}
 #rota-faixa .fx-chip.star{border-style:dashed}
@@ -424,36 +466,36 @@ body:not(.rota-mapa) #rota-topo, body:not(.rota-mapa) #rota-legenda{display:none
    e a atribuição sobe para cima da faixa — visível é obrigatório (registo 20) */
 body.rota-mapa .maplibregl-ctrl-top-left{left:auto;right:10px}
 body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
-.san-row{display:flex;gap:8px;align-items:baseline;font-size:12.5px;padding:4px 0;border-top:1px solid rgba(125,125,125,.18)}
+.san-row{display:flex;gap:8px;align-items:baseline;font-size:var(--t-corpo);padding:4px 0;border-top:1px solid rgba(125,125,125,.18)}
 .san-row b{font-weight:600}
 .san-tx{flex:1;min-width:0}
 .san-pais{color:var(--muted)}
-.san-h{font-size:12px;color:var(--muted);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.4px}
+.san-h{font-size:var(--t-corpo);color:var(--muted);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.4px}
 .san-x{background:none;border:0;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 6px}
 .san-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .san-corrigir{margin-top:8px}
 .seg-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .seg-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:11px;
-  background:var(--surface2);border:1px solid var(--grid);font-size:13.5px}
+  background:var(--surface2);border:1px solid var(--grid);font-size:var(--t-corpo)}
 .seg-item .seg-bar{width:5px;align-self:stretch;border-radius:3px;flex:none}
 .seg-item .seg-main{flex:1;min-width:0}
-.seg-item .seg-main b{font-size:13.5px}
-.seg-item .seg-main span{display:block;font-size:12px;color:var(--muted)}
-.seg-item .seg-val{font-weight:700;font-size:13px;white-space:nowrap}
+.seg-item .seg-main b{font-size:var(--t-corpo)}
+.seg-item .seg-main span{display:block;font-size:var(--t-corpo);color:var(--muted)}
+.seg-item .seg-val{font-weight:700;font-size:var(--t-corpo);white-space:nowrap}
 .dep-chips{display:flex;gap:7px;overflow-x:auto;padding:4px 0 6px}
 .dep-chip{flex:none;border:1px solid var(--border);background:var(--surface2);border-radius:11px;
   padding:8px 12px;cursor:pointer;text-align:center;min-width:74px}
 .dep-chip:hover{border-color:var(--accent)}
 .dep-chip.best{border-color:var(--good);background:var(--good-soft)}
 .dep-chip.sel{outline:2px solid var(--accent)}
-.dep-chip .t{font-weight:750;font-size:13.5px}
-.dep-chip .v{font-size:11.5px;color:var(--ink2);margin-top:1px}
+.dep-chip .t{font-weight:750;font-size:var(--t-corpo)}
+.dep-chip .v{font-size:var(--t-sussurro);color:var(--ink2);margin-top:1px}
 .summary-hero{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.summary-hero .big{font-size:19px;font-weight:750;letter-spacing:-.01em;display:flex;gap:9px;align-items:center}
+.summary-hero .big{font-size:var(--t-veredito);font-weight:750;letter-spacing:-.01em;display:flex;gap:9px;align-items:center}
 /* veredicto com dados em falta: o cartão di-lo à vista, não só no texto */
 .hero.incompleto{outline:2px dashed rgba(216,161,0,.55);outline-offset:-2px}
 .buraco-dados{margin-top:10px;padding:8px 11px;border-radius:9px;display:flex;gap:6px;align-items:flex-start;
-  background:rgba(216,161,0,.10);border:1px solid rgba(216,161,0,.35);font-size:12.5px;line-height:1.45;color:var(--ink)}
+  background:rgba(216,161,0,.10);border:1px solid rgba(216,161,0,.35);font-size:var(--t-corpo);line-height:1.45;color:var(--ink)}
 .tl-col.furo .tl-bar{opacity:.45;
   background-image:repeating-linear-gradient(45deg,transparent 0 4px,rgba(127,127,127,.6) 4px 8px)}
 .nc-cell.furo{background:transparent !important;border:1px dashed var(--muted);color:var(--muted)}
@@ -462,24 +504,24 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
 /* ================= TOOLTIP ================= */
 .viz-tip{position:fixed;z-index:5000;pointer-events:none;background:var(--surface);
   border:1px solid var(--border);border-radius:11px;box-shadow:var(--shadow);padding:9px 12px;
-  font-size:12.5px;max-width:250px;display:none}
-.viz-tip .tt-t{font-weight:750;font-size:13px;margin-bottom:3px}
+  font-size:var(--t-corpo);max-width:250px;display:none}
+.viz-tip .tt-t{font-weight:750;font-size:var(--t-corpo);margin-bottom:3px}
 .viz-tip .tt-row{display:flex;justify-content:space-between;gap:14px}
 .viz-tip .tt-row span{color:var(--ink2)}
 .viz-tip .tt-row b{font-weight:700}
 /* ================= MISC ================= */
-.banner{border-radius:13px;padding:11px 14px;font-size:13.5px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.banner{border-radius:13px;padding:11px 14px;font-size:var(--t-corpo);margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
 .banner.warn{background:var(--warn-soft);border:1px solid var(--warn)}
 .banner.err{background:var(--crit-soft);border:1px solid var(--crit)}
 .skel{position:relative;overflow:hidden;background:var(--surface2);border-radius:12px;min-height:76px}
 .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--border),transparent);
   animation:sh 1.2s infinite}
 @keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-.muted{color:var(--muted)} .small{font-size:12px}
+.muted{color:var(--muted)} .small{font-size:var(--t-corpo)}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(6px);
   background:rgba(12,20,36,.92);color:#f2f5fb;border:1px solid rgba(255,255,255,.12);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  padding:11px 19px;border-radius:16px;font-size:13.5px;font-weight:600;z-index:6000;opacity:0;
+  padding:11px 19px;border-radius:16px;font-size:var(--t-corpo);font-weight:600;z-index:6000;opacity:0;
   transition:opacity .25s,transform .25s;pointer-events:none;max-width:88vw;text-align:center;
   box-shadow:0 14px 40px -12px rgba(0,0,0,.5)}
 .toast.show{opacity:.98;transform:translateX(-50%) translateY(0)}
@@ -487,13 +529,13 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lift);padding:14px;width:290px;display:none}
 .pop.open{display:block}
-.pop h3{margin:0 0 8px;font-size:13.5px}
+.pop h3{margin:0 0 8px;font-size:var(--t-corpo)}
 .radio-row{display:flex;flex-direction:column;gap:6px}
 .radio-row label{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border:1px solid var(--border);
-  border-radius:10px;cursor:pointer;font-size:13px}
+  border-radius:10px;cursor:pointer;font-size:var(--t-corpo)}
 .radio-row label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
-.radio-row b{display:block;font-size:13px}
-.radio-row span{color:var(--muted);font-size:11.5px;display:block}
+.radio-row b{display:block;font-size:var(--t-corpo)}
+.radio-row span{color:var(--muted);font-size:var(--t-sussurro);display:block}
 .radio-row input{margin-top:3px;accent-color:var(--accent)}
 /* stops */
 .sel{padding:10px 8px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);color:var(--ink);cursor:pointer}
@@ -507,7 +549,7 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
 .mic-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;flex:none;font-size:15px}
 .mic-btn:hover{border-color:var(--accent)}
 .mic-in{position:absolute;right:5px;bottom:5px;width:31px;height:31px;border-radius:8px;border:none;
-  background:transparent;cursor:pointer;font-size:15px;line-height:1;padding:0}
+  background:transparent;cursor:pointer;font-size:var(--t-corpo);line-height:1;padding:0}
 .mic-in:hover{background:var(--accent-soft)}
 .field input.has-mic{padding-right:42px}
 .mic-btn.rec,.mic-in.rec{background:var(--crit);color:#fff}
@@ -532,7 +574,7 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
   border-radius:50%;border:2px solid rgba(26,115,232,.45);animation:mepulse 1.8s ease-out infinite}
 /* modo offline */
 .off-banner{background:var(--warn-soft);border:1px solid rgba(250,178,25,.5)}
-#tb-off{flex:none;display:none;align-items:center;gap:5px;font-size:11.5px;font-weight:750;
+#tb-off{flex:none;display:none;align-items:center;gap:5px;font-size:var(--t-sussurro);font-weight:750;
   padding:5px 9px;border-radius:999px;background:var(--warn-soft);color:var(--ink);
   border:1px solid rgba(250,178,25,.55);white-space:nowrap}
 body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset:-2px;border-radius:14px}
@@ -541,10 +583,10 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 .ai-mic{height:41px;width:41px;font-size:17px}
 .ai-mic.rec{background:var(--crit);color:#fff;border-color:transparent}
 .rec{margin-top:14px;border-radius:14px;padding:14px 16px;background:var(--lvl-soft);border:1px solid var(--lvl-c);position:relative}
-.rec .rec-title{font-size:17px;font-weight:800;letter-spacing:-.01em;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-.rec .rec-sub{font-size:13px;color:var(--ink2);margin-top:3px}
+.rec .rec-title{font-size:var(--t-corpo);font-weight:800;letter-spacing:-.01em;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.rec .rec-sub{font-size:var(--t-corpo);color:var(--ink2);margin-top:3px}
 .rec ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
-.rec li{font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.rec li{font-size:var(--t-corpo);display:flex;gap:8px;align-items:baseline}
 .rec li .r-ico{flex:none;width:20px;text-align:center}
 .rec .rec-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 /* dd-58: uma ação primária à vista, as outras atrás do "⋯" */
@@ -554,7 +596,7 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 /* dd-58 §1: o que não tem conteúdo vira UMA linha discreta — informa sem
    ocupar meio ecrã a dizer que não há nada */
 .nada-linha{display:flex;align-items:center;gap:8px;margin:8px 2px 0;padding:9px 12px;
-  border-radius:11px;background:var(--surface2);color:var(--muted);font-size:13px}
+  border-radius:11px;background:var(--surface2);color:var(--muted);font-size:var(--t-corpo)}
 .nada-clic{cursor:pointer}
 .nada-clic:hover{color:var(--text)}
 .nada-mais{margin-left:auto;font-weight:700;color:var(--accent);white-space:nowrap}
@@ -563,9 +605,9 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 .cand-chip.sel{background:var(--accent);color:var(--accent-ink);border-color:transparent}
 .cand-chip.sel b{color:var(--accent-ink)}
 /* vento na cronologia */
-.tl-windcap{font-size:11px;color:var(--muted);margin-top:10px}
+.tl-windcap{font-size:var(--t-sussurro);color:var(--muted);margin-top:10px}
 .tl-wind{display:flex;gap:2px;min-width:620px;margin-top:4px;padding-top:6px;border-top:1px solid var(--grid)}
-.tl-wind span{flex:1;min-width:22px;text-align:center;font-size:9.5px;color:var(--ink2);line-height:1.25}
+.tl-wind span{flex:1;min-width:22px;text-align:center;font-size:var(--t-sussurro);color:var(--ink2);line-height:1.25}
 .tl-wind .w-arr{display:inline-block;font-size:10px;color:var(--muted)}
 .tl-wind i{font-style:normal;display:block;font-variant-numeric:tabular-nums}
 .tl-wind .w-strong i{font-weight:750;color:var(--ink)}
@@ -607,7 +649,7 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 #viagem-estado{position:fixed;left:10px;right:10px;z-index:4080;
   background:var(--nav-bg);color:var(--nav-ink);border:1px solid var(--nav-borda);
   border-left:5px solid var(--good);border-radius:12px;padding:7px 12px;
-  font-size:14.5px;line-height:1.32;box-shadow:0 6px 22px rgba(0,0,0,.32)}
+  font-size:var(--t-corpo);line-height:1.32;box-shadow:0 6px 22px rgba(0,0,0,.32)}
 #viagem-estado[hidden]{display:none}
 #viagem-estado.lvl1{border-left-color:var(--warn)}
 #viagem-estado.lvl2{border-left-color:var(--serious)}
@@ -619,7 +661,7 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
 #btn-recentrar[hidden]{display:none}
 @media (max-width:380px){
   .nav-dist{font-size:30px} .nav-man{font-size:20px} .nav-seta{font-size:32px;width:40px}
-  #viagem-estado{font-size:13.5px}
+  #viagem-estado{font-size:var(--t-corpo)}
 }
 /* dd-65 §2: UMA LINHA. `white-space:nowrap` não é decoração — é o que impede
    que uma frase comprida faça a barra crescer para duas ou três linhas e coma
@@ -629,21 +671,21 @@ body.is-offline #map-route{outline:2px solid rgba(250,178,25,.55);outline-offset
   background:var(--nav-bg);color:var(--nav-ink);border:1px solid var(--nav-borda);border-radius:16px;
   padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));
   box-shadow:0 -4px 30px rgba(0,0,0,.32);border-top:2px solid var(--accent)}
-#travel-bar .tb-main{flex:1;min-width:0;font-size:15px;font-weight:700;line-height:1.25;
+#travel-bar .tb-main{flex:1;min-width:0;font-size:var(--t-corpo);font-weight:700;line-height:1.25;
   font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#travel-bar #tb-off{flex:none;font-size:12.5px;color:var(--nav-ink2)}
+#travel-bar #tb-off{flex:none;font-size:var(--t-corpo);color:var(--nav-ink2)}
 #travel-bar.alert{border-top-color:var(--crit);animation:tbpulse 1s ease 3}
 @keyframes tbpulse{0%,100%{background:var(--nav-bg)}50%{background:#3a1520}}
 /* o botão de terminar fica lá, discreto (dd-65 §2) */
-#travel-bar #tb-stop{flex:none;font-size:13px;padding:7px 11px;background:transparent;
+#travel-bar #tb-stop{flex:none;font-size:var(--t-corpo);padding:7px 11px;background:transparent;
   color:var(--nav-ink);border:1px solid var(--nav-borda)}
 #travel-bar #tb-mute{flex:none;background:transparent;color:var(--nav-ink);border:1px solid var(--nav-borda)}
 body.traveling .wrap{padding-bottom:120px}
-footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
-.gear-chips .chip{font-size:13px;padding:8px 13px}
+footer{margin-top:26px;font-size:var(--t-corpo);color:var(--muted);text-align:center;line-height:1.7}
+.gear-chips .chip{font-size:var(--t-corpo);padding:8px 13px}
 .alert-strip{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
 .maplibregl-map{font:inherit}
-.maplibregl-popup-content{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);padding:12px 14px;font:12.5px/1.5 system-ui,sans-serif}
+.maplibregl-popup-content{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);padding:12px 14px;font-size:var(--t-corpo);line-height:1.5;font-family:system-ui,sans-serif}
 .maplibregl-ctrl-group{background:var(--surface)}
 .maplibregl-ctrl-group button{background:var(--surface);color:var(--ink)}
 .maplibregl-ctrl-group button:hover{background:var(--surface2)}
@@ -668,7 +710,7 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
    No mesmo canto da atribuição, e por cima dela em z para nunca ser tapado. */
 .atrib-info{position:absolute;left:6px;bottom:4px;z-index:30;
   width:44px;height:44px;display:flex;align-items:center;justify-content:center;
-  font-size:17px;line-height:1;color:var(--ink2);text-decoration:none;opacity:.62;
+  font-size:var(--t-corpo);line-height:1;color:var(--ink2);text-decoration:none;opacity:.62;
   text-shadow:0 0 3px var(--surface-solid),0 0 6px var(--surface-solid)}
 .atrib-info:hover,.atrib-info:focus-visible{opacity:1}
 /* enquanto a atribuição está à vista, o ⓘ afasta-se para não a tapar */
@@ -681,8 +723,8 @@ body.traveling .maplibregl-ctrl-bottom-left{bottom:74px}
 body.traveling .atrib-info{bottom:78px}
 @media (max-width:720px){
   .hero{flex-direction:row}
-  .score-ring{width:86px;height:86px}.score-num{font-size:28px}
-  .hero-title{font-size:19px}
+  .score-ring{width:86px;height:86px}.score-num{font-size:var(--t-veredito)}
+  .hero-title{font-size:var(--t-veredito)}
   .daily{grid-template-columns:repeat(4,1fr)}
   .route-grid{grid-template-columns:1fr;}
   .swap-btn{width:100%;height:34px}
@@ -696,10 +738,10 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .brand-tile{width:46px;height:46px;border-radius:14px;object-fit:cover;display:block;
   box-shadow:0 4px 14px -4px rgba(12,20,36,.4),0 0 0 1px var(--border);background:linear-gradient(140deg,#2a78d6,#0d366b);
   display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 4px 14px -6px rgba(26,90,180,.55)}
-.brand-name{font-size:19px;font-weight:800}
+.brand-name{font-size:var(--t-corpo);font-weight:800}
 .card{border-radius:18px;padding:18px;margin-bottom:12px}
-.card h2{font-size:14.5px}
-.card .h-sub{font-size:12px;margin-bottom:10px}
+.card h2{font-size:var(--t-corpo)}
+.card .h-sub{font-size:var(--t-corpo);margin-bottom:10px}
 .tabs{border-radius:14px}
 .tab{border-radius:10px}
 .btn{border-radius:12px}
@@ -710,10 +752,10 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .ac-item{flex-direction:row;align-items:center;gap:10px}
 .ac-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .ac-main b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ac-dist{flex:none;font-size:11.5px;color:var(--muted);font-weight:650;font-variant-numeric:tabular-nums}
+.ac-dist{flex:none;font-size:var(--t-sussurro);color:var(--muted);font-weight:650;font-variant-numeric:tabular-nums}
 .ac-linha{display:flex;align-items:baseline;gap:6px;min-width:0}
 .ac-linha b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ac-tipo{flex:none;font-size:10.5px;color:var(--muted);border:1px solid var(--border,rgba(128,128,128,.35));border-radius:999px;padding:0 7px;line-height:16px}
+.ac-tipo{flex:none;font-size:var(--t-sussurro);color:var(--muted);border:1px solid var(--border,rgba(128,128,128,.35));border-radius:999px;padding:0 7px;line-height:16px}
 .sw-mini{transform:scale(.72);margin:0 -4px}
 .fav-x{margin-left:2px;opacity:.5;padding:0 2px;font-size:11px}
 .fav-x:hover{opacity:1;color:var(--crit)}
@@ -724,22 +766,22 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   .card{padding:14px;margin-bottom:10px;border-radius:16px}
   .app-head{padding:12px 0 8px}
   .hero{gap:12px}
-  .hero-title{font-size:18px}
-  .hero-sub{font-size:12.5px}
-  .reasons li{font-size:12.5px}
-  .chip{font-size:11.5px;padding:5px 9px}
-  .gear-chips .chip{font-size:12px;padding:7px 11px}
+  .hero-title{font-size:var(--t-veredito)}
+  .hero-sub{font-size:var(--t-corpo)}
+  .reasons li{font-size:var(--t-corpo)}
+  .chip{font-size:var(--t-sussurro);padding:5px 9px}
+  .gear-chips .chip{font-size:var(--t-corpo);padding:7px 11px}
   .route-grid{gap:6px}
   .swap-btn{width:44px;height:32px;margin:0 auto;display:block}
   .route-actions .btn{flex:1 1 auto;justify-content:center}
   .route-actions{gap:6px}
-  .seg-item{font-size:12.5px;padding:9px 10px}
+  .seg-item{font-size:var(--t-corpo);padding:9px 10px}
   .dep-chip{min-width:66px;padding:7px 10px}
-  .rec .rec-title{font-size:15.5px}
-  .rec li{font-size:12.5px}
+  .rec .rec-title{font-size:var(--t-corpo)}
+  .rec li{font-size:var(--t-corpo)}
   .daily{gap:6px}
   .day-card{padding:8px 4px}
-  footer{font-size:11px}
+  footer{font-size:var(--t-sussurro)}
 }
 .legs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 /* drawer de viagens planeadas */
@@ -758,30 +800,30 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   display:flex;flex-direction:column;overflow-y:auto}
 .drawer.open{transform:translateX(0)}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;position:sticky;top:0;background:var(--surface-solid);z-index:1}
-.drawer-head h2{margin:0;font-size:16px}
+.drawer-head h2{margin:0;font-size:var(--t-corpo)}
 #trips-list{padding:0 12px 8px;display:flex;flex-direction:column;gap:6px}
-.trip-day{font-size:12px;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 4px 2px}
+.trip-day{font-size:var(--t-corpo);font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 4px 2px}
 .trip-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);cursor:pointer}
 .trip-row:hover{border-color:var(--accent)}
-.trip-when{font-weight:800;font-size:14px;flex:none;min-width:46px}
+.trip-when{font-weight:800;font-size:var(--t-corpo);flex:none;min-width:46px}
 .trip-main{flex:1;min-width:0}
-.trip-name{font-size:13.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.trip-sub{font-size:11.5px;color:var(--muted)}
+.trip-name{font-size:var(--t-corpo);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trip-sub{font-size:var(--t-sussurro);color:var(--muted)}
 .trip-wx{flex:none;font-size:17px}
 .trip-del{flex:none;border:0;background:none;cursor:pointer;font-size:14px;opacity:.6;padding:6px}
 .trip-del:hover{opacity:1}
 .drop-pin{font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
 .pin-pop{display:flex;flex-direction:column;gap:3px;min-width:200px}
-.pin-pop b{font-size:14px;line-height:1.3}
-.pin-sub{font-size:11.5px;color:#6b6b66}
+.pin-pop b{font-size:var(--t-corpo);line-height:1.3}
+.pin-sub{font-size:var(--t-sussurro);color:#6b6b66}
 .pin-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.pin-actions button{padding:9px 11px;border-radius:9px;border:1px solid rgba(0,0,0,.14);background:#f4f4f1;cursor:pointer;font-weight:650;font-size:13px;text-align:left}
+.pin-actions button{padding:9px 11px;border-radius:9px;border:1px solid rgba(0,0,0,.14);background:#f4f4f1;cursor:pointer;font-weight:650;font-size:var(--t-corpo);text-align:left}
 .pin-actions button:hover{background:#e9edf5}
 .foot-links{margin-top:8px}
 .foot-links a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--border)}
 .foot-links a:hover{border-bottom-color:var(--accent)}
 .chk-row{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border:1px solid var(--border);
-  border-radius:11px;cursor:pointer;font-size:13px}
+  border-radius:11px;cursor:pointer;font-size:var(--t-corpo)}
 .chk-row:has(input:checked){border-color:var(--warn);background:var(--warn-soft)}
 /* dd-56 no OUTRO sítio do componente único: aqui o interruptor está à
    esquerda de um rótulo de duas linhas. O contrato é o mesmo — alinha com a
@@ -793,29 +835,29 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .chk-row input{margin-top:2px;flex:none}
 .chk-row span{display:flex;flex-direction:column;gap:2px}
 .chk-row span b{line-height:var(--chk-lh)}
-.chk-row span span{font-size:11.5px;color:var(--muted);font-weight:400}
+.chk-row span span{font-size:var(--t-sussurro);color:var(--muted);font-weight:400}
 .law-note{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding:10px 12px;border-radius:12px;
-  background:var(--surface2);border-left:3px solid var(--muted);font-size:12.5px;line-height:1.45;color:var(--ink2)}
+  background:var(--surface2);border-left:3px solid var(--muted);font-size:var(--t-corpo);line-height:1.45;color:var(--ink2)}
 .law-note p{margin:0 0 6px}
 .law-note p:last-child{margin-bottom:0}
 .hz-row{display:flex;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface2);margin-top:8px;border-left:3px solid var(--warn,#fab219);align-items:flex-start}
 .hz-row.lvl3{border-left-color:#d03b3b}
 .hz-row.lvl2{border-left-color:#ec835a}
 .hz-ico{font-size:19px;line-height:1.2;flex:none}
-.hz-meta{font-size:11.5px;color:var(--muted);font-weight:650;letter-spacing:.02em}
-.hz-txt{font-size:13.5px;line-height:1.45;margin-top:2px}
-.stay-line{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:13.5px;line-height:1.45;background:var(--surface2);border-left:3px solid #0ca30c}
+.hz-meta{font-size:var(--t-sussurro);color:var(--muted);font-weight:650;letter-spacing:.02em}
+.hz-txt{font-size:var(--t-corpo);line-height:1.45;margin-top:2px}
+.stay-line{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:var(--t-corpo);line-height:1.45;background:var(--surface2);border-left:3px solid #0ca30c}
 .stay-line.lvl1{border-left-color:#fab219}
 .stay-line.lvl2{border-left-color:#ec835a}
 .stay-line.lvl3{border-left-color:#d03b3b}
-.leg-row{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink2);flex-wrap:wrap}
+.leg-row{display:flex;gap:8px;align-items:center;font-size:var(--t-corpo);color:var(--ink2);flex-wrap:wrap}
 .leg-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:750;font-size:11px;flex:none}
 .leg-main{flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--ink)}
-.leg-meta{color:var(--muted);font-variant-numeric:tabular-nums;font-size:11.5px}
+.leg-meta{color:var(--muted);font-variant-numeric:tabular-nums;font-size:var(--t-sussurro)}
 .pt-a{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid #0ca30c;color:#0b0b0b;
-  display:grid;place-items:center;font-weight:800;font-size:12px;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+  display:grid;place-items:center;font-weight:800;font-size:var(--t-corpo);box-shadow:0 1px 5px rgba(0,0,0,.4)}
 .pt-b{width:27px;height:27px;border-radius:50%;background:#fff;border:3px solid #d03b3b;
-  display:grid;place-items:center;font-size:13px;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+  display:grid;place-items:center;font-size:var(--t-corpo);box-shadow:0 1px 5px rgba(0,0,0,.4)}
 .locate-btn{width:34px;height:34px;border-radius:9px;border:2px solid rgba(0,0,0,.2);background:var(--surface);
   color:var(--ink);font-size:17px;cursor:pointer;line-height:1;box-shadow:0 1px 5px rgba(0,0,0,.25)}
 .locate-btn:hover{background:var(--surface2)}
@@ -837,7 +879,7 @@ html[data-theme="dark"] .ac-list{background:#111a2c}
 .ac-item{border-bottom:1px solid var(--border)}
 .ac-item:last-child{border-bottom:0}
 .ac-item.fav-hit{background:linear-gradient(90deg,var(--accent-soft),transparent 70%)}
-.ac-atrib{padding:4px 12px 6px;font-size:10.5px;color:var(--muted);opacity:.85}
+.ac-atrib{padding:4px 12px 6px;font-size:var(--t-sussurro);color:var(--muted);opacity:.85}
 .cand-chip.cand-meu{border-color:var(--accent);background:var(--accent-soft)}
 /* o cartão que tem uma lista aberta sobe acima dos vizinhos (o blur cria contexto próprio) */
 .card{position:relative}
@@ -876,61 +918,61 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
    TELEMÓVEL — mesma qualidade do desktop
    ============================================================ */
 @media (max-width:720px){
-  body{font-size:15.5px}
+  body{font-size:var(--t-corpo)}
   .wrap{padding:0 12px calc(58px + env(safe-area-inset-bottom,0px))}
   .app-head{padding:14px 0 10px;gap:10px}
   .brand-tile{width:42px;height:42px;border-radius:13px}
-  .brand-name{font-size:18.5px;letter-spacing:-.03em}
+  .brand-name{font-size:var(--t-corpo);letter-spacing:-.03em}
   .head-actions{gap:6px}
   .icon-btn{width:38px;height:38px;border-radius:12px;font-size:15px}
-  #btn-install{padding:8px 11px;font-size:12.5px}
+  #btn-install{padding:8px 11px;font-size:var(--t-corpo)}
 
   /* tabs: alvos maiores e sempre acessíveis */
   .tabs{top:6px;padding:4px;border-radius:15px;margin:4px 0 14px}
-  .tab{padding:11px 6px;font-size:13.5px;gap:5px;border-radius:11px}
+  .tab{padding:11px 6px;font-size:var(--t-corpo);gap:5px;border-radius:11px}
 
   .card{padding:15px 14px;border-radius:17px;margin-bottom:11px}
-  .card h2{font-size:15px}
-  .card .h-sub{font-size:12.5px;line-height:1.45}
+  .card h2{font-size:var(--t-corpo)}
+  .card .h-sub{font-size:var(--t-corpo);line-height:1.45}
 
   /* veredicto: número e frase equilibrados, sem aperto */
   .hero{gap:14px;align-items:flex-start}
   .score-ring{width:80px;height:80px}
-  .score-num{font-size:26px}
-  .score-lab{font-size:7.5px;letter-spacing:.04em}
-  .hero-title{font-size:18.5px;line-height:1.2;gap:8px}
-  .hero-tag{font-size:9.5px;padding:3px 7px}
-  .hero-sub{font-size:12.5px;line-height:1.45}
+  .score-num{font-size:var(--t-veredito)}
+  .score-lab{font-size:var(--t-sussurro);letter-spacing:.04em}
+  .hero-title{font-size:var(--t-veredito);line-height:1.2;gap:8px}
+  .hero-tag{font-size:var(--t-sussurro);padding:3px 7px}
+  .hero-sub{font-size:var(--t-corpo);line-height:1.45}
 
   /* chips e botões: legíveis e fáceis de acertar com luva */
-  .chip{font-size:12px;padding:6px 10px}
-  .btn{padding:11px 14px;font-size:13.5px}
+  .chip{font-size:var(--t-corpo);padding:6px 10px}
+  .btn{padding:11px 14px;font-size:var(--t-corpo)}
   .route-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .route-actions .btn{width:100%;justify-content:center;font-size:12.5px;padding:11px 8px}
+  .route-actions .btn{width:100%;justify-content:center;font-size:var(--t-corpo);padding:11px 8px}
   .route-actions .btn.primary{grid-column:1 / -1}
 
   /* campos do plano: um por linha, com espaço a respirar */
   .route-extra{display:flex;flex-direction:column;gap:12px;align-items:stretch}
   .route-extra > .field{width:100%;align-self:stretch}
-  .field label{font-size:12.5px;margin-bottom:6px}
-  .field input,.sel{font-size:16px;padding:12px 13px}  /* 16px evita o zoom automático do iOS */
+  .field label{font-size:var(--t-corpo);margin-bottom:6px}
+  .field input,.sel{font-size:var(--t-corpo);padding:12px 13px}  /* 16px evita o zoom automático do iOS */
   .ac-item{padding:11px 12px}
-  .ac-item b{font-size:14.5px}
+  .ac-item b{font-size:var(--t-corpo)}
 
   /* perigos e troços */
-  .hz-txt{font-size:13px}
+  .hz-txt{font-size:var(--t-corpo)}
   .hz-ico{font-size:17px}
-  .stay-line{font-size:13px;padding:10px 12px}
+  .stay-line{font-size:var(--t-corpo);padding:10px 12px}
 
   /* barra de viagem: não tapa o conteúdo e é confortável */
   #travel-bar{left:8px;right:8px;bottom:8px;padding:11px 12px calc(11px + env(safe-area-inset-bottom,0px))}
-  #travel-bar b{font-size:14px}
-  #travel-bar span{font-size:11.5px}
+  #travel-bar b{font-size:var(--t-corpo)}
+  #travel-bar span{font-size:var(--t-sussurro)}
   body.traveling .wrap{padding-bottom:132px}
 
   /* definições ocupam a largura útil em vez de uma coluna estreita */
   .pop{width:min(320px,calc(100vw - 24px));right:-2px}
-  .radio-row label{padding:10px 11px;font-size:13px}
+  .radio-row label{padding:10px 11px;font-size:var(--t-corpo)}
 
   #map-route{height:320px;border-radius:14px}
   .drawer{width:min(340px,92vw)}
@@ -945,9 +987,9 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
   .time-row #rt-timemode,.time-row #rt-when{flex:1 1 100%;max-width:100%;width:100%}
 }
 @media (max-width:380px){
-  .tab{font-size:12.5px;padding:10px 4px}
-  .hero-title{font-size:17px}
-  .score-ring{width:72px;height:72px}.score-num{font-size:23px}
+  .tab{font-size:var(--t-corpo);padding:10px 4px}
+  .hero-title{font-size:var(--t-veredito)}
+  .score-ring{width:72px;height:72px}.score-num{font-size:var(--t-veredito)}
   .route-actions{grid-template-columns:1fr}
 }
 </style>
@@ -1807,6 +1849,30 @@ function applyStaticI18n(){
                /* dd-66 §3: a página de créditos vive ao lado das outras duas.
                   O ⓘ do mapa é o caminho curto; isto é o caminho de sempre. */
                mkLink("./creditos.html","Créditos e licenças"));
+    /* ═══ dd-186 §7: A PORTA PARA O PAINEL «ESTADO DA APP» ═════════════════
+       Mandaram-me escondê-lo atrás de cinco toques no carimbo da versão e eu
+       tirei-o do caminho **sem deixar porta nenhuma**: o carimbo vive dentro
+       das definições, atrás de «mais opções», e o dono foi procurá-lo a
+       «Créditos e licenças», onde não estava.
+
+       Os cinco toques ficam — são o gesto discreto e continuam a servir. O
+       que faltava era uma porta que se ENCONTRE, ao lado das outras, a um
+       toque do ecrã principal.
+
+       **Um painel de diagnóstico escondido sem porta não diagnostica
+       ninguém**: existe para o problema de um cliente, e é sempre nesse
+       momento que ninguém se lembra do gesto secreto.
+
+       ⚠️ E o sítio importa: a primeira tentativa pôs o link em HTML estático
+       no `<footer>`, e este mesmo código apaga o rodapé inteiro (`textContent
+       =""`) para o repintar na língua certa. O link existia no ficheiro e
+       nunca existiu no ecrã — a guarda apanhou-o. Quem constrói o rodapé é
+       quem tem de o construir. */
+    { const d=document.createElement("a");
+      d.href="#"; d.id="link-diag"; d.setAttribute("data-test","link-diag");
+      d.textContent=t("Estado da app");
+      d.addEventListener("click",(ev)=>{ ev.preventDefault(); abrirDiagnostico(); });
+      nav.append(document.createTextNode(" · "), d); }
     ft.append(nav);
   }
   const tbStop=$("#tb-stop"); if(tbStop) tbStop.textContent=t("🛑 Terminar");
@@ -1815,6 +1881,7 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
+"Bom, mas {n} de sensação":"Good, but {n} feels-like","Calor perigoso — {n}":"Dangerous heat — {n}",
 "demorou de mais":"timed out",
 "Estado da app":"App status","presente":"present","em falta":"MISSING","a mais — não devia estar aqui":"extra — shouldn't be here","fora, como deve ser":"gone, as it should be","o motor do mapa":"the map engine","a porta única do mapa":"the map's single door","a tradução":"translation","as tuas preferências":"your preferences","falar com os serviços":"talking to the services","Leaflet, que saiu no A2.2":"Leaflet, which left in A2.2",
 "meteorologia para motociclistas · grátis para começar":"weather for motorcyclists · free to start",
@@ -2270,6 +2337,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
+"Bom, mas {n} de sensação":"Bien, pero {n} de sensación","Calor perigoso — {n}":"Calor peligroso — {n}",
 "demorou de mais":"tardó demasiado",
 "Estado da app":"Estado de la app","presente":"presente","em falta":"FALTA","a mais — não devia estar aqui":"de más — no debería estar aquí","fora, como deve ser":"fuera, como debe ser","o motor do mapa":"el motor del mapa","a porta única do mapa":"la puerta única del mapa","a tradução":"la traducción","as tuas preferências":"tus preferencias","falar com os serviços":"hablar con los servicios","Leaflet, que saiu no A2.2":"Leaflet, que salió en A2.2",
 "meteorologia para motociclistas · grátis para começar":"meteorología para motociclistas · gratis para empezar","Agora":"Ahora","Rota":"Ruta",
@@ -2698,6 +2766,7 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
+"Bom, mas {n} de sensação":"Bien, mais {n} ressentis","Calor perigoso — {n}":"Chaleur dangereuse — {n}",
 "demorou de mais":"trop lent",
 "Estado da app":"État de l'app","presente":"présent","em falta":"MANQUANT","a mais — não devia estar aqui":"en trop — ne devrait pas être là","fora, como deve ser":"parti, comme il se doit","o motor do mapa":"le moteur de la carte","a porta única do mapa":"la porte unique de la carte","a tradução":"la traduction","as tuas preferências":"tes préférences","falar com os serviços":"parler aux services","Leaflet, que saiu no A2.2":"Leaflet, parti en A2.2",
 "meteorologia para motociclistas · grátis para começar":"météo pour motards · gratuit pour commencer","Agora":"Maintenant","Rota":"Itinéraire",
@@ -3133,6 +3202,7 @@ fr:{
    Vocabulário de motociclista, e **«je», nunca «u»**: quem anda de mota
    trata-se por tu. */
 nl:{
+"Bom, mas {n} de sensação":"Goed, maar {n} gevoelstemperatuur","Calor perigoso — {n}":"Gevaarlijke hitte — {n}",
 "norte":"noord",
 "nordeste":"noordoost",
 "este":"oost",
@@ -4712,7 +4782,7 @@ async function fetchDashboardWx(lat,lon){
     current:"temperature_2m,apparent_temperature,relative_humidity_2m,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,wet_bulb_temperature_2m",
     hourly:"temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,visibility,relative_humidity_2m,is_day,wet_bulb_temperature_2m",
     minutely_15:"precipitation",
-    daily:"weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,sunrise,sunset,uv_index_max",
+    daily:"weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,sunrise,sunset,uv_index_max",
     forecast_days:"7", timeformat:"unixtime", timezone:"auto",
   }).toString();
   return jfetch(u.toString());
@@ -5214,8 +5284,25 @@ function refPesquisa(){
   /* dd-170 §4: a CASA antes do sítio no ecrã. Sem isto, procurar um sítio
      fazia dele a âncora do mundo — «perto de: Jumbo». */
   { const c=aCasa(); if(real(c)) return {lat:c.lat, lon:c.lon, rotulo:c.name||t("casa")}; }
+  /* dd-185 §1a: o `aCasa()` passou a recusar uma casa nascida de pesquisa, e
+     esta escada tinha a MESMA assimetria — o `real()` só excluía a reserva.
+     Sem isto, a casa corrompida continuava a ancorar a pesquisa pela porta do
+     lado, e o ecrã dizia «perto de: Franciscus Romanusweg 2».
+
+     ⚠️ TENTEI DISTINGUIR O `state.home` EM MEMÓRIA DO GUARDADO, a pensar que
+     o primeiro era «o sítio que estou a ver agora» e legítimo. **A distinção
+     não existe:** o arranque carrega o home guardado PARA a memória, portanto
+     os dois são o mesmo registo. A régua apanhou-me — continuava a devolver
+     «Franciscus Romanusweg 2» depois de eu já ter escrito o comentário a
+     explicar porque é que não devia.
+
+     A regra é uma só, e é a do dd-170: `pesquisa` é «mostra-me o tempo ali» e
+     nunca foi âncora. E não se perde nada — a escada continua para o mapa à
+     vista e para os recentes, e o sítio acabado de pesquisar É o primeiro
+     recente. Chega ao mesmo destino pela porta honesta, e com o nome certo. */
+  const ancora=(x)=>real(x)&&x.prov?.como!=="pesquisa";
   for(const x of [state.home, store.get("home")])
-    if(real(x)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
+    if(ancora(x)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
   try{ if(state.mapaRota&&state.mapaRota.m){ const c=Mapa.centro(state.mapaRota);
     if(c&&Number.isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("o mapa à vista")}; } }catch(e){}
   for(const x of [(getRecentes()||[])[0], (getFavs()||[])[0]])
@@ -6348,6 +6435,19 @@ function atribDoItem(it){
 
    Devolve `null` quando nenhum item traz licença: **não se inventa
    atribuição, e não se deixa uma linha vazia a fingir que há.** */
+/* dd-186 §6: o rodapé recebe as licenças que o cartão deixou de mostrar.
+   Um slot só, sempre reescrito — duas chamadas não empilham duas linhas. */
+function atribParaRodape(itens){
+  try{
+    const pe=document.querySelector("footer"); if(!pe) return;
+    let slot=document.querySelector("#atrib-dinamica");
+    const la=atribLinha(itens);
+    if(!la){ if(slot) slot.remove(); return; }
+    if(!slot){ slot=el("div"); slot.id="atrib-dinamica"; pe.appendChild(slot); }
+    slot.textContent=""; slot.setAttribute("data-test","atrib-rodape");
+    slot.appendChild(la);
+  }catch(e){ queixar("atribuição no rodapé",e); }
+}
 function atribLinha(itens){
   const a=[...new Set((itens||[]).map(atribDoItem).filter(Boolean))];
   if(!a.length) return null;
@@ -6550,9 +6650,33 @@ function definirCasa(loc,{explicito=false}={}){
 /* a casa a sério, com a ponte para quem ainda não tem o slot novo: quem já
    tinha casa guardada continua a tê-la, sem gesto nenhum (dd-158 — uma
    migração que exige trabalho ao utilizador é uma migração falhada) */
+/* ═══ UMA CASA NASCIDA DE UMA PESQUISA NÃO É UMA CASA (dd-185 §1a) ═════════
+   O `definirCasa` fechou a porta a 05/08 — mas quem já tinha a casa
+   sobrescrita ficou com ela. No aparelho do dono: «Franciscus Romanusweg 2»
+   com `prov.como="pesquisa"`, a servir de âncora ao Agora, à ordenação da
+   pesquisa, ao «De» do planeador e à frase dos radares.
+
+   **A reparação já existia a metade, e a assimetria era o defeito:** a linha
+   do `home` aqui em baixo já recusava uma proveniência de pesquisa; a do
+   `casa` não. A app sabia a regra e não a aplicava ao slot novo.
+
+   ⚠️ NÃO SE ADIVINHA NADA. A proveniência está GUARDADA e diz «pesquisa» à
+   letra — é um facto registado, não uma suspeita. E NÃO SE APAGA NADA: a
+   escada continua para o degrau seguinte e a pessoa cai em «casa por
+   definir», que a app já sabe mostrar e explicar. Melhor uma casa por definir
+   do que a app a acreditar num sítio que ninguém escolheu.
+
+   ⚠️ E uma casa com `prov` AUSENTE fica: «guardada antes desta versão» é a
+   verdade, e inventar-lhe uma origem para a poder deitar fora seria o mesmo
+   erro ao contrário (dd-158). */
+const CASA_PROV_MA = new Set(["pesquisa", "reserva"]);
+function casaCorrompida(c){
+  return !!(c && Number.isFinite(c.lat) && CASA_PROV_MA.has(c.prov?.como));
+}
 function aCasa(){
-  if(state.casa&&Number.isFinite(state.casa.lat)) return state.casa;
-  try{ const g=store.get("casa"); if(g&&Number.isFinite(g.lat)){ state.casa=g; return g; } }catch(e){}
+  if(state.casa&&Number.isFinite(state.casa.lat)&&!casaCorrompida(state.casa)) return state.casa;
+  try{ const g=store.get("casa");
+    if(g&&Number.isFinite(g.lat)&&!casaCorrompida(g)){ state.casa=g; return g; } }catch(e){}
   try{ const h=store.get("home");
     if(h&&Number.isFinite(h.lat)&&h.prov?.como!=="pesquisa"&&h.prov?.como!=="reserva"){
       state.casa=h; return h; } }catch(e){}
@@ -6659,7 +6783,37 @@ function renderLocEstado(alvo,tipo){
   if(tipo==="indisponivel"){ // ≠ recusada, pelo nome — e aqui repetir é lícito
     const b=el("div","banner warn"); b.append(el("span",null,"📡"),
       el("span",null,t("O telemóvel não consegue dar a posição agora — localização do sistema desligada, sem sinal, ou demorou demasiado. Não é uma questão de permissão: tenta outra vez, de preferência a céu aberto.")));
-    box.append(b,manual); return;
+    /* ═══ dd-186 §5: UM AVISO QUE DIZ «TENTA» SEM DAR COMO É UM BECO ═══════
+       O texto mandava tentar outra vez e não havia nada para carregar. A
+       diferença entre um aviso e um beco é UM BOTÃO — e este caso é
+       precisamente aquele em que repetir é lícito: não é permissão recusada,
+       é sinal que pode chegar no minuto seguinte.
+       E há uma segunda saída, a que não precisa das mãos de ninguém: se a
+       posição aparecer sozinha, o aviso sai sozinho. Uma pessoa que sai de
+       um túnel não devia ter de saber que tem de carregar num botão. */
+    const bt=el("button","btn",t("Tentar de novo"));
+    bt.setAttribute("data-test","loc-tentar");
+    bt.style.marginTop="8px";
+    bt.addEventListener("click",()=>{ renderLocEstado(alvo,"pedindo"); useGPS(alvo==="#loc-estado-rota"); });
+    const cx=el("div"); cx.append(b,bt);
+    box.append(cx,manual);
+    /* a vigia passiva: UM fixo chega para desfazer o aviso, e desliga-se a
+       si própria. Uma vigia que fica ligada é bateria que ninguém pediu. */
+    try{
+      if(navigator.geolocation&&!box._vigia){
+        const id=navigator.geolocation.watchPosition((pos)=>{
+          if(!pos||!Number.isFinite(pos.coords?.latitude)) return;
+          try{ navigator.geolocation.clearWatch(id); }catch(e){}
+          box._vigia=null;
+          if(locPintado[alvo]!=="indisponivel") return;   // já mudou de estado: não mexer
+          locSaida.grava(null); renderLocEstado(alvo,null);
+          toast(t("📍 Localização ligada."));
+          useGPS(alvo==="#loc-estado-rota");
+        },()=>{},{enableHighAccuracy:false,maximumAge:0,timeout:120000});
+        box._vigia=id;
+      }
+    }catch(e){ queixar("vigia da posição",e); }
+    return;
   }
   // recusada: cartão permanente, caminho da plataforma, ZERO repedidos
   const c=el("div","banner err");
@@ -6979,7 +7133,15 @@ function renderDashboard(){
   /* dd-172 §2: o NOME deste cartão veio do fornecedor de moradas. A linha de
      proveniência acima («detetada pelo GPS») diz COMO o sítio foi escolhido —
      não é a licença, e uma não substitui a outra. */
-  { const la=atribLinha([state.home]); if(la) main.append(la); }
+  /* ═══ dd-186 §6: A LICENÇA SAI DO CARTÃO DE DECISÃO ═══════════════════
+     Estava aqui — «© OpenStreetMap contributors» no meio do cartão que diz
+     se se vai de moto, logo a seguir a uma ordem para REDUZIR texto. A
+     obrigação da licença cumpre-se; **informação de condução é que não é**.
+     Vai para o rodapé, onde as outras já vivem, e continua na MESMA página:
+     a atribuição redistribui-se onde os dados se mostram, e o rodapé é a
+     mesma superfície. O que muda é o LUGAR, nunca o cumprimento — e é isso
+     que a guarda `atribuicao-fora-do-cartao` mede nas duas direções. */
+  atribParaRodape([state.home]);
   const ul=el("ul","reasons");
   if(worst.s.reasons.length){
     worst.s.reasons.forEach(r=>{ const li=el("li");
@@ -7238,8 +7400,40 @@ function dayVerdict(D,i){
   if(g!=null){ if(g>=65) lvl=Math.max(lvl,2); else if(g>=45) lvl=Math.max(lvl,1); }
   if(tmin!=null&&tmin<=2) lvl=Math.max(lvl,2);
   if((code!=null&&(THUNDER.includes(code)||SNOW.includes(code)||FREEZING.includes(code)))||(ps!=null&&ps>=10)) lvl=3;
+  /* ═══ dd-186: A FAIXA DOS 7 DIAS TINHA CHÃO DE FRIO E NENHUM TETO DE CALOR ══
+     A linha acima trata `tmin <= 2`. Não havia par dela do outro lado — e é a
+     mesma assimetria que o dd-178 curou no `scoreHour` e na rota («dos seis
+     perigos, dois eram do frio e zero do calor»). Esta superfície ficou para
+     trás e ninguém deu por isso porque **um veredicto verde não se queixa**.
+
+     Medido a 05/08 em 63 dias reais de nove sítios da Europa (relatório 111):
+     20 dias com máxima ≥ 32°, 9 com ≥ 36°, e **12 dos 20 dados por bons sem
+     ressalva**. Sevilha deu seis dias seguidos entre 36,2° e 39,0° a dizer
+     «Bom p/ moto».
+
+     ⚠️ A RÉGUA É A SENSAÇÃO, NÃO O AR — e é por isso que a chamada passou a
+     pedir `apparent_temperature_max` (mesmo pedido, zero chamadas novas, como
+     o bolbo húmido do dd-178 B). Julgar calor pela temperatura do ar era o
+     defeito que a rota tinha e que o dd-178 fechou: 39° secos de Sevilha e
+     34° húmidos não são o mesmo perigo.
+
+     A ESCADA É A DO dd-178, TAL E QUAL, e não se inventa um número:
+       · ≥ CALOR_VERMELHO (42°) → o pior nível, **nos três perfis**, sem
+         exceção. O perfil governa quando se AVISA, nunca quando se PROÍBE;
+       · ≥ prof.tCalor (30/32/34) → **nunca o verde a cheio**. Não desce a
+         amarelo — a app não sabe o que a pessoa leva vestido — mas perde o
+         direito de afirmar que o dia está bom, e diz porquê.
+     Sem sensação máxima no dia, o calor **cala-se**: um dia sem o dado não é
+     um dia fresco (7g-ter). */
+  const prof=PROFILES[state.profile]||PROFILES.equilibrado;
+  const atMax=v(D.apparent_temperature_max);
+  let calor=null;
+  if(atMax!=null){
+    if(atMax>=CALOR_VERMELHO){ lvl=3; calor="perigo"; }
+    else if(atMax>=prof.tCalor) calor="cuidado";
+  }
   const completo=pp!=null&&ps!=null&&g!=null&&tmin!=null&&code!=null;
-  return {lvl, completo};
+  return {lvl, completo, calor, atMax};
 }
 function renderDaily(wx){
   const D=wx.daily, card=el("div","card");
@@ -7262,8 +7456,23 @@ function renderDaily(wx){
     /* dia verde só com o dia completo; senão o ponto fica cinzento e di-lo */
     if(lvl===0&&!dv.completo){ dot.style.background="var(--muted)";
       v.append(dot, document.createTextNode(t("Bom? — faltam dados"))); }
+    else if(lvl===0&&dv.calor==="cuidado"){
+      /* dd-186: a banda de cuidado do dd-178 — zero pontos e uma bandeira. O
+         ponto fica verde porque o dia NÃO é mau; o que se perde é o direito
+         de o afirmar a cheio, e diz-se com o número ao lado, nunca só com
+         uma cor (§10.27: uma cor sem o número é uma aproximação). */
+      dot.style.background="var(--good)";
+      /* o `U.temp` fora do `t()`: dentro dele a conversão corria duas vezes
+         (linte `unidades`) — a régua apanhou-o no mesmo minuto em que nasceu */
+      { const n=U.temp(dv.atMax);
+        v.append(dot, document.createTextNode("🥵 "+t("Bom, mas {n} de sensação",{n}))); }
+      v.setAttribute("data-calor","cuidado");
+    }
     else { dot.style.background=`var(--${["good","warn","serious","crit"][lvl]})`;
-      v.append(dot, document.createTextNode(t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl]))); }
+      v.append(dot, document.createTextNode(
+        dv.calor==="perigo" ? (()=>{ const n=U.temp(dv.atMax); return "🥵 "+t("Calor perigoso — {n}",{n}); })()
+                            : t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl])));
+      if(dv.calor) v.setAttribute("data-calor",dv.calor); }
     d.append(v);
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,
       `${dayLabel(ep+43200)} — ${D.weather_code?.[i]==null?"—":wmoTxt(D.weather_code[i])}`,
@@ -10202,6 +10411,23 @@ function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
   renderSitios(); $("#sitios-drawer").classList.add("open"); $("#sitios-bg").classList.add("open"); }
 function fecharSitios(){ $("#sitios-drawer").classList.remove("open"); $("#sitios-bg").classList.remove("open"); }
 function renderSitios(){
+  /* ═══ O MESMO SÍTIO NÃO SE MOSTRA DUAS VEZES (dd-185 §1b) ═════════════════
+     Declarado à cabeça de propósito: as três secções (Casa · Guardados ·
+     Recentes) desenham-se por ordem, e cada uma tem de saber o que as de cima
+     já mostraram. A primeira versão disto declarava o conjunto a meio da
+     função — depois dos favoritos — e rebentou com «Cannot access
+     chaveSitio before initialization». A ordem de declaração é parte do
+     desenho, não detalhe.
+
+     Por COORDENADAS, não por nome: o mesmo sítio chega com nomes diferentes
+     conforme a porta por onde entrou. Quatro decimais ≈ 11 m.
+     A precedência é a do valor para a pessoa: Casa > Guardados > Recentes —
+     esconde-se sempre a cópia MENOS deliberada, nunca a escolha.
+     E esconder é só na LISTA: não se apaga nada do armazenamento. */
+  const jaMostrados=new Set();
+  const chaveSitio=(x)=>(Number.isFinite(x?.lat)&&Number.isFinite(x?.lon))
+    ? `${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}` : null;
+  { const c=aCasa(); const k=chaveSitio(c); if(k) jaMostrados.add(k); }
   const box=$("#sitios-corpo"); if(!box) return;
   box.textContent="";
   /* dd-172 §2: esta gaveta mostra a casa, os favoritos e os recentes — todos
@@ -10233,7 +10459,11 @@ function renderSitios(){
 
   /* ── GUARDADOS: renomear e apagar, nunca em silêncio ── */
   box.appendChild(el("p","san-h","⭐ "+t("Guardados")+` (${getFavs().length}/20)`));
-  const favs=getFavs();
+  /* os favoritos também se deduplicam contra a Casa — no ecrã do dono o mesmo
+     sítio aparecia duas vezes, «uma com estrela e outra sem». Só depois é que
+     alimentam o conjunto, para os recentes não os repetirem. */
+  const favs=getFavs().filter(f=>{ const k=chaveSitio(f); return !k||!jaMostrados.has(k); });
+  for(const f of favs){ const k=chaveSitio(f); if(k) jaMostrados.add(k); }
   if(!favs.length) box.appendChild(el("p","small muted",t("Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.")));
   favs.forEach(f=>{
     const r=el("div","sitio-row");
@@ -10269,8 +10499,27 @@ function renderSitios(){
     r.append(be,bx); box.appendChild(r);
   });
 
+  /* ═══ O MESMO SÍTIO NÃO SE MOSTRA TRÊS VEZES (dd-185 §1b) ═════════════════
+     No ecrã do dono, «Franciscus Romanusweg 2» aparecia DUAS vezes — uma na
+     Casa e outra na lista de baixo, uma com estrela e outra sem. Medido: o
+     mesmo sítio pode estar em `casa`, `favs` e `recentes` ao mesmo tempo, e
+     as três secções desenhavam-se sem se falarem.
+
+     A deduplicação é por COORDENADAS, não por nome: o mesmo sítio chega com
+     nomes diferentes conforme a porta por onde entrou («A minha casa», o nome
+     da rua, o nome do estabelecimento). Quatro casas decimais ≈ 11 m, que é a
+     precisão a que dois registos são o mesmo sítio na prática.
+
+     A ORDEM DE PRECEDÊNCIA é a do valor para a pessoa: a Casa ganha aos
+     favoritos, e os favoritos ganham aos recentes. O que se esconde é sempre
+     a cópia MENOS deliberada — nunca a escolha.
+
+     ⚠️ Esconder é só na LISTA. Não se apaga nada do armazenamento: quem tirar
+     o sítio dos favoritos volta a vê-lo nos recentes, onde ele sempre esteve.
+     Uma deduplicação que apaga é uma deduplicação que perde dados. */
   /* ── RECENTES: ver, apagar um a um, limpar tudo ── */
-  const rec=getRecentes();
+  const rec=getRecentes().filter(x=>{ const k=chaveSitio(x);
+    return !k || !jaMostrados.has(k); });
   box.appendChild(el("p","san-h","🕘 "+t("Recentes")+` (${rec.length}/25)`));
   if(!rec.length) box.appendChild(el("p","small muted",t("Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.")));
   rec.forEach((x,i)=>{
@@ -10281,7 +10530,15 @@ function renderSitios(){
     r.appendChild(tx);
     const bx=el("button","icon-btn","✕"); bx.title=t("Apagar");
     bx.addEventListener("click",()=>{
-      store.set("recentes",getRecentes().filter((_,j)=>j!==i));
+      /* ⚠️ APAGAR POR COORDENADA, NÃO POR ÍNDICE. A lista desenhada passou a
+         ser FILTRADA (deduplicação contra a casa e os favoritos, dd-185 §1b)
+         e o índice dela deixou de corresponder ao da lista guardada — apagar
+         por `j!==i` deitaria fora o sítio errado. Foi um defeito que a
+         própria correção da duplicação criou, e que só se vê a ler o
+         chamador: a lista que se DESENHA e a lista que se GUARDA deixaram de
+         ser a mesma no minuto em que uma delas ganhou um filtro. */
+      const alvo=chaveSitio(x);
+      store.set("recentes",getRecentes().filter(r2=>chaveSitio(r2)!==alvo));
       renderSitios(); toast(t("Apagado: {p}",{p:x.name}));
     });
     r.appendChild(bx); box.appendChild(r);
@@ -11145,7 +11402,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-05-2013-a14121";
+const BUILD="2026-08-06-0038-5f45c2";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
