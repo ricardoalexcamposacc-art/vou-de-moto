@@ -238,6 +238,12 @@ a{color:var(--accent)}
 .saude-ponto.bom{color:var(--good)}
 .saude-ponto.mau{color:var(--serious)}
 .saude-host{font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* dd-196 §2b: a saída da linha da casa. Botão de texto, sublinhado, com alvo
+   de dedo — não é um link (não navega) e não é um botão de cartão (não é uma
+   ação de peso): é uma saída ao lado de um facto. */
+.btn-linha{background:none;border:0;padding:4px 2px;margin:0;cursor:pointer;
+  color:var(--accent);text-decoration:underline;font:inherit;font-size:var(--t-sussurro)}
+.btn-linha:hover,.btn-linha:focus-visible{opacity:.8}
 .saude-tec{flex:none;opacity:.55;font-size:var(--t-sussurro)}
 #saude-resumo{font-size:var(--t-corpo);margin:2px 0 0}
 #saude-resumo[data-ok="nao"]{color:var(--serious)}
@@ -1881,7 +1887,8 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
-"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Your home is saved {d} away from everything else you've saved. Is that really your home?","É":"It is","Não, esquecer":"No, forget it",
+"Não é esta? Mudar":"Not this one? Change","Definir a casa":"Set your home",
+
 "Bom, mas {n} de sensação":"Good, but {n} feels-like","Calor perigoso — {n}":"Dangerous heat — {n}",
 "demorou de mais":"timed out",
 "Estado da app":"App status","presente":"present","em falta":"MISSING","a mais — não devia estar aqui":"extra — shouldn't be here","fora, como deve ser":"gone, as it should be","o motor do mapa":"the map engine","a porta única do mapa":"the map's single door","a tradução":"translation","as tuas preferências":"your preferences","falar com os serviços":"talking to the services","Leaflet, que saiu no A2.2":"Leaflet, which left in A2.2",
@@ -2338,7 +2345,8 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
-"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Tu casa está guardada a {d} de todo lo demás que has guardado. ¿Es de verdad tu casa?","É":"Lo es","Não, esquecer":"No, olvídala",
+"Não é esta? Mudar":"¿No es esta? Cambiar","Definir a casa":"Definir la casa",
+
 "Bom, mas {n} de sensação":"Bien, pero {n} de sensación","Calor perigoso — {n}":"Calor peligroso — {n}",
 "demorou de mais":"tardó demasiado",
 "Estado da app":"Estado de la app","presente":"presente","em falta":"FALTA","a mais — não devia estar aqui":"de más — no debería estar aquí","fora, como deve ser":"fuera, como debe ser","o motor do mapa":"el motor del mapa","a porta única do mapa":"la puerta única del mapa","a tradução":"la traducción","as tuas preferências":"tus preferencias","falar com os serviços":"hablar con los servicios","Leaflet, que saiu no A2.2":"Leaflet, que salió en A2.2",
@@ -2768,7 +2776,8 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
-"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Ta maison est enregistrée à {d} de tout le reste que tu as enregistré. C'est vraiment chez toi ?","É":"Oui, c'est ça","Não, esquecer":"Non, oublie-la",
+"Não é esta? Mudar":"Ce n'est pas ça ? Changer","Definir a casa":"Définir le domicile",
+
 "Bom, mas {n} de sensação":"Bien, mais {n} ressentis","Calor perigoso — {n}":"Chaleur dangereuse — {n}",
 "demorou de mais":"trop lent",
 "Estado da app":"État de l'app","presente":"présent","em falta":"MANQUANT","a mais — não devia estar aqui":"en trop — ne devrait pas être là","fora, como deve ser":"parti, comme il se doit","o motor do mapa":"le moteur de la carte","a porta única do mapa":"la porte unique de la carte","a tradução":"la traduction","as tuas preferências":"tes préférences","falar com os serviços":"parler aux services","Leaflet, que saiu no A2.2":"Leaflet, parti en A2.2",
@@ -3205,7 +3214,8 @@ fr:{
    Vocabulário de motociclista, e **«je», nunca «u»**: quem anda de mota
    trata-se por tu. */
 nl:{
-"🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?":"🏠 Je thuis staat opgeslagen op {d} van al het andere dat je hebt bewaard. Is dat echt je thuis?","É":"Ja, klopt","Não, esquecer":"Nee, vergeet het",
+"Não é esta? Mudar":"Niet deze? Wijzigen","Definir a casa":"Thuis instellen",
+
 "Bom, mas {n} de sensação":"Goed, maar {n} gevoelstemperatuur","Calor perigoso — {n}":"Gevaarlijke hitte — {n}",
 "norte":"noord",
 "nordeste":"noordoost",
@@ -4933,8 +4943,17 @@ async function photonSearch(q,pos,limit=7){
       /* dd-168: só se degrada o que se sabe que É uma queda do fornecedor —
          o `fornecedorCaiu` do geoSearch. Qualquer outro erro sobe inteiro:
          uma reserva que engole erros que não entende é o `catch` mudo com
-         outra roupa. */
-      throw e;
+         outra roupa.
+
+         ⚠️ ESTAS DUAS LINHAS JÁ MORRERAM UMA VEZ, e o modo como morreram vale
+         mais do que elas: um commit meu apanhou a árvore com a INJEÇÃO DO
+         PROVADOR em cima (o `5859ef98` traz o `A-INJETAR-NAO-EDITES` no
+         próprio diff) e gravou o defeito como se fosse código. A mensagem do
+         commit falava de outra coisa. Ficou no `main`, foi publicado no
+         `levante-v22`, e durante esse tempo a app respondia «Sem ligação» em
+         vez de ir à reserva sempre que a Geoapify caísse. */
+      if(!e?.fornecedorCaiu) throw e;
+      degradarPesquisa(e.motivo||tipoDeFalha(e));
       /* e segue para a via SEM CHAVE, aqui em baixo — que é a mesma que a app
          usa quando não há chave nenhuma, e portanto já está provada. */
     }
@@ -6607,92 +6626,30 @@ function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomp
    GUARDA GRITA OU CALA-SE? Grita: baixo demais faz perguntas visíveis a mais;
    nunca grava calado. */
 const LIMIAR_CASA_KM=300;
-/* ═══ dd-190 §1 — A CASA IMPLAUSÍVEL: 3000 km, E É PERGUNTA ═══════════════
-   O caso: a app do dono guardava «شمال دارفور, North Darfur, Sudão» como
-   CASA, a ~4500 km de Maastricht, onde estão todos os sítios dele. A
-   reparação por PROVENIÊNCIA (dd-185) fecha a porta às casas escritas por
-   uma pesquisa — mas **só apanha as que trazem `prov.como="pesquisa"`**.
-   Uma casa escrita por uma versão anterior à proveniência passa por essa
-   porta sem tocar na campainha, e foi por isso que o dono teve de a corrigir
-   à mão. Este detetor existe **só para esse legado**.
+/* ═══ dd-196 §1 — O DETETOR DE DISTÂNCIA DA CASA MORREU, E FICA A LÁPIDE ═══
+   Esteve aqui, de 06/08 às 06/08: um detetor que perguntava «é mesmo a tua
+   casa?» quando ela estava a mais de N km de tudo o resto que a pessoa
+   guardara. **Saiu inteiro, e a razão não é o número — é o eixo.**
 
-   ⚠️ QUEM NÃO ENTRA AQUI, e é metade da regra:
-     · casas com proveniência de GESTO (`escolha`, `gps`) são **sagradas** —
-       a pessoa disse que é ali, e a app não discute com ela;
-     · casas com `prov.como="pesquisa"` já se reparam sozinhas — não se
-       pergunta duas vezes pela mesma coisa;
-     · **com menos de 2 sítios de referência o detetor NÃO CORRE.** Sem
-       referência não há implausibilidade — há só uma casa. Quem acabou de
-       instalar a app e guardou a casa numa viagem não leva pergunta nenhuma.
+   A medição que o matou:
 
-   O LIMIAR: **3000 km**, e a medição ao lado (§10.7). A diagonal da Europa
-   continental anda pelos ~3400 km — Lisboa–Helsínquia são ≈3360 km em linha
-   reta. Uma viagem de mota europeia real, com a casa numa ponta e os
-   favoritos na outra, cabe **folgada abaixo** do limiar. O caso real
-   (Maastricht → Sudão) está a ≈4500 km, **folgado acima**. O limiar separa
-   os dois mundos com margem dos dois lados.
+     Faro → Cabo Norte      4264 km
+     Maastricht → Darfur    4278 km
 
-   E A AÇÃO É UMA **PERGUNTA**, NUNCA UMA REPARAÇÃO. A assimetria manda
-   (7g-ter): apagar uma casa verdadeira é perda de dados; deixar uma falsa
-   custa um toque. Na dúvida, o silêncio ganha à ação. */
-const CASA_LONGE_KM = 3000;
-/* ⚠️ O DETETOR ESTÁ DESLIGADO, E A RAZÃO É UMA MEDIÇÃO QUE DESMENTE A CARTA.
-   A dd-190 §1 justifica os 3000 km assim: «Lisboa–Helsínquia ≈ 3360 em linha
-   reta — uma viagem de mota europeia real, com a casa numa ponta e favoritos
-   na outra, cabe folgada ABAIXO do limiar». **Não cabe: 3360 está 360 km
-   ACIMA de 3000.** Medi com o haversine desta app:
+   **Catorze quilómetros** entre a viagem de mota europeia por excelência e o
+   caso corrompido que fez nascer o detetor. Não existe valor defensável entre
+   os dois: aperta-se e acusa-se o motociclista, alarga-se e deixa-se passar o
+   defeito. **As duas respostas erradas estão sempre disponíveis, e é isso que
+   denuncia o eixo** (lei §10.31).
 
-     Lisboa → Helsínquia   3360 km      (a carta dá-a por abaixo; está acima)
-     Lisboa → Tampere      3383 km
-     Maastricht → Darfur   4278 km      (a carta estimou ~4500)
-     **Faro → Nordkapp     4264 km**    ← e é isto que fecha a questão
+   Não ficou adormecido com um interruptor. Um detetor desligado com um limiar
+   lá dentro é um convite a que daqui a seis meses alguém o ligue «só para
+   experimentar» — e o número continuaria a ser uma moeda ao ar com ar de
+   engenharia.
 
-   O «cabo a cabo» — Faro ao Cabo Norte — é **a** viagem de mota europeia, e
-   está a **14 km** do caso do Sudão. Não há limiar que apanhe um e deixe o
-   outro: os dois mundos que a carta queria separar **sobrepõem-se**.
-
-   Por isso a obra fica escrita, guardada e PROVADA no seu ficheiro, e o
-   detetor não corre até o Ricardo decidir. Ligar isto com os 3000 punha a
-   app a duvidar da casa de quem foi ao Cabo Norte — e uma pergunta errada a
-   quem tem razão gasta a confiança que a pergunta certa vai precisar.
-   Muda-se este `false` para `true` no dia em que houver número. */
-const CASA_LONGE_ATIVO = false;
-const CASA_PROV_DE_GESTO = new Set(["escolha", "gps"]);
-function casaImplausivel(){
-  if(!CASA_LONGE_ATIVO) return null;
-  try{
-    const c=state.home||store.get("home"); if(!c||!Number.isFinite(c.lat)) return null;
-    if(CASA_PROV_DE_GESTO.has(c.prov?.como)) return null;          // sagrada
-    if(CASA_PROV_MA.has(c.prov?.como)) return null;                // já reparada pelo dd-185
-    const refs=[...(getFavs?getFavs():[]), ...(getRecentes?getRecentes():[])]
-      .filter(x=>x&&Number.isFinite(x.lat)&&Number.isFinite(x.lon));
-    if(refs.length<2) return null;                                 // sem referência não há implausibilidade
-    /* a distância ao sítio MAIS PRÓXIMO de tudo o que ela guardou: se o mais
-       perto está a 4500 km, todos estão. Usar a média escondia um favorito
-       ao lado da casa no meio de dez do outro lado do mundo. */
-    const perto=Math.min(...refs.map(r=>haversine(c,r)));
-    return perto>CASA_LONGE_KM?{casa:c, km:Math.round(perto), refs:refs.length}:null;
-  }catch(e){ queixar("detetor da casa implausível",e); return null; }
-}
-function perguntarCasaImplausivel(){
-  const r=casaImplausivel(); if(!r) return false;
-  const slot=$("#confirmar-casa-slot"); if(!slot||slot.firstChild) return false;
-  const card=el("div","card"); card.id="casa-implausivel";
-  card.setAttribute("data-test","casa-implausivel");
-  card.appendChild(el("p",null,t("🏠 A tua casa está guardada a {d} de tudo o resto que guardaste. É mesmo a tua casa?",
-    {d:`${r.km} km`})));
-  const acoes=el("div","san-acoes");
-  const sim=el("button","btn primary",t("É"));
-  /* dizer «é» não é só fechar o cartão: passa a ser uma casa de GESTO, e
-     nunca mais se pergunta. Perguntar todos os dias a mesma coisa é a
-     maneira mais certa de ensinar alguém a carregar sem ler. */
-  sim.addEventListener("click",()=>{ slot.textContent=""; setHome(r.casa,{prov:"escolha"}); });
-  const nao=el("button","btn",t("Não, esquecer"));
-  nao.addEventListener("click",()=>{ slot.textContent=""; try{ store.del("home"); store.del("casa"); }catch(e){} location.reload(); });
-  acoes.append(sim,nao); card.appendChild(acoes);
-  slot.appendChild(card);
-  return true;
-}
+   No lugar dele, o §2b: **a casa passa a ser VISÍVEL e a corrigir-se num
+   toque** — ver `pintarSitiosLinha`. Zero falsos positivos, zero perguntas a
+   quem tem a casa certa. */
 function confirmarCasa(loc){
   const slot=$("#confirmar-casa-slot"); if(!slot) return;
   slot.textContent="";
@@ -10511,12 +10468,53 @@ function provQuando(p){
   if(p&&p.quando){ try{ s+=" · "+new Date(p.quando).toLocaleDateString(state.lang||"pt"); }catch(e){} }
   return s;
 }
+/* ═══ dd-196 §2b — A CASA É VISÍVEL, E CORRIGE-SE NUM TOQUE ════════════════
+   O que estava aqui antes: `🏠 {nome} — {sub} · {proveniência}`. O nome do
+   sítio e mais nada — **não dizia ONDE fica nem COMO se muda**. Foi por isso
+   que o dono andou com «شمال دارفور» como casa sem perceber o que via: o nome
+   estava lá, escrito num alfabeto que ele não lê, e nada ao lado dizia
+   «Sudão» nem oferecia saída.
+
+   A cura para o legado — casas sem proveniência, que ninguém sabe de onde
+   vieram — **não é adivinhar: é mostrar**. Três coisas, sempre:
+
+     1 · o **nome da placa** (§10.10 — o que está pintado na estrada, com o
+         exónimo entre parênteses só quando difere);
+     2 · o **PAÍS**, por extenso e na língua da app. É o que torna «شمال
+         دارفور» legível a quem não lê árabe: ao lado passa a estar «Sudão»;
+     3 · a saída, **sempre presente e nunca condicional a suspeita nenhuma**:
+         «Não é esta? Mudar».
+
+   ⚠️ SEM COORDENADAS. Um par de decimais não diz nada a ninguém e enche a
+   linha; o país diz tudo num relance.
+
+   ⚠️ E A SAÍDA NÃO SE CONDICIONA. A tentação era mostrá-la só quando a casa
+   «parece estranha» — e é exatamente essa tentação que produziu o detetor de
+   distância que morreu no §1. **Uma saída que só aparece quando a app
+   desconfia obriga a app a desconfiar bem**; uma saída que está sempre lá não
+   obriga a nada. Zero falsos positivos por construção. */
 function pintarSitiosLinha(){
   const li=$("#sitios-casa-linha"); if(!li) return;
   const h=state.home||store.get("home");
-  li.textContent=h?`🏠 ${h.name}${h.sub?" — "+h.sub:""} · ${provQuando(h.prov)}`:t("sem casa guardada");
-  /* dd-172 §2: o nome é do fornecedor; a licença vai colada, na mesma linha */
-  { const a=atribDoItem(h); if(a) li.textContent+=" · "+a; }
+  li.textContent="";
+  const linha=el("span");
+  if(h){
+    /* ⚠️ O PAÍS SÓ ENTRA SE HOUVER PAÍS. O `nomePais()` devolve «país?» quando
+       não há código — e «país?» numa linha que existe para dizer ONDE fica é
+       ruído, não informação. Apanhado pela guarda com o valor de arranque
+       (Lisboa, sem `cc`), que escrevia «Lisboa · Portugal · país?». */
+    const onde=[nomeDaPlaca(h)||h.name, h.sub||null, h.cc?nomePais(h.cc):null].filter(Boolean).join(" · ");
+    linha.textContent=`🏠 ${onde} · ${provQuando(h.prov)}`;
+    /* dd-172 §2: o nome é do fornecedor; a licença vai colada, na mesma linha */
+    const a=atribDoItem(h); if(a) linha.textContent+=" · "+a;
+  } else linha.textContent=t("sem casa guardada");
+  li.appendChild(linha);
+  /* a saída, sempre — mesmo com casa por definir, onde o botão passa a ser
+     o caminho para a definir pela primeira vez */
+  const mudar=el("button","btn-linha",h?t("Não é esta? Mudar"):t("Definir a casa"));
+  mudar.setAttribute("data-test","casa-mudar");
+  mudar.addEventListener("click",()=>{ abrirSitios(); });
+  li.append(document.createTextNode(" "), mudar);
   const b=$("#btn-sitios"); if(b) b.textContent=t("Gerir os meus sítios");
 }
 function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
@@ -11559,7 +11557,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-06-0141-53cb2d";
+const BUILD="2026-08-06-1134-c262a8";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -13099,7 +13097,6 @@ function init(){
   pintarVersaoLinha();
   ligarToquesDiagnostico();
   estadoAparelho();   // o que este aparelho não consegue fazer, dito onde dura
-  perguntarCasaImplausivel();   // dd-190 §1: uma pergunta, e só para o legado
   const sth=store.get("theme"); if(sth==="light"||sth==="dark") setTheme(sth,{guardar:false});
   $("#btn-theme").addEventListener("click",()=>setTheme(state.theme==="dark"?"light":"dark"));
 

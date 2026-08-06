@@ -6,7 +6,7 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-const V = "levante-v22";
+const V = "levante-v23";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
