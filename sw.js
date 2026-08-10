@@ -6,7 +6,22 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-const V = "levante-v23";
+/* ═══ levante-v24 — 10/08/2026 ═══════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · dd-204 §2 — as moradas dos resultados deixam de ser cortadas: a lista de
+     pesquisa passou de 167 px para 294 num ecrã de 320, e a morada tem duas
+     linhas. E a app **deixou de deslizar de lado** em português e francês.
+   · dd-204 §2 — a pastilha do calor na faixa dos 7 dias diz «🥵 37°»; a frase
+     inteira continua a ser lida por quem usa leitor de ecrã.
+   · dd-207 §1 — orçamento de tempo declarado (900 ms): passado ele, a caixa
+     diz que ainda está a procurar, sem apagar o que já mostrou.
+   · dd-210 §1 — os LUGARES: escrever «Portugal» devolve o país, não uma rua
+     com o mesmo nome.
+   · 36 frases que apareciam em português a quem tem a app em neerlandês —
+     incluindo o veredicto do ecrã principal — passaram a estar traduzidas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const V = "levante-v24";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
