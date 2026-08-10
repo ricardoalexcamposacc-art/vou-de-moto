@@ -6,7 +6,22 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v24 — 10/08/2026 ═══════════════════════════════════════════
+/* ═══ levante-v25 — 10/08/2026 ═══════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · O MICROFONE VOLTA A ESTAR DENTRO DO CAMPO de pesquisa. Tinha saído para
+     cima do botão do GPS, meio fora do cartão, e a culpa foi da obra da
+     versão anterior: para a lista de resultados ocupar a barra inteira, o
+     campo perdeu a âncora que segurava o 🎤. Agora a lista é irmã do campo em
+     vez de filha, e cada um tem a sua âncora — as duas coisas cabem.
+   · O TEXTO DO CAMPO DEIXA DE CORTAR A MEIO DE UMA PALAVRA. Dizia «Pesquisar
+     cid…». A app passa a medir o próprio texto contra o próprio campo e a
+     ficar com a frase mais informativa que lá cabe, em cada língua e em cada
+     largura — em vez de um limiar adivinhado.
+   · Quando o ajuste do texto falhar, a app queixa-se uma vez na consola em
+     vez de ficar calada.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ levante-v24 — 10/08/2026 (publicada) ═══════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
    · dd-204 §2 — as moradas dos resultados deixam de ser cortadas: a lista de
@@ -21,7 +36,7 @@
    · 36 frases que apareciam em português a quem tem a app em neerlandês —
      incluindo o veredicto do ecrã principal — passaram a estar traduzidas.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v24";
+const V = "levante-v25";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */

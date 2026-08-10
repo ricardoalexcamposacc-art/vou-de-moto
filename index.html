@@ -217,9 +217,16 @@ a{color:var(--accent)}
    no `.field`, que é `flex:1` numa barra onde o botão do GPS come 129 px. A
    gaveta herdava a largura da GAVETEIRA em vez da do MÓVEL.
    Pôr o `.field` em `position:static` faz a lista ancorar na `.locbar` — 296
-   px dos mesmos 320. **+129 px, +78 %,** e a morada passa a caber. O campo
-   de texto não se mexe: continua ao lado do botão, como tem de estar. */
-.locbar>.field{flex:1;position:static}
+   px dos mesmos 320. **+129 px, +78 %,** e a morada passa a caber.
+
+   ⚠️ E A PRIMEIRA VERSÃO DISTO CUSTOU UM DEFEITO VISÍVEL: pus o `.field` em
+   `position:static` para a lista ancorar na barra — e tirei a âncora ao
+   MICROFONE, que é absoluto e vive dentro do campo. Foi parar ao canto
+   inferior do botão do GPS, meio fora do cartão, e **foi o dono que o viu no
+   ar; régua nenhuma o apanhou**. A cura não é escolher entre os dois: é a
+   lista deixar de ser filha do campo (ver o HTML) para que cada um tenha a
+   sua âncora. §10.64. */
+.locbar>.field{flex:1;position:relative}
 .loc-name{display:flex;flex-direction:column;min-width:0}
 .loc-name b{font-size:var(--t-corpo);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .loc-name span{font-size:var(--t-corpo);color:var(--muted)}
@@ -1221,9 +1228,18 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
     <div class="card locbar">
       <div class="field" style="flex:1">
         <input type="search" id="loc-search" placeholder="Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)" autocomplete="off" aria-label="Pesquisar localização">
-        <div class="ac-list" id="loc-results" role="listbox"></div>
       </div>
       <button class="btn" id="btn-gps" title="Usar a minha localização">📍<span class="gps-lab">GPS</span></button>
+      <!-- ═══ dd-204 §2 + o defeito do microfone (10/08) ═══════════════════
+           A lista É IRMÃ do campo, não filha, e a razão é uma cadeia que se
+           mediu: para a lista ocupar a barra inteira eu tinha posto o
+           `.field` em `position:static` — e isso tirou a âncora ao MICROFONE,
+           que é `position:absolute` e foi parar ao canto do botão do GPS,
+           meio fora do cartão. O dono viu-o no ar.
+           Com a lista aqui, ancora na `.locbar` (que já é relativa) e o
+           `.field` volta a ser relativo para o microfone. As duas coisas
+           deixam de disputar o mesmo `position`. -->
+      <div class="ac-list" id="loc-results" role="listbox"></div>
     </div>
     <!-- PORTEIRO 6 (dd-43 §3): quem abre a app pela primeira vez tinha um
          cartão de pesquisa, um interruptor a explicar-se em quatro linhas e
@@ -1788,6 +1804,7 @@ function setLangReal(l,{escolha}={}){
   if(escolha!==undefined) store.set("lang",escolha);
   document.documentElement.lang=l;
   applyStaticI18n();
+  ajustarSugestoes();
   pintarFilaLinguas();
   if(state.wx) renderDashboard();
   if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); }
@@ -2010,7 +2027,7 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
-"Não é esta? Mudar":"Not this one? Change","Definir a casa":"Set your home",
+"Pesquisar cidade ou morada…":"Search city or address…","Cidade ou morada…":"City or address…","Pesquisar…":"Search…","Não é esta? Mudar":"Not this one? Change","Definir a casa":"Set your home",
 
 "Bom, mas {n} de sensação":"Good, but {n} feels-like","Calor perigoso — {n}":"Dangerous heat — {n}",
 "demorou de mais":"timed out",
@@ -2496,7 +2513,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
-"Não é esta? Mudar":"¿No es esta? Cambiar","Definir a casa":"Definir la casa",
+"Pesquisar cidade ou morada…":"Buscar ciudad o dirección…","Cidade ou morada…":"Ciudad o dirección…","Pesquisar…":"Buscar…","Não é esta? Mudar":"¿No es esta? Cambiar","Definir a casa":"Definir la casa",
 
 "Bom, mas {n} de sensação":"Bien, pero {n} de sensación","Calor perigoso — {n}":"Calor peligroso — {n}",
 "demorou de mais":"tardó demasiado",
@@ -2955,7 +2972,7 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
-"Não é esta? Mudar":"Ce n'est pas ça ? Changer","Definir a casa":"Définir le domicile",
+"Pesquisar cidade ou morada…":"Chercher une ville ou une adresse…","Cidade ou morada…":"Ville ou adresse…","Pesquisar…":"Chercher…","Não é esta? Mudar":"Ce n'est pas ça ? Changer","Definir a casa":"Définir le domicile",
 
 "Bom, mas {n} de sensação":"Bien, mais {n} ressentis","Calor perigoso — {n}":"Chaleur dangereuse — {n}",
 "demorou de mais":"trop lent",
@@ -3421,7 +3438,7 @@ fr:{
    Vocabulário de motociclista, e **«je», nunca «u»**: quem anda de mota
    trata-se por tu. */
 nl:{
-"Créditos e licenças":"Credits en licenties","Destino":"Naar","Encoberto":"Bewolkt","Hora de partida":"Vertrektijd","Ligação aos serviços":"Verbinding met de diensten","Motor antigo (tem de estar fora)":"Oude motor (moet weg zijn)","Motor do mapa":"Kaartmotor","Origem":"Van","Porta do mapa":"Deur naar de kaart","Preferências":"Voorkeuren","Privacidade":"Privacy","Rota":"Route","Termos de utilização":"Gebruiksvoorwaarden","Tradução":"Vertaling","chuva das {a} às {b}":"regen van {a} tot {b}","ex.: \"vou ao MediaMarkt\" · \"decathlon\" · \"bombas de gasolina\"":"bijv. \"ik ga naar MediaMarkt\" · \"decathlon\" · \"tankstations\"","Vai de moto!":"Rijden maar!","via verde":"vrij baan","Vai, mas equipado":"Rijden, maar goed uitgerust","atenção":"let op","Arriscado — pensa duas vezes":"Riskant — denk twee keer na","risco":"risico","Melhor não ir de moto":"Beter niet rijden","não recomendado":"afgeraden","o motor do mapa":"de kaartmotor","a porta única do mapa":"de enige deur naar de kaart","a tradução":"de vertaling","as tuas preferências":"je voorkeuren","falar com os serviços":"praten met de diensten","Leaflet, que saiu no A2.2":"Leaflet, dat vertrok in A2.2","Chuvisco possível":"Mogelijke motregen","Chuva forte / trovoada":"Zware regen / onweer","Bom p/ moto":"Goed rijweer","Com aviso":"Voorzichtig","Arriscado":"Riskant","Mau p/ moto":"Slecht rijweer",
+"Pesquisar cidade ou morada…":"Zoek stad of adres…","Cidade ou morada…":"Stad of adres…","Pesquisar…":"Zoeken…","Créditos e licenças":"Credits en licenties","Destino":"Naar","Encoberto":"Bewolkt","Hora de partida":"Vertrektijd","Ligação aos serviços":"Verbinding met de diensten","Motor antigo (tem de estar fora)":"Oude motor (moet weg zijn)","Motor do mapa":"Kaartmotor","Origem":"Van","Porta do mapa":"Deur naar de kaart","Preferências":"Voorkeuren","Privacidade":"Privacy","Rota":"Route","Termos de utilização":"Gebruiksvoorwaarden","Tradução":"Vertaling","chuva das {a} às {b}":"regen van {a} tot {b}","ex.: \"vou ao MediaMarkt\" · \"decathlon\" · \"bombas de gasolina\"":"bijv. \"ik ga naar MediaMarkt\" · \"decathlon\" · \"tankstations\"","Vai de moto!":"Rijden maar!","via verde":"vrij baan","Vai, mas equipado":"Rijden, maar goed uitgerust","atenção":"let op","Arriscado — pensa duas vezes":"Riskant — denk twee keer na","risco":"risico","Melhor não ir de moto":"Beter niet rijden","não recomendado":"afgeraden","o motor do mapa":"de kaartmotor","a porta única do mapa":"de enige deur naar de kaart","a tradução":"de vertaling","as tuas preferências":"je voorkeuren","falar com os serviços":"praten met de diensten","Leaflet, que saiu no A2.2":"Leaflet, dat vertrok in A2.2","Chuvisco possível":"Mogelijke motregen","Chuva forte / trovoada":"Zware regen / onweer","Bom p/ moto":"Goed rijweer","Com aviso":"Voorzichtig","Arriscado":"Riskant","Mau p/ moto":"Slecht rijweer",
 "Não é esta? Mudar":"Niet deze? Wijzigen","Definir a casa":"Thuis instellen",
 
 "Bom, mas {n} de sensação":"Goed, maar {n} gevoelstemperatuur","Calor perigoso — {n}":"Gevaarlijke hitte — {n}",
@@ -7611,6 +7628,56 @@ function voiceInto(btn,cb){
     rec.start();
   }catch(e){ activeRec=null; btn.classList.remove("rec"); toast(t("Voz indisponível neste browser.")); }
 }
+/* ═══ O TEXTO DE SUGESTÃO CABE, OU ENCURTA — e quem decide é a MEDIÇÃO ═════
+   MEDIDO a 10/08, no ar, pelo dono: o campo dizia «Pesquisar cid…». E medido
+   aqui, a três larguras: o texto inteiro tem **465 px** e o campo tem **112**
+   de espaço útil a 320 px. Não é um caso raro — **não cabe em largura
+   nenhuma**: nem a 412 px, onde há 201 px úteis e a instrução sozinha, sem os
+   exemplos, já pede 229.
+
+   ⚠️ E NÃO SE ESCOLHE POR LIMIAR. Um `@media (max-width:…)` seria eu a
+   adivinhar em que largura é que o texto de CINCO línguas deixa de caber — e
+   as cinco têm comprimentos diferentes. A app mede o seu próprio texto contra
+   o seu próprio campo e fica com **a variante mais comprida que cabe**. Sem
+   número inventado e sem lista por língua.
+
+   ⚠️ E O QUE CEDE É O TEXTO, NUNCA A CAIXA — é a mesma ordem da dd-204 §2,
+   aqui aplicada à sugestão. */
+function ajustarSugestao(input){
+  if(!input) return;
+  const cheio=input.dataset.phCheio||input.placeholder;
+  input.dataset.phCheio=cheio;
+  const st=getComputedStyle(input);
+  /* ⚠️ A MARGEM DE 4 px NÃO É SUPERSTIÇÃO: o `clientWidth` não conta a
+     borda, o texto é medido com um espelho que arredonda ao subpíxel, e um
+     texto que cabe «à justa» aparece cortado por um pixel no aparelho real.
+     Medido a 10/08: cinco línguas × três larguras, e três casos falhavam por
+     1 a 4 px. */
+  const util=input.clientWidth-parseFloat(st.paddingLeft||0)-parseFloat(st.paddingRight||0)-4;
+  if(!(util>0)) return;                       // campo escondido: não se mede o que não tem caixa
+  const regua=document.createElement("span");
+  regua.style.cssText="position:absolute;visibility:hidden;white-space:nowrap;left:-9999px";
+  regua.style.font=st.font;
+  document.body.appendChild(regua);
+  const cabe=(txt)=>{ regua.textContent=txt; return regua.getBoundingClientRect().width<=util; };
+  /* da mais informativa para a mais curta; fica a primeira que couber */
+  const escolhida=[cheio, t("Pesquisar cidade ou morada…"), t("Cidade ou morada…"), t("Pesquisar…")]
+    .find(cabe) || t("Pesquisar…");
+  regua.remove();
+  input.placeholder=escolhida;
+}
+/* ⚠️ O GUARDA VIVE AQUI, E FALA. Eu tinha-o espalhado por CINCO `catch(e){}`
+   mudos nos sítios que chamam — cinco silêncios para uma função só, e o
+   portão das famílias apanhou-mos (F2: 105 contra 102). Um erro apanhado e
+   calado é um erro que ninguém vai depurar. Passa a haver **um** guarda, no
+   dono da operação, e a queixa sai pelo canal que já existia — uma vez por
+   área, sem ruído em cada `resize`. */
+function ajustarSugestoes(){
+  try{ document.querySelectorAll("#loc-search,#rt-o,#rt-d").forEach(ajustarSugestao); }
+  catch(e){ queixar("ajustar o texto de sugestão", e); }
+}
+/* rodar o telemóvel muda a largura e portanto muda o que cabe */
+addEventListener("resize", ajustarSugestoes);
 function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomplete
   if(!SR||!input) return;
   const wrap=input.closest(".field")||input.parentElement;
@@ -7625,6 +7692,13 @@ function addMicTo(input){ // mete um 🎤 dentro de um campo .field com autocomp
   });
   wrap.appendChild(b);
   input.classList.add("has-mic");
+  /* ⚠️ E A SUGESTÃO REMEDE-SE AQUI, DEPOIS do `has-mic`. Esta classe acrescenta
+     **42 px** de `padding-right` para o texto não passar por baixo do
+     microfone — e a primeira versão media a sugestão ANTES disto, com 13 px de
+     padding em vez de 42. Escolhia uma variante que cabia num campo que ainda
+     não existia, e o texto saía cortado. Quem mede antes de a caixa estar
+     pronta mede outra caixa. */
+  ajustarSugestao(input);
 }
 
 /* =====================================================================
@@ -12623,7 +12697,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-10-1101-dfb424";
+const BUILD="2026-08-10-1420-32f21a";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -14095,6 +14169,7 @@ function init(){
   // idioma + estáticos
   document.documentElement.lang=state.lang;
   applyStaticI18n();
+  ajustarSugestoes();
   $$("#lang-row .chip").forEach(c=>c.addEventListener("click",()=>setLang(c.dataset.lang)));
   pintarFilaLinguas();
   // unidades: métrico, imperial ou o híbrido britânico (milhas com Celsius)
@@ -14142,6 +14217,7 @@ function init(){
   $$("#unit-row .chip").forEach(c=>c.addEventListener("click",()=>{
     state.units=c.dataset.units; store.set("units",state.units); paintUnits();
     applyStaticI18n();
+  ajustarSugestoes();
     if(state.wx) renderDashboard();
     if(state.route){ applyShift(state.route.shift); renderDepartures(); renderCameras(); renderHazards(); }
     renderFavRow();
