@@ -179,6 +179,85 @@ a{color:var(--accent)}
   transition:background .18s,color .18s,box-shadow .18s,transform .12s}
 .tab[aria-selected="true"]{background:var(--acc-grad);color:var(--accent-ink);box-shadow:var(--glow)}
 .tab:not([aria-selected="true"]):hover{background:var(--surface2)}
+
+/* ═══ dd-224 BLOCO 3 — A BARRA DE ABAS EM BAIXO ═══════════════════════════
+   Os separadores saem do topo e passam a uma barra FIXA em baixo, onde o
+   polegar já está. Guarda a classe `.tabs` de propósito: três réguas
+   perguntam por `.tabs .tab` e `.tabs button`, e trocar-lhes o nome era
+   partir três âncoras para não escrever uma palavra (§10.73).
+
+   ⚠️ A BARRA NÃO SE ESCONDE AO ROLAR, e é ordem: uma barra que foge é uma
+   barra com que não se pode contar, e a razão de existir é ser previsível.
+   Não há aqui nenhuma regra de `transform` ligada à rolagem, e não pode
+   passar a haver.
+
+   ⚠️ O PREÇO ESTÁ ESCRITO: são píxeis PERMANENTES, em todos os ecrãs. Uma
+   barra fixa não desaparece quando não é precisa. É por isso que a §10.84
+   exige medir também o B — a barra baixa a altura até ao veredicto E baixa
+   a dobra com ela. */
+.tabs.barra-abas{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:1600;
+  display:flex;gap:2px;margin:0;border-radius:0;border:0;border-top:1px solid var(--border);
+  padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -2px 14px rgba(0,0,0,.10)}
+.tabs.barra-abas .tab{flex:1 1 0;min-width:0;flex-direction:column;gap:1px;
+  padding:5px 6px;border-radius:12px;font-size:var(--t-sussurro);line-height:1.2}
+.barra-abas .aba-ico{font-size:17px;line-height:1.15}
+/* ⚠️ O rótulo NÃO parte em duas linhas: `Maintenant` e `Itinéraire` são as
+   duas palavras compridas das cinco línguas, e foram medidas ANTES de isto
+   se construir — 56 px e 44 px contra 68 px de largura útil a 320 px. Se um
+   dia deixarem de caber, o `nowrap` empurra as reticências e a régua
+   `i18n-enquadramento` acusa o transbordo: não parte a barra em silêncio. */
+.barra-abas .aba-rot{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ⚠️ O ESPAÇO DA BARRA RESERVA-SE NO FIM DO DOCUMENTO, e o número NÃO é
+   escrito à mão: o `--h-abas` é posto pelo JS a partir da altura MEDIDA da
+   barra, e volta a ser medido quando a língua ou o tamanho do ecrã mudam.
+   Um número à mão ficaria certo em português e tapava o último elemento em
+   francês. O 56px aqui é só o valor de arranque, antes da primeira medição. */
+:root{--h-abas:56px}
+body{padding-bottom:calc(var(--h-abas) + env(safe-area-inset-bottom,0px) + 10px)}
+
+/* ═══ dd-224 BLOCO 3 — A MARCA E A PESQUISA NUMA LINHA SÓ ════════════════
+   É a metade do bloco que GANHA A SÉRIO: ~58 px que nada devolve lá em
+   baixo, e é o mesmo ganho que a dd-217 §1c pedia ao cabeçalho retrátil —
+   sem o cabeçalho desaparecer e sem depender de rolagem. */
+.app-head.fundida{gap:8px;padding:10px 0 8px;align-items:center}
+.app-head.fundida .locbar{flex:1;min-width:0}
+.app-head.fundida .locbar.card{padding:0;background:none;border:0;box-shadow:none}
+.app-head.fundida .head-actions{margin-left:0}
+/* a lupa à esquerda, DENTRO do campo: quem não souber que se toca ali não
+   procura, e o campo deixou de ter um convite escrito (mostra onde estás) */
+.campo-lupa{position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  font-size:13px;opacity:.65;pointer-events:none;line-height:1}
+.app-head.fundida .field input[type="search"]{padding-left:32px;padding-right:38px}
+/* ⚠️ DUAS PEÇAS ABSOLUTAS NO MESMO CANTO. O 🎤 é `position:absolute;right:5px`
+   dentro do `.field` (dd-204) e o GPS passou a viver lá dentro também — os
+   dois ficavam um por cima do outro, e o de cima come o toque do de baixo.
+   O GPS fica no canto e o microfone recua a largura dele. O `:has()` existe
+   para o recuo só acontecer quando há mesmo microfone: sem
+   reconhecimento de voz o campo não perde 30 px de texto por nada. */
+.app-head.fundida .field:has(.mic-in) input[type="search"]{padding-right:70px}
+.app-head.fundida .field .mic-in{right:38px;bottom:50%;transform:translateY(50%)}
+.app-head.fundida #btn-gps{position:absolute;right:4px;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:10px;font-size:13px;box-shadow:none;z-index:2}
+.app-head.fundida #btn-gps .gps-lab{display:none}
+/* ⚠️ A LISTA VALE A LINHA INTEIRA, e é a dd-204 §2 outra vez, agora com o
+   cabeçalho fundido. A `.ac-list` é absoluta e ancora no antepassado
+   POSICIONADO mais próximo. Na barra antiga esse era a `.locbar`, que valia
+   296 px num ecrã de 320. Na linha fundida a `.locbar` vale ~196 px — o
+   logótipo e a engrenagem comem o resto — e a gaveta voltaria a herdar a
+   largura do móvel em vez da da parede, que é EXATAMENTE o defeito das
+   moradas cortadas que custou a medição de 09/08.
+   Cura: nesta linha a `.locbar` deixa de ser âncora e a âncora passa a ser o
+   cabeçalho. O `.field` continua relativo — o microfone é absoluto e é dele
+   que depende (foi o defeito de 10/08). */
+.app-head.fundida{position:relative}
+.app-head.fundida .locbar.card{position:static;backdrop-filter:none;-webkit-backdrop-filter:none;filter:none;animation:none;transform:none;contain:none;will-change:auto}
+.app-head.fundida .ac-list{left:0;right:0}
+/* fora do fluxo mas NO documento: as réguas continuam a lê-la, o leitor de
+   ecrã também, e não ocupa um pixel da linha fundida */
+.marca-oculta{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+  clip-path:inset(50%);white-space:nowrap}
 .tab:active{transform:scale(.97)}
 .view{display:none}
 .view.active{display:block;animation:viewIn .26s ease-out}
@@ -381,13 +460,36 @@ a{color:var(--accent)}
 .nc-x{display:flex;gap:2px;margin-top:4px}
 .nc-x span{flex:1;text-align:center;font-size:var(--t-sussurro);color:var(--muted)}
 /* ================= DAILY ================= */
-.daily{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:12px}
-.day-card{background:var(--surface2);border:1px solid var(--grid);border-radius:12px;padding:10px 6px;
-  display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+/* ═══ dd-217 §2 — OS SETE DIAS PASSAM A LINHAS HORIZONTAIS ════════════════
+   De sete colunas estreitas a sete LINHAS, todas com a MESMA ALTURA. A
+   comparação que importa é entre dias, e ler sete colunas de cinco andares
+   obriga o olho a subir e descer sete vezes.
+   ⚠️ A CAIXA NUNCA CRESCE. A altura é fixa e o que não couber ENCURTA-SE
+   (reticências), que é ordem à letra. Uma linha que cresce com o texto é uma
+   fila que deixa de ser fila, e foi assim que a faixa antiga comeu 550 px. */
+.daily{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.day-card{background:var(--surface2);border:1px solid var(--grid);border-radius:10px;padding:0 8px;
+  display:flex;flex-direction:row;align-items:center;gap:4px;text-align:left;
+  /* 40 px, e o número é medido: o conteúdo mais alto da linha é a pastilha
+     do veredicto (21 px) e a caixa pedia 37 px de altura de conteúdo. Com 34
+     a linha cortava por dentro — a régua acusou `scrollHeight` 35 contra
+     `clientHeight` 32. Uma caixa que não cresce não pode ser uma caixa que
+     corta o que tem lá dentro. */
+  height:40px;min-height:40px;max-height:40px;overflow:hidden}
+.day-card>*{flex:none;min-width:0}
+.day-card .d-name{width:38px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day-card .d-min,.day-card .d-max{font-size:var(--t-sussurro);font-variant-numeric:tabular-nums;
+  width:28px;text-align:right;white-space:nowrap}
+.day-card .d-max{font-weight:700;text-align:left}
+/* a faixa é o único elemento elástico da linha: é ela que absorve a largura
+   que sobra, e é por isso que os números nunca saltam de sítio entre linhas */
+.day-card .d-faixa{flex:1 1 auto;position:relative;height:6px;border-radius:99px;
+  background:var(--grid);min-width:40px}
+.day-card .d-barra{position:absolute;top:0;bottom:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--warn))}
+.day-card .day-verdict{flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .day-card .d-name{font-size:var(--t-sussurro);font-weight:700;text-transform:capitalize}
-.day-card .d-emoji{font-size:22px;line-height:1.2}
-.day-card .d-temp{font-size:var(--t-corpo)}.day-card .d-temp b{font-weight:700}
-.day-card .d-temp span{color:var(--muted)}
+.day-card .d-emoji{font-size:16px;line-height:1.2;width:20px;text-align:center}
 .day-card .d-meta{font-size:var(--t-sussurro);color:var(--muted)}
 /* ═══ dd-204 §2 — E A PASTILHA TAMBÉM NÃO MANDA NA CAIXA ═════════════════
    É ESTA a peça que segura a faixa dos 7 dias dentro do ecrã a 320 px, e
@@ -846,7 +948,17 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   box-shadow:0 4px 14px -4px rgba(12,20,36,.4),0 0 0 1px var(--border);background:linear-gradient(140deg,#2a78d6,#0d366b);
   display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 4px 14px -6px rgba(26,90,180,.55)}
 .brand-name{font-size:var(--t-corpo);font-weight:800}
-.card{border-radius:18px;padding:18px;margin-bottom:12px}
+/* ═══ dd-217 §1c — OS ESPAÇOS APERTAM, e o número está medido ════════════
+   MEDIDO a 12/08, a 360 px, no ecrã AGORA com seis cartões: **55 px de vazio
+   entre cartões** e 15/14 px de enchimento dentro deles. A Fase 1 tinha
+   contado 77 px de espaços acima do veredicto; essa metade já morreu com a
+   fusão do cabeçalho — o que sobra é o vazio ENTRE os cartões, que é o que
+   se aperta aqui.
+   ⚠️ NÃO É DENSIDADE POR DENSIDADE. Um cartão sem respiração lê-se pior, e
+   isso não se mede num número de píxeis. Corta-se um terço do vazio e
+   deixa-se o enchimento quase como está: 12 -> 8 de margem, 18 -> 15 de
+   enchimento. A medição do depois vai no relatório, ao lado desta. */
+.card{border-radius:18px;padding:15px;margin-bottom:8px}
 .card h2{font-size:var(--t-corpo)}
 .card .h-sub{font-size:var(--t-corpo);margin-bottom:10px}
 .tabs{border-radius:14px}
@@ -874,7 +986,7 @@ body{font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .score-ring svg{width:100%;height:100%}
 @media (max-width:720px){
   .wrap{padding:0 10px 46px}
-  .card{padding:14px;margin-bottom:10px;border-radius:16px}
+  .card{padding:13px;margin-bottom:7px;border-radius:16px}   /* dd-217 §1c */
   .app-head{padding:12px 0 8px}
   .hero{gap:12px}
   .hero-title{font-size:var(--t-veredito)}
@@ -1042,7 +1154,12 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
   .tabs{top:6px;padding:4px;border-radius:15px;margin:4px 0 14px}
   .tab{padding:11px 6px;font-size:var(--t-corpo);gap:5px;border-radius:11px}
 
-  .card{padding:15px 14px;border-radius:17px;margin-bottom:11px}
+  /* dd-217 §1c — os espaços apertam. MEDIDO a 360 px, seis cartões no Agora:
+     55 px de vazio entre cartões antes; o depois vai no relatório ao lado
+     desta linha. Corta-se o VAZIO (11 -> 7) e alivia-se o enchimento
+     (15/14 -> 13/12) — não se esmaga: um cartão sem respiração lê-se pior, e
+     isso não aparece num número de píxeis. */
+  .card{padding:13px 12px;border-radius:17px;margin-bottom:7px}
   .card h2{font-size:var(--t-corpo)}
   .card .h-sub{font-size:var(--t-corpo);line-height:1.45}
 
@@ -1107,21 +1224,56 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 </head>
 <body>
 <div class="wrap">
-  <header class="app-head">
+  <header class="app-head fundida">
     <div class="brand">
       <img class="brand-tile" alt="" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCABgAGADASIAAhEBAxEB/8QAHgAAAQMFAQEAAAAAAAAAAAAABAACCQEDBQcIBgr/xAA6EAABAwMCBAMGBAMJAQAAAAABAgMEAAURBiEHEjFBCBNRFCIyYXGBCVKRoUJighYjM0RTcpKxwtH/xAAbAQABBQEBAAAAAAAAAAAAAAAEAAIDBQYBB//EAC0RAAIBAgQDCAEFAAAAAAAAAAECAAMRBAUSIQYxQRMiUWFxkcHRoSMyseHw/9oADAMBAAIRAxEAPwDhhntRrI3FBMb4o1rrXpazGPDmetHsCse0dx6UcyvHei1gLCHNJ6UY23t86BaXtRTbuO9FLAWBlx1Hu/Og3R7tEOPbHfOaEdX86TRLeCvigXhvRjy85oF1WTQphywN3qaDe6n6Ua6aCd70I0OWMZONqMaV0rHtqxvRTTgpqmPYTItqGBRTa8HrWNbdAGSRgV114WfATqLjUIOoNVuSNK6New4z7mJ09HXLSVDDaD/qKG/8KT1p1TEU6Ca6hsJCtB6raUF5zTbY0m5zGokKO9MmOnDceO2pxxf0SkEn7CtvWLwlcZtQsJficOL4hpQyFS20Rsj6OqSf2qWzhhwN0XwYtSYGjNOwbOOUJdl8nmSXj6uOn31n6qx6AV7JUOSrJ9sKT/K0nH75qgqZ817Uk28/6lomUKR+o2/lIUtV+GjixoqK5Ju/D6/MRWxlb7MX2hCR6ktFePvWqXXcFWdikkKHcHuMetT43trUce2vGzO26TNGC2iehbaFYO4KkHbI2zjb0PSuYuOXBzhnx+bfiars44c8Qd0s3ZKEoWpztzkYRJbJ75Jx0KTtU9DOmc2qrt4j6kVXKgm9Nvf7kYV4skWBFtUGK+m8324pbeU3APmpjhf+HHHL8bysgqA+HIQMq5sBatszOlHjaHVtyby0cT1tLCm4yx/l0kbKUn+NQ25vdHwkn0utdM6x8NPEu42maU26+w2VoamsJDiHWHUFIkR1kdFJJ5VjCknI2UDXk9X2CPpP2a2uSWpl55EvTPZnQ4zF5k5SwFDIW4AQVkHCSQkZIUavNYYAg3BlWEKtZuc844rr60I6rarriwRtQrq6iYwpRLDbgIohtwd6x6V9xV5DtQgwllvNi8E7RN1Jxg0Pa7awzKnSr3DbaZkIC2lHzkk86TkFISCSD2BqeJmTLgOYnMhC0ElElrdpxPofynHY7dKh6/DeTaXfFfp167OhCosKa/DCk8wVIDPKP0Qp1X9NTRIcQ+0FtqS42obKScgis1m1S9RVtyEtMCmlCfOPQtLiErScpUMgjuK1xxD8QuiOGN5btF6ujhuikJdXEhxnJC2kKzyqcCAeUHG2dz1Ar3sMhpbkboE+83/tPb7HI/So8fGBpC76C4zXO8Sg49adRLEuJKOSOZLaELZJ7FPKCB+VQ9DWFzjGVsBhu2orc369B4/E12UYOjjsR2VZrbbW6n/bzsa1+KHhjdcBvVLDCz/BMjvMEf8ANArPtcUNC6jSYiL9arilxJJY8xLgUB1909aiyuOopMWyzZkc5eaaKkZGcH1x8uteo4V2xUO72S+z7nMnvBSHilTxDYChhQx3GFGsOvFuJUa6qqBe3I3/AJ+ZrKnDFG+mkzE2vvb6m6/xCuG2l+I/C+Nc9JGMvUmkXeZUeMkpzCdBW4306AgOJHTZQHxVFupwco5cY7Y6VL+45Bl+2xQy2GblAVHewN1lB5kZPfZShUR2tbQrS+rb1Z1ApMGa9HAP5UrIT+2K9T4S4gfM6lbC1LdyxHoSb9Ty7vuZ55n+TrgVp10v3rg+wt8+0xK3O1DOubU1TuTjoKsLc5jk9O1eiEzJqtoOh3GKupc3oBLvzp4cqEGFFZsjgdxGVwr4v6P1ZzFLNqubL8jHdgnleH3bUup1zJmQYb0iyONvOraLkdDhPkvkpyjOOytveG++a+eRLuRg7g9Qakv8Kn4iVi05w901priLbnnF22IiE1eoLyXlKbb91vzmSQrmCQkEpKs4ziqvH0WqAOgvaEYdwlwxtO/tF6zg8QtMQL9bFlrzApK2V4K47yTyusOD8yVAgj5AjtVjiHo+wcTtLydP6qgedAewpLqDuy4PhcQsboUM7H6g5BIrUVj8cHAdTAZh6qYtbalFXlrtb7KeYnJPut4yT3r21h8QvDPV7iW7Rr2wSnlfCyqchpZ/pc5TWcq4cuCrodJ8RLSnW0EMjbjwnK+u/BNrPThlf2eLGsLI8hSUKZdQzKSkjHvNqISoj1Srf0FaXgq1BwrZYtGsdM3e0Bj+7blvxVpSpOdicj/ompPVlTID8V1TPPuHGj7iv/Kqeu/lxhUe5wm50ZYwrkSDkfNCtj9v0rDYrhHCV1YUiVB3tzsfLr+T6TY4fifE0yDVAa3XkT69PwJwrauLNkUm2FNzadL7oQjkPw5BGVg7pHbf1rhvxSRBbuO2qUpGEvrZk4HqtlBP75qZHWPhy4Y6+t7lwZ0nBTIUTzO29KoiycEYV5eOhIJ2JwNs1EH419OStH8eJ1tlW+XbXEW+IUtypjcsLRyFKVtOoQgqbITtzpCtiDR3CPD2IyjM2rlwyFCp33vqUjaw8IFn+b0Mywa0lUhgwPLa1iDvfzmkS5n/AOVZW7nvVku1bK+9exFp5+FtA0PfOrodyetA1UOFNRXk+kzIJdpwcB64/SgEv+tPD49acDGWmQQ9y7g4Py2otm8S45Hlynk47c5I/Q1hw6PvVfOFd1Tmmbi4b+KLiLwseSqwamnxGQcqYQ8fKV9WzlB+6a6/4T/ill8swte2Rp8bJM+3YYd+pbJ8tX2KPpUb3mj1qheHrQ9SjTqfuWPUsvIz6AOCniC0DxBiz5dl1NDU0iP7W/HlLEd6OlAJWtaF4wAncqGRhPWoWvFLxbY41cfNZathPLetMuaWbapY5SYbQDbJx25kp5sfz1q1i/zYUV6MxLdbjupKFtJVsQdiPlkbHHWgFPZqCjhloOXB5yVqjOoBEJL2/Xera36H5yen61Tr1ouRhZWlSpU2SyhSD2qnJTqVKKNwRSGRTqVdvOWEac0sE06lSitG8tVAAqtKubzsVKlSpRT/2Q==">
-      <div>
+      <!-- ⚠️ O NOME E A ASSINATURA CONTINUAM NO DOCUMENTO, escondidos, e NÃO
+           foram apagados. Três razões, todas medidas: a régua do
+           `offline-sw` confirma a interface montada por `.brand-name`
+           === "Levante"; o auditor de línguas conta a assinatura entre os
+           textos traduzidos nas cinco línguas; e apagar texto de marca é
+           decisão do dono, não minha. Na linha fundida não cabem — ficam
+           fora do fluxo, legíveis por régua e por leitor de ecrã. -->
+      <div class="marca-oculta">
         <div class="brand-name">Levante</div>
         <div class="brand-sub">meteorologia para motociclistas · grátis para começar</div>
       </div>
     </div>
+    <!-- A BARRA DE LOCALIZAÇÃO SOBE PARA AQUI, inteira: campo + GPS + lista.
+         Sobe INTEIRA de propósito — o microfone é `position:absolute` e
+         ancora no `.field`, e a lista ancora na `.locbar`. Separá-los foi o
+         defeito de 10/08 que pôs o microfone no canto do botão do GPS. -->
+    <div class="card locbar">
+      <div class="field" style="flex:1">
+        <span class="campo-lupa" aria-hidden="true">🔍</span>
+        <input type="search" id="loc-search" placeholder="Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)" autocomplete="off" aria-label="Pesquisar localização">
+        <button class="btn" id="btn-gps" title="Usar a minha localização">📍<span class="gps-lab">GPS</span></button>
+      </div>
+      <div class="ac-list" id="loc-results" role="listbox"></div>
+    </div>
     <div class="head-actions" style="position:relative">
       <button class="btn primary" id="btn-install" style="display:none;padding:8px 13px" title="Instalar como app">📲 Instalar</button>
-      <button class="icon-btn" id="btn-trips" title="Viagens planeadas" aria-label="Viagens planeadas">🗓️</button>
-      <button class="icon-btn" id="btn-theme" title="Alternar tema claro/escuro" aria-label="Alternar tema">🌙</button>
       <button class="icon-btn" id="btn-settings" title="Definições" aria-label="Definições">⚙️</button>
       <div class="pop" id="settings-pop" role="dialog" aria-label="Definições">
-        <h3>Perfil de decisão</h3>
+        <!-- ⚠️ dd-224 bloco 3 — DECISÃO QUE NÃO ERA MINHA, TOMADA PARA NÃO
+             PARAR A NOITE, E ESTÁ ESCRITA COMO PERGUNTA NO RELATÓRIO.
+             A ordem manda fundir o cabeçalho em «logo · campo · engrenagem»
+             — três peças — e o esboço aprovado mostra exatamente três. Mas
+             o cabeçalho tinha CINCO controlos. Medido a 320 px: com os três
+             botões de ícone na linha, o campo fica com ~100 px e mostra
+             «Maastric» cortado, ou seja o campo deixa de conseguir dizer
+             onde estás, que é a razão de ele existir assim.
+             Os dois que não estavam na ordem descem para aqui, o primeiro
+             sítio onde alguém procura definições. Não se perdeu nada: um
+             toque a mais, os mesmos IDs, os mesmos ouvintes.
+             ⇢ REVERSÍVEL EM DUAS LINHAS: voltam a subir cortando-as daqui e
+             colando-as acima do `#btn-settings`. -->
+        <h3 id="atalhos-title" style="margin-top:0">Atalhos</h3>
+        <div class="chips" style="margin-bottom:12px">
+          <button class="icon-btn" id="btn-trips" title="Viagens planeadas" aria-label="Viagens planeadas">🗓️</button>
+          <button class="icon-btn" id="btn-theme" title="Alternar tema claro/escuro" aria-label="Alternar tema">🌙</button>
+        </div>
+        <h3 id="perfil-title">Perfil de decisão</h3>
         <div class="radio-row" id="profile-radios">
           <label><input type="radio" name="profile" value="conservador">
             <span><b>Conservador</b><span>Qualquer risco relevante já pesa na decisão.</span></span></label>
@@ -1206,10 +1358,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
     </div>
   </header>
 
-  <nav class="tabs" role="tablist" aria-label="Secções">
-    <button class="tab" role="tab" id="tab-agora" aria-selected="true" data-view="agora">🏍️ Agora</button>
-    <button class="tab" role="tab" id="tab-rota" aria-selected="false" data-view="rota">🗺️ Rota</button>
-  </nav>
+  <!-- os separadores desceram para a barra fixa em baixo (dd-224 bloco 3) -->
 
   <div id="offline-banner" style="display:none" class="banner off-banner">
     <span>📴</span><span id="offline-txt"><b>Sem internet.</b> O mapa guardado, a rota e o GPS continuam a funcionar — a meteorologia é a da última atualização.</span>
@@ -1225,22 +1374,7 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 
   <!-- ============ AGORA ============ -->
   <section class="view active" id="view-agora" role="tabpanel">
-    <div class="card locbar">
-      <div class="field" style="flex:1">
-        <input type="search" id="loc-search" placeholder="Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)" autocomplete="off" aria-label="Pesquisar localização">
-      </div>
-      <button class="btn" id="btn-gps" title="Usar a minha localização">📍<span class="gps-lab">GPS</span></button>
-      <!-- ═══ dd-204 §2 + o defeito do microfone (10/08) ═══════════════════
-           A lista É IRMÃ do campo, não filha, e a razão é uma cadeia que se
-           mediu: para a lista ocupar a barra inteira eu tinha posto o
-           `.field` em `position:static` — e isso tirou a âncora ao MICROFONE,
-           que é `position:absolute` e foi parar ao canto do botão do GPS,
-           meio fora do cartão. O dono viu-o no ar.
-           Com a lista aqui, ancora na `.locbar` (que já é relativa) e o
-           `.field` volta a ser relativo para o microfone. As duas coisas
-           deixam de disputar o mesmo `position`. -->
-      <div class="ac-list" id="loc-results" role="listbox"></div>
-    </div>
+    <!-- a `.locbar` subiu para o cabeçalho fundido (dd-224 bloco 3) -->
     <!-- PORTEIRO 6 (dd-43 §3): quem abre a app pela primeira vez tinha um
          cartão de pesquisa, um interruptor a explicar-se em quatro linhas e
          uma previsão para uma cidade que nunca escolheu — e nada que
@@ -1424,6 +1558,18 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
     </div>
   </section>
 
+  <!-- ============ DIAS ============
+       dd-224 bloco 3: a aba nasce aqui e o conteúdo dos 7 dias muda-se para
+       ela no mesmo gesto — uma aba com um marcador de lugar seria uma aba a
+       mentir. A rotação dos cartões para linhas horizontais é o bloco 5. -->
+  <section class="view" id="view-dias" role="tabpanel"></section>
+
+  <!-- ============ SÍTIOS ============
+       dd-224 bloco 3: a aba existe e aponta para o MESMO conteúdo da gaveta
+       «Os meus sítios», pintado aqui em vez de lá. É o que a ordem permite
+       explicitamente enquanto o bloco 6 não chega. -->
+  <section class="view" id="view-sitios" role="tabpanel"></section>
+
 
   <footer>
     Dados gratuitos: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (previsões) ·
@@ -1435,6 +1581,20 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 
 <div class="viz-tip" id="viz-tip" role="tooltip"></div>
 <div class="toast" id="toast" role="status"></div>
+
+<!-- ═══ dd-224 BLOCO 3 — A BARRA DE ABAS, FIXA EM BAIXO ═══════════════════
+     Quatro entradas, e a quarta é a que destranca os blocos 5 e 6: os DIAS
+     e os SÍTIOS deixam de viver por baixo da dobra e atrás de uma gaveta.
+     ⚠️ NÃO SE ESCONDE AO ROLAR. Não há aqui, nem pode passar a haver, um
+     ouvinte de `scroll` que lhe mexa na posição.
+     ⚠️ Mantém a classe `.tabs` e os IDs `#tab-agora`/`#tab-rota`: dezassete
+     réguas clicam-lhes pelo ID e três perguntam pelo contentor. -->
+<nav class="tabs barra-abas" role="tablist" aria-label="Secções">
+  <button class="tab" role="tab" id="tab-agora" aria-selected="true" data-view="agora"><span class="aba-ico" aria-hidden="true">🏍️</span><span class="aba-rot">Agora</span></button>
+  <button class="tab" role="tab" id="tab-rota" aria-selected="false" data-view="rota"><span class="aba-ico" aria-hidden="true">🗺️</span><span class="aba-rot">Rota</span></button>
+  <button class="tab" role="tab" id="tab-dias" aria-selected="false" data-view="dias"><span class="aba-ico" aria-hidden="true">📅</span><span class="aba-rot">Dias</span></button>
+  <button class="tab" role="tab" id="tab-sitios" aria-selected="false" data-view="sitios"><span class="aba-ico" aria-hidden="true">📍</span><span class="aba-rot">Sítios</span></button>
+</nav>
 
 <!-- barra do modo viagem -->
 <div class="drawer-bg" id="trips-bg"></div>
@@ -1848,6 +2008,37 @@ function pintarAtribuicao(){
   sp.append(document.createElement("br"), a);
   pe.appendChild(sp);
 }
+/* ═══ dd-224 bloco 3 — O CAMPO DIZ ONDE ESTÁS, NÃO CONVIDA ════════════════
+   O campo mostrava «Pesquisar cidade ou morada…» — um convite. Passa a
+   mostrar o sítio para que a app está a prever, que é INFORMAÇÃO: quem abre
+   a app vê, sem rolar e sem tocar, para onde é o veredicto.
+
+   ⚠️ E É POR ISSO QUE A LUPA FICA À ESQUERDA. Sem o convite escrito, nada
+   diz que aquilo se toca para procurar — a lupa é o que resta a dizê-lo, e
+   é o custo assumido desta troca (está escrito no esboço, na caixa «POR
+   DECIDIR»). O `aria-label` continua a dizer «Pesquisar localização»: quem
+   ouve o ecrã continua a ouvir o que a caixa FAZ.
+
+   ⚠️ Enquanto não há casa, volta o convite. Um campo vazio e mudo no
+   primeiro arranque seria pior do que o convite que substituiu. */
+function pintarCampoDoLocal(){
+  const i=$("#loc-search"); if(!i) return;
+  const casa=state.home&&state.home.name?state.home.name:null;
+  const convite=i.getAttribute("data-i18n-placeholder")||"Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)";
+  i.placeholder=casa||t(convite);
+}
+/* ═══ dd-224 bloco 3 — O ESPAÇO DA BARRA SAI DA BARRA MEDIDA ══════════════
+   A barra é fixa: sem reserva no fim do documento, tapa o último elemento de
+   qualquer ecrã. A reserva NÃO é um número escrito à mão — é a altura
+   medida da própria barra. Um 56 ficaria certo em português e curto em
+   francês no dia em que um rótulo passasse a duas linhas, e o defeito
+   apareceria no fundo da página, longe da causa (§10.21: a régua conta a
+   coleção viva). Remede-se quando a língua ou o ecrã mudam. */
+function medirBarraDeAbas(){
+  const b=document.querySelector(".barra-abas"); if(!b) return;
+  const h=Math.round(b.getBoundingClientRect().height);
+  if(h>0) document.documentElement.style.setProperty("--h-abas",h+"px");
+}
 function applyStaticI18n(){
   /* ═══ dd-147: OS ATRIBUTOS CRUS ERAM A ÚLTIMA PORTA DO PORTUGUÊS ═══
      `title`, `aria-label` e `placeholder` nunca passavam pelo t(). Não
@@ -1867,11 +2058,15 @@ function applyStaticI18n(){
   });
   const map=[
     [".brand-sub","txt","meteorologia para motociclistas · grátis para começar"],
-    ["#tab-agora","txt2","🏍️ ","Agora"], ["#tab-rota","txt2","🗺️ ","Rota"],
+    /* dd-224 bloco 3: o emoji passou a ser um `<span>` próprio na barra de
+       baixo, por isso o rótulo traduz-se sozinho e o ícone não entra na
+       tradução — um emoji traduzido é um emoji que alguém pode perder */
+    ["#tab-agora .aba-rot","txt","Agora"], ["#tab-rota .aba-rot","txt","Rota"],
+    ["#tab-dias .aba-rot","txt","Dias"], ["#tab-sitios .aba-rot","txt","Sítios"],
     ["#loc-search","ph","Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)"],
     ["#btn-install","txt","📲 Instalar"],
     ["#sentinel-card h2","txt","🔔 Sentinela meteorológica"],
-    ["#sitios-title","txt","Os meus sítios"], ["#sitios-head","txt2","📍 ","Os meus sítios"],
+    ["#atalhos-title","txt","Atalhos"], ["#sitios-title","txt","Os meus sítios"], ["#sitios-head","txt2","📍 ","Os meus sítios"],
     ["#som-title","txt","Som de aviso"], ["#som-opt-b","txt","Tocar um som nos avisos"],
     ["#guarda-title","txt","A moto cá fora"], ["#guarda-opt-b","txt","Avisar se a moto pode ficar cá fora"],
     ["#btn-recentrar","txt","🎯 Recentrar"],
@@ -1937,7 +2132,12 @@ function applyStaticI18n(){
   // definições
   const pop=$("#settings-pop");
   if(pop){
-    pop.querySelector("h3").textContent=t("Perfil de decisão");
+    /* dd-224 bloco 3: era `querySelector("h3")` — o PRIMEIRO h3 da gaveta. Com o
+     cabeçalho fundido, os atalhos que desceram trouxeram um h3 acima deste, e
+     o pintor passou a traduzir o título errado, deixando «Perfil de decisão»
+     em português no ecrã inglês. Um selector por POSIÇÃO envelhece à primeira
+     peça nova; passa a ser pelo nome. */
+  pop.querySelector("#perfil-title").textContent=t("Perfil de decisão");
     const labs=$$("#profile-radios label");
     const P=[["Conservador","Qualquer risco relevante já pesa na decisão."],
              ["Equilibrado","Avisos com chuvisco/vento moderado; vermelho só com condições más."],
@@ -2024,6 +2224,12 @@ function applyStaticI18n(){
   const tbStop=$("#tb-stop"); if(tbStop) tbStop.textContent=t("🛑 Terminar");
   updateTravelButtons();
   pintarAtribuicao();
+  /* dd-224 bloco 3: os dois vêm DEPOIS do map, e é de propósito — o map
+     reescreve o placeholder do campo com o convite traduzido, e o sítio onde
+     estamos tem de ganhar a seguir. E a barra remede-se porque o rótulo mudou
+     de língua e pode ter mudado de altura. */
+  pintarCampoDoLocal();
+  medirBarraDeAbas();
 }
 const I18N={pt:{},
 en:{
@@ -2051,7 +2257,7 @@ en:{
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
 "Vê se os teus sítios guardados batem certo":"Check that your saved places look right",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"An earlier version of the search could save a place with the wrong coordinates — up to thousands of kilometres off. That's fixed, but only you can confirm what's already saved on your device. I'll ask once.",
-"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"The Now forecast, the search anchor, the planner's From and the speed-camera notice all follow this home.","Redefinir por pesquisa":"Reset by search","Redefinir pelo GPS":"Reset by GPS","Redefinir por toque no mapa":"Reset by tapping the map","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Guardados":"Saved","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nothing saved yet. Plan a route and tap ⭐ to save the destination under your own name.","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"I tell you whether it's rideable — right now, where you are, and along the way to where you're going.","📍 Onde estou":"📍 Where I am","🗺️ O tempo no meu caminho":"🗺️ Weather on my route","Como funciona?":"How it works","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"If the phone suspends the app, the time without checks is stated when you return — never counted as watched.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"Watching with the app closed requires our own server plus push notifications (and, on iPhone, probably the native installable build). It's on the plan; it isn't built.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"On — checks the weather where you are while the app is open.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. When on, it checks the weather where you are while the app is open and alerts you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinel on — a check every ~2 minutes, with the app open.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"With the app open and on screen: a check every ~2 minutes, with voice, vibration and notification alerts.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimised or with the screen off, the phone suspends the app: during that time there are NO checks. No web app can do it without a server watching on its behalf.","Possível chuvisco em ~{d} do caminho":"Possible drizzle over ~{d} of the way","Possível chuvisco já no início do caminho":"Possible drizzle right at the start","{x} já aqui":"{x} right here","a rota está aqui ao lado":"the route is right beside you","Sem sinal GPS — a tentar.":"No GPS signal — retrying.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"No GPS signal — retrying. Your position may be out of date.","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
+"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"The Now forecast, the search anchor, the planner's From and the speed-camera notice all follow this home.","Redefinir por pesquisa":"Reset by search","Redefinir pelo GPS":"Reset by GPS","Redefinir por toque no mapa":"Reset by tapping the map","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Dias":"Days","Sítios":"Places","📋 Contexto":"📋 Context","Atalhos":"Shortcuts","Guardados":"Saved","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nothing saved yet. Plan a route and tap ⭐ to save the destination under your own name.","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"I tell you whether it's rideable — right now, where you are, and along the way to where you're going.","📍 Onde estou":"📍 Where I am","🗺️ O tempo no meu caminho":"🗺️ Weather on my route","Como funciona?":"How it works","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"If the phone suspends the app, the time without checks is stated when you return — never counted as watched.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"Watching with the app closed requires our own server plus push notifications (and, on iPhone, probably the native installable build). It's on the plan; it isn't built.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"On — checks the weather where you are while the app is open.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. When on, it checks the weather where you are while the app is open and alerts you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinel on — a check every ~2 minutes, with the app open.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"With the app open and on screen: a check every ~2 minutes, with voice, vibration and notification alerts.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimised or with the screen off, the phone suspends the app: during that time there are NO checks. No web app can do it without a server watching on its behalf.","Possível chuvisco em ~{d} do caminho":"Possible drizzle over ~{d} of the way","Possível chuvisco já no início do caminho":"Possible drizzle right at the start","{x} já aqui":"{x} right here","a rota está aqui ao lado":"the route is right beside you","Sem sinal GPS — a tentar.":"No GPS signal — retrying.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"No GPS signal — retrying. Your position may be out of date.","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
 "✔ Está tudo certo":"✔ All correct","A casa não está certa — corrigir":"Home isn't right — fix it",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Pick the right place in the search above — home only changes when you choose one.",
 "Ir para a pesquisa":"Go to the search","Apagar este registo":"Delete this entry",
@@ -2132,6 +2338,7 @@ en:{
 "café":"café",
 "restaurante":"restaurant",
 "supermercado":"supermarket",
+"loja de conveniência":"convenience store","lugar":"place",
 "farmácia":"pharmacy",
 "hostel":"hostel",
 "motel":"motel",
@@ -2295,7 +2502,7 @@ en:{
 "Silenciar ou ligar a voz":"Mute or unmute the voice",
 "Estado da ligação":"Connection status","Só serviços que já tentei contactar nesta sessão.":"Only services I've actually tried to reach this session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"No results for this search — check the spelling or try another name.",
-"Não encontrei {m} aqui à volta — nem até 50 km.":"I didn't find any {m} around here — not even within 50 km.",
+"Não encontrei nada para «{q}» aqui à volta — nem até 50 km.":"I didn't find anything for “{q}” around here — not even within 50 km.",
 "campismo":"campsite",
 "hotel":"hotel",
 "multibanco":"ATM",
@@ -2533,7 +2740,7 @@ es:{
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
 "Vê se os teus sítios guardados batem certo":"Comprueba que tus sitios guardados están bien",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Una versión anterior de la búsqueda podía guardar un sitio con coordenadas equivocadas — hasta a miles de kilómetros. Ya está corregido, pero lo que quedó guardado en tu dispositivo solo tú puedes confirmarlo. Pregunto una vez.",
-"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La previsión de Ahora, el ancla de la búsqueda, el Desde del planificador y la frase de los radares siguen esta casa.","Redefinir por pesquisa":"Redefinir por búsqueda","Redefinir pelo GPS":"Redefinir por GPS","Redefinir por toque no mapa":"Redefinir tocando el mapa","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Guardados":"Guardados","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Aún no hay nada guardado. Calcula una ruta y toca ⭐ para guardar el destino con tu nombre.","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Te digo si se puede ir en moto — ahora, donde estás, y a lo largo del camino hasta donde vas.","📍 Onde estou":"📍 Dónde estoy","🗺️ O tempo no meu caminho":"🗺️ El tiempo en mi ruta","Como funciona?":"¿Cómo funciona?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si el móvil suspende la app, el tiempo sin comprobaciones se indica al volver — nunca se da por vigilado.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La vigilancia con la app cerrada exige servidor propio y notificaciones push (y, en el iPhone, probablemente la versión instalable nativa). Está en el plan; no está hecho.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activada — comprueba el tiempo donde estás mientras la app esté abierta.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Desactivado. Activado, comprueba el tiempo donde estás mientras la app esté abierta y avisa por voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Centinela activado — comprobación cada ~2 minutos, con la app abierta.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Con la app abierta y en pantalla: comprobación cada ~2 minutos, con aviso por voz, vibración y notificación.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimizada o con la pantalla apagada, el móvil suspende la app: en ese tiempo NO hay comprobaciones. Ninguna app web puede hacerlo sin un servidor que vigile por ella.","Possível chuvisco em ~{d} do caminho":"Posible llovizna en ~{d} del camino","Possível chuvisco já no início do caminho":"Posible llovizna justo al inicio","{x} já aqui":"{x} aquí mismo","a rota está aqui ao lado":"la ruta está justo al lado","Sem sinal GPS — a tentar.":"Sin señal GPS — reintentando.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Sin señal GPS — reintentando. Tu posición puede estar desactualizada.","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
+"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La previsión de Ahora, el ancla de la búsqueda, el Desde del planificador y la frase de los radares siguen esta casa.","Redefinir por pesquisa":"Redefinir por búsqueda","Redefinir pelo GPS":"Redefinir por GPS","Redefinir por toque no mapa":"Redefinir tocando el mapa","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Dias":"Días","Sítios":"Lugares","📋 Contexto":"📋 Contexto","Atalhos":"Atajos","Guardados":"Guardados","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Aún no hay nada guardado. Calcula una ruta y toca ⭐ para guardar el destino con tu nombre.","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Te digo si se puede ir en moto — ahora, donde estás, y a lo largo del camino hasta donde vas.","📍 Onde estou":"📍 Dónde estoy","🗺️ O tempo no meu caminho":"🗺️ El tiempo en mi ruta","Como funciona?":"¿Cómo funciona?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si el móvil suspende la app, el tiempo sin comprobaciones se indica al volver — nunca se da por vigilado.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La vigilancia con la app cerrada exige servidor propio y notificaciones push (y, en el iPhone, probablemente la versión instalable nativa). Está en el plan; no está hecho.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activada — comprueba el tiempo donde estás mientras la app esté abierta.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Desactivado. Activado, comprueba el tiempo donde estás mientras la app esté abierta y avisa por voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Centinela activado — comprobación cada ~2 minutos, con la app abierta.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Con la app abierta y en pantalla: comprobación cada ~2 minutos, con aviso por voz, vibración y notificación.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimizada o con la pantalla apagada, el móvil suspende la app: en ese tiempo NO hay comprobaciones. Ninguna app web puede hacerlo sin un servidor que vigile por ella.","Possível chuvisco em ~{d} do caminho":"Posible llovizna en ~{d} del camino","Possível chuvisco já no início do caminho":"Posible llovizna justo al inicio","{x} já aqui":"{x} aquí mismo","a rota está aqui ao lado":"la ruta está justo al lado","Sem sinal GPS — a tentar.":"Sin señal GPS — reintentando.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Sin señal GPS — reintentando. Tu posición puede estar desactualizada.","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
 "✔ Está tudo certo":"✔ Todo correcto","A casa não está certa — corrigir":"La casa no está bien — corregir",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Elige el sitio correcto en la búsqueda de arriba — la casa solo cambia cuando elijas uno.",
 "Ir para a pesquisa":"Ir a la búsqueda","Apagar este registo":"Borrar este registro",
@@ -2612,6 +2819,7 @@ es:{
 "café":"café",
 "restaurante":"restaurante",
 "supermercado":"supermercado",
+"loja de conveniência":"tienda de conveniencia","lugar":"lugar",
 "farmácia":"farmacia",
 "hostel":"hostal",
 "motel":"motel",
@@ -2776,7 +2984,7 @@ es:{
 "Silenciar ou ligar a voz":"Silenciar o activar la voz",
 "Estado da ligação":"Estado de la conexión","Só serviços que já tentei contactar nesta sessão.":"Solo servicios que ya he intentado contactar en esta sesión.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Sin resultados para esta búsqueda — revisa la escritura o prueba otro nombre.",
-"Não encontrei {m} aqui à volta — nem até 50 km.":"No he encontrado {m} por aquí cerca — ni siquiera a 50 km.",
+"Não encontrei nada para «{q}» aqui à volta — nem até 50 km.":"No he encontrado nada para «{q}» por aquí cerca — ni siquiera a 50 km.",
 "campismo":"camping",
 "hotel":"hotel",
 "multibanco":"cajero",
@@ -2992,7 +3200,7 @@ fr:{
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
 "Vê se os teus sítios guardados batem certo":"Vérifie que tes lieux enregistrés sont corrects",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Une version précédente de la recherche pouvait enregistrer un lieu avec de mauvaises coordonnées — jusqu'à des milliers de kilomètres à côté. C'est corrigé, mais ce qui est déjà enregistré sur ton appareil, toi seul peux le confirmer. Je demande une fois.",
-"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La prévision de Maintenant, l'ancre de la recherche, le Départ du planificateur et la phrase des radars suivent ce domicile.","Redefinir por pesquisa":"Redéfinir par recherche","Redefinir pelo GPS":"Redéfinir par GPS","Redefinir por toque no mapa":"Redéfinir en touchant la carte","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Guardados":"Enregistrés","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Rien d'enregistré pour l'instant. Calcule un itinéraire et touche ⭐ pour enregistrer la destination sous ton nom.","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Je te dis si c'est roulable — maintenant, là où tu es, et tout au long du trajet.","📍 Onde estou":"📍 Où je suis","🗺️ O tempo no meu caminho":"🗺️ La météo sur mon trajet","Como funciona?":"Comment ça marche ?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si le téléphone suspend l'app, le temps sans vérification est indiqué au retour — jamais compté comme surveillé.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La surveillance app fermée exige un serveur propre et des notifications push (et, sur iPhone, probablement la version installable native). C'est au plan ; ce n'est pas fait.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activée — vérifie la météo là où tu es tant que l'app est ouverte.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Activée, elle vérifie la météo là où tu es tant que l'app est ouverte et prévient par la voix, la vibration et une notification quand la pluie arrive (ou s'arrête), que le vent monte ou qu'un orage approche.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinelle activée — vérification toutes les ~2 minutes, avec l'app ouverte.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Avec l'app ouverte et à l'écran : vérification toutes les ~2 minutes, avec alerte voix, vibration et notification.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimisée ou écran éteint, le téléphone suspend l'app : pendant ce temps il n'y a AUCUNE vérification. Aucune app web ne peut le faire sans un serveur qui surveille à sa place.","Possível chuvisco em ~{d} do caminho":"Bruine possible sur ~{d} du trajet","Possível chuvisco já no início do caminho":"Bruine possible dès le départ","{x} já aqui":"{x} ici même","a rota está aqui ao lado":"l'itinéraire est juste à côté","Sem sinal GPS — a tentar.":"Pas de signal GPS — nouvelle tentative.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Pas de signal GPS — nouvelle tentative. Ta position peut être obsolète.","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
+"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La prévision de Maintenant, l'ancre de la recherche, le Départ du planificateur et la phrase des radars suivent ce domicile.","Redefinir por pesquisa":"Redéfinir par recherche","Redefinir pelo GPS":"Redéfinir par GPS","Redefinir por toque no mapa":"Redéfinir en touchant la carte","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Dias":"Jours","Sítios":"Lieux","📋 Contexto":"📋 Contexte","Atalhos":"Raccourcis","Guardados":"Enregistrés","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Rien d'enregistré pour l'instant. Calcule un itinéraire et touche ⭐ pour enregistrer la destination sous ton nom.","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Je te dis si c'est roulable — maintenant, là où tu es, et tout au long du trajet.","📍 Onde estou":"📍 Où je suis","🗺️ O tempo no meu caminho":"🗺️ La météo sur mon trajet","Como funciona?":"Comment ça marche ?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si le téléphone suspend l'app, le temps sans vérification est indiqué au retour — jamais compté comme surveillé.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La surveillance app fermée exige un serveur propre et des notifications push (et, sur iPhone, probablement la version installable native). C'est au plan ; ce n'est pas fait.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activée — vérifie la météo là où tu es tant que l'app est ouverte.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Activée, elle vérifie la météo là où tu es tant que l'app est ouverte et prévient par la voix, la vibration et une notification quand la pluie arrive (ou s'arrête), que le vent monte ou qu'un orage approche.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinelle activée — vérification toutes les ~2 minutes, avec l'app ouverte.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Avec l'app ouverte et à l'écran : vérification toutes les ~2 minutes, avec alerte voix, vibration et notification.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimisée ou écran éteint, le téléphone suspend l'app : pendant ce temps il n'y a AUCUNE vérification. Aucune app web ne peut le faire sans un serveur qui surveille à sa place.","Possível chuvisco em ~{d} do caminho":"Bruine possible sur ~{d} du trajet","Possível chuvisco já no início do caminho":"Bruine possible dès le départ","{x} já aqui":"{x} ici même","a rota está aqui ao lado":"l'itinéraire est juste à côté","Sem sinal GPS — a tentar.":"Pas de signal GPS — nouvelle tentative.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Pas de signal GPS — nouvelle tentative. Ta position peut être obsolète.","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
 "✔ Está tudo certo":"✔ Tout est bon","A casa não está certa — corrigir":"Le domicile n'est pas bon — corriger",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Choisis le bon lieu dans la recherche au-dessus — le domicile ne change que quand tu choisis.",
 "Ir para a pesquisa":"Aller à la recherche","Apagar este registo":"Supprimer cette entrée",
@@ -3071,6 +3279,7 @@ fr:{
 "café":"café",
 "restaurante":"restaurant",
 "supermercado":"supermarché",
+"loja de conveniência":"supérette","lugar":"lieu",
 "farmácia":"pharmacie",
 "hostel":"auberge de jeunesse",
 "motel":"motel",
@@ -3235,7 +3444,7 @@ fr:{
 "Silenciar ou ligar a voz":"Couper ou activer la voix",
 "Estado da ligação":"État de la connexion","Só serviços que já tentei contactar nesta sessão.":"Uniquement les services que j'ai réellement essayé de joindre cette session.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Aucun résultat pour cette recherche — vérifie l'orthographe ou essaie un autre nom.",
-"Não encontrei {m} aqui à volta — nem até 50 km.":"Je n'ai trouvé aucun {m} dans les environs — même pas à 50 km.",
+"Não encontrei nada para «{q}» aqui à volta — nem até 50 km.":"Je n'ai rien trouvé pour « {q} » dans les environs — même pas à 50 km.",
 "campismo":"camping",
 "hotel":"hôtel",
 "multibanco":"distributeur",
@@ -3729,7 +3938,7 @@ nl:{
 "Redefinir pelo GPS":"Opnieuw instellen via gps",
 "Redefinir por toque no mapa":"Opnieuw instellen door de kaart aan te raken",
 "No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Op de kaart: houd je vinger op een punt (of rechtsklik op de pc) en kies “Als thuis gebruiken”.",
-"Guardados":"Bewaard",
+"Dias":"Dagen","Sítios":"Plekken","📋 Contexto":"📋 Context","Atalhos":"Snelkoppelingen","Guardados":"Bewaard",
 "Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nog niets bewaard. Bereken een route en tik op ⭐ om de bestemming onder je eigen naam te bewaren.",
 "Renomear":"Naam wijzigen",
 "Guardar":"Bewaren",
@@ -3914,7 +4123,7 @@ nl:{
 "😎 Condições confortáveis — equipamento habitual chega":"😎 Comfortabele omstandigheden — je gewone uitrusting volstaat",
 "Sem ligação — não consegui contactar o serviço de pesquisa. Tenta outra vez daqui a pouco.":"Geen verbinding — ik kon de zoekdienst niet bereiken. Probeer het zo meteen opnieuw.",
 "Sem resultados para esta pesquisa — confirma a escrita ou tenta outro nome.":"Geen resultaten voor deze zoekopdracht — controleer de spelling of probeer een andere naam.",
-"Não encontrei {m} aqui à volta — nem até 50 km.":"Ik heb hier in de buurt geen {m} gevonden — zelfs niet binnen 50 km.",
+"Não encontrei nada para «{q}» aqui à volta — nem até 50 km.":"Ik heb hier in de buurt niets gevonden voor ‘{q}’ — zelfs niet binnen 50 km.",
 "campismo":"camping",
 "hotel":"hotel",
 "multibanco":"geldautomaat",
@@ -4121,6 +4330,7 @@ nl:{
 "café":"café",
 "restaurante":"restaurant",
 "supermercado":"supermarkt",
+"loja de conveniência":"buurtwinkel","lugar":"plaats",
 },
 };
 /* razões do índice + favoritos */
@@ -5169,7 +5379,16 @@ function portaLimpa(hn){
    pesquisa nova: um aviso pegajoso seria a mesma mentira ao contrário. */
 /* dd-207 §1 — o orçamento declarado. A razão do número está escrita no
    `search()` do attachAC, junto ao relógio que o usa: 350 ms de debounce
-   medidos (dd-134 §1.2) + ~500 ms de mediana de rede medidos a 09/08. */
+   medidos (dd-134 §1.2) + ~500 ms de mediana de rede medidos a 09/08.
+
+   ⚠️ n NÃO REGISTADO, e a razão é a dívida que já está escrita ao lado do
+   ORCAMENTO_RESERVA_MS (§10.79): os ~500 ms são a mediana de rede POR PERNA,
+   e o gravador do `medir-motor-pesquisa` guarda `ms` da CONSULTA INTEIRA.
+   A gravação de 09/08 tem 27 amostras — mas são de consultas (mediana
+   1 966 ms), não de pedidos, e não respondem a esta pergunta. Quem puser `ms`
+   por pedido no gravador recupera o n deste número de graça, de meses de
+   gravações. Até lá, o número vale o que vale e diz-se assim, em vez de levar
+   um n inventado ao lado. (Contado a 11/08/2026 a partir da própria gravação.) */
 const ORCAMENTO_PESQUISA_MS=900;
 const PESQUISA={degradada:null, alargamento:null, alargada:null, marcaSemLojas:null, aindaAProcurar:false};
 function degradarPesquisa(motivo){
@@ -5715,7 +5934,21 @@ function detectPoiCat(q){
   return {tag:melhor.tag, geo, extra:den?den.extra:"", label:melhor.label, largura};
 }
 
-async function poiNear(cat,pos,radiusM=30000){
+/* ⚠️ 50 km, E É A dd-215 §1 CUMPRIDA INTEIRA (11/08). A decisão do dono foi
+   «consulta única a 50 km, sem escada, sem acumular» — e eu apliquei-a só à
+   perna da MARCA. A perna da CATEGORIA ficou nos 30 000 e ninguém deu por
+   isso, porque as duas nunca aparecem lado a lado: uma responde a
+   «McDonald's», a outra a «hotel».
+
+   MEDIDO antes de mudar, e é por isso que sai de graça: o raio **não muda a
+   latência** (a consulta única a 50 km custa o mesmo que o primeiro anel) e
+   **não muda os créditos** (a Geoapify cobra 1 por cada 20 resultados
+   devolvidos, não por área varrida). Alargar aqui não custa nada e alinha as
+   duas pernas na mesma pergunta.
+
+   O `RAIO_MARCA` ao lado é 50000 pela mesma carta. Se um dia divergirem
+   outra vez, é sinal de que a decisão mudou só num sítio. */
+async function poiNear(cat,pos,radiusM=50000){
   if(geoOn()){
     try{
       const r=await geoPlaces(cat,pos,radiusM);
@@ -5747,10 +5980,74 @@ async function poiNear(cat,pos,radiusM=30000){
   const body=`[out:json][timeout:20];(`+
     ["node","way"].map(k=>`${k}(around:${radiusM},${pos.lat.toFixed(5)},${pos.lon.toFixed(5)})[${cat.tag}]${cat.extra};`).join("")+
     `);out center 40;`;
-  for(const ep of OVERPASS_EPS){
+  /* ═══ O ORÇAMENTO É DA PERNA, NÃO DE CADA ESPELHO (dd 11/08) ═════════════
+     PRIMEIRA CURA, e estava meia: esta porta não tinha relógio NENHUM. O
+     `[out:json][timeout:20]` da pergunta é do SERVIDOR — só conta depois de
+     ele aceitar, e não vale nada quando o espelho se cala. A gravação do
+     banco apanhou uma consulta a demorar **58 550 ms** e a devolver um
+     mosteiro no lugar de oficinas de motas. Pus 22 s por espelho.
+
+     **O DONO RECUSOU, e tinha razão: dois espelhos em série davam 44 s, e
+     ninguém espera 44 s por uma pesquisa.** O orçamento passa a ser da PERNA
+     INTEIRA, contado como PRAZO: marca-se o fim uma vez, e cada espelho leva
+     o que sobrar. O primeiro fica com a fatia maior por ir primeiro; o
+     segundo com o resto. É a repartição que ele pediu, sem a aritmética
+     frágil de dividir fatias à mão.
+
+     ⚠️ **DE ONDE SAI O NÚMERO, e o que lhe falta.** Ele pediu p50 e p90 das
+     respostas com êxito, tiradas das gravações. **As gravações não os têm** —
+     o gravador guarda o tempo da CONSULTA inteira, não o de cada pedido (a
+     dívida está registada no próprio gravador). Medido ao vivo a 11/08, com
+     n=4 respostas com êxito e nada mais:
+
+         overpass-api.de        3 705 ms · 6 800 ms
+         overpass.kumi.systems 31 300 ms · 32 114 ms
+
+     São quatro pontos, não um p90, e digo-o em vez de o disfarçar. O número
+     escolhido **não vem deles**: vem do que a própria pergunta declara ao
+     servidor — **20 s**. Um servidor que trabalha dentro do prazo que lhe
+     demos nunca é cortado; um que o ultrapassa já quebrou a sua própria
+     promessa. É a única âncora aqui que não é opinião minha.
+
+     ⚠️ E O QUE A MEDIÇÃO DESMENTE, para o dono decidir: **o PRIMEIRO da lista
+     é o lento.** O `kumi.systems` responde em ~31 s quando responde; o
+     `overpass-api.de` em ~4-7 s. Com prazo total, o lento come o orçamento
+     todo e o rápido nunca é chamado. Trocar a ordem é gesto do dono — está no
+     `para-o-ricardo.md`, com estes quatro números ao lado.
+
+     ⚠️ **NUNCA EM PARALELO.** O Overpass é infraestrutura doada; duplicar a
+     carga para ganhar latência é fazer os outros pagar o nosso problema. */
+  const ORCAMENTO_RESERVA_MS=20000;
+  /* ⚠️ UMA REPARTIÇÃO, NÃO UM PRAZO ABERTO — e a diferença apanhou-me na
+     guarda. A primeira tentativa foi «marca-se o fim e cada espelho leva o
+     que sobrar». Parece a mesma coisa e não é: **com o primeiro pendurado,
+     ele come o orçamento inteiro e o segundo NUNCA é chamado.** A guarda
+     mediu-o — 20 089 ms e lista vazia, quando o segundo espelho estava são e
+     tinha a resposta. Uma reserva com dois espelhos que na prática só tem um
+     é pior do que ter um só, porque mente sobre a sua própria redundância.
+
+     A ordem do dono já dizia a forma certa: *«o primeiro espelho leva a maior
+     fatia; o segundo leva o que sobrar»*. **Fatia, não prazo.** O primeiro
+     leva 60 % do orçamento; o resto fica garantido para quem vem a seguir. */
+  const FATIA_PRIMEIRO=Math.round(ORCAMENTO_RESERVA_MS*0.6);
+  const prazo=Date.now()+ORCAMENTO_RESERVA_MS;
+  for(let i=0;i<OVERPASS_EPS.length;i++){
+    const ep=OVERPASS_EPS[i];
+    const resta=prazo-Date.now();
+    /* sem tempo útil não se bate à porta: um pedido com 200 ms de prazo só
+       gasta uma ligação a um servidor doado para a abortar a seguir */
+    /* ⚠️ SEM EMBRULHO NO `console.warn`, e é de propósito: um `try{…}catch(_){}`
+       à volta de um `console.warn` é um catch mudo a mais na conta, e o
+       catraveia dos mudos apanhou-mo à primeira corrida da bateria. O ficheiro
+       já tem dois `console.warn` nus (linhas 12087 e 12505) — o embrulho aqui
+       era cargo, não rede. */
+    if(resta<1000){ console.warn("[levante] orçamento da reserva esgotado, não tento",ep); break; }
+    /* o primeiro leva a fatia maior; os seguintes levam o que sobra do prazo */
+    const espera=i===0?Math.min(FATIA_PRIMEIRO,resta):resta;
+    const ctl=new AbortController(); const th=setTimeout(()=>ctl.abort(),espera);
     try{
       const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(body),
-        headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+        headers:{"Content-Type":"application/x-www-form-urlencoded"}, signal:ctl.signal});
       if(!r.ok) continue;
       const j=await r.json();
       const out=(j.elements||[]).map(e=>{
@@ -5773,8 +6070,23 @@ async function poiNear(cat,pos,radiusM=30000){
       out.sort((a,b)=>a._d-b._d);
       // sem nome só entra se não houver melhor
       const named=out.filter(o=>o.name!==t("sem nome"));
-      return (named.length?named:out).slice(0,8);
-    }catch(e){}
+      return (named.length?named:out);   // dd-215 §5: o corte nos 8 morreu
+    }catch(e){
+      /* O espelho caiu ou estourou o orçamento: passa-se ao seguinte, que é
+         para isso que a lista tem dois. Mas passa-se A DIZER — este `catch`
+         estava VAZIO, e um `catch` vazio com um comentário dentro continua
+         vazio e deixa de ser contado como mudo, que é pior do que o deixar
+         mudo. É o mesmo remédio que a porta de cima já leva («o vazio
+         continua a ser a resposta, mas o PORQUÊ fica visível»), e é o que
+         teria dito, em texto, que o primeiro espelho passou 22 s calado. */
+      try{ console.warn("[levante] espelho Overpass falhou:",ep,
+        e?.name==="AbortError"?`sem resposta dentro do prazo da perna (${ORCAMENTO_RESERVA_MS/1000} s no total)`:(e?.message||e)); }catch(_){}
+    }finally{
+      /* o relógio limpa-se nos três caminhos — sucesso, falha, e o `continue`
+         do `!r.ok` lá em cima — senão fica um `setTimeout` vivo a abortar um
+         pedido que já acabou */
+      clearTimeout(th);
+    }
   }
   return [];
 }
@@ -6055,7 +6367,7 @@ async function geocode(q){
      anterior mandaria alargar uma coisa que já ninguém procurou. */
   PESQUISA.alargamento=null; PESQUISA.alargada=null; PESQUISA.marcaSemLojas=null;
   const key=q.trim().toLowerCase();
-  if(geoCache.has(key)) return [...locaisLocais(q), ...geoCache.get(key)].slice(0,8);
+  if(geoCache.has(key)) return [...locaisLocais(q), ...geoCache.get(key)];   // dd-215 §5
   const m=q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;]\s*(-?\d{1,3}[.,]\d+)\s*$/);
   if(m){ const lat=parseFloat(m[1].replace(",",".")), lon=parseFloat(m[2].replace(",","."));
     return [{name:`${lat.toFixed(4)}, ${lon.toFixed(4)}`, sub:t("coordenadas"), lat, lon}]; }
@@ -6100,15 +6412,56 @@ async function geocode(q){
      apareceu do lado mais improvável, na atribuição de licença, porque um
      resultado que não devia existir trouxe uma atribuição que não devia
      estar lá. Uma rota nova herda as condições das rotas suas irmãs. */
+  /* ═══ dd-215 §0 e §1 — UMA CONSULTA A 50 km, E A PERNA É EXCLUSIVA ═══════
+     Duas ordens do dono, e as duas saíram de medições que desmentiram o que
+     se assumia. Ficam escritas porque a próxima pessoa vai querer «otimizar»
+     isto de volta.
+
+     ═══ §1 · A ESCADA DE RAIOS MORRE. UMA CONSULTA, A 50 km. ═══
+     A escada 5 → 15 → 50 parava no primeiro anel com resultados. Medido a
+     10/08 em seis âncoras, cinco repetições cada:
+
+       · O RAIO NÃO AFETA A LATÊNCIA. Lisboa 643 / 679 / 631 ms para
+         5 / 15 / 50 km. Berlim 641 / 571 / 601. Um anel pequeno não é mais
+         barato — é igual. O «começar pequeno» não poupava nada.
+       · OS ANÉIS PEQUENOS NÃO TRAZEM NADA que o de 50 km não traga: ZERO
+         sítios, nas cinco âncoras. A união dos três é IGUAL ao de 50 km.
+       · E NA ÂNCORA RURAL a escada era a MAIS LENTA: Mértola custava
+         221+229+292 = 742 ms em série e escondia o McDonald's a 43,9 km;
+         uma consulta só custa 292 ms e traz--o.
+
+     ⚠️ O DONO DECIDIU CONTRA A SUA PRÓPRIA TABELA, e a razão está escrita:
+     «a tabela tinha um eixo escondido que eu nunca medi — assumi que a
+     latência crescia com o raio. Não cresce. A partir daí as duas saídas
+     deixaram de separar nada.» Voltar a pôr a escada tem de rebentar.
+
+     ═══ §0 · A PERNA DA MARCA É EXCLUSIVA ═══
+     A app corria a perna da marca E a de texto livre e MISTURAVA as duas na
+     mesma lista. Daí saíam três defeitos que pareciam independentes: os
+     McDonald\'s de 151 km (Longwy) e 166 km (Haia) — que não são McDonald\'s,
+     são POIs com nome parecido vindos da perna de texto —, a etiqueta «fast
+     food» só nos de perto, e a lista a saltar de 4 km para 151.
+
+     Reconhecida a marca, a lista é SÓ da perna da marca. A perna de texto
+     livre corre APENAS se a da marca devolver zero no raio máximo.
+
+     ⚠️ O QUE ESTA LISTA PODE AFIRMAR, E O QUE NÃO PODE — e a distinção é do
+     dono, depois de eu medir que o `limit=20` não devolve os 20 mais
+     próximos (Berlim perde 3, Maastricht devolve 12 de 15) e que NENHUM
+     parâmetro da API o corrige (`sort`, `sortBy` e `conditions` são
+     silenciosamente ignorados):
+       PODE: todos são daquela marca · não há salto de 4 para 151 km · os que
+             vieram estão ordenados por distância.
+       NÃO PODE: que sejam os N mais próximos QUE EXISTEM.
+     O limite NÃO sobe para tapar isso: 20 resultados = 1 crédito, e pedir
+     100 seria 5x por pesquisa. Os que faltam vêm pela paginação (§5), e isso
+     é dívida com nome. */
+  const RAIO_MARCA=50000;
   const marca=(here&&geoOn())?escadaDaMarca(q):null;
+  let marcaMandou=false;
   if(marca&&marca.geo){
-    const RAIOS_MARCA=[5000,15000,50000];
-    let achou=null;
-    for(const raio of RAIOS_MARCA){
-      const r=await geoPlacesMarca(marca,here,raio).catch(rede);
-      if(r&&r.length){ achou=r; break; }
-    }
-    if(achou) add(achou);
+    const achou=await geoPlacesMarca(marca,here,RAIO_MARCA).catch(rede);
+    if(achou&&achou.length){ add(achou); marcaMandou=true; }
     else if(!falhouRede) PESQUISA.marcaSemLojas={marca:marca.marca, q};
   }
 
@@ -6166,11 +6519,19 @@ async function geocode(q){
     add(pais);
   }
 
-  // 3) pesquisa por texto, com viés forte para a tua zona
-  add(await photonSearch(q, here).catch(rede));
+  /* 3) pesquisa por texto — E SÓ SE A MARCA NÃO MANDOU (dd-215 §0).
+        É esta linha que produzia os McDonald\'s de 151 e 166 km: a perna de
+        texto devolvia POIs com nome parecido e eles entravam na mesma lista
+        que a perna da marca, indistinguíveis. Com a marca reconhecida e com
+        lojas encontradas, esta pergunta não se faz. */
+  if(!marcaMandou) add(await photonSearch(q, here).catch(rede));
 
-  // 4) nada? tenta com menos palavras (nomes longos falham inteiros)
-  if(out.length<2){
+  /* 4) nada? tenta com menos palavras (nomes longos falham inteiros).
+        ⚠️ TAMBÉM CALA COM A MARCA A MANDAR (dd-215 §0): esta perna é texto
+        livre com outro nome, e uma marca que devolveu UMA loja disparava-a
+        (`out.length<2`) e enchia a lista de POIs com nome parecido. A
+        exclusividade não é «quase» — ou a lista é da marca, ou não é. */
+  if(!marcaMandou&&out.length<2){
     const words=q.trim().split(/\s+/);
     for(let n=words.length-1;n>=2&&out.length<4;n--)
       add(await photonSearch(words.slice(0,n).join(" "), here).catch(rede));
@@ -6215,7 +6576,29 @@ async function geocode(q){
      em vez de deixar a pessoa supor. Errar para o lado seguro é aqui dizer
      menos, não inventar um número. */
   if(!here) for(const r of out) r._semRef=true;
-  const res=out.slice(0,8);
+  /* ═══ O CORTE NOS 8 MORREU — dd-215 §5, decidido pelo dono a 11/08 ═══════
+     A queixa era «a lista dos hotéis acaba ao fim de meia dúzia», e durante
+     semanas leu-se como limite da API. **Não era.** Medido: o pedido leva
+     `limit=20`, o fornecedor **responde 20**, e o ecrã mostrava **8** — em
+     Maastricht, Lisboa e Berlim, cidades de tamanhos incomparáveis. A app
+     recebia vinte e deitava doze fora.
+
+     O corte estava em CINCO sítios — a reserva do Overpass, as duas pernas
+     da Geoapify, o funil, e o caminho da cache — e um sexto que NÃO é lista
+     (as notificações nativas, que ficam nos 8 de propósito).
+
+     A cura não é trocar 8 por 20: é **mostrar tudo o que veio e deixar o
+     contentor rolar**, que é o que o Google Maps faz. O `.ac-list` já tem
+     um teto de 384 px ou 52 % da altura do ecrã (o menor dos dois) e
+     `overflow-y:auto` desde a dd-204 §2 — e escrevo o teto POR PALAVRAS de
+     propósito: citá-lo em código criava uma segunda ocorrência do mesmo texto
+     no ficheiro e apodrecia o `@procura` da guarda `moradas-distinguiveis#4`,
+     que é exatamente o que aconteceu à primeira corrida da bateria —
+     MEDIDO a 11/08: com 20 linhas dentro, rola de facto (791 px de conteúdo
+     em 293 px de caixa, e a última linha fica visível). Não foi preciso
+     tocar no contentor.
+     ═════════════════════════════════════════════════════════════════════ */
+  const res=out;
   /* a cache guarda só o que veio da rede: guardar os favoritos aqui faria com
      que apagar ou renomear um deles continuasse a aparecer até recarregar.
      dd-168: e NÃO guarda o que veio da RESERVA — senão a mesma consulta
@@ -6368,8 +6751,13 @@ function geoFeature(f){
   const ds=p.datasource;
   const atrib=ds?{sourcename:ds.sourcename, attribution:ds.attribution,
                   license:ds.license, url:ds.url}:null;
+  /* ⚠️ A ETIQUETA NASCE AQUI, no funil por onde TODAS as pernas passam — e
+     não em cada perna, que foi como nasceu o defeito: duas pernas punham-na,
+     uma não, e a lista saía meio-a-meio. Uma coleção, um dono. */
+  const _tipo=tipoDoResultado(p.categories)||tipoDoResultado(p.category)||null;
   return {name:nome, sub, lat:p.lat??f.geometry?.coordinates?.[1],
-          lon:p.lon??f.geometry?.coordinates?.[0], kind:p.result_type||p.category, atrib};
+          lon:p.lon??f.geometry?.coordinates?.[0], kind:p.result_type||p.category,
+          ...(_tipo?{_tipo}:{}), atrib};
 }
 const RAIO_PERTO_M=50000; // o "por aqui" de quem anda de mota: 50 km. 7b: errado se
                           // um caso real mostrar um sítio querido escondido além dos
@@ -6495,20 +6883,65 @@ const TIPO_DO_RESULTADO={
   "healthcare.pharmacy":"farmácia", "healthcare.hospital":"hospital",
   "service.financial.atm":"multibanco",
   "parking":"estacionamento", "parking.motorcycle":"estacionamento de motas",
+  /* ⚠️ AS DUAS QUE FALTAVAM, e não vieram de imaginação: contei as categorias
+     que os fornecedores DEVOLVEM mesmo, nas gravações das seis âncoras, e
+     confrontei-as com este vocabulário. Apareceram 27 distintas; 24 eram
+     ruído e duas eram tipos a sério.
+
+     `populated_place` é a que interessa à dd-215 §2: é o que a perna de texto
+     devolve para «Rewerenda» e «Rewert» — os falsos REWE que o dono viu. Com
+     a etiqueta, a linha diz «lugar» e a pessoa vê num relance que não é uma
+     loja. **Era esta palavra que faltava para o defeito ser visível.**
+
+     As outras 24 NÃO entram, e a razão é a mesma que as trouxe à conta:
+       · `wheelchair`, `internet_access`, `vegan`, `halal`, `kosher`,
+         `gluten_free`, `access_limited` — são ATRIBUTOS, não tipos. Um
+         McDonald's etiquetado «vegan» seria uma etiqueta errada, que é pior
+         do que nenhuma (§7g-ter);
+       · `catering`, `commercial`, `building` — são os PAIS, vagos demais.
+         Etiquetar um McDonald's como «comércio» perde informação, e o
+         `tipoDoResultado` já prefere a mais funda de qualquer maneira. */
+  "commercial.convenience":"loja de conveniência",
+  "populated_place":"lugar",
 };
 /* a MAIS ESPECÍFICA ganha: uma feature traz ["accommodation",
    "accommodation.hostel"] e o que interessa dizer é «hostel» */
+/* ═══ dd-215 §2 — A ETIQUETA DERIVA-SE DO RESULTADO, EM TODAS AS PERNAS ═══
+   MEDIDO a 10/08: a etiqueta aparecia só nos resultados de perto, e o dono
+   viu-o no ar. A causa não era a perna de texto «não trazer categorias» —
+   **trazia**, e a app é que lia o campo errado:
+
+     perna da MARCA  (/v2/places)              → `categories: ["catering",
+                                                  "catering.fast_food", …]`
+     perna de TEXTO  (/geocode/autocomplete)   → `category: "catering.fast_food"`
+
+   Plural num sítio, singular no outro, **o mesmo vocabulário nos dois**. O
+   `tipoDoResultado` exigia um Array e devolvia `null` a tudo o que viesse da
+   perna de texto.
+
+   ⚠️ E ISTO ERA O MESMO DEFEITO DUAS VEZES. Se a etiqueta estivesse certa, os
+   «McDonald's» de 151 e 166 km teriam aparecido com a etiqueta **cidade** —
+   medido nas gravações: «Rewerenda» vem com `category:"populated_place"` e
+   `result_type:"city"`. O dono teria VISTO que não eram restaurantes. A
+   mistura de pernas escondia-se atrás da etiqueta em falta.
+
+   ⚠️ O QUE NÃO MUDA: a etiqueta continua a sair das categorias **daquele
+   resultado**, nunca do que pedimos e nunca emprestada do vizinho. Um
+   resultado cuja resposta não traz categoria nenhuma fica **sem etiqueta** —
+   nenhuma etiqueta é melhor do que uma etiqueta errada (§7g-ter). */
 function tipoDoResultado(cats){
-  if(!Array.isArray(cats)) return null;
+  /* aceita as duas formas em que o MESMO fornecedor devolve a mesma coisa */
+  const lista=Array.isArray(cats)?cats:(typeof cats==="string"&&cats?[cats]:null);
+  if(!lista) return null;
   let melhor=null, prof=-1;
-  for(const c of cats){
+  for(const c of lista){
     const et=TIPO_DO_RESULTADO[c]; if(!et) continue;
     const d=String(c).split(".").length;
     if(d>prof){ prof=d; melhor=et; }
   }
   return melhor;
 }
-async function geoPlaces(cat,pos,radiusM=30000){
+async function geoPlaces(cat,pos,radiusM=50000){   // dd-215 §1: a perna da categoria acompanha a da marca
   const j=await jfetch(geoURL("/v2/places",{
     categories:cat.geo||cat.tag, limit:"20",
     filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${Math.round(radiusM)}`,
@@ -6531,7 +6964,7 @@ async function geoPlaces(cat,pos,radiusM=30000){
     return r; }).filter(r=>Number.isFinite(r.lat));
   out.forEach(o=>{ o._poi=true; o._d=haversine(pos,o); });
   out.sort((a,b)=>a._d-b._d);
-  return out.slice(0,8);
+  return out;   // dd-215 §5: a perna da categoria devolve tudo o que veio
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -6561,7 +6994,7 @@ async function geoPlacesMarca(marca,pos,raioM){
     return r; }).filter(r=>Number.isFinite(r.lat));
   out.forEach(o=>{ o._poi=true; o._marca=marca.marca; o._d=haversine(pos,o); });
   out.sort((a,b)=>a._d-b._d);
-  return out.slice(0,8);
+  return out;   // dd-215 §5: a perna da marca devolve tudo o que veio
 }
 
 /* ── manobras: classificamos o que conseguimos, o resto fica com o texto
@@ -6708,9 +7141,30 @@ async function geocodeNear(q,pos){
    mundo — sucesso com ar de sucesso e sem nada lá dentro. Foi ele que deixou
    o ficheiro de radares vazio nos Países Baixos, na Bélgica, em Portugal e em
    Espanha, e ninguém deu por isso porque nada falhava. */
+/* ═══ A ORDEM TROCOU A 11/08, POR DECISÃO DO DONO, E COM O NÚMERO AO LADO ═══
+   O `kumi.systems` era o primeiro desde sempre e nunca ninguém mediu porquê.
+   Medido ao vivo a **11/08/2026**, sequencial e com pausa (é infraestrutura
+   doada), **n=4 respostas com êxito** — quatro, não um p90, e o número curto
+   fica escrito de propósito:
+
+     overpass-api.de          3 705 ms · 6 800 ms
+     overpass.kumi.systems   31 300 ms · 32 114 ms
+
+   **Cinco a oito vezes.** Com o orçamento da perna repartido, o primeiro leva
+   a fatia maior — logo pôr o lento à frente era gastar 60 % do tempo no
+   espelho que responde pior.
+
+   ⚠️ **n=4 É AMOSTRA FINA e a próxima medição pode desmenti-la.** Fica escrito
+   aqui em vez de num relatório porque é aqui que alguém olha antes de mexer.
+   Mas cinco a oito vezes não se ignora à espera de n=30 — a decisão é do dono
+   e o custo da troca é zero.
+
+   ⚠️ E A DÍVIDA QUE IMPEDE O n=30: o `medir-motor-pesquisa` guarda `ms` da
+   CONSULTA INTEIRA, não de cada pedido. Quem lhe puser `ms` por pedido ganha
+   o p50 e o p90 de graça, de meses de gravações. */
 const OVERPASS_EPS=[
-  "https://overpass.kumi.systems/api/interpreter",
   "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
 ];
 async function fetchCameras(coords){
   const step=Math.max(1,Math.floor(coords.length/110));
@@ -6719,9 +7173,66 @@ async function fetchCameras(coords){
   if(pts[pts.length-1]!==coords[coords.length-1]) pts.push(coords[coords.length-1]);
   const chain=pts.map(c=>`${c.lat.toFixed(5)},${c.lon.toFixed(5)}`).join(",");
   const q=`[out:json][timeout:10];node["highway"="speed_camera"](around:170,${chain});out body 80;`;
+  /* ═══ O ORÇAMENTO É DA PERNA, NÃO DE CADA ESPELHO (dd-223 §1) ═════════════
+     ESTA PERNA TINHA UM RELÓGIO POR ESPELHO — 11 000 ms cada, dois espelhos em
+     série, 22 s no pior caso. É EXATAMENTE a forma que o dono recusou na perna
+     da categoria no mesmo dia, com a aritmética na mão: «dois espelhos em série
+     dão 44 s, e ninguém espera 44 s». A cura foi feita lá e NÃO foi varrida
+     para aqui — regra 1, e o defeito é do próprio diretor, que o disse.
+
+     Passa à mesma forma da perna da categoria: PRAZO ÚNICO marcado uma vez,
+     repartido — o primeiro leva a fatia maior por ir primeiro, o segundo leva
+     o que sobrar garantido. Fatia, não prazo aberto: com prazo aberto o
+     primeiro pendurado come tudo e o segundo NUNCA é chamado, que foi o que a
+     guarda da perna da categoria apanhou (20 089 ms e lista vazia).
+
+     ⚠️ DE ONDE SAI O NÚMERO, e o que ele NÃO é. Não é herdado dos 11 000 ms
+     que aqui estavam — esses nunca tiveram medição nenhuma ao lado. Sai da
+     única medição que existe destes dois espelhos, feita ao vivo a
+     11/08/2026, sequencial e com pausa (é infraestrutura doada),
+     n=4 respostas com êxito — quatro, não um p90:
+
+         overpass-api.de          3 705 ms · 6 800 ms
+         overpass.kumi.systems   31 300 ms · 32 114 ms
+
+     A fatia do primeiro tem de cobrir a resposta mais lenta que o espelho
+     rápido deu: 6 800 ms. Com a repartição 60/40 já provada, o total sai
+     6 800 / 0,6 = 11 333 ms, arredondado para 12 000 — primeira fatia
+     7 200 ms, segunda 4 800 ms garantidos.
+
+     ⚠️ n=4 É AMOSTRA FINA e a próxima medição pode desmenti-la. E é ainda mais
+     fina do que parece: os 6 800 ms foram medidos na perna da CATEGORIA, que
+     é uma consulta mais pesada do que esta (`nwr` num raio de 50 km com regex
+     sobre nomes, contra um filtro de etiqueta única em nós). Usar o número
+     dela aqui é o lado conservador: cobre a mais.
+
+     ⚠️ E O QUE ISTO CUSTA, dito por inteiro: 7 200 ms é MENOS do que os 10 s
+     que a pergunta promete ao servidor no `[timeout:10]`. Um espelho que use
+     a promessa toda é cortado por nós no primeiro e passa ao segundo. A
+     medição diz que isso é raro (o máximo medido do rápido é 6,8 s) e o custo
+     de acontecer é uma passagem de espelho, não uma falha. Subir o total para
+     17 000 ms fá-lo desaparecer e é uma linha — é limiar, e limiares são do
+     dono.
+
+     ⚠️ NUNCA EM PARALELO. O Overpass é infraestrutura doada; duplicar a carga
+     para ganhar latência é fazer os outros pagar o nosso problema.
+
+     ⚠️ E FICA REGISTADO O QUE ESTA CURA NÃO TOCA: um 200 com `remark` e
+     `elements` vazio — o Overpass a desistir do seu próprio prazo — devolve
+     daqui uma lista vazia, indistinguível de «não há radares nesta rota»
+     (§10.32). Não é desta ordem e não foi curado. */
+  const ORCAMENTO_RADARES_MS=12000;
+  const FATIA_PRIMEIRO=Math.round(ORCAMENTO_RADARES_MS*0.6);
+  const prazo=Date.now()+ORCAMENTO_RADARES_MS;
   let lastErr=null;
-  for(const ep of OVERPASS_EPS){ // espelhos gratuitos com fallback automático
-    const ctl=new AbortController(); const th=setTimeout(()=>ctl.abort(),11000);
+  for(let i=0;i<OVERPASS_EPS.length;i++){ // espelhos gratuitos, orçamento repartido
+    const ep=OVERPASS_EPS[i];
+    const resta=prazo-Date.now();
+    /* sem tempo útil não se bate à porta: um pedido com 200 ms de prazo só
+       gasta uma ligação a um servidor doado para a abortar a seguir */
+    if(resta<1000){ console.warn("[levante] orçamento dos radares esgotado, não tento",ep); break; }
+    const espera=i===0?Math.min(FATIA_PRIMEIRO,resta):resta;
+    const ctl=new AbortController(); const th=setTimeout(()=>ctl.abort(),espera);
     try{
       const r=await fetch(ep,{method:"POST",
         headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -6729,7 +7240,14 @@ async function fetchCameras(coords){
       if(!r.ok) throw new Error("overpass "+r.status);
       const j=await r.json();
       return (j.elements||[]).map(e=>({lat:e.lat, lon:e.lon, max:e.tags?.maxspeed||null}));
-    }catch(e){ lastErr=e; }
+    }catch(e){
+      lastErr=e;
+      /* passa-se ao seguinte A DIZER, como na perna da categoria: um `catch`
+         que só guarda o erro não deixa rasto de que o primeiro espelho esteve
+         calado o orçamento inteiro */
+      console.warn("[levante] espelho Overpass (radares) falhou:",ep,
+        e?.name==="AbortError"?`sem resposta dentro do prazo da perna (${ORCAMENTO_RADARES_MS/1000} s no total)`:(e?.message||e));
+    }
     finally{ clearTimeout(th); }
   }
   throw lastErr||new Error("overpass indisponível");
@@ -7455,9 +7973,31 @@ function attachAC(input, list, onPick){
       d.setAttribute("data-test","pesquisa-ainda-a-procurar");
       list.appendChild(d);
     }
-    if(PESQUISA.marcaSemLojas){
-      const d=el("div","ac-aviso",t("Não encontrei {m} aqui à volta — nem até 50 km.",
-        {m:PESQUISA.marcaSemLojas.marca}));
+    /* ═══ dd-215 §3 — O AVISO MENTIA DUAS VEZES, e eram dois defeitos ═══════
+       MEDIDOS PELO DONO NO AR, na v25:
+
+       3a · APARECIA COM RESULTADOS POR BAIXO. «I didn't find any Gama around
+            here» com três Gamma na lista. Um aviso de ausência por cima de
+            uma lista cheia não é um aviso: é a app a contradizer-se no mesmo
+            ecrã, e a pessoa acredita no texto e não na lista.
+            **O aviso só existe quando a lista visível está VAZIA.**
+
+       3b · NOMEAVA UMA MARCA INTERNA, não o que a pessoa escreveu. Em
+            «Portugal» apareceu **«პორტალი»**, em georgiano — o nome de
+            exibição da marca que o comparador por distância de edição
+            encontrou. Ninguém escreveu aquilo e ninguém o reconhece.
+            **O aviso repete o TEXTO DO UTILIZADOR, tal e qual.**
+
+       ⚠️ A DIFERENÇA ENTRE OS DOIS É DE DONO, e é por isso que são dois: o
+       primeiro é sobre QUANDO a frase aparece; o segundo é sobre O QUE a
+       frase diz. Curar um e não o outro deixava a app a mentir metade.
+
+       ⚠️ E O `q` JÁ ESTAVA GUARDADO ao lado da marca desde o dia em que isto
+       foi escrito — o defeito não foi falta de informação, foi escolher o
+       campo errado dos dois que lá estavam. */
+    if(PESQUISA.marcaSemLojas&&!items.length){
+      const d=el("div","ac-aviso",t("Não encontrei nada para «{q}» aqui à volta — nem até 50 km.",
+        {q:PESQUISA.marcaSemLojas.q}));
       d.setAttribute("data-test","marca-sem-lojas");
       list.appendChild(d);
     }
@@ -7778,7 +8318,14 @@ function definirCasa(loc,{explicito=false}={}){
   if(state.casa&&state.casa.prov?.como==="escolha"&&!explicito) return;
   state.casa={name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon,
               prov:loc.prov||(explicito?{como:"escolha", quando:Date.now()}:null)};
-  try{ store.set("casa",state.casa); }catch(e){}
+  /* ⚠️ SEM EMBRULHO, E É POR ELE JÁ EXISTIR. O `store.set` apanha a exceção
+     dentro dele e chama `queixar("gravar no aparelho", e)` — nunca deixa nada
+     subir. O `try{…}catch(e){}` que estava aqui era, por construção, código
+     que não podia correr: uma rede por baixo de uma rede, e a de cima cega.
+     Pior do que inútil — um `catch` mudo à volta de uma gravação da CASA é
+     exatamente onde alguém procuraria o silêncio se a casa se perdesse, e
+     encontraria uma resposta falsa. A queixa a sério está no `store.set`. */
+  store.set("casa",state.casa);
   if(typeof pintarSitiosLinha==="function") pintarSitiosLinha();
 }
 /* a casa a sério, com a ponte para quem ainda não tem o slot novo: quem já
@@ -7853,6 +8400,7 @@ function setHome(loc, {silent=false, prov, deStore=false}={}){
       const r=el("button","btn",t("Tentar de novo")); r.style.marginTop="8px";
       r.addEventListener("click",()=>setHome(loc));
       box.appendChild(b); box.appendChild(r); } });
+  pintarCampoDoLocal();   // dd-224 bloco 3: o campo diz a casa NOVA, não a antiga
 }
 
 /* ═══ OS TRÊS ESTADOS DA LOCALIZAÇÃO (dd-41, registo 42) ═══════════════════
@@ -8158,6 +8706,14 @@ function fraseJanelaChuva(H,metrics,i0,prof){
 }
 function renderDashboard(){
   const wx=state.wx, H=wx.hourly, box=$("#agora-content");
+  /* ═══ dd-217 §1a — O QUE DESCE, JUNTA-SE AQUI E SAI NO FIM ═══════════════
+     A obra do meio é uma obra de ORDEM: nada se apaga, tudo o que não decide
+     desce. Este cesto recolhe, pela ordem em que nasce, o que antes vivia
+     dentro do cartão de decisão ou logo a seguir — perfil, proveniência,
+     humidade, visibilidade, UV, sol — e pinta-o num cartão de contexto no
+     fim. Recolher em vez de reordenar depois é o que garante que uma peça
+     nova escrita amanhã não fica órfã: quem a escrever põe-na no cesto. */
+  const contexto=[];
   const prof=PROFILES[state.profile];
   const now=Date.now()/1000;
   let i0=H.time.findIndex(t=>t>now-3600); if(i0<0)i0=0;
@@ -8253,7 +8809,9 @@ function renderDashboard(){
     const pl=el("div","hero-perfil small muted");
     pl.setAttribute("data-test","perfil-do-indice");
     pl.textContent=t("Índice calculado com o perfil {p} — muda-o nas definições.",{p:nomePerfil});
-    main.append(pl);
+    /* dd-217 §1a: DESCE. Continua obrigatório e continua a existir — muda de
+       sítio, não de estatuto. Guarda-se para o cartão de contexto do fim. */
+    contexto.push(pl);
   }
   /* dd-47 §3: o resto do dia numa linha, das horárias QUE JÁ PEDIMOS — zero
      chamadas novas. Honestidade por faixas (7g-ter): probabilidade não é
@@ -8263,7 +8821,10 @@ function renderDashboard(){
   if(jc){ const l=el("div","chuva-janela"); l.id="chuva-janela"; l.dataset.tipo=jc.tipo; l.textContent=jc.txt; main.appendChild(l); }
   /* a linha discreta da proveniência da casa (A3.5.35 ponto 5): quem vir
      "definida a partir de uma pesquisa" percebe sozinho o que aconteceu */
-  main.append(el("div","hero-prov","🏠 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
+  /* dd-217 §1a: a PROVENIÊNCIA desce. É confiança, não decisão — e a decisão
+     é que disputa o primeiro ecrã. Desce inteira, com o mesmo texto e o mesmo
+     `data-test`; quem a mede continua a encontrá-la. */
+  contexto.push(el("div","hero-prov","🏠 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
   /* dd-172 §2: o NOME deste cartão veio do fornecedor de moradas. A linha de
      proveniência acima («detetada pelo GPS») diz COMO o sítio foi escolhido —
      não é a licença, e uma não substitui a outra. */
@@ -8280,8 +8841,15 @@ function renderDashboard(){
   if(worst.s.reasons.length){
     worst.s.reasons.forEach(r=>{ const li=el("li");
       li.append(el("span","r-ico",r.icon), el("span",null,r.label)); ul.appendChild(li); });
-  } else if(completo){ const li=el("li"); li.append(el("span","r-ico","😎"),
-      el("span",null,t("Sem chuva, vento controlado e temperatura agradável."))); ul.appendChild(li); }
+  }
+  /* ═══ dd-217 §1a — A FRASE QUE REPETIA OS CHIPS SAIU ═════════════════════
+     Estava aqui: «😎 Sem chuva, vento controlado e temperatura agradável.»,
+     quando não havia razões e os dados estavam completos. Diz por palavras
+     exatamente o que os três chips dizem por formas, um centímetro abaixo —
+     e ocupava o lugar mais caro do ecrã. É material dos 81 % que
+     CONTEXTUALIZAM, medido no relatório 130.
+     ⚠️ E não se perdeu nada: a ausência de razões JÁ É a informação, e ela
+     está dita no veredicto e no anel do índice, que é onde decide. */
   // sem razões E sem dados completos: nada a afirmar aqui — o aviso do
   // buraco, já a seguir, é que fala
   // mudança relevante nas próximas 12h — a mesma assimetria: a notícia má
@@ -8318,6 +8886,20 @@ function renderDashboard(){
   hero.append(sw,main);
   box.appendChild(hero);
 
+  /* ═══ dd-217 §1a — «O QUE VESTIR» SOBE, e é a segunda coisa do ecrã ═════
+     A ordem do dono: logo abaixo do veredicto vêm duas coisas — a que horas
+     melhora (que já vive dentro do cartão, na lista de razões) e O QUE
+     VESTIR. Estava três cartões abaixo, e é a única peça do ecrã que diz o
+     que FAZER a seguir a decidir ir. */
+  // ---- equipamento ----
+  const gearCard=el("div","card gear-chips");
+  gearCard.appendChild(el("h2",null,t("🧤 Equipamento recomendado")));
+  gearCard.appendChild(el("p","h-sub",t("Com base nas próximas 6 horas.")));
+  const gc=el("div","chips");
+  gearAdvice(metrics.slice(i0,i0+6)).forEach(g=>gc.appendChild(el("span","chip",g)));
+  gearCard.appendChild(gc); box.appendChild(gearCard);
+
+
   // ---- chips de condições atuais ----
   const daily=wx.daily||{};
   const chips=el("div","card"); chips.style.padding="12px 16px";
@@ -8326,14 +8908,30 @@ function renderDashboard(){
     c.append(el("span",null,ico), el("span",null,lab+" "), el("b",null,val)); return c; };
   /* valor em falta mostra-se como "—", nunca como um número inventado */
   const q=(v,f)=>v==null?"—":f(v);
+  /* ═══ dd-217 §1a — DOIS CHIPS FICAM, QUATRO DESCEM ═══════════════════════
+     Ficam os dois que mudam o «vou ou não vou» agora: a TEMPERATURA (com a
+     sensação, que é o número da lei do calor) e o VENTO com rajadas. Descem
+     humidade, visibilidade, UV e sol: continuam todos, no cartão de contexto,
+     e nenhum facto de condução se perde — muda de sítio.
+
+     ⚠️ O ESBOÇO MOSTRA TRÊS CHIPS e o terceiro é o CÉU («Limpo»). Não o
+     construí: hoje o estado do céu vive na frase do veredicto («Encoberto ·
+     14° em Maastricht») e fazer dele um chip é criar uma superfície nova, não
+     mudar a ordem de uma que existe. A ordem desta noite é ARRUMAÇÃO — e a
+     mesma ordem diz que o prompt manda sobre o esboço. Fica escrito em
+     melhorias-propostas, para o dono decidir. */
   cw.append(
     mkChip("🌡️","", `${q(mNow.t,U.temp)} (${t("sensação {t}°",{t:q(mNow.at,rnd)})})`),
     mkChip("💨",t("vento"), `${q(mNow.wind,U.spd)}${mNow.dir==null?"":" "+windArrow(mNow.dir)} · ${t("rajadas")} ${q(mNow.gust,U.spd)}`),
+  );
+  const cwBaixo=el("div","chips");
+  cwBaixo.append(
     mkChip("💧",t("humidade"), mNow.rh==null?"—":`${rnd(mNow.rh)}%`),
     mkChip("👁️",t("visibilidade"), q(mNow.vis,U.distM)),
   );
-  if(daily.uv_index_max?.[0]!=null) cw.append(mkChip("☀️",t("UV máx"), fmtN(daily.uv_index_max[0],0)));
-  if(daily.sunrise?.[0]) cw.append(mkChip("🌅",t("sol"), `${fmtHM(daily.sunrise[0])} – ${fmtHM(daily.sunset[0])}`));
+  if(daily.uv_index_max?.[0]!=null) cwBaixo.append(mkChip("☀️",t("UV máx"), fmtN(daily.uv_index_max[0],0)));
+  if(daily.sunrise?.[0]) cwBaixo.append(mkChip("🌅",t("sol"), `${fmtHM(daily.sunrise[0])} – ${fmtHM(daily.sunset[0])}`));
+  contexto.push(cwBaixo);
   chips.appendChild(cw); box.appendChild(chips);
   /* dd-87 §4: a caixa diz de ONDE são os valores — humidade, visibilidade,
      UV e vento valem para a célula do modelo, não para a rua (2 km em
@@ -8349,16 +8947,12 @@ function renderDashboard(){
     const dec=km>=3?0:(Math.round(km*10)%10?1:0), dTxt=U.dist(km,dec);
     const p=el("p","h-sub",t("Valores desta zona, ~{d} em redor",{d:dTxt}));
     p.setAttribute("data-test","malha-linha"); p.style.marginTop="8px";
-    chips.appendChild(p);
+    /* dd-217 §1a: a linha da malha diz de ONDE são a humidade, a
+       visibilidade e o UV — desce com eles, para o contexto, senão ficava a
+       explicar valores que já não estão por baixo dela. Se o cartão do
+       contexto ainda não existir (a sonda é assíncrona), fica nos chips. */
+    (document.querySelector('[data-test="contexto-do-agora"]')||chips).appendChild(p);
   }).catch(()=>{});
-
-  // ---- equipamento ----
-  const gearCard=el("div","card gear-chips");
-  gearCard.appendChild(el("h2",null,t("🧤 Equipamento recomendado")));
-  gearCard.appendChild(el("p","h-sub",t("Com base nas próximas 6 horas.")));
-  const gc=el("div","chips");
-  gearAdvice(metrics.slice(i0,i0+6)).forEach(g=>gc.appendChild(el("span","chip",g)));
-  gearCard.appendChild(gc); box.appendChild(gearCard);
 
   // ---- cronologia 24h ----
   box.appendChild(renderTimeline(H,metrics,scores,i0,prof));
@@ -8378,8 +8972,26 @@ function renderDashboard(){
     mc.appendChild(el("p",null,motoGuard.cartao.corpo+" · "+t("visto às {h}",{h:fmtHM(motoGuard.cartao.quando)})));
     box.appendChild(mc);
   }
-  // ---- 7 dias ----
-  box.appendChild(renderDaily(wx));
+  /* ═══ dd-217 §1a — O CARTÃO DE CONTEXTO, e é o fim da descida ════════════
+     Tudo o que desceu chega aqui pela ordem em que nasceu: os quatro chips
+     (humidade, visibilidade, UV, sol), a linha da malha do modelo, o perfil
+     de decisão e a proveniência da casa.
+
+     ⚠️ NENHUM FACTO DE CONDUÇÃO SE PERDEU — mudou de sítio, e a régua da
+     escada conta as linhas para o provar. O título diz o que a caixa é, para
+     quem rola não ter de adivinhar porque é que aquilo está ali em baixo. */
+  if(contexto.length){
+    const cx=el("div","card"); cx.setAttribute("data-test","contexto-do-agora");
+    cx.appendChild(el("h2",null,t("📋 Contexto")));
+    contexto.forEach(n=>cx.appendChild(n));
+    box.appendChild(cx);
+  }
+
+  /* ---- 7 dias ----
+     dd-224 bloco 3: os 7 dias saem do AGORA e passam a ter casa própria na
+     aba DIAS. Aqui já não se pendura nada; o cartão nasce quando a aba se
+     abre e quando a meteorologia muda, a partir do MESMO `renderDaily`. */
+  pintarDias(wx);
 
   /* dd-108 (pergunta 8): o `planNativeAlerts()` que vivia aqui MORREU como
      disparador — agendava alarmes de SO só por haver meteorologia da zona,
@@ -8591,22 +9203,73 @@ function pastilhaDoCalor(v,dot,numero,fraseInteira){
   v.title=fraseInteira;
   v.setAttribute("aria-label",fraseInteira);
 }
+/* ═══ dd-224 bloco 3 — A CASA DOS 7 DIAS ═══════════════════════════════════
+   O cartão é o MESMO (`renderDaily`); o que muda é a caixa onde ele mora. A
+   última meteorologia fica guardada para a aba se poder pintar quando for
+   aberta sem ter havido atualização entretanto — sem isto, abrir DIAS depois
+   de trocar de aba dava um ecrã vazio, que é uma aba a mentir. */
+function pintarDias(wx){
+  if(wx) state._wxDias=wx;
+  const box=$("#view-dias"); if(!box) return;
+  const w=wx||state._wxDias;
+  box.textContent="";
+  if(!w||!w.daily) return;
+  box.appendChild(renderDaily(w));
+}
 function renderDaily(wx){
   const D=wx.daily, card=el("div","card");
   card.appendChild(el("h2",null,t("📅 Próximos 7 dias")));
   card.appendChild(el("p","h-sub",t("Para planear a voltinha de fim de semana.")));
   const grid=el("div","daily");
+  /* a escala é a da SEMANA: com sete escalas diferentes, sete barras cheias
+     diriam que todos os dias são iguais — que é o contrário do que a faixa
+     existe para mostrar. Dados em falta ficam de fora da conta (nunca a
+     empurram para o lado bom, que é a família do ??0). */
+  const tsMin=(D.temperature_2m_min||[]).filter(Number.isFinite);
+  const tsMax=(D.temperature_2m_max||[]).filter(Number.isFinite);
+  const semanaMin=tsMin.length?Math.min(...tsMin):null;
+  const semanaMax=tsMax.length?Math.max(...tsMax):null;
+  const escala=(semanaMin!=null&&semanaMax!=null)?(semanaMax-semanaMin):0;
   (D.time||[]).forEach((ep,i)=>{
     const dv=dayVerdict(D,i), lvl=dv.lvl;
     const dnum=(a,f)=>a?.[i]==null?"—":f(a[i]);
     const d=el("div","day-card");
-    d.append(el("div","d-name", i===0?t("hoje"):`${fmtDow(ep+43200)} ${fmtDayMo(ep+43200)}`));
+    /* dd-217 §2: na linha vai só o DIA DA SEMANA — a data por extenso não
+       cabe em 42 px e ficava «Quinta 1…», que é pior do que não estar. A data
+       completa continua no rótulo e na tabela do toque. */
+    d.append(el("div","d-name", i===0?t("hoje"):fmtDow(ep+43200)));
     d.append(el("div","d-emoji", D.weather_code?.[i]==null?"❔":wmoIco(D.weather_code[i],1)));
-    const tt=el("div","d-temp");
-    tt.append(el("b",null,dnum(D.temperature_2m_max,U.temp)), document.createTextNode(" "),
-      el("span",null,dnum(D.temperature_2m_min,U.temp)));
-    d.append(tt);
-    d.append(el("div","d-meta",`☔ ${dnum(D.precipitation_probability_max,rnd)}% · 💨 ${dnum(D.wind_gusts_10m_max,rnd)}`));
+    /* ═══ dd-217 §2 — A LINHA HORIZONTAL: mín · BARRA · máx ══════════════
+       A barra é a comparação que os cartões verticais não davam: sete
+       intervalos lado a lado, na MESMA escala, e o olho vê logo qual é o dia
+       quente e qual é o dia frio. A escala é a da SEMANA — não do dia — e é
+       por isso que se calcula antes do ciclo.
+       ⚠️ §10.27: a barra não é a resposta, é o desenho da resposta. Os dois
+       números continuam escritos ao lado dela, e o toque continua a abrir a
+       tabela inteira. Uma barra sem o número é uma aproximação a fingir de
+       facto. */
+    const tmin=D.temperature_2m_min?.[i], tmax=D.temperature_2m_max?.[i];
+    d.append(el("span","d-min", dnum(D.temperature_2m_min,U.temp)));
+    const faixa=el("div","d-faixa");
+    if(Number.isFinite(tmin)&&Number.isFinite(tmax)&&escala>0){
+      const barra=el("div","d-barra");
+      barra.style.left=`${Math.max(0,Math.min(100,(tmin-semanaMin)/escala*100))}%`;
+      barra.style.right=`${Math.max(0,Math.min(100,(semanaMax-tmax)/escala*100))}%`;
+      faixa.appendChild(barra);
+    }
+    d.append(faixa);
+    d.append(el("span","d-max", dnum(D.temperature_2m_max,U.temp)));
+    /* ═══ dd-217 §2 — O ☔ E O 💨 SAEM DA LINHA, E ESTÁ MEDIDO PORQUÊ ═══════
+       MEDIDO a 12/08: a 320 px a linha tem 270 px e os custos fixos (nome 52
+       · céu 27 · mínima 34 · máxima 34 · veredicto 78 · seis intervalos 36)
+       já somam 261. Sobravam NOVE píxeis para a barra e para o «☔ 70% · 💨
+       45» — e o ecrã mostrava «☔ …», que não é texto encurtado: é um facto a
+       fingir que está lá. A ordem diz «o texto que não couber ENCURTA-SE»;
+       isto não encurtava, desaparecia com ar de presente.
+       Os dois números NÃO se perdem: continuam na tabela do toque, onde já
+       estavam, e passam a estar no rótulo da própria linha — que é o que um
+       leitor de ecrã lê e o que aparece ao pousar o rato. */
+    const metaTxt=`☔ ${dnum(D.precipitation_probability_max,rnd)}% · 💨 ${dnum(D.wind_gusts_10m_max,rnd)}`;
     const v=el("span","day-verdict");
     const dot=el("span","dot");
     /* dia verde só com o dia completo; senão o ponto fica cinzento e di-lo */
@@ -8630,6 +9293,8 @@ function renderDaily(wx){
       else v.append(dot, document.createTextNode(t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][lvl])));
       if(dv.calor) v.setAttribute("data-calor",dv.calor); }
     d.append(v);
+    d.title=`${dayLabel(ep+43200)} · ${metaTxt}`;
+    d.setAttribute("aria-label",d.title);
     const show=(ev)=>tipShow(ev.clientX,ev.clientY,
       `${dayLabel(ep+43200)} — ${D.weather_code?.[i]==null?"—":wmoTxt(D.weather_code[i])}`,
       [[t("Máx / mín"),`${dnum(D.temperature_2m_max,U.temp)} / ${dnum(D.temperature_2m_min,U.temp)}`],
@@ -11630,7 +12295,17 @@ function pintarSitiosLinha(){
 function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
   renderSitios(); $("#sitios-drawer").classList.add("open"); $("#sitios-bg").classList.add("open"); }
 function fecharSitios(){ $("#sitios-drawer").classList.remove("open"); $("#sitios-bg").classList.remove("open"); }
+/* ═══ dd-224 bloco 3 — A MESMA LISTA, DUAS SUPERFÍCIES, UM PINTOR ══════════
+   A aba SÍTIOS mostra exatamente o que a gaveta mostra. Não se copia a
+   função: pinta-se nas duas caixas com o MESMO código, porque duas
+   superfícies com o mesmo conteúdo e dois pintores divergem no primeiro dia
+   em que alguém mexe num deles (§10.6 — é a razão por que a atribuição tem
+   porta única). A gaveta fica de pé enquanto o bloco 6 não a substituir, e é
+   o que a ordem permite explicitamente. */
 function renderSitios(){
+  for(const alvo of ["#sitios-corpo","#view-sitios"]) pintarSitiosEm($(alvo));
+}
+function pintarSitiosEm(box){
   /* ═══ O MESMO SÍTIO NÃO SE MOSTRA DUAS VEZES (dd-185 §1b) ═════════════════
      Declarado à cabeça de propósito: as três secções (Casa · Guardados ·
      Recentes) desenham-se por ordem, e cada uma tem de saber o que as de cima
@@ -11648,7 +12323,7 @@ function renderSitios(){
   const chaveSitio=(x)=>(Number.isFinite(x?.lat)&&Number.isFinite(x?.lon))
     ? `${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}` : null;
   { const c=aCasa(); const k=chaveSitio(c); if(k) jaMostrados.add(k); }
-  const box=$("#sitios-corpo"); if(!box) return;
+  if(!box) return;
   box.textContent="";
   /* dd-172 §2: esta gaveta mostra a casa, os favoritos e os recentes — todos
      com nome vindo do fornecedor e todos com o `atrib` guardado. A linha vai
@@ -12697,7 +13372,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-10-1420-32f21a";
+const BUILD="2026-08-12-0938-2740bb";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -13966,6 +14641,12 @@ function switchTab(name){
   $$(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.view===name)));
   $$(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));
   tipHide();
+  /* dd-224 bloco 3: as duas abas novas pintam-se À ENTRADA, a partir do que
+     já está em memória. Uma aba que só se pinta quando os dados chegam fica
+     vazia para quem a abre entre atualizações — e uma aba vazia é uma aba
+     que mente sobre não haver nada. */
+  if(name==="dias") pintarDias(null);
+  if(name==="sitios") renderSitios();
   if(name==="rota"){ initRouteMap(); setTimeout(()=>state.mapaRota&&Mapa.redimensionar(state.mapaRota),60);
     oferecerFocoNaRota();              // o que se procurou no Agora já espera aqui (dd-06 §1a)
     /* dd-57 §1: ao ATERRAR na Rota com rota calculada, ela cabe inteira no

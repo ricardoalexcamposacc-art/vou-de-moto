@@ -6,7 +6,20 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v25 — 10/08/2026 ═══════════════════════════════════════════
+/* ═══ levante-v26 — 11/08/2026 ═══════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · A PESQUISA DEIXA DE MISTURAR DUAS BUSCAS NUMA LISTA. Quando escreves uma
+     marca, a lista é só dessa marca — acabaram os «McDonald's» a 151 km que
+     eram sítios com nome parecido.
+   · UMA PERGUNTA SÓ, ATÉ AOS 50 km. A escada parava no primeiro anel e
+     escondia o que estava a seguir: quem está no campo passa a ver a loja a
+     40 km, que antes nunca aparecia. E é mais rápido, não mais lento.
+   · CADA LINHA DIZ O QUE É, EM TODAS AS BUSCAS. A etiqueta («fast food»,
+     «pensão», «lugar») aparecia só nos resultados de perto. Agora um lugar
+     chamado como uma loja aparece etiquetado LUGAR, e vê-se num relance.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ levante-v25 — 10/08/2026 (publicada) ═══════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
    · O MICROFONE VOLTA A ESTAR DENTRO DO CAMPO de pesquisa. Tinha saído para
@@ -36,7 +49,7 @@
    · 36 frases que apareciam em português a quem tem a app em neerlandês —
      incluindo o veredicto do ecrã principal — passaram a estar traduzidas.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v25";
+const V = "levante-v26";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
