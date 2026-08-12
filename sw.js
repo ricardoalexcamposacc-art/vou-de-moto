@@ -74,7 +74,27 @@
    · 36 frases que apareciam em português a quem tem a app em neerlandês —
      incluindo o veredicto do ecrã principal — passaram a estar traduzidas.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v27";
+/* ═══ levante-v28 — 12/08/2026 ═══════════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · **A Sentinela deixou de avisar com precisão que não existe.** Ela dizia
+     «chuva daqui a 12 minutos» a partir do campo de quartos de hora da
+     Open-Meteo — e esse campo só é medido onde correm modelos de alta
+     resolução (Europa Central e América do Norte). Fora daí é **interpolado
+     da previsão horária**, e a resposta não distingue um do outro. Em
+     Portugal e em Espanha, a voz que interrompe alguém na estrada estava a
+     falar de uma reta traçada entre dois valores. Agora a Sentinela decide
+     pela previsão **horária** e diz a hora: «chuva a chegar por volta das
+     15h». Menos precisão aparente, e a que fica é observada.
+   · Os alvos de toque do 📍 e do 🎤 dentro do campo de pesquisa passaram de
+     30 e 31 px para **44** — o mínimo publicado da Apple. O desenho não
+     mudou de tamanho nem de sítio: cresceu a caixa que recebe o dedo.
+   · O anel do índice dizia **MOTORIND / EX** em neerlandês. Passou a partir
+     o composto onde ele se parte: MOTOR- / INDEX.
+   · O cartão do equipamento diz agora a que janela se refere no próprio
+     título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const V = "levante-v28";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -96,6 +116,16 @@ const SHELL = [
      legais, que já cá estavam. */
   "./creditos.html",
   "./paises.json",
+  /* ⚠️ dd-228: O MOTOR DO MAPA ENTRA NO SHELL PORQUE SAIU DO `index.html`.
+     Ele deixou de ser pedido por uma etiqueta no arranque — passou a ser
+     carregado ao entrar na Rota — e sem esta linha deixava de ser guardado
+     por acaso na primeira visita. Quem instalasse a app e ficasse sem rede
+     antes de abrir a Rota ficava sem mapa.
+     Aqui é descarregado no `install`, em segundo plano, **fora do caminho
+     crítico da primeira pintura**: o utilizador vê a app enquanto isto vai
+     acontecendo. Guardado de propósito em vez de por acaso. */
+  "./maplibre-gl.js",
+  "./maplibre-gl.css",
 ];
 /* dd-78/dd-74 (c): só o OpenFreeMap serve tiles nesta app. O CARTO saiu no
    dd-16 §2 e o tile.openstreetmap.org e o stadiamaps nunca chegaram a entrar —
