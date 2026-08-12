@@ -6,7 +6,32 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v26 — 11/08/2026 ═══════════════════════════════════════════
+/* ═══ levante-v27 — 12/08/2026 ═══════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · **A RESPOSTA PASSA A ESTAR NO TOPO.** Os separadores saíram do cimo do
+     ecrã e passaram a uma barra fixa em baixo, onde o polegar já está. Com o
+     espaço que libertaram, o logótipo e a pesquisa juntaram-se numa linha só.
+     A altura até à frase que decide — «Vai de moto!» — caiu de 250 px para
+     91, e o que se vê sem rolar passou de duas peças para seis.
+   · **DUAS SECÇÕES NOVAS, que estavam escondidas.** Os 7 DIAS deixam de viver
+     no fundo do Agora e passam a ter aba própria — e agora cabem os sete no
+     ecrã, em linhas com barra de mínima e máxima, em vez de quatro cartões e
+     rolar. Os SÍTIOS deixam de estar atrás de uma gaveta: casa, guardados e
+     recentes ficam a um toque.
+   · **O CAMPO DE PESQUISA DIZ ONDE ESTÁS.** Em vez de «Pesquisar cidade ou
+     sítio», mostra o sítio para que a app está a prever. A lupa à esquerda
+     diz que se toca ali.
+   · **O QUE VESTIR SOBE, o contexto desce.** Logo abaixo do veredicto vêm a
+     que horas melhora e o equipamento. Humidade, visibilidade, UV, sol,
+     perfil e proveniência continuam todos — juntos, num cartão de contexto no
+     fim. Nada se perdeu; mudou de sítio.
+   · **CORREÇÕES DE TEXTO.** Os veredictos dos dias deixam de ser cortados a
+     meio da palavra («Mau p/ mo»); em francês, os sinais « ! ? : ; » deixam
+     de saltar sozinhos para a linha seguinte; e uma data desconhecida deixa de
+     aparecer como «01/01/1970».
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ levante-v26 — 11/08/2026 (publicada) ═══════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
    · A PESQUISA DEIXA DE MISTURAR DUAS BUSCAS NUMA LISTA. Quando escreves uma
@@ -49,7 +74,7 @@
    · 36 frases que apareciam em português a quem tem a app em neerlandês —
      incluindo o veredicto do ecrã principal — passaram a estar traduzidas.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v26";
+const V = "levante-v27";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
