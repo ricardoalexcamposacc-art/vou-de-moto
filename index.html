@@ -1530,9 +1530,6 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
       <button class="bv-x" id="bv-fechar" type="button" aria-label="Fechar">✕</button>
     </div>
     <div id="loc-estado-agora" class="loc-estado"></div>
-    <!-- dd-128 §3.1: o que a mudança de casa deixou para trás (permissões
-         são por origem e não atravessam). Permanente enquanto durar. -->
-    <div id="perm-migracao" hidden></div>
     <div id="foco-chip" class="chips" hidden style="margin:2px 2px 0"></div>
     <!-- dd-55: uma janela aberta há horas não tem NENHUM sinal de que a app
          mudou no servidor — foi assim que a captura do diretor mostrou o
@@ -1552,6 +1549,12 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
       <div class="skel" style="height:150px;margin-bottom:14px"></div>
       <div class="skel" style="height:220px"></div>
     </div>
+    <!-- ⚠️ dd-237 §3b: ESTE AVISO VIVIA ACIMA DO VEREDICTO, e são ~400 px num
+         ecrã de onde se tiraram 158 em três noites. O veredicto é o produto:
+         acima dele só fica coisa mais importante do que «vou de mota?», e uma
+         permissão por conceder não é. Desceu para junto da Sentinela — que é a
+         função de que fala, e é onde a marca permanente do §3c também vive. -->
+    <div id="perm-migracao" hidden></div>
     <div class="card" id="sentinel-card">
       <div class="card-head">
         <h2>🔔 Sentinela meteorológica</h2>
@@ -2751,6 +2754,11 @@ en:{
 "margem desconhecida":"accuracy unknown",
 "morada só ao nível da rua ou da cidade":"address only down to street or city",
 "A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"The main search service didn't answer ({m}) — these results come from the backup source.",
+"Os avisos não estão permitidos neste telemóvel. A Sentinela não te avisa enquanto não permitires as notificações.":"Notifications aren't allowed on this phone. The Sentinel can't warn you until you allow them.",
+"A localização deixou de estar autorizada. A tua casa veio contigo; a permissão não.":"Location is no longer allowed. Your home came with you; the permission didn't.",
+"Permitir avisos":"Allow alerts",
+"Agora não":"Not now",
+"Avisos por permitir — a Sentinela vigia, mas não te consegue avisar.":"Alerts not allowed — the Sentinel is watching, but can't warn you.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Couldn't find \"{q}\" — check the spelling or try another name.",
 "Recarregar a app":"Reload the app",
 "Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"I can't reach the internet — weather and search are offline. Check the device's network, or reload the app.",
@@ -3236,6 +3244,11 @@ es:{
 "margem desconhecida":"margen desconocido",
 "morada só ao nível da rua ou da cidade":"dirección solo a nivel de calle o ciudad",
 "A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"El servicio de búsqueda principal no respondió ({m}) — estos resultados vienen de la fuente de reserva.",
+"Os avisos não estão permitidos neste telemóvel. A Sentinela não te avisa enquanto não permitires as notificações.":"Las notificaciones no están permitidas en este teléfono. El Centinela no puede avisarte hasta que las permitas.",
+"A localização deixou de estar autorizada. A tua casa veio contigo; a permissão não.":"La ubicación ya no está autorizada. Tu casa vino contigo; el permiso no.",
+"Permitir avisos":"Permitir avisos",
+"Agora não":"Ahora no",
+"Avisos por permitir — a Sentinela vigia, mas não te consegue avisar.":"Avisos sin permitir — el Centinela vigila, pero no puede avisarte.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"No encontré \"{q}\" — revisa la escritura o prueba otro nombre.",
 "Recarregar a app":"Recargar la app",
 "Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"No puedo llegar a internet — el tiempo y la búsqueda están sin conexión. Revisa la red del dispositivo o recarga la app.",
@@ -3699,6 +3712,11 @@ fr:{
 "margem desconhecida":"marge inconnue",
 "morada só ao nível da rua ou da cidade":"adresse au niveau de la rue ou de la ville seulement",
 "A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"Le service de recherche principal n'a pas répondu ({m}) — ces résultats viennent de la source de secours.",
+"Os avisos não estão permitidos neste telemóvel. A Sentinela não te avisa enquanto não permitires as notificações.":"Les notifications ne sont pas autorisées sur ce téléphone. La Sentinelle ne peut pas te prévenir tant que tu ne les autorises pas.",
+"A localização deixou de estar autorizada. A tua casa veio contigo; a permissão não.":"La localisation n'est plus autorisée. Ta maison t'a suivi ; pas l'autorisation.",
+"Permitir avisos":"Autoriser les alertes",
+"Agora não":"Plus tard",
+"Avisos por permitir — a Sentinela vigia, mas não te consegue avisar.":"Alertes non autorisées — la Sentinelle surveille, mais ne peut pas te prévenir.",
 "Não encontrei \"{q}\" — confirma a escrita ou tenta outro nome.":"Aucun résultat pour « {q} » — vérifie l'orthographe ou essaie un autre nom.",
 "Recarregar a app":"Recharger l'app",
 "Não consigo chegar à internet — a meteo e a pesquisa estão sem ligação. Verifica a rede do aparelho, ou recarrega a app.":"Je n'arrive pas à joindre internet — la météo et la recherche sont hors ligne. Vérifie le réseau de l'appareil, ou recharge l'app.",
@@ -4365,6 +4383,11 @@ nl:{
 "A procurar…":"Zoeken…",
 "perto de: {r}":"in de buurt van: {r}",
 "A pesquisa principal não respondeu ({m}) — estes resultados vêm da fonte de reserva.":"De hoofdzoekdienst reageerde niet ({m}) — deze resultaten komen uit de reservebron.",
+"Os avisos não estão permitidos neste telemóvel. A Sentinela não te avisa enquanto não permitires as notificações.":"Meldingen zijn niet toegestaan op deze telefoon. De Wachter kan je niet waarschuwen totdat je ze toestaat.",
+"A localização deixou de estar autorizada. A tua casa veio contigo; a permissão não.":"Locatie is niet meer toegestaan. Je thuisadres ging mee; de toestemming niet.",
+"Permitir avisos":"Meldingen toestaan",
+"Agora não":"Niet nu",
+"Avisos por permitir — a Sentinela vigia, mas não te consegue avisar.":"Meldingen niet toegestaan — de Wachter kijkt mee, maar kan je niet waarschuwen.",
 "distância?":"afstand?",
 "Voz não suportada neste browser — escreve o destino.":"Spraak wordt in deze browser niet ondersteund — typ je bestemming.",
 "Sem reconhecimento de voz — repete ou escreve o destino.":"Geen spraakherkenning — herhaal het of typ je bestemming.",
@@ -7270,7 +7293,17 @@ function geoManobra(instr){
 async function geoRoute(points){
   const wp=points.map(p=>`${p.lat.toFixed(5)},${p.lon.toFixed(5)}`).join("|");
   const j=await jfetch(geoURL("/v1/routing",{
-    waypoints:wp, mode:"motorcycle", details:"instruction_details,route_details",
+    /* ⚠️ `drive`, NÃO `motorcycle` — e a razão é aritmética, não gosto.
+       MEDIDO nas seis âncoras: a Geoapify em perfil de mota dá ~20 % menos
+       tempo do que em carro **na mesma estrada** (distância a variar 0,1 %).
+       Numa mota o limite de velocidade é o MESMO que num carro: um perfil 20 %
+       mais rápido está a assumir que o condutor EXCEDE o limite — e a app põe
+       isso na hora de passagem, que é a promessa central do produto. Era a app
+       a cozinhar excesso de velocidade lá dentro. Decisão do dono, 13/08.
+       ⚠️ E o que É nosso não muda: o índice de mota, o vento lateral, a
+       sensação térmica em andamento e o equipamento continuam iguais. O que
+       saiu foi só o perfil que se pede ao motor de rotas. */
+    waypoints:wp, mode:"drive", details:"instruction_details,route_details",
     lang:GEO_LANG[vozIdioma?vozIdioma():state.lang]||"en", units:"metric",
   }),20000,"rota");
   /* O Geoapify devolve UMA rota — não tem alternativas, verificado contra a API
@@ -7294,7 +7327,23 @@ async function geoRoute(points){
         name:st.name||st.instruction?.streets?.[0]||"",
         ref:st.road_class==="motorway"?(st.name||""):"",
         texto:st.instruction?.text||"",
-        maneuver:mv?{type:mv.type, modifier:mv.modifier, exit:Number(st.instruction?.exitNumber)||0}
+        /* ⚠️ `roundabout_exit`, NÃO `exitNumber` — e esta troca de uma palavra é
+           o defeito mais grave que esta app teve. O dono ouviu «primeira saída»
+           numa rotunda onde tinha de sair na TERCEIRA, a conduzir.
+
+           Os dois campos existem os dois no objeto `instruction` da Geoapify e
+           NÃO são a mesma coisa (documentação deles, StepInstruction):
+             · `exitNumber` ...... o número da PLACA de uma saída de autoestrada
+                                   («Saída 12»). Numa rotunda não vem.
+             · `roundabout_exit` . «Roundabout exit's number» — a contagem que a
+                                   voz precisa.
+           Ler o primeiro numa rotunda dá `undefined` → `Number(undefined)||0` →
+           0, e o `navPhrase` transformava o 0 em «1ª». **A app não contava mal:
+           não contava nada, e inventava o número que faltava.**
+
+           E o `exitNumber` não se perde por perder: nenhuma frase da app o usa
+           (a saída de autoestrada diz «sai na próxima saída», sem número). */
+        maneuver:mv?{type:mv.type, modifier:mv.modifier, exit:Number(st.instruction?.roundabout_exit)||0}
                    :{type:"", modifier:"", exit:0, texto:st.instruction?.text||""}};
     }),
   }));
@@ -7311,6 +7360,12 @@ async function geoRoute(points){
   return {routes:rotas, waypoints};
 }
 
+/* ⚠️ AQUI VIVIA A BANDEIRA DA ROTA DE RESERVA, e saiu por ordem de 13/08.
+   O aviso que ela acendia dizia «as horas são de um perfil de carro» — e isso
+   distinguia alguma coisa enquanto o principal pedia `motorcycle`. Com o
+   principal em `drive`, os dois lados passaram a pedir carro: **o aviso deixou
+   de avisar de alguma coisa, e um aviso que não avisa é ruído.** A razão fica
+   escrita em `melhorias-propostas` para quem o vir desaparecer do git. */
 async function osrmRoute(points){ // points: [{lat,lon},...]
   if(geoOn()) return geoRoute(points);
   const path=points.map(p=>`${p.lon.toFixed(5)},${p.lat.toFixed(5)}`).join(";");
@@ -7713,8 +7768,20 @@ async function renderCamLei(){
      "Porquê?", aberta só por quem quer. País por countryAt() (offline),
      nome do país por Intl.DisplayNames (capacidade, não tabela nossa). */
   const alvo=$("#cam-law-txt"); if(!alvo) return;
+  /* ⚠️ dd-228 §2 — AS FRONTEIRAS SÓ SE CARREGAM COM A GAVETA ABERTA, e o
+     comentário do `paisesCarregar` dizia «à primeira pergunta» há semanas.
+     MEDIDO no traço de arranque: **pedido a +450 ms, em TODOS os arranques**,
+     porque esta função é pintada no arranque. São **536 KB** — meio megabyte
+     dos dados móveis de quem anda na estrada — por uma frase dentro das
+     Definições **fechadas**.
+     É a §10.99, escrita a partir deste caso: um comentário que diz QUANDO uma
+     coisa acontece é uma afirmação sobre o comportamento, e envelhece.
+     ⚠️ E não fica vazio à espera: sem país, a frase GENÉRICA que já existia é
+     verdadeira («sigo a lei de cada país por onde o trajeto passa»). Quando a
+     gaveta abre, esta função corre outra vez e a frase ganha o país. */
   let cc=null;
-  try{ if(state.home&&Number.isFinite(state.home.lat)){ await paisesCarregar(); cc=await countryAt(state.home.lat,state.home.lon); } }catch(e){}
+  const gavetaAberta=!!document.getElementById("settings-pop")?.classList.contains("open");
+  try{ if(gavetaAberta&&state.home&&Number.isFinite(state.home.lat)){ await paisesCarregar(); cc=await countryAt(state.home.lat,state.home.lon); } }catch(e){}
   const nomeDe=(c)=>{ try{ return new Intl.DisplayNames([state.lang],{type:"region"}).of(c)||c; }catch(e){ return c; } };
   const law=cc?CAM_LAW[cc]:undefined;
   let frase, why;
@@ -8795,25 +8862,74 @@ async function avisarPermissoesPerdidas(){
     /* «prompt» = por conceder. «denied» já tem o cartão do dd-41 e não é
        isto; «granted» não há nada a dizer. Sem Permissions API, cala-se —
        não se adivinha (7g-ter). */
-    if(est==="prompt") linhas.push({ico:"📍", txt:t("A app mudou de morada e o browser voltou a pedir autorização da localização — a tua casa veio contigo, a permissão não."),
+    if(est==="prompt") linhas.push({ico:"📍", txt:t("A localização deixou de estar autorizada. A tua casa veio contigo; a permissão não."),
       botao:t("Autorizar a localização"), acao:()=>useGPS(false)});
   }
   if(prova.notif&&typeof Notification!=="undefined"&&Notification.permission==="default"){
-    linhas.push({ico:"🔔", txt:t("Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam."),
-      botao:t("Voltar a autorizar os avisos"), acao:()=>{ try{ Notification.requestPermission().then(()=>avisarPermissoesPerdidas()); }catch(e){} }});
+    /* ⚠️ dd-237 §2 e §3a — A FRASE ANTIGA AFIRMAVA UMA COISA QUE A APP NÃO SABE.
+       Dizia «os avisos estão calados na morada nova: a permissão não atravessa a
+       mudança de casa». MEDIDO: não há, em lado nenhum do armazenamento, marca
+       de que uma travessia tenha acontecido — o gatilho é só «a Sentinela está
+       ligada» + «a permissão está por conceder». Numa instalação limpa em que
+       alguém liga a Sentinela e nunca autorizou notificações, a app contava-lhe
+       uma mudança de casa que nunca houve.
+
+       E havia um segundo engano por baixo: quem escreveu «morada» queria dizer
+       **origem** (o domínio mudou, e as permissões de browser são por origem).
+       Quem lê num telemóvel entende «mudei de cidade». Duas leituras, ambas
+       erradas para quem está a ler.
+
+       A causa verdadeira é a mesma nos dois casos e não precisa de história:
+       **as notificações não estão permitidas.** Duas frases — o que acontece, e
+       o que custa (dd-237 §3a). */
+    linhas.push({ico:"🔔", txt:t("Os avisos não estão permitidos neste telemóvel. A Sentinela não te avisa enquanto não permitires as notificações."),
+      botao:t("Permitir avisos"), acao:()=>{ try{ Notification.requestPermission().then(()=>avisarPermissoesPerdidas()); }catch(e){} }});
   }
-  if(!linhas.length) return;
+  if(!linhas.length){ marcarAvisoNaSentinela(false); return; }
+  /* dd-237 §3c: DISPENSAR NÃO É ESQUECER. O aviso sai do ecrã, e a verdade fica
+     onde a função vive — uma marca junto ao interruptor da Sentinela. Sem isto,
+     quem carrega em «Agora não» fica a pensar que está coberto e não está. */
+  if(sessionStorage.getItem("levante-perm-dispensado")==="1"){ marcarAvisoNaSentinela(true); return; }
   for(const l of linhas){
     const b=el("div","banner warn"); b.setAttribute("data-test","perm-migracao");
     const col=el("div");
     col.appendChild(el("div",null,l.txt));
-    const bt=el("button","btn",l.botao); bt.style.marginTop="8px";
+    const fila=el("div"); fila.style.cssText="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap";
+    const bt=el("button","btn",l.botao);
     bt.addEventListener("click",()=>{ l.acao(); });
-    col.appendChild(bt);
+    /* o `.btn.ghost` é largura 100 % por omissão — dentro desta fila tem de
+       encolher, senão empurra o «Permitir avisos» para outra linha a 320 px */
+    const nao=el("button","btn ghost",t("Agora não")); nao.style.width="auto";
+    nao.addEventListener("click",()=>{
+      /* o `sessionStorage` rebenta em modo privado nalguns browsers, e isso
+         não pode partir o gesto — mas também não se cala: um erro apanhado e
+         calado é um erro que ninguém vai depurar. O aviso volta na próxima
+         pintura, que é o recuo certo (falha para o lado de dizer a verdade). */
+      try{ sessionStorage.setItem("levante-perm-dispensado","1"); }
+      catch(e){ console.warn("[levante] não consegui guardar o «Agora não»:",e); }
+      box.textContent=""; box.hidden=true; marcarAvisoNaSentinela(true);
+    });
+    fila.append(bt,nao);
+    col.appendChild(fila);
     b.append(el("span",null,l.ico),col);
     box.appendChild(b);
   }
   box.hidden=false;
+  marcarAvisoNaSentinela(false);
+}
+/* a marca que fica quando o aviso sai — junto ao interruptor, onde a função
+   vive. Não é um segundo aviso: é a mesma verdade, no sítio onde alguém a vai
+   procurar quando se lembrar de perguntar «isto está mesmo a vigiar?». */
+function marcarAvisoNaSentinela(mostrar){
+  const b=$("#btn-sentinel"); if(!b) return;
+  b.classList.toggle("sem-avisos",!!mostrar);
+  const c=$("#sentinel-card"); if(!c) return;
+  let m=c.querySelector("#sentinel-sem-avisos");
+  if(!mostrar){ if(m) m.remove(); return; }
+  if(!m){ m=el("p","h-sub sentinel-aviso"); m.id="sentinel-sem-avisos"; m.style.margin="6px 0 0";
+    const alvo=$("#sentinel-status"); if(alvo&&alvo.parentNode) alvo.parentNode.insertBefore(m,alvo.nextSibling);
+    else c.appendChild(m); }
+  m.textContent="🔔 "+t("Avisos por permitir — a Sentinela vigia, mas não te consegue avisar.");
 }
 async function preencherOrigemOmissao(){
   /* dd-54 §2 (decisão da A4.2 registada no r24): o caso comum é A→B agora —
@@ -13800,7 +13916,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-12-2207-1eb199";
+const BUILD="2026-08-13-1525-c0e1f6";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -14204,6 +14320,7 @@ const NAV_LANG={
     onramp:(r)=>`Apanha o acesso${r}`, offramp:(r)=>`Sai na próxima saída${r}`,
     fork:(d)=>`Na bifurcação, mantém-te ${d}`, eor:(d)=>`No fim da estrada, vira ${d}`,
     rb:(n)=>`Na rotunda, sai na ${n}ª saída`, uturn:"Inverte o sentido assim que puderes",
+    rbSem:(r)=>r?`Na rotunda, sai${r}`:"Rotunda à frente",
     depart:(r)=>`Segue${r}`, arrive:"Estás a chegar ao teu ponto de paragem",
     road:(n)=>` para ${n}`, dist:(m)=>`Em ${U.falaDist(m,{km:"quilómetros",m:"metros",mi:"milhas",ft:"pés"})}, `},
   en:{left:"left",right:"right",sleft:"slightly left",sright:"slightly right",
@@ -14212,6 +14329,7 @@ const NAV_LANG={
     onramp:(r)=>`Take the ramp${r}`, offramp:(r)=>`Take the next exit${r}`,
     fork:(d)=>`At the fork, keep ${d}`, eor:(d)=>`At the end of the road, turn ${d}`,
     rb:(n)=>`At the roundabout, take exit ${n}`, uturn:"Make a U-turn when possible",
+    rbSem:(r)=>r?`At the roundabout, take the exit${r}`:"Roundabout ahead",
     depart:(r)=>`Head out${r}`, arrive:"You are arriving at your stop",
     road:(n)=>` onto ${n}`, dist:(m)=>`In ${U.falaDist(m,{km:"kilometres",m:"metres",mi:"miles",ft:"feet"})}, `},
   es:{left:"a la izquierda",right:"a la derecha",sleft:"ligeramente a la izquierda",sright:"ligeramente a la derecha",
@@ -14220,6 +14338,7 @@ const NAV_LANG={
     onramp:(r)=>`Toma el acceso${r}`, offramp:(r)=>`Toma la próxima salida${r}`,
     fork:(d)=>`En la bifurcación, mantente ${d}`, eor:(d)=>`Al final de la calle, gira ${d}`,
     rb:(n)=>`En la rotonda, toma la ${n}ª salida`, uturn:"Cambia de sentido cuando puedas",
+    rbSem:(r)=>r?`En la rotonda, toma la salida${r}`:"Rotonda más adelante",
     depart:(r)=>`Sigue${r}`, arrive:"Estás llegando a tu parada",
     road:(n)=>` hacia ${n}`, dist:(m)=>`En ${U.falaDist(m,{km:"kilómetros",m:"metros",mi:"millas",ft:"pies"})}, `},
   fr:{left:"à gauche",right:"à droite",sleft:"légèrement à gauche",sright:"légèrement à droite",
@@ -14228,8 +14347,32 @@ const NAV_LANG={
     onramp:(r)=>`Prends la bretelle${r}`, offramp:(r)=>`Prends la prochaine sortie${r}`,
     fork:(d)=>`À la bifurcation, reste ${d}`, eor:(d)=>`Au bout de la route, tourne ${d}`,
     rb:(n)=>`Au rond-point, prends la ${n}${n===1?"re":"e"} sortie`, uturn:"Fais demi-tour dès que possible",
+    rbSem:(r)=>r?`Au rond-point, prends la sortie${r}`:"Rond-point devant",
     depart:(r)=>`Suis${r}`, arrive:"Tu arrives à ton arrêt",
     road:(n)=>` vers ${n}`, dist:(m)=>`Dans ${U.falaDist(m,{km:"kilomètres",m:"mètres",mi:"miles",ft:"pieds"})}, `},
+  /* ⚠️ O NEERLANDÊS NÃO EXISTIA AQUI, e o `NAV_LANG[vozIdioma()]||NAV_LANG.pt`
+     escondia-o: a app fala cinco línguas (`SPEECH_LANGS` tem `nl-NL`, o
+     `GEO_LANG` tem `nl`, há um botão NL no seletor), mas a NAVEGAÇÃO só tinha
+     quatro. Um condutor neerlandês ouvia **texto português** dito por uma voz
+     **neerlandesa** — nem uma coisa nem outra, e em movimento.
+
+     Encontrado a varrer a classe do §1a: a pergunta era «que instruções de voz
+     levam um número contado por nós», e a resposta trouxe esta por cima. É pior
+     do que o defeito da rotunda para quem conduz na Holanda, que é onde o dono
+     conduz. Não estava decidido na carta; curo-o porque vive na mesma estrutura
+     que a ordem me mandou abrir, e deixá-lo é escolher publicar uma voz errada.
+
+     ⚠️ E a falta era INVISÍVEL ao olho: o recuo para `pt` nunca dá erro, nunca
+     fica mudo, nunca acende nada. §10.18 — a ausência lê-se como conformidade. */
+  nl:{left:"links",right:"rechts",sleft:"iets naar links",sright:"iets naar rechts",
+    shleft:"scherp naar links",shright:"scherp naar rechts",straight:"rechtdoor",
+    turn:(d,r)=>`Sla ${d} af${r}`, cont:(r)=>`Rijd rechtdoor${r}`, merge:(r)=>`Voeg in${r}`,
+    onramp:(r)=>`Neem de oprit${r}`, offramp:(r)=>`Neem de volgende afrit${r}`,
+    fork:(d)=>`Bij de splitsing, houd ${d} aan`, eor:(d)=>`Aan het einde van de weg, sla ${d} af`,
+    rb:(n)=>`Neem op de rotonde de ${n}e afslag`, uturn:"Keer om zodra het kan",
+    rbSem:(r)=>r?`Neem op de rotonde de afslag${r}`:"Rotonde vooruit",
+    depart:(r)=>`Rijd weg${r}`, arrive:"Je komt aan bij je stop",
+    road:(n)=>` naar ${n}`, dist:(m)=>`Over ${U.falaDist(m,{km:"kilometer",m:"meter",mi:"mijl",ft:"voet"})}, `},
 };
 function navPhrase(mv){
   /* manobra que não soubemos classificar: dizemos o texto do próprio
@@ -14243,7 +14386,14 @@ function navPhrase(mv){
   switch(mv.type){
     case "turn": return mv.mod==="straight"?Lg.cont(road):Lg.turn(dir,road);
     case "end of road": return Lg.eor(dir);
-    case "roundabout": case "rotary": return Lg.rb(mv.exit||1);
+    /* ⚠️ O `||1` QUE ESTAVA AQUI ERA A SEGUNDA METADE DO DEFEITO. Com o campo
+       certo lido, o número chega quase sempre — mas quando NÃO chega, dizer «1ª
+       saída» é inventar. É a 7g-ter à letra: o valor de recurso é o mais
+       HONESTO, não o mais completo. Sem número, a frase diz o que se sabe (que
+       há uma rotunda, e para onde se vai) e cala o que não se sabe.
+       Uma voz que erra uma vez perde as outras todas. */
+    case "roundabout": case "rotary":
+      return mv.exit>=1?Lg.rb(mv.exit):(Lg.rbSem||NAV_LANG.pt.rbSem)(road);
     case "roundabout turn": case "exit roundabout": case "exit rotary": return Lg.cont(road);
     case "fork": return Lg.fork(dir);
     case "merge": return Lg.merge(road);
@@ -15415,7 +15565,11 @@ function init(){
   pintarSitiosLinha();
   $("#trips-bg").addEventListener("click",closeTrips);
   planTripAlerts();
-  $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open"); });
+  $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open");
+    /* dd-228 §2: é AQUI que as fronteiras se pedem — com a gaveta a abrir, não
+       no arranque. A frase genérica já lá está desde o arranque; esta chamada
+       acrescenta-lhe o país quando ele se souber. */
+    if(pop.classList.contains("open")&&typeof renderCamLei==="function") renderCamLei(); });
   /* dd-125: recarga VERDADEIRA, não foco — o botão da família das avarias de rede */
   $("#net-recarregar")?.addEventListener("click",()=>location.reload());
   document.addEventListener("click",(e)=>{ if(!pop.contains(e.target)&&e.target.id!=="btn-settings") pop.classList.remove("open"); });

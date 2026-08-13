@@ -6,6 +6,29 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v29 — 13/08/2026 ═══════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · A VOZ DIZ A SAÍDA CERTA DA ROTUNDA. Dizia «primeira saída» onde era a
+     terceira — o pior defeito que esta app teve, porque manda fazer a coisa
+     errada em movimento. A app lia o número da PLACA de uma saída de
+     autoestrada onde devia ler a contagem de saídas da rotunda.
+   · E QUANDO O NÚMERO NÃO EXISTE, DEIXA DE O INVENTAR. Sem número, a voz diz
+     que há uma rotunda e para onde se sai — e cala o que não sabe.
+   · NAVEGAÇÃO EM NEERLANDÊS. Quem tinha a app em NL ouvia as indicações de
+     condução em PORTUGUÊS, ditas por uma voz neerlandesa. Faltava a língua
+     inteira na navegação.
+   · A ROTA DE RESERVA DIZ QUE É DE RESERVA. Sem chave de rotas, o trajeto vem
+     de um serviço com perfil de CARRO — e as horas de cada troço podem estar
+     deslocadas. Passa a estar escrito no ecrã, só quando acontece.
+   · A HORA DE PASSAGEM DEIXA DE ASSUMIR EXCESSO DE VELOCIDADE. O motor de
+     rotas era interrogado em perfil de MOTA, que devolve tempos mais baixos do
+     que o de carro — e numa mota o limite de velocidade é o mesmo. Passa a
+     perguntar em perfil de carro.
+   · O AVISO DAS NOTIFICAÇÕES DEIXA DE INVENTAR UMA MUDANÇA DE CASA que nunca
+     houve, sai de cima do veredicto, e passa a poder dispensar-se — deixando a
+     marca junto à Sentinela, para dispensar não ser esquecer.
+   ═══════════════════════════════════════════════════════════════════════════ */
 /* ═══ levante-v27 — 12/08/2026 ═══════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -74,7 +97,7 @@
    · 36 frases que apareciam em português a quem tem a app em neerlandês —
      incluindo o veredicto do ecrã principal — passaram a estar traduzidas.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* ═══ levante-v28 — 12/08/2026 ═══════════════════════════════════════════════
+/* ═══ levante-v29 — 12/08/2026 ═══════════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
    · **A Sentinela deixou de avisar com precisão que não existe.** Ela dizia
@@ -94,7 +117,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v28";
+const V = "levante-v29";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
