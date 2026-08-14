@@ -6,6 +6,24 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v30 — 13/08/2026 ══════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · OS SETE DIAS VOLTAM A DIZER O QUE SÃO. A faixa mostrava verde, amarelo,
+     laranja e vermelho e mais nada — três cores e nenhuma palavra. Cada dia
+     volta a trazer o veredicto escrito ao lado do ponto: «Bom · Aviso ·
+     Risco · Mau», nas cinco línguas, com a frase inteira no rótulo para quem
+     ouve o ecrã. O 🥵 e o número do calor ficam ao lado da palavra, não no
+     lugar dela.
+   · OS SÍTIOS DIZEM O QUE FAZEM. «Redefinir por pesquisa» não queria dizer
+     nada — não se redefine nada, escolhe-se a casa. As três acções passam a
+     «Escolher pesquisando · Usar a minha posição · Tocar no mapa», nas cinco
+     línguas.
+   · E OS RECENTES PASSAM A RESPONDER AO DEDO. Eram uma lista onde o único
+     gesto possível era apagar: tocar na linha passa a usar aquele sítio, e o
+     ⭐ guarda-o nos Guardados com o nome que quiseres. A tua CASA não se
+     mexe com isso — para a mudar continua a ser preciso dizê-lo.
+   ══════════════════════════════════════════════════════════ */
 /* ═══ levante-v29 — 13/08/2026 ═══════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -117,7 +135,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v29";
+const V = "levante-v30";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
