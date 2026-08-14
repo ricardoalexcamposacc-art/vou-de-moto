@@ -6,6 +6,33 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v32 — 14/08/2026 ══════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · O ANEL PASSA A DIZER QUANTO VIU. Quando falta uma hora de previsão a
+     frase já dizia «Provavelmente bom» — mas o número ao lado dizia 100, e
+     100 é o que sai quando não há nada de mau para descontar. Dois
+     instrumentos, duas respostas, e o leitor a ver uma contradição com
+     razão. Agora a calha do anel — o círculo de trás, que é literalmente o
+     que falta preencher — fica TRACEJADA enquanto a janela estiver
+     incompleta, e volta a contínua quando estiver completa. O arco não se
+     toca: continua proporcional ao índice.
+   · E SEM DADO NENHUM NÃO HÁ NÚMERO. No caso extremo — nenhuma das horas
+     chegou — a app mostrava 100 sem ter olhado para coisa nenhuma. Passa a
+     mostrar «—», o anel fica só com a calha, e o ecrã diz por palavras que
+     não sabemos dizer. Cinco línguas.
+   · O VENTO DE TRAVÉS DEIXA DE TER DUAS RESPOSTAS NO MESMO ECRÃ. A pastilha
+     do resumo da rota dizia «vento lateral até ~60 km/h perto do km 0» e a
+     linha de perigo, dois blocos abaixo, dizia «km 0–30 · 19:00–19:45» — do
+     mesmo vento. Eram duas contas diferentes com dois limiares diferentes.
+     Passa a haver uma só: a pastilha diz o mesmo troço e ganha a hora
+     («km 0–30 · ~19:00»).
+   · E O AGORA PASSA A DIZER O TRAVÉS. Um chip novo, ao lado da humidade e da
+     visibilidade, quando as rajadas chegam ao mesmo limiar. Como aqui não há
+     rota, não há rumo — o chip diz «lateral até», que é o limite numa estrada
+     atravessada ao vento, e a frase inteira está no rótulo. Sem direção de
+     vento não aparece.
+   ══════════════════════════════════════════════════════════ */
 /* ═══ levante-v31 — 14/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -148,7 +175,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v31";
+const V = "levante-v32";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
