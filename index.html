@@ -10859,6 +10859,25 @@ function buildVariant(route,pts,waypoints,pauseSec,dense){
       });
     });
   }
+  /* ═══ ORDEM 14/08 §1a — O NÚMERO DA SAÍDA VIAJA PARA O PASSO DE DENTRO ══
+     O `roundabout_exit` vem no passo de APROXIMAÇÃO. O passo de saída — o
+     que fala quando já se está na rotunda — chega quase sempre com `exit:0`,
+     e sem número não há como dizer «terceira saída» lá dentro.
+     Passa-se para a frente, e **só até à primeira manobra que não seja de
+     rotunda**: parar aí é o que impede o número de uma rotunda escorregar
+     para a seguinte. Se o fornecedor um dia preencher o passo de saída, o
+     valor dele ganha — nunca se escreve por cima de um número que veio do
+     mundo. */
+  for(let i=0;i<maneuvers.length;i++){
+    if(maneuvers[i].type!=="roundabout"&&maneuvers[i].type!=="rotary") continue;
+    const n=maneuvers[i].exit;
+    if(!(n>=1)) continue;
+    for(let j=i+1;j<maneuvers.length;j++){
+      const tj=maneuvers[j].type;
+      if(tj!=="exit roundabout"&&tj!=="exit rotary"&&tj!=="roundabout turn") break;
+      if(!(maneuvers[j].exit>=1)) maneuvers[j].exit=n;
+    }
+  }
   /* estradas curtas não interessam a ninguém: fica o que se conduz mesmo */
   const estradasUteis=estradas.filter(e=>e.km1-e.km0>=0.4);
   const legs=(route.legs&&route.legs.length===pts.length-1)?route.legs
@@ -13454,6 +13473,29 @@ function raioChegada(velMps){
    estado é terminal para aquela viagem. Sem trinco, sair e voltar a entrar no
    raio (uma rotunda ao pé do destino) repetia o anúncio. */
 const chegada={dentro:0, feito:false};
+/* ═══ ORDEM 14/08 §1b — UMA CHAVE GEOGRÁFICA, NÃO UMA POSIÇÃO NA ROTA ═════
+   O dono ouviu a temperatura máxima anunciada várias vezes na mesma viagem.
+   A causa tinha DUAS metades e a chave é a segunda:
+     · `travel.alerted.clear()` no recálculo esquecia tudo o que já foi dito;
+     · e a chave era `hz-<tipo>-<km ao longo da rota>` — portanto, mesmo sem o
+       clear, **uma rota nova dá km diferentes ao mesmo sítio** e o perigo
+       voltava a ser tratado como novo.
+   Um facto que não mudou não se anuncia outra vez. A chave passa a ser o que
+   o facto é (`tipo`) mais ONDE ele está, arredondado a ~1,1 km — que é o grão
+   a que dois avisos são o mesmo aviso na estrada. Assim sobrevive a qualquer
+   recálculo, porque o sítio não muda quando a rota muda.
+   ⚠️ A posição vem da amostra mais próxima do `km0` do perigo: os perigos
+   guardam km, e é do `R.samples` que sai a geografia. Sem amostra utilizável
+   cai-se no km — pior, mas honesto, e a queda diz-se aqui em vez de fingir. */
+function arred(la,lo){ return (Number.isFinite(la)&&Number.isFinite(lo))?`${la.toFixed(2)},${lo.toFixed(2)}`:null; }
+function chavePerigo(R,h){
+  let melhor=null,dmin=Infinity;
+  for(const sm of (R?.samples||[])){
+    const d=Math.abs((sm.km||0)-(h.km0||0));
+    if(d<dmin){ dmin=d; melhor=sm; }
+  }
+  return `hz-${h.kind}-${arred(melhor?.lat,melhor?.lon)||(h.km0||0).toFixed(1)}`;
+}
 const travel={active:false, watch:null, marcador:null, wakeLock:null, alerted:new Set(),
   lastRecalc:0, lastPaint:0, lastNotif:0, geomIdx:0, kmDone:0,
   offHits:0, rerouting:false, lastReroute:0,
@@ -13838,7 +13880,19 @@ async function rerouteFromHere(pos){
       variants:[v], active:0, coords:v.coords, cum:v.cum, geomKm:v.geomKm,
       totalKm:v.totalKm, travelTotal:v.travelTotal, totalSec:v.travelTotal,
       samples:v.samples, maneuvers:v.maneuvers, estradas:v.estradas||[], cameras:[], camerasError:false};
-    travel.geomIdx=0; travel.kmDone=0; travel.alerted.clear();
+    travel.geomIdx=0; travel.kmDone=0;
+    /* ═══ ORDEM 14/08 §1b — O RECÁLCULO NÃO ESQUECE O QUE JÁ FOI DITO ══════
+       Era um `travel.alerted.clear()`. Cada recálculo apagava a memória toda e
+       a rota nova voltava a anunciar os mesmos perigos — a sensação de 36°
+       incluída. É por isso que o dono ouvia a máxima repetida: não havia
+       temporizador nenhum, havia amnésia.
+       ⚠️ MAS AS MANOBRAS TÊM DE SAIR, e é a razão de isto não ser uma linha
+       apagada: as chaves delas são `nav<índice>`, e o índice é a posição na
+       lista de manobras da rota. Numa rota nova o índice 3 é outra manobra —
+       guardar essas chaves fazia a app CALAR uma indicação de condução, que é
+       muito pior do que repetir um aviso de calor.
+       Sai o que é por índice; fica o que é por sítio. */
+    for(const kAnt of [...travel.alerted]) if(kAnt.startsWith("nav")) travel.alerted.delete(kAnt);
     travel.lastRecalc=now; travel.lastPaint=0;
     applyShift(0,false);
     renderDepartures();
@@ -14015,7 +14069,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-14-0046-b1cd05";
+const BUILD="2026-08-14-1656-45a0b6";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -14418,7 +14472,8 @@ const NAV_LANG={
     turn:(d,r)=>`Vira ${d}${r}`, cont:(r)=>`Continua em frente${r}`, merge:(r)=>`Entra${r}`,
     onramp:(r)=>`Apanha o acesso${r}`, offramp:(r)=>`Sai na próxima saída${r}`,
     fork:(d)=>`Na bifurcação, mantém-te ${d}`, eor:(d)=>`No fim da estrada, vira ${d}`,
-    rb:(n)=>`Na rotunda, sai na ${n}ª saída`, uturn:"Inverte o sentido assim que puderes",
+    rb:(n)=>`Na rotunda, sai na ${n}ª saída`,
+    rbPara:(n,r)=>`Na rotunda, ${n}ª saída${r}`, rbSaida:(n)=>`${n}ª saída`, rbSaidaSem:"Sai da rotunda", uturn:"Inverte o sentido assim que puderes",
     rbSem:(r)=>r?`Na rotunda, sai${r}`:"Rotunda à frente",
     depart:(r)=>`Segue${r}`, arrive:"Estás a chegar ao teu ponto de paragem",
     road:(n)=>` para ${n}`, dist:(m)=>`Em ${U.falaDist(m,{km:"quilómetros",m:"metros",mi:"milhas",ft:"pés"})}, `},
@@ -14427,7 +14482,8 @@ const NAV_LANG={
     turn:(d,r)=>`Turn ${d}${r}`, cont:(r)=>`Continue straight${r}`, merge:(r)=>`Merge${r}`,
     onramp:(r)=>`Take the ramp${r}`, offramp:(r)=>`Take the next exit${r}`,
     fork:(d)=>`At the fork, keep ${d}`, eor:(d)=>`At the end of the road, turn ${d}`,
-    rb:(n)=>`At the roundabout, take exit ${n}`, uturn:"Make a U-turn when possible",
+    rb:(n)=>`At the roundabout, take exit ${n}`,
+    rbPara:(n,r)=>`At the roundabout, take exit ${n}${r}`, rbSaida:(n)=>`Exit ${n}`, rbSaidaSem:"Leave the roundabout", uturn:"Make a U-turn when possible",
     rbSem:(r)=>r?`At the roundabout, take the exit${r}`:"Roundabout ahead",
     depart:(r)=>`Head out${r}`, arrive:"You are arriving at your stop",
     road:(n)=>` onto ${n}`, dist:(m)=>`In ${U.falaDist(m,{km:"kilometres",m:"metres",mi:"miles",ft:"feet"})}, `},
@@ -14436,7 +14492,8 @@ const NAV_LANG={
     turn:(d,r)=>`Gira ${d}${r}`, cont:(r)=>`Sigue de frente${r}`, merge:(r)=>`Incorpórate${r}`,
     onramp:(r)=>`Toma el acceso${r}`, offramp:(r)=>`Toma la próxima salida${r}`,
     fork:(d)=>`En la bifurcación, mantente ${d}`, eor:(d)=>`Al final de la calle, gira ${d}`,
-    rb:(n)=>`En la rotonda, toma la ${n}ª salida`, uturn:"Cambia de sentido cuando puedas",
+    rb:(n)=>`En la rotonda, toma la ${n}ª salida`,
+    rbPara:(n,r)=>`En la rotonda, toma la ${n}ª salida${r}`, rbSaida:(n)=>`${n}ª salida`, rbSaidaSem:"Sal de la rotonda", uturn:"Cambia de sentido cuando puedas",
     rbSem:(r)=>r?`En la rotonda, toma la salida${r}`:"Rotonda más adelante",
     depart:(r)=>`Sigue${r}`, arrive:"Estás llegando a tu parada",
     road:(n)=>` hacia ${n}`, dist:(m)=>`En ${U.falaDist(m,{km:"kilómetros",m:"metros",mi:"millas",ft:"pies"})}, `},
@@ -14445,7 +14502,8 @@ const NAV_LANG={
     turn:(d,r)=>`Tourne ${d}${r}`, cont:(r)=>`Continue tout droit${r}`, merge:(r)=>`Insère-toi${r}`,
     onramp:(r)=>`Prends la bretelle${r}`, offramp:(r)=>`Prends la prochaine sortie${r}`,
     fork:(d)=>`À la bifurcation, reste ${d}`, eor:(d)=>`Au bout de la route, tourne ${d}`,
-    rb:(n)=>`Au rond-point, prends la ${n}${n===1?"re":"e"} sortie`, uturn:"Fais demi-tour dès que possible",
+    rb:(n)=>`Au rond-point, prends la ${n}${n===1?"re":"e"} sortie`,
+    rbPara:(n,r)=>`Au rond-point, prends la ${n}${n===1?"re":"e"} sortie${r}`, rbSaida:(n)=>`${n}${n===1?"re":"e"} sortie`, rbSaidaSem:"Sors du rond-point", uturn:"Fais demi-tour dès que possible",
     rbSem:(r)=>r?`Au rond-point, prends la sortie${r}`:"Rond-point devant",
     depart:(r)=>`Suis${r}`, arrive:"Tu arrives à ton arrêt",
     road:(n)=>` vers ${n}`, dist:(m)=>`Dans ${U.falaDist(m,{km:"kilomètres",m:"mètres",mi:"miles",ft:"pieds"})}, `},
@@ -14468,7 +14526,8 @@ const NAV_LANG={
     turn:(d,r)=>`Sla ${d} af${r}`, cont:(r)=>`Rijd rechtdoor${r}`, merge:(r)=>`Voeg in${r}`,
     onramp:(r)=>`Neem de oprit${r}`, offramp:(r)=>`Neem de volgende afrit${r}`,
     fork:(d)=>`Bij de splitsing, houd ${d} aan`, eor:(d)=>`Aan het einde van de weg, sla ${d} af`,
-    rb:(n)=>`Neem op de rotonde de ${n}e afslag`, uturn:"Keer om zodra het kan",
+    rb:(n)=>`Neem op de rotonde de ${n}e afslag`,
+    rbPara:(n,r)=>`Neem op de rotonde de ${n}e afslag${r}`, rbSaida:(n)=>`${n}e afslag`, rbSaidaSem:"Verlaat de rotonde", uturn:"Keer om zodra het kan",
     rbSem:(r)=>r?`Neem op de rotonde de afslag${r}`:"Rotonde vooruit",
     depart:(r)=>`Rijd weg${r}`, arrive:"Je komt aan bij je stop",
     road:(n)=>` naar ${n}`, dist:(m)=>`Over ${U.falaDist(m,{km:"kilometer",m:"meter",mi:"mijl",ft:"voet"})}, `},
@@ -14491,9 +14550,24 @@ function navPhrase(mv){
        HONESTO, não o mais completo. Sem número, a frase diz o que se sabe (que
        há uma rotunda, e para onde se vai) e cala o que não se sabe.
        Uma voz que erra uma vez perde as outras todas. */
+    /* ═══ ORDEM 14/08 §1a — O NOME NA APROXIMAÇÃO, O NÚMERO LÁ DENTRO ═════
+       Os dois passos existiam e estavam TROCADOS. A aproximação dizia o
+       número e calava a estrada; o passo de saída — que é o que fala quando
+       o condutor JÁ ESTÁ dentro da rotunda — devolvia `Lg.cont(road)`, ou
+       seja o nome da rua e mais nada.
+       **Um nome de rua não se lê a inclinar, de capacete.** Lá dentro só
+       serve uma coisa: contar saídas. E na aproximação o nome serve, porque
+       é onde ainda há tempo de o ler ou de o reconhecer.
+       ⚠️ E quando não há número, o passo de dentro NÃO cai para o nome da
+       rua — cai para «sai da rotunda». Dizer o nome sem o número é
+       exatamente o que esta ordem proíbe (7g-ter: o recurso é o mais
+       honesto, não o mais completo). */
     case "roundabout": case "rotary":
-      return mv.exit>=1?Lg.rb(mv.exit):(Lg.rbSem||NAV_LANG.pt.rbSem)(road);
-    case "roundabout turn": case "exit roundabout": case "exit rotary": return Lg.cont(road);
+      return mv.exit>=1?(Lg.rbPara||NAV_LANG.pt.rbPara)(mv.exit,road)
+                       :(Lg.rbSem||NAV_LANG.pt.rbSem)(road);
+    case "roundabout turn": case "exit roundabout": case "exit rotary":
+      return mv.exit>=1?(Lg.rbSaida||NAV_LANG.pt.rbSaida)(mv.exit)
+                       :(Lg.rbSaidaSem||NAV_LANG.pt.rbSaidaSem);
     case "fork": return Lg.fork(dir);
     case "merge": return Lg.merge(road);
     case "on ramp": return Lg.onramp(road);
@@ -14855,7 +14929,7 @@ function onTravelPos(p){
   if(R.hazards?.length){
     for(const h of R.hazards){
       const d=h.km0-kmNow;
-      const k=`hz-${h.kind}-${h.km0.toFixed(1)}`;
+      const k=chavePerigo(R,h);
       if(d<=1.5&&d>-0.2&&!travel.alerted.has(k)){
         travel.alerted.add(k);
         buzz(h.sev>=3?[280,110,280]:[180,80,180]);
@@ -14871,7 +14945,7 @@ function onTravelPos(p){
     if(nextCam){
       const dc=nextCam.km-kmNow;
       for(const [th,lab] of [[1.0,"1 quilómetro"],[0.4,"400 metros"]]){
-        const key=`cam${nextCam.km.toFixed(1)}-${th}`;
+        const key=`cam${arred(nextCam.lat,nextCam.lon)||nextCam.km.toFixed(1)}-${th}`;
         if(dc<=th&&dc>-0.05&&!travel.alerted.has(key)){
           travel.alerted.add(key);
           avisar([180,80,180],"radar");  // dd-87 §6: assinatura própria, não o som de perigo

@@ -6,6 +6,19 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v31 — 14/08/2026 ══════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · NA ROTUNDA, A VOZ CONTA SAÍDAS EM VEZ DE LER PLACAS. Lá dentro dizia o
+     nome da rua — e um nome de rua não se lê a inclinar, de capacete. Agora
+     a aproximação diz «na rotunda, 3ª saída para X» e, já lá dentro, «3ª
+     saída». Cinco línguas.
+   · E O AVISO DE CALOR DEIXA DE SE REPETIR. Sempre que a app recalculava a
+     rota esquecia tudo o que já tinha dito, e voltava a anunciar os mesmos
+     perigos — a temperatura máxima incluída. Um facto que não mudou passa a
+     ser dito uma vez só. As indicações de condução continuam a ser
+     recalculadas, que essas mudam mesmo.
+   ══════════════════════════════════════════════════════════ */
 /* ═══ levante-v30 — 13/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -135,7 +148,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v30";
+const V = "levante-v31";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
