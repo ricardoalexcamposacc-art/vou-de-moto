@@ -745,6 +745,13 @@ body.rota-mapa #view-agora{display:none}
 html[data-theme="dark"] .sw::before{background:#4a5568}
 /* Os meus sítios (dd-48a): linhas de gestão na gaveta */
 .sitio-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);min-width:0}
+.mini-tracado,.mini-pino{width:46px;height:46px;border-radius:11px;background:var(--surface2);
+flex:none;display:grid;place-items:center;border:1px solid var(--line,#0002);font-size:17px}
+.mini-tracado svg{width:46px;height:46px;display:block}
+.mini-tracado path{fill:none;stroke:var(--fg,#141a26);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.mini-tracado .ini{fill:var(--good,#16a34a)}
+.mini-tracado .fim{fill:var(--fg,#141a26)}
+
 .sitio-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .sitio-tx b{font-size:var(--t-corpo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sitio-tx .small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -858,6 +865,11 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
 .hero.incompleto{outline:2px dashed rgba(216,161,0,.55);outline-offset:-2px}
 .buraco-dados{margin-top:10px;padding:8px 11px;border-radius:9px;display:flex;gap:6px;align-items:flex-start;
   background:rgba(216,161,0,.10);border:1px solid rgba(216,161,0,.35);font-size:var(--t-corpo);line-height:1.45;color:var(--ink)}
+.origem-suposta{display:flex;align-items:center;gap:8px;width:100%;margin-top:8px;padding:8px 10px;
+border:1px solid var(--line,#0002);border-radius:10px;background:var(--surface2);color:inherit;
+font:inherit;font-size:.92em;text-align:left;cursor:pointer}
+.origem-suposta .os-mudar{margin-left:auto;opacity:.75;text-decoration:underline}
+
 .tl-col.furo .tl-bar{opacity:.45;
   background-image:repeating-linear-gradient(45deg,transparent 0 4px,rgba(127,127,127,.6) 4px 8px)}
 .nc-cell.furo{background:transparent !important;border:1px dashed var(--muted);color:var(--muted)}
@@ -2795,7 +2807,7 @@ en:{
 "Autorizar a localização":"Allow location",
 "Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"Alerts are silent at the new address: notification permission doesn't cross a change of home. Until you grant it, watch and the Sentinel won't warn you.",
 "Voltar a autorizar os avisos":"Allow alerts again",
-"sensação {t}°":"feels {t}°","lateral até":"crosswind up to","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"On a road running across this wind, the lateral component reaches ~{g} — firm on the bars.","vento":"wind","rajadas":"gusts","humidade":"humidity","visibilidade":"visibility","UV máx":"UV max","sol":"sun",
+"sensação {t}°":"feels {t}°","lateral até":"crosswind up to","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"On a road running across this wind, the lateral component reaches ~{g} — firm on the bars.","vento":"wind","rajadas":"gusts","humidade":"humidity","visibilidade":"visibility","UV máx":"UV max","sol":"sun","Também não há {p} aqui à volta.":"There aren't any {p} around here either.","A pesquisa não respondeu. Verifica a ligação e tenta outra vez.":"The search didn't answer. Check your connection and try again.","A localização está recusada — a previsão fica no sítio que já tinha.":"Location is denied — the forecast stays at the place I already had.","O GPS não respondeu a tempo — mantenho a previsão onde estava.":"The GPS didn't answer in time — I'm keeping the forecast where it was.","Voltou a rede, mas a meteorologia não veio. Toca no sítio para tentar outra vez.":"The network is back, but the forecast didn't come. Tap the place to try again.","📶 Internet de volta.":"📶 Internet is back.","De: casa · {n}":"From: home · {n}","mudar":"change","Não sabia onde estavas, por isso parti de casa. Toca para mudar a origem.":"I didn't know where you were, so I started from home. Tap to change the origin.","A rota para {p} não saiu — o que falta está no cartão.":"The route to {p} didn't come out — what's missing is on the card.","Traçado desta ida":"The shape of this ride","Sítio que ainda não foi destino":"A place that has never been a destination","Ir outra vez a {p}":"Go to {p} again","Toca para ir outra vez · toque longo para ver só o tempo aí":"Tap to go again · long-press to just see the weather there",
 "Valores desta zona, ~{d} em redor":"Values for this area, ~{d} around",
 "🧤 Equipamento · próximas 6 h":"🧤 Gear · next 6 h",
 "🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Full rain suit (jacket + trousers + boot covers)",
@@ -3285,7 +3297,7 @@ es:{
 "Autorizar a localização":"Permitir la ubicación",
 "Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"Los avisos están mudos en la dirección nueva: el permiso de notificaciones no cruza el cambio de casa. Hasta que lo des, el vigilar y el Centinela no te avisan.",
 "Voltar a autorizar os avisos":"Volver a permitir los avisos",
-"sensação {t}°":"sensación {t}°","lateral até":"lateral hasta","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"En una carretera atravesada a este viento, la componente lateral llega a ~{g} — firme en el manillar.","vento":"viento","rajadas":"rachas","humidade":"humedad","visibilidade":"visibilidad","UV máx":"UV máx","sol":"sol",
+"sensação {t}°":"sensación {t}°","lateral até":"lateral hasta","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"En una carretera atravesada a este viento, la componente lateral llega a ~{g} — firme en el manillar.","vento":"viento","rajadas":"rachas","humidade":"humedad","visibilidade":"visibilidad","UV máx":"UV máx","sol":"sol","Também não há {p} aqui à volta.":"Tampoco hay {p} por aquí cerca.","A pesquisa não respondeu. Verifica a ligação e tenta outra vez.":"La búsqueda no respondió. Comprueba la conexión e inténtalo de nuevo.","A localização está recusada — a previsão fica no sítio que já tinha.":"La ubicación está denegada — la previsión se queda en el sitio que ya tenía.","O GPS não respondeu a tempo — mantenho a previsão onde estava.":"El GPS no respondió a tiempo — mantengo la previsión donde estaba.","Voltou a rede, mas a meteorologia não veio. Toca no sítio para tentar outra vez.":"Volvió la red, pero la previsión no llegó. Toca el sitio para intentarlo otra vez.","📶 Internet de volta.":"📶 Internet de vuelta.","De: casa · {n}":"Desde: casa · {n}","mudar":"cambiar","Não sabia onde estavas, por isso parti de casa. Toca para mudar a origem.":"No sabía dónde estabas, así que salí de casa. Toca para cambiar el origen.","A rota para {p} não saiu — o que falta está no cartão.":"La ruta a {p} no salió — lo que falta está en la tarjeta.","Traçado desta ida":"El trazado de esta ida","Sítio que ainda não foi destino":"Un sitio que nunca fue destino","Ir outra vez a {p}":"Ir otra vez a {p}","Toca para ir outra vez · toque longo para ver só o tempo aí":"Toca para ir otra vez · pulsación larga para ver solo el tiempo allí",
 "Valores desta zona, ~{d} em redor":"Valores de esta zona, ~{d} a la redonda",
 "🧤 Equipamento · próximas 6 h":"🧤 Equipación · próximas 6 h",
 "🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Traje de agua completo (chaqueta + pantalón + cubrebotas)",
@@ -3753,7 +3765,7 @@ fr:{
 "Autorizar a localização":"Autoriser la localisation",
 "Os avisos estão calados na morada nova: a permissão de notificações não atravessa a mudança de casa. Enquanto não a deres, o vigiar e a Sentinela não te avisam.":"Les alertes sont muettes à la nouvelle adresse : l'autorisation de notifications ne traverse pas le changement de maison. Tant que tu ne la donnes pas, la surveillance et la Sentinelle ne te préviennent pas.",
 "Voltar a autorizar os avisos":"Réautoriser les alertes",
-"sensação {t}°":"ressenti {t}°","lateral até":"latéral jusqu'à","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"Sur une route en travers de ce vent, la composante latérale atteint ~{g} — tiens bien le guidon.","vento":"vent","rajadas":"rafales","humidade":"humidité","visibilidade":"visibilité","UV máx":"UV max","sol":"soleil",
+"sensação {t}°":"ressenti {t}°","lateral até":"latéral jusqu'à","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"Sur une route en travers de ce vent, la composante latérale atteint ~{g} — tiens bien le guidon.","vento":"vent","rajadas":"rafales","humidade":"humidité","visibilidade":"visibilité","UV máx":"UV max","sol":"soleil","Também não há {p} aqui à volta.":"Il n'y a pas non plus de {p} dans le coin.","A pesquisa não respondeu. Verifica a ligação e tenta outra vez.":"La recherche n'a pas répondu. Vérifie la connexion et réessaie.","A localização está recusada — a previsão fica no sítio que já tinha.":"La localisation est refusée — la météo reste au lieu que j'avais déjà.","O GPS não respondeu a tempo — mantenho a previsão onde estava.":"Le GPS n'a pas répondu à temps — je garde la météo là où elle était.","Voltou a rede, mas a meteorologia não veio. Toca no sítio para tentar outra vez.":"Le réseau est revenu, mais la météo n'est pas arrivée. Touche le lieu pour réessayer.","📶 Internet de volta.":"📶 Internet est de retour.","De: casa · {n}":"Depuis : maison · {n}","mudar":"changer","Não sabia onde estavas, por isso parti de casa. Toca para mudar a origem.":"Je ne savais pas où tu étais, donc je pars de la maison. Touche pour changer le départ.","A rota para {p} não saiu — o que falta está no cartão.":"L'itinéraire vers {p} n'est pas sorti — ce qui manque est sur la carte.","Traçado desta ida":"Le tracé de ce trajet","Sítio que ainda não foi destino":"Un lieu qui n'a jamais été une destination","Ir outra vez a {p}":"Retourner à {p}","Toca para ir outra vez · toque longo para ver só o tempo aí":"Touche pour y retourner · appui long pour voir seulement la météo là-bas",
 "Valores desta zona, ~{d} em redor":"Valeurs de cette zone, ~{d} à la ronde",
 "🧤 Equipamento · próximas 6 h":"🧤 Équipement · 6 h à venir",
 "🌧️ Fato de chuva completo (casaco + calças + cobre-botas)":"🌧️ Tenue de pluie complète (veste + pantalon + sur-bottes)",
@@ -4462,7 +4474,7 @@ nl:{
 "Sem dados de {c} para as {h}.":"Geen gegevens over {c} voor {h}.",
 "O que verifiquei está bom, mas sem isso não afirmo o verde.":"Wat ik heb gecontroleerd is goed, maar zonder dat durf ik geen groen te zeggen.",
 "Os dados em falta não melhoravam esta resposta.":"De ontbrekende gegevens zouden dit antwoord niet beter maken.",
-"sensação {t}°":"gevoel {t}°",
+"sensação {t}°":"gevoel {t}°","Também não há {p} aqui à volta.":"Er zijn hier in de buurt ook geen {p}.","A pesquisa não respondeu. Verifica a ligação e tenta outra vez.":"De zoekopdracht gaf geen antwoord. Controleer je verbinding en probeer opnieuw.","A localização está recusada — a previsão fica no sítio que já tinha.":"Locatie is geweigerd — de verwachting blijft op de plek die ik al had.","O GPS não respondeu a tempo — mantenho a previsão onde estava.":"De gps antwoordde niet op tijd — ik houd de verwachting waar die was.","Voltou a rede, mas a meteorologia não veio. Toca no sítio para tentar outra vez.":"Het netwerk is terug, maar de weersverwachting niet. Tik op de plek om het opnieuw te proberen.","📶 Internet de volta.":"📶 Internet is terug.","De: casa · {n}":"Vanaf: thuis · {n}","mudar":"wijzigen","Não sabia onde estavas, por isso parti de casa. Toca para mudar a origem.":"Ik wist niet waar je was, dus vertrek ik vanaf thuis. Tik om het vertrekpunt te wijzigen.","A rota para {p} não saiu — o que falta está no cartão.":"De route naar {p} kwam er niet uit — wat ontbreekt staat op de kaart.","Traçado desta ida":"Het tracé van deze rit","Sítio que ainda não foi destino":"Een plek die nooit bestemming was","Ir outra vez a {p}":"Ga opnieuw naar {p}","Toca para ir outra vez · toque longo para ver só o tempo aí":"Tik om opnieuw te gaan · lang indrukken om alleen het weer daar te zien",
 "rajadas":"windstoten",
 "UV máx":"UV max","lateral até":"zijwind tot","Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.":"Op een weg dwars op deze wind haalt de zijwindcomponent ~{g} — stevig aan het stuur.",
 "farmácia":"apotheek",
@@ -8362,11 +8374,23 @@ function attachAC(input, list, onPick){
         const ref=refPesquisa(); if(!ref) return;
         const paiCat=CAT_SINONIMOS.find(c=>c.geo===a.geoPai);
         if(!paiCat) return;
+        const rotulo=b.textContent;
         b.disabled=true; b.textContent=t("A procurar…");
-        const r=await poiNear(paiCat,ref).catch(()=>[]);
+        /* ═══ dd-242 §10.115 — A PROMESSA GANHA PAR ════════════════════════
+           O `.catch(()=>[])` engolia a falha e o `r.length?r:items` deixava a
+           lista exactamente na mesma. O dedo tocava, o botão dizia «A
+           procurar…», e depois não acontecia NADA — nem resultado, nem razão.
+           Agora a falha e o vazio distinguem-se, e cada um diz o que é. */
+        const r=await poiNear(paiCat,ref).catch(()=>null);
+        if(!r||!r.length){
+          b.disabled=false; b.textContent=rotulo;
+          toast(r?t("Também não há {p} aqui à volta.",{p:t(a.pai)})
+                 :t("A pesquisa não respondeu. Verifica a ligação e tenta outra vez."),6000);
+          return;
+        }
         PESQUISA.alargada={cat:a.cat, pai:a.pai};
         PESQUISA.alargamento=null;
-        items=r.length?r:items; active=items.length?0:-1;
+        items=r; active=items.length?0:-1;
         render();
       });
       d.appendChild(b);
@@ -8403,7 +8427,7 @@ function attachAC(input, list, onPick){
   };
   const pick=(i)=>{ const it=items[i]; if(!it) return;
     input.value=it.name+(it.sub?` — ${it.sub.split(",")[0]}`:"");
-    input._picked=it; input._doFoco=false; addRecente(it); close(); onPick&&onPick(it); };
+    input._picked=it; input._suposta=null; input._doFoco=false; addRecente(it); close(); onPick&&onPick(it); };
   const search=debounce(async ()=>{
     const q=input.value.trim();
     /* DEFEITO APANHADO EM 04/08 (bloco 3): este `close()` apagava, 350 ms
@@ -8472,6 +8496,7 @@ function attachAC(input, list, onPick){
   search._turno=0;      // o carimbo da Fase D: só a pesquisa mais recente pinta
   input.addEventListener("input",()=>{
     input._picked=null;
+    input._suposta=null;   // dd-241 §4.5a: escrever à mão desfaz a suposição
     input._doFoco=false;               // escrever à mão retira o campo ao foco
     /* os teus sítios aparecem já, sem esperar pelos 350 ms nem pela rede. Isto
        é o que faz a diferença entre "os favoritos funcionam" e "os favoritos
@@ -8981,17 +9006,26 @@ async function preencherOrigemOmissao(){
   const o=$("#rt-o"); if(!o||o.value.trim()||o._picked) return;
   const est=await locEstado();
   if(est==="concedida"){ const p=await freshPos();
-    if(p){ o.value="📍 "+t("A minha posição"); o._picked={...p}; return; } }
+    if(p){ o.value="📍 "+t("A minha posição"); o._picked={...p}; o._suposta="gps"; return; } }
   const casa=state.home||store.get("home");
-  if(casa&&Number.isFinite(casa.lat)){ o.value=casa.name; o._picked={...casa}; }
+  /* ═══ dd-241 §4.5a — A ORIGEM SUPOSTA DECLARA-SE (§10.95) ═══════════════
+     Uma origem que a app escolheu sozinha dá uma rota errada a quem não está
+     em casa, e dá-a com ar de certeza. Fica a marca de QUEM a escolheu; quem
+     desenha o cartão diz-o em voz alta, e o campo continua editável. */
+  if(casa&&Number.isFinite(casa.lat)){ o.value=casa.name; o._picked={...casa}; o._suposta="casa"; }
 }
 async function useGPS(fromRoute){
   const alvo=fromRoute?"#loc-estado-rota":"#loc-estado-agora";
   const est=await locEstado();
   if(est==="sem-suporte"){ renderLocEstado(alvo,"sem-suporte"); return; }
   if(est==="recusada"){ renderLocEstado(alvo,"recusada"); return; } // sem caixa possível: zero pedidos
+  /* ═══ dd-242 §10.115 — quem promete por TOAST responde por TOAST ═══════
+     A promessa saía por toast e o fracasso ia só para a caixa de estado da
+     localização, noutro sítio do ecrã. Quem viu a promessa não via a
+     resposta. A marca `prometeuPorToast` é o que obriga o par. */
+  let prometeuPorToast=false;
   if(est==="nunca-pedida") renderLocEstado(alvo,"pedindo");
-  else toast(t("A obter a tua posição… 📡"));
+  else { toast(t("A obter a tua posição… 📡")); prometeuPorToast=true; }
   /* dd-170 §1: a MELHOR leitura de uma janela curta, não a primeira que
      chegar. É um gesto deliberado do utilizador — pode custar dois segundos
      para não custar uma morada errada. */
@@ -9000,6 +9034,9 @@ async function useGPS(fromRoute){
     if(!best){
       locSaida.grava(recusou?"recusada":"indisponivel");
       renderLocEstado(alvo,recusou?"recusada":"indisponivel");
+      if(prometeuPorToast) toast(recusou
+        ? t("A localização está recusada — a previsão fica no sítio que já tinha.")
+        : t("O GPS não respondeu a tempo — mantenho a previsão onde estava."),7000);
       const fb=store.get("home")||DEFAULT_LOC;
       if(!fromRoute && !state.wx) setHome(fb);   // a app continua a servir com a casa
       return;
@@ -9013,6 +9050,7 @@ async function useGPS(fromRoute){
   }).catch(()=>{
     locSaida.grava("indisponivel");
     renderLocEstado(alvo,"indisponivel");
+    if(prometeuPorToast) toast(t("O GPS não respondeu a tempo — mantenho a previsão onde estava."),7000);
     const fb=store.get("home")||DEFAULT_LOC;
     if(!fromRoute && !state.wx) setHome(fb);
   });
@@ -9378,8 +9416,11 @@ function renderDashboard(){
      inteira mora no rótulo. §10.19 — a régua declara o que não cobre.
      O limiar é o mesmo do cartão de perigos: um só para esta noção. */
   if(Number.isFinite(mNow.gust)&&mNow.dir!=null&&mNow.gust>=HAZARD_CFG.crossWindKmh){
-    const cTrav=mkChip("💨",t("lateral até"), U.spd(mNow.gust));
-    cTrav.title=t("Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.",{g:U.spd(mNow.gust)});
+    /* dd-242: o `U.*` NÃO entra dentro do `t()` — converteria duas vezes.
+       Converte-se uma vez, aqui, e entra já como texto. */
+    const gTrav=U.spd(mNow.gust);
+    const cTrav=mkChip("💨",t("lateral até"), gTrav);
+    cTrav.title=t("Numa estrada atravessada a este vento, a componente lateral chega a ~{g} — firme no guiador.",{g:gTrav});
     cTrav.setAttribute("data-test","chip-travessia");
     cwBaixo.append(cTrav);
   }
@@ -9965,8 +10006,20 @@ function setOffline(off){
     toast(t("📴 Sem internet — mapa e rota guardados continuam a funcionar. O GPS não precisa de rede."),8000);
     if(travel.active) speakT("Perdeste a ligação à internet. O mapa guardado e a navegação continuam a funcionar.");
   } else {
-    toast(t("📶 Internet de volta — a atualizar a meteorologia."),4000);
+    /* ═══ dd-242 §10.115 — A PROMESSA SEM ACÇÃO NENHUMA POR TRÁS ═══════════
+       Isto dizia «a atualizar a meteorologia» e NÃO atualizava coisa nenhuma:
+       o único gesto do ramo era o pré-carregamento de mosaicos, e só com
+       viagem activa. Não era uma promessa que podia falhar — era uma
+       promessa sem acção. Ou se faz, ou não se diz: agora faz-se, e as duas
+       pontas respondem pelo mesmo canal por onde a promessa saiu. */
     if(state.route&&travel.active) precacheRouteTiles();
+    const casa=state.home||store.get("home");
+    if(casa&&Number.isFinite(casa.lat)){
+      toast(t("📶 Internet de volta — a atualizar a meteorologia."),4000);
+      fetchDashboardWx(casa.lat,casa.lon)
+        .then(wx=>{ state.wx=wx; renderDashboard(); })
+        .catch(()=>toast(t("Voltou a rede, mas a meteorologia não veio. Toca no sítio para tentar outra vez."),7000));
+    } else toast(t("📶 Internet de volta."),3000);
   }
 }
 
@@ -10407,6 +10460,12 @@ const Mapa = (() => {
           layout: { "line-join": "round", "line-cap": spec.tracejado ? "butt" : "round" },
           paint: { "line-color": E(spec.cor, "#888"), "line-width": E(spec.espessura, 4),
                    "line-opacity": E(spec.opacidade, 1),
+                   /* dd-241 §5.3: `vao` → `line-gap-width`. Uma linha com vão
+                      desenha as DUAS arestas à volta de um espaço vazio — é
+                      assim que se faz um contorno no MapLibre, em vez de
+                      empilhar duas linhas cheias e rezar para que a de cima
+                      cubra a de baixo. O vão é a largura da linha de dentro. */
+                   ...(spec.vao != null ? { "line-gap-width": E(spec.vao, 0) } : {}),
                    ...(spec.tracejado ? { "line-dasharray": spec.tracejado } : {}) } });
       } else if (spec.tipo === "ponto") {
         poe({ id, type: "circle", source: nome, ...filtro,
@@ -10768,14 +10827,23 @@ async function applyPinChoice(act,loc){
     return;
   }
   // destino
-  $("#rt-d").value=loc.name; $("#rt-d")._picked=loc;
+  $("#rt-d").value=loc.name; $("#rt-d")._picked=loc; $("#rt-d")._suposta=null;
   focar(loc);
-  if(!$("#rt-o")._picked&&$("#rt-o").value.trim().length<3){
-    const pos=await freshPos();
-    if(pos){ $("#rt-o").value=pos.name; $("#rt-o")._picked=pos; }
-  }
+  /* ═══ dd-241 §4.5 — O CAMINHO QUENTE USAVA A PIOR DAS DUAS ORIGENS ══════
+     Aqui estava escrito à mão um preenchimento SÓ POR GPS. Com a localização
+     recusada — o telemóvel do dono — a origem ficava vazia, o `computeRoute`
+     morria em «Indica a origem.» antes de qualquer chamada, e a razão era
+     escrita dentro do cartão de planeamento, que está `display:none` para
+     quem chegou pela pesquisa. **A app aceitava o destino e não desenhava
+     nada.**  MEDIDO em tools/medir-rota-que-nao-calcula.mjs.
+     E havia duas mãos a fazer a mesma coisa (regra 4): o
+     `preencherOrigemOmissao` já fazia GPS→casa, e era o melhor dos dois. */
+  if(!$("#rt-o")._picked&&$("#rt-o").value.trim().length<3) await preencherOrigemOmissao();
   toast(t("🏁 A calcular rota para {p}…",{p:loc.name}));
-  computeRoute();
+  /* §10.115: a promessa foi dita antes de a coisa poder falhar — então o
+     fracasso tem de chegar pelo mesmo canal por onde a promessa chegou. */
+  const saiu=await computeRoute();
+  if(!saiu) toast(t("A rota para {p} não saiu — o que falta está no cartão.",{p:loc.name}),8000);
 }
 function surfaceColor(){ return getComputedStyle(document.documentElement).getPropertyValue("--surface").trim()||"#fff"; }
 
@@ -10824,6 +10892,14 @@ async function resolveInput(input, label){
 function routeError(msg){
   const box=$("#route-error"); box.textContent="";
   if(!msg) return;
+  /* ═══ dd-241 §4.5b — A RAZÃO DEIXA DE VIVER NUMA GAVETA FECHADA ═════════
+     Esta caixa está DENTRO do `#plan-card`, que é `display:none` enquanto não
+     tiver `.open` — e quem chega pela pesquisa nunca o abriu. A app explicava
+     porque falhou, e explicava-o onde ninguém a lia. O CSS do modo-mapa
+     esconde-a também, por isso sair do modo-mapa faz parte de a mostrar.
+     Uma mão só, no sítio por onde TODAS as falhas passam. */
+  if(document.body.classList.contains("rota-mapa")) rotaMapaModo(false);
+  $("#plan-card").classList.add("open");
   const b=el("div","banner err"); b.style.marginTop="12px";
   b.append(el("span",null,"⚠️"), el("span",null,msg));
   box.appendChild(b);
@@ -11027,6 +11103,7 @@ async function computeRoute(){
   btn.disabled=true; btn.textContent=t("A calcular…"); routeError(null);
   try{
     const o=await resolveInput($("#rt-o"),"a origem");
+    const origemSuposta=$("#rt-o")._suposta||null;   // dd-241 §4.5a
     const d=await resolveInput($("#rt-d"),"o destino");
     const stops=await collectStops();
     const whenVal=$("#rt-when").value;
@@ -11097,7 +11174,7 @@ async function computeRoute(){
        o marcador, a câmara e o registo da viagem que ainda é a antiga. */
     if(typeof travel==="object"&&travel.active)
       stopTravel(t("🧭 Modo viagem terminado — calculaste um trajeto novo."),{consulta:true});
-    state.route={o,d,pts,stops,dep,pauseSec,stayMin,shift:0,variants,active:0,
+    state.route={o,d,pts,stops,dep,pauseSec,stayMin,shift:0,variants,active:0,origemSuposta,
       coords:v0.coords,cum:v0.cum,geomKm:v0.geomKm,totalKm:v0.totalKm,
       travelTotal:v0.travelTotal,totalSec:v0.travelTotal,samples:v0.samples,maneuvers:v0.maneuvers,
       aEsperar:true};
@@ -11115,6 +11192,10 @@ async function computeRoute(){
     /* o `rotaMapaModo(true)` estava aqui e subiu para antes da meteorologia:
        calcular É o gesto de entrar no ecrã-mapa (A4.2), e esse gesto não tem
        de esperar por dados que ainda vêm a caminho */
+    /* dd-243 §1: a geometria fica guardada COM o recente do destino, a partir
+       de agora. Os antigos não ganham traçado nenhum — mostram pino, que é a
+       verdade (§7g-ter). Guarda-se JÁ simplificada: é o desenho, não a rota. */
+    try{ marcarRecenteComGeo(d, v0.coords); }catch(e){}
     scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
     loadDrySpell(); // historial de dias secos → aviso de óleo na primeira chuva
     setTimeout(precacheRouteTiles,1200); // mapa offline do corredor da rota
@@ -11372,16 +11453,19 @@ function drawRoute(fit){
        É o que o MapLibre compila; o adaptador Leaflet traduz para funções.
        A cor já vinha das propriedades — o que muda é deixar de a ir buscar
        com código que só um dos motores sabe correr. */
+    /* dd-241 §5.3: o contorno deixa de ser uma linha CHEIA por baixo e passa a
+       ser um vão — as duas arestas nascem já à volta do traçado, com o mesmo
+       zoom, e não há empilhamento nenhum para desalinhar. */
     Mapa.camada(h,"rota",{id:"contorno",tipo:"linha",filtro:Mapa.tem("contorno"),
-      cor:Mapa.campo("cor"),espessura:9,opacidade:.9});
+      cor:Mapa.campo("cor"),espessura:BORDA_ROTA,vao:LARG_ROTA,opacidade:.9});
     Mapa.camada(h,"rota",{id:"troços",tipo:"linha",
       filtro:Mapa.tudo(Mapa.naoTem("contorno"),Mapa.naoTem("percorrido"),Mapa.naoTem("trovoada")),
-      cor:Mapa.campo("cor"),espessura:5,opacidade:.95});
+      cor:Mapa.campo("cor"),espessura:LARG_ROTA,opacidade:.95});
     Mapa.camada(h,"rota",{id:"troços·trovoada",tipo:"linha",filtro:Mapa.tem("trovoada"),
-      cor:Mapa.campo("cor"),espessura:5,opacidade:.95,tracejado:[2,1.2]});
+      cor:Mapa.campo("cor"),espessura:LARG_ROTA,opacidade:.95,tracejado:[2,1.2]});
     Mapa.camada(h,"rota",{id:"percorrido",tipo:"linha",filtro:Mapa.tem("percorrido"),
-      cor:"#8b9099",espessura:5,opacidade:.95});
-    Mapa.camada(h,"variantes",{id:"fantasmas",tipo:"linha",cor:"#8a8f96",espessura:4,opacidade:.5,
+      cor:"#8b9099",espessura:LARG_ROTA,opacidade:.95});
+    Mapa.camada(h,"variantes",{id:"fantasmas",tipo:"linha",cor:"#8a8f96",espessura:LARG_FANTASMA,opacidade:.5,
       aoClicar:p=>switchVariant(p.i)});
     Mapa.camada(h,"amostras",{id:"pontos",tipo:"ponto",raio:4.5,
       cor:Mapa.campo("borda"),espessura:2,corDentro:Mapa.campo("cor"),
@@ -11716,6 +11800,23 @@ function renderRouteSummary(){
   const sub=el("div","hero-sub",
     `${R.o.name} → ${R.d.name} · ${fmtN(R.totalKm,0)} km · ${fmtDur(R.travelTotal)} ${t("em andamento")}${viaTxt} · ${t("partida")} ${fmtHM(dep)} (${dayLabel(dep)}) · ${t("chegada")} ~${fmtHM(arrive)}`);
   main.appendChild(sub);
+  /* ═══ dd-241 §4.5a — DE ONDE PARTE, quando fui eu a escolher ════════════
+     §10.95: uma âncora não se assume, declara-se. A app pôs a casa como
+     origem porque não tinha GPS; quem não está em casa tem de ver isso ANTES
+     de acreditar na rota, e tem de poder mudá-la sem adivinhar onde. */
+  if(R.origemSuposta==="casa"){
+    const b=el("button","origem-suposta"); b.type="button";
+    b.setAttribute("data-test","origem-suposta");
+    b.append(el("span",null,"🏠"), el("span",null,t("De: casa · {n}",{n:R.o.name})),
+             el("span","os-mudar",t("mudar")));
+    b.title=t("Não sabia onde estavas, por isso parti de casa. Toca para mudar a origem.");
+    b.addEventListener("click",()=>{
+      rotaMapaModo(false);
+      $("#plan-card").classList.add("open");
+      const o=$("#rt-o"); o.value=""; o._picked=null; o._suposta=null; o.focus();
+    });
+    main.appendChild(b);
+  }
   /* aviso do buraco: condição do passado, vive no cartão (7g-bis) e diz
      ONDE e QUANDO faltam os dados */
   if(!completo){
@@ -11871,6 +11972,46 @@ function renderRouteSummary(){
      As entradas no modo-mapa são gestos: calcular, "Ver o mapa", o separador. */
   rotaMapaModo(document.body.classList.contains("rota-mapa"));
 }
+
+/* ═══ dd-241 §5.1 e §5.3 — A LARGURA DA ROTA POR EXPRESSÃO DE ZOOM ═════════
+   Era uma CONSTANTE: contorno 9 px, traçado 5 px, em qualquer zoom. A 12 uma
+   linha de 5 px tapa a região; a 18, sobre a rua, quase não se vê.
+
+   ⚠️ A LATITUDE DOS MERCADOS, CONFIRMADA ANTES DE FIXAR OS PARES, e nos
+   polígonos de fronteira do próprio ficheiro (linhas ~7755-7765):
+
+     AT 46,43–48,85  ·  BE 49,53–51,50  ·  CH 45,83–47,70
+     DE 47,55–54,90  ·  FR 42,47–51,09  ·  LU 49,45–50,18
+     → o intervalo inteiro é 42,47° a 54,90°.
+
+   ⚠️ E CORRIJO O NÚMERO DA CARTA. Ela diz «a ~50°: z16 ≈ 1,8 m/px, z17 ≈ 0,9,
+   z18 ≈ 0,46». Medido — `m/px = 156543,03392 · cos(lat) / 2^z` — 1,8/0,9/0,46
+   é a aritmética dos **40°**, não dos 50°:
+
+       lat |    z12 |   z16 |   z17 |   z18
+       40° |  29,28 | 1,830 | 0,915 | 0,457   ← os números da carta
+       45° |  27,02 | 1,689 | 0,845 | 0,422
+       50° |  24,57 | 1,535 | 0,768 | 0,384   ← o que dá a 50°
+       55° |  21,92 | 1,370 | 0,685 | 0,343
+
+   O QUE A CURVA COBRE NO CHÃO, que é o critério (uma faixa de rodagem tem
+   3–3,5 m; uma estrada de duas vias ~7 m):
+
+       z16 · 4 px → 5,5 m (55°) a 6,8 m (42°)   ≈ uma estrada
+       z17 · 8 px → 5,5 m a 6,8 m               ≈ uma estrada
+       z18 · 15 px → 5,1 m a 6,3 m              ≈ uma estrada
+       z12 · 3 px →  66 m a  81 m               ≈ um traço, que é o que serve
+
+   Entre o extremo sul e o extremo norte dos mercados a mesma largura em
+   píxeis vale **28 % menos metros** no norte (cos 42,47 / cos 54,90 = 1,28).
+   Cabe dentro da banda; por isso os pares são em píxeis e não se corrigem
+   por latitude — e fica escrito, para quem duvidar não ter de medir outra vez. */
+const LARG_ROTA=["interpolate",["exponential",1.5],["zoom"],12,3,16,4,17,8,18,15];
+/* a aresta do contorno, de cada lado do vão: 2 px é o que a rota tinha
+   (9 − 5 = 4, dois de cada lado) e é o que separa a linha do fundo */
+const BORDA_ROTA=["interpolate",["exponential",1.5],["zoom"],12,1.5,16,2,18,3];
+/* os trajetos alternativos vivem por baixo: sempre mais finos do que o ativo */
+const LARG_FANTASMA=["interpolate",["exponential",1.5],["zoom"],12,2,16,3,17,5,18,9];
 
 /* estatísticas de vento ao longo da rota */
 function computeWindStats(R){
@@ -12518,7 +12659,65 @@ function cartaoDepartures(evals,best,R){
 function getFavs(){ return store.get("favs")||[]; }
 /* sítios escolhidos recentemente: ficam no dispositivo e são procurados
    localmente antes de qualquer pedido à rede */
+/* ═══ dd-243 §1 — A MINIATURA É O TRAÇADO DA PRÓPRIA ROTA, SEM MAPA ════════
+   Do esboço `levante-esboco-guardados-quando.html`: «menos de 2 KB cada, zero
+   créditos, zero terceiros, e funciona sem rede». Cem rotas guardadas ocupam
+   ~50–180 KB; em imagem seriam 1,5–2,5 MB e um fornecedor novo nas páginas
+   legais. É o que a Strava faz: desenha o traçado primeiro.
+
+   ⚠️ E A FORMA NÃO DIZ ONDE — não é para isso. O TEXTO identifica; a FORMA
+   encontra, como a lombada de um livro numa prateleira de vinte.
+
+   ⚠️ NUNCA se desenha um traçado que não existe (§7g-ter): sem geometria
+   guardada, a linha leva um PINO e diz que é um sítio, não uma ida. */
+const MINI_CX=46, MINI_PAD=5;
+/* Web Mercator: a projeção do mapa que a app usa, para a forma ser a mesma */
+function mercY(lat){ const f=Math.min(85,Math.max(-85,lat))*Math.PI/180;
+  return Math.log(Math.tan(Math.PI/4+f/2)); }
+/* Ramer–Douglas–Peucker, para 100 pontos não virarem 100 pares de casas
+   decimais. `tol` em unidades já projetadas. */
+function simplificar(pts,tol){
+  if(pts.length<3) return pts.slice();
+  let dmax=0,idx=0;
+  const [ax,ay]=pts[0], [bx,by]=pts[pts.length-1];
+  const dx=bx-ax, dy=by-ay, len=Math.hypot(dx,dy)||1;
+  for(let i=1;i<pts.length-1;i++){
+    const d=Math.abs((pts[i][0]-ax)*dy-(pts[i][1]-ay)*dx)/len;
+    if(d>dmax){ dmax=d; idx=i; }
+  }
+  if(dmax<=tol) return [pts[0],pts[pts.length-1]];
+  return [...simplificar(pts.slice(0,idx+1),tol).slice(0,-1), ...simplificar(pts.slice(idx),tol)];
+}
+/* de coordenadas para um <path> normalizado à caixa. Devolve null quando não
+   há forma nenhuma para desenhar — quem chama mostra o pino. */
+function miniTracado(coords){
+  const pts=(coords||[]).filter(c=>c&&Number.isFinite(c.lat)&&Number.isFinite(c.lon))
+    .map(c=>[c.lon*Math.PI/180, mercY(c.lat)]);
+  if(pts.length<2) return null;
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+  const w=x1-x0, h=y1-y0, esc=Math.max(w,h);
+  if(!(esc>0)) return null;                    // partida = chegada: não há traço
+  const util=MINI_CX-2*MINI_PAD, k=util/esc;
+  /* centrado na caixa, e com o Y invertido — no ecrã cresce para baixo */
+  const ox=MINI_PAD+(util-w*k)/2, oy=MINI_PAD+(util-h*k)/2;
+  const proj=pts.map(([x,y])=>[ox+(x-x0)*k, oy+(y1-y)*k]);
+  const simp=simplificar(proj, 0.6);
+  const n=(v)=>Math.round(v*10)/10;
+  const d="M"+simp.map(([x,y])=>`${n(x)} ${n(y)}`).join("L");
+  return { d, ini:simp[0], fim:simp[simp.length-1], pontos:simp.length };
+}
 function getRecentes(){ return store.get("recentes")||[]; }
+/* guarda o traçado (já normalizado) na entrada dos recentes do destino */
+function marcarRecenteComGeo(destino, coords){
+  if(!destino||!Number.isFinite(destino.lat)) return;
+  const m=miniTracado(coords); if(!m) return;
+  const k=(x)=>`${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}`;
+  const lista=getRecentes(); const alvo=lista.find(r=>k(r)===k(destino));
+  if(!alvo) return;
+  alvo.geo={d:m.d, ini:m.ini, fim:m.fim, quando:Date.now()};
+  store.set("recentes", lista);
+}
 function addRecente(it){
   if(!it||!Number.isFinite(it.lat)) return;
   const k=(x)=>`${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}`;
@@ -13005,6 +13204,28 @@ function fecharSitios(){ $("#sitios-drawer").classList.remove("open"); $("#sitio
 function renderSitios(){
   for(const alvo of ["#sitios-corpo","#view-sitios"]) pintarSitiosEm($(alvo));
 }
+/* a lombada: traçado quando existe, pino quando não existe */
+function miniDaLinha(x){
+  /* ⚠️ A DECISÃO NUM SÍTIO SÓ. A primeira versão perguntava `x.geo?.d` em três
+     linhas seguidas, e o provador apanhou-a MORTA: uma injeção que mudava a
+     classe não mexia no `data-test`, e a guarda continuava a ler o certo.
+     Uma decisão repetida é uma decisão que se pode partir por metade. */
+  const d=x.geo?.d||null;
+  const ini=x.geo?.ini||[MINI_PAD,MINI_PAD], fim=x.geo?.fim||[MINI_CX-MINI_PAD,MINI_CX-MINI_PAD];
+  const cx=el("span", d ? "mini-tracado" : "mini-pino");
+  cx.setAttribute("data-test", d ? "mini-tracado" : "mini-pino");
+  if(d){
+    cx.setAttribute("aria-label", t("Traçado desta ida"));
+    cx.innerHTML=`<svg viewBox="0 0 ${MINI_CX} ${MINI_CX}" aria-hidden="true">`
+      +`<path d="${d}"/>`
+      +`<circle class="ini" cx="${ini[0]}" cy="${ini[1]}" r="3.4"/>`
+      +`<circle class="fim" cx="${fim[0]}" cy="${fim[1]}" r="3.4"/></svg>`;
+  } else {
+    cx.textContent="📍";
+    cx.setAttribute("aria-label", t("Sítio que ainda não foi destino"));
+  }
+  return cx;
+}
 function pintarSitiosEm(box){
   /* ═══ O MESMO SÍTIO NÃO SE MOSTRA DUAS VEZES (dd-185 §1b) ═════════════════
      Declarado à cabeça de propósito: as três secções (Casa · Guardados ·
@@ -13119,6 +13340,8 @@ function pintarSitiosEm(box){
   if(!rec.length) box.appendChild(el("p","small muted",t("Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.")));
   rec.forEach((x,i)=>{
     const r=el("div","sitio-row");
+    /* dd-243 §1: com traçado é uma IDA; sem traçado é um SÍTIO. */
+    r.appendChild(miniDaLinha(x));
     const tx=el("div","sitio-tx");
     tx.appendChild(el("b",null,x.name));
     tx.appendChild(el("span","small muted",`${x.sub||""}${x.prov?.quando?(x.sub?" · ":"")+new Date(x.prov.quando).toLocaleDateString(state.lang||"pt"):""}`));
@@ -13136,13 +13359,35 @@ function pintarSitiosEm(box){
        por um gesto que a NOMEIE, e este não a nomeia. */
     r.classList.add("sitio-tocavel");
     r.setAttribute("role","button"); r.tabIndex=0;
-    r.setAttribute("aria-label",t("A usar: {p}",{p:x.name}));
-    const usar=()=>{ fecharSitios(); switchTab("agora");
+    r.setAttribute("aria-label",t("Ir outra vez a {p}",{p:x.name}));
+    /* ═══ dd-243 §2 — UM RECENTE É UM SÍTIO ONDE ELE FOI ═══════════════════
+       Não é um sítio que consultou: é um sítio ONDE ESTEVE. O gesto óbvio é
+       «levar-me lá outra vez», e era o que faltava — o toque punha a previsão
+       naquele sítio, que é a pergunta secundária.
+       ⚠️ E NÃO SE CONSTRUIU NADA (a carta manda medir antes): o
+       `applyPinChoice("destino", …)` já faz o funil inteiro — escreve o
+       destino, preenche a origem pela CASA quando não há GPS, declara-o no
+       cartão, promete, calcula e responde se falhar. Uma segunda mão a
+       calcular rotas seria um pintor a mais na mesma superfície.
+       ⚠️ E O «VER O TEMPO AÍ» NÃO SE PERDE: passa a toque LONGO, que é onde
+       vivem as acções secundárias, e o rótulo do dedo di-lo. */
+    const irAte=()=>{ fecharSitios();
+      applyPinChoice("destino",{name:x.name, sub:x.sub||"", lat:x.lat, lon:x.lon, atrib:x.atrib||null}); };
+    const verOTempo=()=>{ fecharSitios(); switchTab("agora");
       setHome({name:x.name, sub:x.sub||"", lat:x.lat, lon:x.lon, atrib:x.atrib||null},
               {prov:"escolha", semCasa:true});
       toast("📍 "+t("A usar: {p}",{p:x.name})); };
-    r.addEventListener("click",usar);
-    r.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); usar(); } });
+    r.title=t("Toca para ir outra vez · toque longo para ver só o tempo aí");
+    let longo=null, foiLongo=false;
+    r.addEventListener("pointerdown",()=>{ foiLongo=false;
+      longo=setTimeout(()=>{ foiLongo=true; verOTempo(); },550); });
+    for(const ev of ["pointerup","pointerleave","pointercancel"])
+      r.addEventListener(ev,()=>{ clearTimeout(longo); });
+    r.addEventListener("click",()=>{ if(foiLongo){ foiLongo=false; return; } irAte(); });
+    r.addEventListener("contextmenu",(e)=>{ e.preventDefault(); clearTimeout(longo); foiLongo=true; verOTempo(); });
+    /* teclado: Enter leva lá; Shift+Enter é a acção secundária */
+    r.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){
+      e.preventDefault(); (e.shiftKey?verOTempo:irAte)(); } });
     /* ⭐ GUARDA COM NOME PRÓPRIO, e pergunta-o aqui mesmo — sem `prompt()`,
        que é uma caixa do browser e não fala a língua da app. É o mesmo molde
        do renomear dos Guardados, a dois passos de distância no mesmo ecrã. */
@@ -14148,7 +14393,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-14-2158-1f32f2";
+const BUILD="2026-08-15-0100-7b64ee";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){

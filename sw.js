@@ -6,6 +6,24 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v33 — 15/08/2026 ══════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · OS SÍTIOS RECENTES GANHAM A FORMA DA IDA. Cada linha passa a mostrar o
+     TRAÇADO da própria rota — um desenho do caminho, sem mapa por baixo, como
+     a lombada de um livro numa prateleira. O texto diz qual é; a forma
+     encontra-o de relance. Pesa menos de 2 KB, não gasta créditos nenhuns e
+     funciona sem rede.
+   · E QUEM NUNCA FOI LÁ FICA COM UM PINO. Um sítio que nunca foi destino não
+     tem traçado nenhum para mostrar, e a app não inventa um: mostra um pino e
+     diz que é um sítio, não uma ida. Os recentes antigos ficam todos assim —
+     a partir de agora, cada rota que sai guarda o seu desenho.
+   · E TOCAR NUM RECENTE PASSA A LEVAR-TE LÁ. Um sítio recente não é um sítio
+     que consultaste — é um sítio onde estiveste, e o gesto óbvio é «leva-me
+     lá outra vez». O toque calcula a rota até lá (a partir de casa quando não
+     sei onde estás, e digo-o no cartão). Ver só o tempo naquele sítio passa a
+     toque longo, e a linha explica os dois.
+   ══════════════════════════════════════════════════════════ */
 /* ═══ levante-v32 — 14/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -32,6 +50,35 @@
      rota, não há rumo — o chip diz «lateral até», que é o limite numa estrada
      atravessada ao vento, e a frase inteira está no rótulo. Sem direção de
      vento não aparece.
+   · A ROTA DEIXA DE FALHAR CALADA. Escolhias uma morada na pesquisa, a app
+     dizia «a calcular rota para X…» — e não desenhava nada. Eram três coisas
+     ao mesmo tempo: a origem só se preenchia por GPS (com a localização
+     recusada ficava vazia, embora a app conheça a tua casa), a razão da
+     falha era escrita dentro do cartão de planeamento, que está fechado para
+     quem chega pela pesquisa, e a promessa não tinha par nenhum no fracasso.
+     Agora parte de casa quando não sabe onde estás, o cartão abre-se com a
+     razão à vista quando alguma coisa falha, e a promessa tem resposta nos
+     dois sentidos.
+   · E QUANDO FUI EU A ESCOLHER A ORIGEM, DIGO-O. O cartão passa a trazer
+     «🏠 De: casa · <sítio> · mudar» sempre que a origem foi suposta e não
+     escolhida — uma origem adivinhada em silêncio dá uma rota errada a quem
+     não está em casa. Toca-se na linha para a mudar. Cinco línguas.
+   · «INTERNET DE VOLTA — A ATUALIZAR A METEOROLOGIA» PASSA A ATUALIZAR MESMO.
+     A frase aparecia quando a rede voltava e não atualizava coisa nenhuma —
+     era uma promessa sem nada por trás. Agora pede a previsão outra vez, e se
+     ela não vier diz-o pelo mesmo sítio por onde prometeu.
+   · E MAIS DUAS PROMESSAS GANHAM RESPOSTA. O botão «Mostrar outros…» da
+     pesquisa dizia «A procurar…» e, se a busca falhasse, deixava a lista na
+     mesma sem uma palavra. E «A obter a tua posição…» respondia noutro canto
+     do ecrã. As duas passam a responder onde perguntaram.
+   · A LINHA DA ROTA PASSA A ACOMPANHAR O ZOOM. Era uma largura fixa — 5 px em
+     qualquer zoom. Longe tapava a região; em cima da rua quase não se via.
+     Agora cresce com o zoom, e o critério é o chão: aos zooms de rua vale a
+     largura de uma estrada (5,2 a 7 m em todos os mercados, do sul de França
+     ao norte da Alemanha) e ao zoom de região é um traço de ~66 m, que é o
+     que ali serve. O contorno passa a ser uma moldura a sério em vez de uma
+     linha empilhada por baixo, e os trajetos alternativos ficam sempre mais
+     finos do que o escolhido.
    ══════════════════════════════════════════════════════════ */
 /* ═══ levante-v31 — 14/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
@@ -175,7 +222,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v32";
+const V = "levante-v33";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
