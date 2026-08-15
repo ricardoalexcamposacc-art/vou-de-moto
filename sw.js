@@ -6,8 +6,24 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v33 — 15/08/2026 ══════════════════════════════
+/* ═══ levante-v34 — 15/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · OS TEUS SÍTIOS SAEM DAS DEFINIÇÕES. O separador «Sítios» passa a ser a
+     casa deles: a tua casa, os guardados, as viagens planeadas e os
+     recentes, tudo no mesmo ecrã. Nas Definições fica a linha da casa com o
+     «Não é esta? Mudar» — e esse toque leva-te lá com o menu já aberto.
+   · OS BOTÕES DA CASA PASSAM A DIZER O QUE FAZEM. Em vez de «Escolher» sem
+     objecto: «Mudar a casa ▾» abre 🔍 Procurar uma morada · 📍 Usar onde
+     estou agora · 🗺️ Escolher no mapa.
+   · AS VIAGENS PLANEADAS APARECEM NOS SÍTIOS, com o dia e a hora — e um
+     toque repõe a rota planeada.
+   · O «⭐ undefined» MORREU. Um favorito antigo sem nome mostrava
+     «undefined» no ecrã, no renomear e no apagar. Agora a app mostra a
+     morada; sem morada, a coordenada; sem nada, «Sítio sem nome».
+   ══════════════════════════════════════════════════════════ */
+/* ═══ levante-v33 — 15/08/2026 ══════════════════════════════
+   (arquivo)
 
    · OS SÍTIOS RECENTES GANHAM A FORMA DA IDA. Cada linha passa a mostrar o
      TRAÇADO da própria rota — um desenho do caminho, sem mapa por baixo, como
@@ -222,7 +238,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v33";
+const V = "levante-v34";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */

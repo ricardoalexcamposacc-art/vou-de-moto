@@ -97,6 +97,9 @@
   --accent-soft:rgba(37,99,235,.10); --accent-ink:#ffffff;
   --glow:0 6px 22px -6px rgba(37,99,235,.42);
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  /* dd-244 §1: os azuis da chuva ganham nome — eram números soltos na
+     corDaHora, que morreu; a faixa da fita e quem vier depois leem daqui */
+  --chuva:#3b82f6; --chuva-fraca:#bfdbfe;
   --good-soft:rgba(12,163,12,.13); --warn-soft:rgba(250,178,25,.16);
   --serious-soft:rgba(236,131,90,.16); --crit-soft:rgba(208,59,59,.14);
   --seq100:#cde2fb; --seq250:#86b6ef; --seq400:#3987e5; --seq550:#1c5cab; --seq700:#0d366b;
@@ -371,7 +374,13 @@ body{padding-bottom:calc(var(--h-abas) + env(safe-area-inset-bottom,0px) + 10px)
   gap:8px;font-size:var(--t-sussurro);color:var(--muted);margin-bottom:6px}
 .faixa24 .cab b{color:var(--ink);font-weight:650}
 .fita{display:flex;height:26px;border-radius:7px;overflow:hidden}
-.fita i{display:block;flex:1;min-width:0;cursor:pointer}
+.fita i{display:block;flex:1;min-width:0;cursor:pointer;position:relative}
+/* dd-244 §1: o enchimento é o NÍVEL DO ÍNDICE (a escala que já tem palavra no
+   veredicto e nos Dias); a chuva é a FAIXA de baixo, lida da nivelChuva */
+.fita i.n0{background:var(--good)} .fita i.n1{background:var(--warn)}
+.fita i.n2{background:var(--serious)} .fita i.n3{background:var(--crit)}
+.fita i.chuva::after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;background:var(--chuva)}
+.fita i.chuvisco::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--chuva-fraca)}
 .fita i.furo{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 3px,var(--border) 3px,var(--border) 6px)}
 .fita i:focus{outline:2px solid var(--accent);outline-offset:-2px}
 .faixa24 .horas{display:flex;justify-content:space-between;
@@ -756,12 +765,18 @@ flex:none;display:grid;place-items:center;border:1px solid var(--line,#0002);fon
 .sitio-tx b{font-size:var(--t-corpo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sitio-tx .small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sitio-row .icon-btn{width:38px;height:38px;flex:none}
+/* dd-243 §3a — o tempo em cada linha: bolinha do nível + temperatura, com a
+   palavra dos Dias por baixo; no cartão da casa vira linha horizontal
+   (dentro do <b> do nome não pode viver: o ellipsis cortava-o) */
+.sitio-wx{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;text-align:right}
+.sitio-wx b{display:flex;align-items:center;gap:4px}
+.sitio-wx .wx-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.sitio-wx .wx-palavra{font-size:var(--t-sussurro);color:var(--muted);font-weight:400}
+.casa-cx .sitio-wx{flex-direction:row;align-items:center;gap:6px;margin-top:6px;text-align:left}
 .sitio-conf{display:flex;gap:8px;align-items:center;padding:8px 0;flex-wrap:wrap}
 .sitio-edit{display:flex;gap:6px;flex:1;min-width:0}
 .sitio-edit input{flex:1;min-width:0;height:38px;border-radius:10px;border:1px solid var(--border);
   background:var(--surface2);color:var(--text);padding:0 10px;font-size:var(--t-corpo)}
-.sitios-acoes{display:flex;flex-direction:column;gap:8px;margin:8px 0 2px}
-.sitios-acoes .btn{width:100%;justify-content:flex-start}
 /* dd-55: aviso discreto de versão nova — informa, nunca interrompe */
 .vnova{display:flex;align-items:center;gap:10px;margin:2px 2px 0;padding:9px 12px;
   border:1px solid var(--border);border-radius:12px;background:var(--surface2);
@@ -839,7 +854,17 @@ body.rota-mapa .maplibregl-ctrl-bottom-right{bottom:var(--faixa-h,150px)}
 .san-row b{font-weight:600}
 .san-tx{flex:1;min-width:0}
 .san-pais{color:var(--muted)}
-.san-h{font-size:var(--t-corpo);color:var(--muted);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.4px}
+/* dd-245 §6: o peso 800 é a diferença de FORMA que o dono via contra o
+   esboço — os rótulos de secção estavam em 400. A forma está descongelada. */
+.san-h{font-size:var(--t-corpo);color:var(--muted);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.4px;font-weight:800}
+/* dd-244 bloco 3 — a casa com o menu de objecto (esboço sitios-barra: copia-se
+   a forma e as palavras; as cores são as da paleta da app) */
+.casa-cx{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:11px 12px;margin:2px 0 4px}
+.casa-cx .botao-menu{margin-top:9px;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:var(--t-corpo);font-weight:700;display:flex;align-items:center;gap:6px;color:var(--ink);cursor:pointer}
+.casa-cx .botao-menu .seta{margin-left:auto;font-size:10px;color:var(--muted)}
+.casa-menu{margin-top:5px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.casa-menu button{display:block;width:100%;text-align:left;padding:9px 11px;font-size:var(--t-corpo);font-weight:600;background:var(--surface);border:0;border-bottom:1px solid var(--border);color:var(--ink);cursor:pointer}
+.casa-menu button:last-child{border-bottom:0}
 .san-x{background:none;border:0;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 6px}
 .san-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .san-corrigir{margin-top:8px}
@@ -1515,11 +1540,13 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
              muda uma decisão de conduzir. -->
         <!-- dd-48a / rel-45: a casa era visível no cartão e não havia NENHUMA
              porta para a ver, mudar ou apagar — a violação original. A porta
-             vive aqui; a gestão vive na gaveta (a pop é pequena de mais para
-             25 recentes). -->
+             vive aqui; a gestão vive no separador SÍTIOS (dd-244 bloco 3 —
+             a gaveta morreu; a pop continua pequena de mais para 25 recentes). -->
         <h3 style="margin-top:14px">📍 <span id="sitios-title">Os meus sítios</span></h3>
+        <!-- dd-244 bloco 3: fica UMA linha — a casa com o «Não é esta? Mudar»,
+             que leva ao separador Sítios com o menu de mudar já aberto. O
+             botão da gaveta morreu com a gaveta. -->
         <p class="small muted" id="sitios-casa-linha" style="margin:0 0 8px"></p>
-        <button class="btn" id="btn-sitios" style="width:100%;justify-content:center"></button>
         <div class="h-sub" id="estado-aparelho" style="margin:8px 0 0" hidden></div>
         <!-- O estado da INSTALAÇÃO vive aqui pela mesma razão que o da voz
              (dd-07 §3): o botão desaparecia e deixava gente sem caminho.
@@ -1792,14 +1819,10 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 <!-- OS MEUS SÍTIOS (dd-48a, desenho do rel-45 §2): casa com proveniência
      visível e três caminhos para redefinir; guardados com renomear/apagar
      confirmado; recentes com apagar um a um e limpar tudo. Tudo local. -->
-<div class="drawer-bg" id="sitios-bg"></div>
-<aside class="drawer" id="sitios-drawer" role="dialog" aria-label="Os meus sítios">
-  <div class="drawer-head">
-    <h2 id="sitios-head">📍 Os meus sítios</h2>
-    <button class="icon-btn" id="sitios-close" aria-label="Fechar">✕</button>
-  </div>
-  <div id="sitios-corpo" style="padding:0 16px 16px"></div>
-</aside>
+<!-- dd-244 bloco 3: a gaveta dos sítios morreu — os sítios vivem no separador
+     SÍTIOS (view-sitios), pintados pelo MESMO pintor de sempre. A linha da
+     casa nas Definições leva lá com o menu de mudar já aberto. -->
+
 <!-- PAINEL DE CONDUÇÃO (dd-33 fase 1). A violação original: as capturas de
      30/07, sem nada disto. Só promete o que os dados TÊM (medido no
      anexo-payload-geoapify.json): seta pelo type, distância a contar da
@@ -2230,7 +2253,7 @@ function setLangReal(l,{escolha}={}){
   if(typeof renderCamLei==="function") renderCamLei();
   if(typeof renderVersaoNova==="function") renderVersaoNova();
   if(typeof pintarSitiosLinha==="function") pintarSitiosLinha();
-  if(typeof renderSitios==="function"&&$("#sitios-drawer")?.classList.contains("open")) renderSitios();
+  if(typeof renderSitios==="function"&&$("#view-sitios")?.classList.contains("active")) renderSitios();   // dd-244 bloco 3: a gaveta morreu — repinta-se se o separador estiver à vista
   if(typeof pintarSom==="function") pintarSom();
   /* dd-173 §3: estes dois nasciam em português e nunca eram repintados — a
      auditoria de chaves contava-os como traduzidos porque a chave existe. */
@@ -2268,13 +2291,21 @@ function pintarAtribuicao(){
    DECIDIR»). O `aria-label` continua a dizer «Pesquisar localização»: quem
    ouve o ecrã continua a ouvir o que a caixa FAZ.
 
-   ⚠️ Enquanto não há casa, volta o convite. Um campo vazio e mudo no
+   ⚠️ Enquanto o slot não tem nome, volta o convite. Um campo vazio e mudo no
    primeiro arranque seria pior do que o convite que substituiu. */
 function pintarCampoDoLocal(){
   const i=$("#loc-search"); if(!i) return;
-  const casa=state.home&&state.home.name?state.home.name:null;
+  /* dd-244 §3 (regra 2): isto mostra O SÍTIO PARA QUE A APP ESTÁ A PREVER —
+     o sítio no ecrã, como o desenho acima manda («para onde é o veredicto»).
+     A variável chamava-lhe «casa» e não era: o nome muda, a leitura NÃO.
+     (A primeira tentativa deste bloco pô-lo a ler aCasa() — a bateria
+     respondeu com 15 vermelhos na microfone-no-campo: sem casa, o convite
+     comprido transbordava um campo de 88px úteis que nunca o tinha
+     mostrado. A âncora que ORDENA a pesquisa é outra peça, e essa é que é
+     a casa — refPesquisa, primeiro degrau.) */
+  const sitio=state.home&&state.home.name?state.home.name:null;
   const convite=i.getAttribute("data-i18n-placeholder")||"Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)";
-  i.placeholder=casa||t(convite);
+  i.placeholder=sitio||t(convite);
 }
 /* ═══ dd-224 bloco 3 — O ESPAÇO DA BARRA SAI DA BARRA MEDIDA ══════════════
    A barra é fixa: sem reserva no fim do documento, tapa o último elemento de
@@ -2326,7 +2357,7 @@ function applyStaticI18n(){
     ["#loc-search","ph","Pesquisar cidade ou morada… (ex.: Lisboa, Sintra, A1 Aveiras)"],
     ["#btn-install","txt","📲 Instalar"],
     ["#sentinel-card h2","txt","🔔 Sentinela meteorológica"],
-    ["#atalhos-title","txt","Atalhos"], ["#sitios-title","txt","Os meus sítios"], ["#sitios-head","txt2","📍 ","Os meus sítios"],
+    ["#atalhos-title","txt","Atalhos"], ["#sitios-title","txt","Os meus sítios"],
     ["#som-title","txt","Som de aviso"], ["#som-opt-b","txt","Tocar um som nos avisos"],
     ["#guarda-title","txt","A moto cá fora"], ["#guarda-opt-b","txt","Avisar se a moto pode ficar cá fora"],
     ["#btn-recentrar","txt","🎯 Recentrar"],
@@ -2494,7 +2525,7 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
-"Pesquisar cidade ou morada…":"Search city or address…","Cidade ou morada…":"City or address…","Pesquisar…":"Search…","Não é esta? Mudar":"Not this one? Change","Definir a casa":"Set your home",
+"Pesquisar cidade ou morada…":"Search city or address…","Cidade ou morada…":"City or address…","Pesquisar…":"Search…","Não é esta? Mudar":"Not this one? Change","Toque longo para renomear":"Long-press to rename","Viagem planeada":"Planned ride","Toca para repor esta rota":"Tap to bring this route back","Sem viagens planeadas.":"No planned rides.","Mudar a casa":"Change home","Procurar uma morada":"Search for an address","Usar onde estou agora":"Use where I am now","Escolher no mapa":"Pick on the map","Sítio sem nome":"Unnamed place","Planeadas":"Planned","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Tap the ⭐ on any recent place to give it a name.","Definir a casa":"Set your home",
 
 "Bom, mas {n} de sensação":"Good, but {n} feels-like","Calor perigoso — {n}":"Dangerous heat — {n}",
 "demorou de mais":"timed out",
@@ -2518,7 +2549,7 @@ en:{
 "à hora a que lá vais passar":"for the time you'll be passing there",", não o tempo de agora.":", not the weather right now.",
 "Vê se os teus sítios guardados batem certo":"Check that your saved places look right",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"An earlier version of the search could save a place with the wrong coordinates — up to thousands of kilometres off. That's fixed, but only you can confirm what's already saved on your device. I'll ask once.",
-"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","Não sei dizer — não recebi dados":"Can't say — no data came through","sem dados":"no data","Escolher pesquisando":"Choose by searching","Usar a minha posição":"Use my location","Tocar no mapa":"Tap on the map","Guardar com um nome":"Save with a name","Guardado: {p}":"Saved: {p}","A usar: {p}":"Using: {p}","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"The Now forecast, the search anchor, the planner's From and the speed-camera notice all follow this home.","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Dias":"Days","Sítios":"Places","📋 Contexto":"📋 Context","Bom":"Good","Aviso":"Caution","Risco":"Risky","Mau":"Bad","Bom?":"Good?","Próximas 24 h":"Next 24 h","toca para o número exato de cada hora":"tap for the exact number for each hour","Vento":"Wind","céu":"sky","Atalhos":"Shortcuts","Guardados":"Saved","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nothing saved yet. Plan a route and tap ⭐ to save the destination under your own name.","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"I tell you whether it's rideable — right now, where you are, and along the way to where you're going.","📍 Onde estou":"📍 Where I am","🗺️ O tempo no meu caminho":"🗺️ Weather on my route","Como funciona?":"How it works","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"If the phone suspends the app, the time without checks is stated when you return — never counted as watched.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"Watching with the app closed requires our own server plus push notifications (and, on iPhone, probably the native installable build). It's on the plan; it isn't built.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"On — checks the weather where you are while the app is open.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. When on, it checks the weather where you are while the app is open and alerts you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinel on — a check every ~2 minutes, with the app open.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"With the app open and on screen: a check every ~2 minutes, with voice, vibration and notification alerts.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimised or with the screen off, the phone suspends the app: during that time there are NO checks. No web app can do it without a server watching on its behalf.","Possível chuvisco em ~{d} do caminho":"Possible drizzle over ~{d} of the way","Possível chuvisco já no início do caminho":"Possible drizzle right at the start","{x} já aqui":"{x} right here","a rota está aqui ao lado":"the route is right beside you","Sem sinal GPS — a tentar.":"No GPS signal — retrying.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"No GPS signal — retrying. Your position may be out of date.","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
+"Os meus sítios":"My places","Gerir os meus sítios":"Manage my places","Casa":"Home","Não sei dizer — não recebi dados":"Can't say — no data came through","sem dados":"no data","Escolher pesquisando":"Choose by searching","Usar a minha posição":"Use my location","Tocar no mapa":"Tap on the map","Guardar com um nome":"Save with a name","Guardado: {p}":"Saved: {p}","A usar: {p}":"Using: {p}","A pesquisa, o «De» do planeador e o aviso da moto cá fora partem desta casa.":"Search, the planner's From and the bike-outside notice start from this home.","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Search for the place and pick it — it becomes your home.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"On the map: press and hold a point (or right-click on PC) and choose “Use as home”.","Usar como casa":"Use as home","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Home updated — from now on I forecast for here.","Dias":"Days","Sítios":"Places","📋 Contexto":"📋 Context","Bom":"Good","Aviso":"Caution","Risco":"Risky","Mau":"Bad","Bom?":"Good?","Próximas 24 h":"Next 24 h","toca para o número exato de cada hora":"tap for the exact number for each hour","Vento":"Wind","céu":"sky","Atalhos":"Shortcuts","Guardados":"Saved","Renomear":"Rename","Guardar":"Save","Renomeado: {p}":"Renamed: {p}","Apagar {p}?":"Delete {p}?","Sim, apagar":"Yes, delete","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"No recent places. The ones you pick in search will show up here.","Limpar todos os recentes":"Clear all recent places","Apagar os {n} recentes?":"Delete the {n} recent places?","Recentes limpos.":"Recent places cleared.","Som de aviso":"Alert sound","Tocar um som nos avisos":"Play a sound on alerts","Som de aviso: ligado":"Alert sound: on","Som de aviso: desligado":"Alert sound: off","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Plays on hazard and Sentinel alerts. Turn-by-turn speech always wins; with the phone on silent it may not sound — the vibration and the alert stay.","Só vibração e texto nos avisos.":"Alerts use vibration and text only.","Sem sinal de GPS":"No GPS signal","Segue em frente":"Carry straight on","depois: {x}":"then: {x}","{x} daqui a {d}":"{x} in {d}","Céu limpo à frente":"Clear sky ahead","agora":"now","🎯 Recentrar":"🎯 Recentre","Fora da rota":"Off route","regressa {d} a {r}":"head back {d} to the {r}","norte":"north","nordeste":"north-east","este":"east","sudeste":"south-east","sul":"south","sudoeste":"south-west","oeste":"west","noroeste":"north-west","Mais ações":"More actions","sem chuva nem vento perigoso no caminho":"no rain or dangerous wind on the way","sem radares fixos conhecidos no trajeto":"no known fixed speed cameras on this route","seco a qualquer hora até às {h}":"dry at any time until {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km of rain at any time until {h}","ver horas":"see times","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"I tell you whether it's rideable — right now, where you are, and along the way to where you're going.","📍 Onde estou":"📍 Where I am","🗺️ O tempo no meu caminho":"🗺️ Weather on my route","Como funciona?":"How it works","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"If the phone suspends the app, the time without checks is stated when you return — never counted as watched.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"Watching with the app closed requires our own server plus push notifications (and, on iPhone, probably the native installable build). It's on the plan; it isn't built.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"On — checks the weather where you are while the app is open.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Off. When on, it checks the weather where you are while the app is open and alerts you by voice, vibration and notification when rain is coming (or stopping), wind jumps or a storm approaches.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinel on — a check every ~2 minutes, with the app open.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"With the app open and on screen: a check every ~2 minutes, with voice, vibration and notification alerts.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimised or with the screen off, the phone suspends the app: during that time there are NO checks. No web app can do it without a server watching on its behalf.","Possível chuvisco em ~{d} do caminho":"Possible drizzle over ~{d} of the way","Possível chuvisco já no início do caminho":"Possible drizzle right at the start","{x} já aqui":"{x} right here","a rota está aqui ao lado":"the route is right beside you","Sem sinal GPS — a tentar.":"No GPS signal — retrying.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"No GPS signal — retrying. Your position may be out of date.","sem casa guardada":"no home saved","Recentes":"Recent","Favoritos":"Favourites","país?":"country?",
 "✔ Está tudo certo":"✔ All correct","A casa não está certa — corrigir":"Home isn't right — fix it",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Pick the right place in the search above — home only changes when you choose one.",
 "Ir para a pesquisa":"Go to the search","Apagar este registo":"Delete this entry",
@@ -2989,7 +3020,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
-"Pesquisar cidade ou morada…":"Buscar ciudad o dirección…","Cidade ou morada…":"Ciudad o dirección…","Pesquisar…":"Buscar…","Não é esta? Mudar":"¿No es esta? Cambiar","Definir a casa":"Definir la casa",
+"Pesquisar cidade ou morada…":"Buscar ciudad o dirección…","Cidade ou morada…":"Ciudad o dirección…","Pesquisar…":"Buscar…","Não é esta? Mudar":"¿No es esta? Cambiar","Toque longo para renomear":"Mantén pulsado para renombrar","Viagem planeada":"Viaje planeado","Toca para repor esta rota":"Toca para reponer esta ruta","Sem viagens planeadas.":"Sin viajes planeados.","Mudar a casa":"Cambiar la casa","Procurar uma morada":"Buscar una dirección","Usar onde estou agora":"Usar donde estoy ahora","Escolher no mapa":"Elegir en el mapa","Sítio sem nome":"Sitio sin nombre","Planeadas":"Planeadas","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Toca la ⭐ de cualquier sitio reciente para darle un nombre.","Definir a casa":"Definir la casa",
 
 "Bom, mas {n} de sensação":"Bien, pero {n} de sensación","Calor perigoso — {n}":"Calor peligroso — {n}",
 "demorou de mais":"tardó demasiado",
@@ -3009,7 +3040,7 @@ es:{
 "A cor de cada troço mostra o tempo previsto ":"El color de cada tramo muestra el tiempo previsto ","à hora a que lá vais passar":"a la hora en que pasarás por allí",", não o tempo de agora.":", no el tiempo de ahora.",
 "Vê se os teus sítios guardados batem certo":"Comprueba que tus sitios guardados están bien",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Una versión anterior de la búsqueda podía guardar un sitio con coordenadas equivocadas — hasta a miles de kilómetros. Ya está corregido, pero lo que quedó guardado en tu dispositivo solo tú puedes confirmarlo. Pregunto una vez.",
-"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","Não sei dizer — não recebi dados":"No puedo decirlo — no llegaron datos","sem dados":"sin datos","Escolher pesquisando":"Elegir buscando","Usar a minha posição":"Usar mi ubicación","Tocar no mapa":"Tocar en el mapa","Guardar com um nome":"Guardar con un nombre","Guardado: {p}":"Guardado: {p}","A usar: {p}":"Usando: {p}","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La previsión de Ahora, el ancla de la búsqueda, el Desde del planificador y la frase de los radares siguen esta casa.","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Dias":"Días","Sítios":"Lugares","📋 Contexto":"📋 Contexto","Bom":"Bueno","Aviso":"Aviso","Risco":"Riesgo","Mau":"Malo","Bom?":"¿Bueno?","Próximas 24 h":"Próximas 24 h","toca para o número exato de cada hora":"toca para el número exacto de cada hora","Vento":"Viento","céu":"cielo","Atalhos":"Atajos","Guardados":"Guardados","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Aún no hay nada guardado. Calcula una ruta y toca ⭐ para guardar el destino con tu nombre.","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Te digo si se puede ir en moto — ahora, donde estás, y a lo largo del camino hasta donde vas.","📍 Onde estou":"📍 Dónde estoy","🗺️ O tempo no meu caminho":"🗺️ El tiempo en mi ruta","Como funciona?":"¿Cómo funciona?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si el móvil suspende la app, el tiempo sin comprobaciones se indica al volver — nunca se da por vigilado.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La vigilancia con la app cerrada exige servidor propio y notificaciones push (y, en el iPhone, probablemente la versión instalable nativa). Está en el plan; no está hecho.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activada — comprueba el tiempo donde estás mientras la app esté abierta.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Desactivado. Activado, comprueba el tiempo donde estás mientras la app esté abierta y avisa por voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Centinela activado — comprobación cada ~2 minutos, con la app abierta.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Con la app abierta y en pantalla: comprobación cada ~2 minutos, con aviso por voz, vibración y notificación.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimizada o con la pantalla apagada, el móvil suspende la app: en ese tiempo NO hay comprobaciones. Ninguna app web puede hacerlo sin un servidor que vigile por ella.","Possível chuvisco em ~{d} do caminho":"Posible llovizna en ~{d} del camino","Possível chuvisco já no início do caminho":"Posible llovizna justo al inicio","{x} já aqui":"{x} aquí mismo","a rota está aqui ao lado":"la ruta está justo al lado","Sem sinal GPS — a tentar.":"Sin señal GPS — reintentando.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Sin señal GPS — reintentando. Tu posición puede estar desactualizada.","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
+"Os meus sítios":"Mis sitios","Gerir os meus sítios":"Gestionar mis sitios","Casa":"Casa","Não sei dizer — não recebi dados":"No puedo decirlo — no llegaron datos","sem dados":"sin datos","Escolher pesquisando":"Elegir buscando","Usar a minha posição":"Usar mi ubicación","Tocar no mapa":"Tocar en el mapa","Guardar com um nome":"Guardar con un nombre","Guardado: {p}":"Guardado: {p}","A usar: {p}":"Usando: {p}","A pesquisa, o «De» do planeador e o aviso da moto cá fora partem desta casa.":"La búsqueda, el Desde del planificador y el aviso de la moto fuera parten de esta casa.","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Busca el sitio y elígelo — queda como tu casa.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"En el mapa: mantén el dedo en un punto (o clic derecho en el PC) y elige “Usar como casa”.","Usar como casa":"Usar como casa","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Casa actualizada — a partir de ahora pronostico para aquí.","Dias":"Días","Sítios":"Lugares","📋 Contexto":"📋 Contexto","Bom":"Bueno","Aviso":"Aviso","Risco":"Riesgo","Mau":"Malo","Bom?":"¿Bueno?","Próximas 24 h":"Próximas 24 h","toca para o número exato de cada hora":"toca para el número exacto de cada hora","Vento":"Viento","céu":"cielo","Atalhos":"Atajos","Guardados":"Guardados","Renomear":"Renombrar","Guardar":"Guardar","Renomeado: {p}":"Renombrado: {p}","Apagar {p}?":"¿Eliminar {p}?","Sim, apagar":"Sí, eliminar","Não":"No","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Sin sitios recientes. Los que elijas en la búsqueda aparecerán aquí.","Limpar todos os recentes":"Borrar todos los recientes","Apagar os {n} recentes?":"¿Eliminar los {n} recientes?","Recentes limpos.":"Recientes borrados.","Som de aviso":"Sonido de aviso","Tocar um som nos avisos":"Reproducir un sonido en los avisos","Som de aviso: ligado":"Sonido de aviso: activado","Som de aviso: desligado":"Sonido de aviso: desactivado","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Suena en los avisos de peligro y del Centinela. La voz de las maniobras gana siempre; con el móvil en silencio puede no sonar — la vibración y el aviso quedan.","Só vibração e texto nos avisos.":"Solo vibración y texto en los avisos.","Sem sinal de GPS":"Sin señal de GPS","Segue em frente":"Sigue recto","depois: {x}":"después: {x}","{x} daqui a {d}":"{x} en {d}","Céu limpo à frente":"Cielo despejado por delante","agora":"ahora","🎯 Recentrar":"🎯 Recentrar","Fora da rota":"Fuera de la ruta","regressa {d} a {r}":"vuelve {d} hacia el {r}","norte":"norte","nordeste":"noreste","este":"este","sudeste":"sureste","sul":"sur","sudoeste":"suroeste","oeste":"oeste","noroeste":"noroeste","Mais ações":"Más acciones","sem chuva nem vento perigoso no caminho":"sin lluvia ni viento peligroso en el camino","sem radares fixos conhecidos no trajeto":"sin radares fijos conocidos en el trayecto","seco a qualquer hora até às {h}":"seco a cualquier hora hasta las {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de lluvia a cualquier hora hasta las {h}","ver horas":"ver horas","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Te digo si se puede ir en moto — ahora, donde estás, y a lo largo del camino hasta donde vas.","📍 Onde estou":"📍 Dónde estoy","🗺️ O tempo no meu caminho":"🗺️ El tiempo en mi ruta","Como funciona?":"¿Cómo funciona?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si el móvil suspende la app, el tiempo sin comprobaciones se indica al volver — nunca se da por vigilado.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La vigilancia con la app cerrada exige servidor propio y notificaciones push (y, en el iPhone, probablemente la versión instalable nativa). Está en el plan; no está hecho.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activada — comprueba el tiempo donde estás mientras la app esté abierta.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Desactivado. Activado, comprueba el tiempo donde estás mientras la app esté abierta y avisa por voz, vibración y notificación cuando llegue (o pare) la lluvia, suba el viento o venga tormenta.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Centinela activado — comprobación cada ~2 minutos, con la app abierta.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Con la app abierta y en pantalla: comprobación cada ~2 minutos, con aviso por voz, vibración y notificación.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimizada o con la pantalla apagada, el móvil suspende la app: en ese tiempo NO hay comprobaciones. Ninguna app web puede hacerlo sin un servidor que vigile por ella.","Possível chuvisco em ~{d} do caminho":"Posible llovizna en ~{d} del camino","Possível chuvisco já no início do caminho":"Posible llovizna justo al inicio","{x} já aqui":"{x} aquí mismo","a rota está aqui ao lado":"la ruta está justo al lado","Sem sinal GPS — a tentar.":"Sin señal GPS — reintentando.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Sin señal GPS — reintentando. Tu posición puede estar desactualizada.","sem casa guardada":"sin casa guardada","Recentes":"Recientes","Favoritos":"Favoritos","país?":"¿país?",
 "✔ Está tudo certo":"✔ Todo correcto","A casa não está certa — corrigir":"La casa no está bien — corregir",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Elige el sitio correcto en la búsqueda de arriba — la casa solo cambia cuando elijas uno.",
 "Ir para a pesquisa":"Ir a la búsqueda","Apagar este registo":"Borrar este registro",
@@ -3457,7 +3488,7 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
-"Pesquisar cidade ou morada…":"Chercher une ville ou une adresse…","Cidade ou morada…":"Ville ou adresse…","Pesquisar…":"Chercher…","Não é esta? Mudar":"Ce n'est pas ça ? Changer","Definir a casa":"Définir le domicile",
+"Pesquisar cidade ou morada…":"Chercher une ville ou une adresse…","Cidade ou morada…":"Ville ou adresse…","Pesquisar…":"Chercher…","Não é esta? Mudar":"Ce n'est pas ça ? Changer","Toque longo para renomear":"Appui long pour renommer","Viagem planeada":"Trajet prévu","Toca para repor esta rota":"Touche pour remettre cet itinéraire","Sem viagens planeadas.":"Aucun trajet prévu.","Mudar a casa":"Changer le domicile","Procurar uma morada":"Chercher une adresse","Usar onde estou agora":"Utiliser là où je suis","Escolher no mapa":"Choisir sur la carte","Sítio sem nome":"Lieu sans nom","Planeadas":"Prévues","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Touche la ⭐ d'un lieu récent pour lui donner un nom.","Definir a casa":"Définir le domicile",
 
 "Bom, mas {n} de sensação":"Bien, mais {n} ressentis","Calor perigoso — {n}":"Chaleur dangereuse — {n}",
 "demorou de mais":"trop lent",
@@ -3477,7 +3508,7 @@ fr:{
 "A cor de cada troço mostra o tempo previsto ":"La couleur de chaque tronçon montre la météo prévue ","à hora a que lá vais passar":"à l'heure où tu y passeras",", não o tempo de agora.":", pas la météo actuelle.",
 "Vê se os teus sítios guardados batem certo":"Vérifie que tes lieux enregistrés sont corrects",
 "Uma versão anterior da pesquisa podia gravar um sítio com coordenadas erradas — até milhares de quilómetros ao lado. Já está corrigido, mas o que ficou gravado no teu aparelho só tu podes confirmar. Pergunto uma vez.":"Une version précédente de la recherche pouvait enregistrer un lieu avec de mauvaises coordonnées — jusqu'à des milliers de kilomètres à côté. C'est corrigé, mais ce qui est déjà enregistré sur ton appareil, toi seul peux le confirmer. Je demande une fois.",
-"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","Não sei dizer — não recebi dados":"Impossible à dire — aucune donnée reçue","sem dados":"sans données","Escolher pesquisando":"Choisir en cherchant","Usar a minha posição":"Utiliser ma position","Tocar no mapa":"Toucher la carte","Guardar com um nome":"Enregistrer avec un nom","Guardado: {p}":"Enregistré : {p}","A usar: {p}":"Utilisation : {p}","A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"La prévision de Maintenant, l'ancre de la recherche, le Départ du planificateur et la phrase des radars suivent ce domicile.","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Dias":"Jours","Sítios":"Lieux","📋 Contexto":"📋 Contexte","Bom":"Bon","Aviso":"Prudence","Risco":"Risqué","Mau":"Mauvais","Bom?":"Bon ?","Próximas 24 h":"24 h à venir","toca para o número exato de cada hora":"touche pour le chiffre exact de chaque heure","Vento":"Vent","céu":"ciel","Atalhos":"Raccourcis","Guardados":"Enregistrés","Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Rien d'enregistré pour l'instant. Calcule un itinéraire et touche ⭐ pour enregistrer la destination sous ton nom.","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Je te dis si c'est roulable — maintenant, là où tu es, et tout au long du trajet.","📍 Onde estou":"📍 Où je suis","🗺️ O tempo no meu caminho":"🗺️ La météo sur mon trajet","Como funciona?":"Comment ça marche ?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si le téléphone suspend l'app, le temps sans vérification est indiqué au retour — jamais compté comme surveillé.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La surveillance app fermée exige un serveur propre et des notifications push (et, sur iPhone, probablement la version installable native). C'est au plan ; ce n'est pas fait.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activée — vérifie la météo là où tu es tant que l'app est ouverte.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Activée, elle vérifie la météo là où tu es tant que l'app est ouverte et prévient par la voix, la vibration et une notification quand la pluie arrive (ou s'arrête), que le vent monte ou qu'un orage approche.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinelle activée — vérification toutes les ~2 minutes, avec l'app ouverte.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Avec l'app ouverte et à l'écran : vérification toutes les ~2 minutes, avec alerte voix, vibration et notification.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimisée ou écran éteint, le téléphone suspend l'app : pendant ce temps il n'y a AUCUNE vérification. Aucune app web ne peut le faire sans un serveur qui surveille à sa place.","Possível chuvisco em ~{d} do caminho":"Bruine possible sur ~{d} du trajet","Possível chuvisco já no início do caminho":"Bruine possible dès le départ","{x} já aqui":"{x} ici même","a rota está aqui ao lado":"l'itinéraire est juste à côté","Sem sinal GPS — a tentar.":"Pas de signal GPS — nouvelle tentative.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Pas de signal GPS — nouvelle tentative. Ta position peut être obsolète.","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
+"Os meus sítios":"Mes lieux","Gerir os meus sítios":"Gérer mes lieux","Casa":"Domicile","Não sei dizer — não recebi dados":"Impossible à dire — aucune donnée reçue","sem dados":"sans données","Escolher pesquisando":"Choisir en cherchant","Usar a minha posição":"Utiliser ma position","Tocar no mapa":"Toucher la carte","Guardar com um nome":"Enregistrer avec un nom","Guardado: {p}":"Enregistré : {p}","A usar: {p}":"Utilisation : {p}","A pesquisa, o «De» do planeador e o aviso da moto cá fora partem desta casa.":"La recherche, le Départ du planificateur et l'alerte de la moto dehors partent de ce domicile.","Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Cherche le lieu et choisis-le — il devient ton domicile.","No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Sur la carte : garde le doigt appuyé (ou clic droit sur PC) et choisis « Utiliser comme domicile ».","Usar como casa":"Utiliser comme domicile","🏠 Casa atualizada — a partir de agora prevejo para aqui.":"🏠 Domicile mis à jour — désormais je prévois pour ici.","Dias":"Jours","Sítios":"Lieux","📋 Contexto":"📋 Contexte","Bom":"Bon","Aviso":"Prudence","Risco":"Risqué","Mau":"Mauvais","Bom?":"Bon ?","Próximas 24 h":"24 h à venir","toca para o número exato de cada hora":"touche pour le chiffre exact de chaque heure","Vento":"Vent","céu":"ciel","Atalhos":"Raccourcis","Guardados":"Enregistrés","Renomear":"Renommer","Guardar":"Enregistrer","Renomeado: {p}":"Renommé : {p}","Apagar {p}?":"Supprimer {p} ?","Sim, apagar":"Oui, supprimer","Não":"Non","Sem sítios recentes. Os que escolheres na pesquisa aparecem aqui.":"Aucun lieu récent. Ceux que tu choisis dans la recherche apparaîtront ici.","Limpar todos os recentes":"Effacer tous les récents","Apagar os {n} recentes?":"Supprimer les {n} récents ?","Recentes limpos.":"Récents effacés.","Som de aviso":"Son d'alerte","Tocar um som nos avisos":"Jouer un son lors des alertes","Som de aviso: ligado":"Son d'alerte : activé","Som de aviso: desligado":"Son d'alerte : désactivé","Toca nos avisos de perigo e da Sentinela. A voz das manobras ganha sempre; com o telemóvel em silêncio pode não soar — a vibração e o aviso ficam.":"Se déclenche pour les alertes de danger et de la Sentinelle. La voix des manœuvres passe toujours en premier ; avec le téléphone en silencieux le son peut ne pas passer — la vibration et l'alerte restent.","Só vibração e texto nos avisos.":"Alertes en vibration et texte uniquement.","Sem sinal de GPS":"Pas de signal GPS","Segue em frente":"Continue tout droit","depois: {x}":"ensuite : {x}","{x} daqui a {d}":"{x} dans {d}","Céu limpo à frente":"Ciel dégagé devant","agora":"maintenant","🎯 Recentrar":"🎯 Recentrer","Fora da rota":"Hors itinéraire","regressa {d} a {r}":"reviens {d} vers le {r}","norte":"nord","nordeste":"nord-est","este":"est","sudeste":"sud-est","sul":"sud","sudoeste":"sud-ouest","oeste":"ouest","noroeste":"nord-ouest","Mais ações":"Plus d'actions","sem chuva nem vento perigoso no caminho":"ni pluie ni vent dangereux sur le trajet","sem radares fixos conhecidos no trajeto":"aucun radar fixe connu sur le trajet","seco a qualquer hora até às {h}":"sec à toute heure jusqu'à {h}","~{n} km de chuva a qualquer hora até às {h}":"~{n} km de pluie à toute heure jusqu'à {h}","ver horas":"voir les heures","Digo-te se dá para ir de mota — agora, onde estás, e ao longo do caminho até onde vais.":"Je te dis si c'est roulable — maintenant, là où tu es, et tout au long du trajet.","📍 Onde estou":"📍 Où je suis","🗺️ O tempo no meu caminho":"🗺️ La météo sur mon trajet","Como funciona?":"Comment ça marche ?","Se o telemóvel suspender a app, o tempo sem verificações é dito no regresso — nunca é dado como vigiado.":"Si le téléphone suspend l'app, le temps sans vérification est indiqué au retour — jamais compté comme surveillé.","Vigilância com a app fechada exige servidor próprio e notificações push (e, no iPhone, provavelmente a versão instalável nativa). Está no plano; não está feito.":"La surveillance app fermée exige un serveur propre et des notifications push (et, sur iPhone, probablement la version installable native). C'est au plan ; ce n'est pas fait.","Ligada — verifica o tempo onde estás enquanto a app estiver aberta.":"Activée — vérifie la météo là où tu es tant que l'app est ouverte.","Desligada. Ligada, verifica o tempo onde estás enquanto a app estiver aberta e avisa por voz, vibração e notificação quando a chuva estiver a chegar (ou a parar), o vento der um salto ou vier trovoada.":"Désactivée. Activée, elle vérifie la météo là où tu es tant que l'app est ouverte et prévient par la voix, la vibration et une notification quand la pluie arrive (ou s'arrête), que le vent monte ou qu'un orage approche.","🔔 Sentinela ligada — verificação a cada ~2 minutos, com a app aberta.":"🔔 Sentinelle activée — vérification toutes les ~2 minutes, avec l'app ouverte.","Com a app aberta e no ecrã: verificação a cada ~2 minutos, com aviso por voz, vibração e notificação.":"Avec l'app ouverte et à l'écran : vérification toutes les ~2 minutes, avec alerte voix, vibration et notification.","Minimizada ou com o ecrã apagado, o telemóvel suspende a app: nesse tempo NÃO há verificações. Nenhuma app web o consegue fazer sem um servidor a vigiar por ela.":"Minimisée ou écran éteint, le téléphone suspend l'app : pendant ce temps il n'y a AUCUNE vérification. Aucune app web ne peut le faire sans un serveur qui surveille à sa place.","Possível chuvisco em ~{d} do caminho":"Bruine possible sur ~{d} du trajet","Possível chuvisco já no início do caminho":"Bruine possible dès le départ","{x} já aqui":"{x} ici même","a rota está aqui ao lado":"l'itinéraire est juste à côté","Sem sinal GPS — a tentar.":"Pas de signal GPS — nouvelle tentative.","Sem sinal GPS — a tentar. A tua posição pode estar desatualizada.":"Pas de signal GPS — nouvelle tentative. Ta position peut être obsolète.","sem casa guardada":"pas de domicile enregistré","Recentes":"Récents","Favoritos":"Favoris","país?":"pays ?",
 "✔ Está tudo certo":"✔ Tout est bon","A casa não está certa — corrigir":"Le domicile n'est pas bon — corriger",
 "Escolhe o sítio certo na pesquisa lá de cima — a casa só muda quando escolheres.":"Choisis le bon lieu dans la recherche au-dessus — le domicile ne change que quand tu choisis.",
 "Ir para a pesquisa":"Aller à la recherche","Apagar este registo":"Supprimer cette entrée",
@@ -3933,7 +3964,7 @@ fr:{
    trata-se por tu. */
 nl:{
 "Pesquisar cidade ou morada…":"Zoek stad of adres…","Cidade ou morada…":"Stad of adres…","Pesquisar…":"Zoeken…","Créditos e licenças":"Credits en licenties","Destino":"Naar","Encoberto":"Bewolkt","Hora de partida":"Vertrektijd","Ligação aos serviços":"Verbinding met de diensten","Motor antigo (tem de estar fora)":"Oude motor (moet weg zijn)","Motor do mapa":"Kaartmotor","Origem":"Van","Porta do mapa":"Deur naar de kaart","Preferências":"Voorkeuren","Privacidade":"Privacy","Rota":"Route","Termos de utilização":"Gebruiksvoorwaarden","Tradução":"Vertaling","chuva das {a} às {b}":"regen van {a} tot {b}","ex.: \"vou ao MediaMarkt\" · \"decathlon\" · \"bombas de gasolina\"":"bijv. \"ik ga naar MediaMarkt\" · \"decathlon\" · \"tankstations\"","Vai de moto!":"Rijden maar!","via verde":"vrij baan","Vai, mas equipado":"Rijden, maar goed uitgerust","atenção":"let op","Arriscado — pensa duas vezes":"Riskant — denk twee keer na","risco":"risico","Melhor não ir de moto":"Beter niet rijden","não recomendado":"afgeraden","o motor do mapa":"de kaartmotor","a porta única do mapa":"de enige deur naar de kaart","a tradução":"de vertaling","as tuas preferências":"je voorkeuren","falar com os serviços":"praten met de diensten","Leaflet, que saiu no A2.2":"Leaflet, dat vertrok in A2.2","Chuvisco possível":"Mogelijke motregen","Chuva forte / trovoada":"Zware regen / onweer","Bom p/ moto":"Goed rijweer","Com aviso":"Voorzichtig","Arriscado":"Riskant","Mau p/ moto":"Slecht rijweer",
-"Não é esta? Mudar":"Niet deze? Wijzigen","Definir a casa":"Thuis instellen",
+"Não é esta? Mudar":"Niet deze? Wijzigen","Toque longo para renomear":"Houd ingedrukt om te hernoemen","Viagem planeada":"Geplande rit","Toca para repor esta rota":"Tik om deze route terug te zetten","Sem viagens planeadas.":"Geen geplande ritten.","Mudar a casa":"Thuis wijzigen","Procurar uma morada":"Een adres zoeken","Usar onde estou agora":"Gebruiken waar ik nu ben","Escolher no mapa":"Op de kaart kiezen","Sítio sem nome":"Plek zonder naam","Planeadas":"Gepland","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Tik op de ⭐ van een recente plek om die een naam te geven.","Definir a casa":"Thuis instellen",
 
 "Bom, mas {n} de sensação":"Goed, maar {n} gevoelstemperatuur","Calor perigoso — {n}":"Gevaarlijke hitte — {n}",
 "norte":"noord",
@@ -4220,13 +4251,13 @@ nl:{
 "Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.":"Geen locatie. Geef toegang tot gps, of zoek je stad op het tabblad Nu.",
 "Gerir os meus sítios":"Mijn plekken beheren",
 "Os meus sítios":"Mijn plekken",
-"A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.":"De verwachting op Nu, het ankerpunt van de zoekfunctie, het Van-veld van de planner en de zin over flitspalen volgen dit thuis.",
+"A pesquisa, o «De» do planeador e o aviso da moto cá fora partem desta casa.":"De zoekfunctie, het Van-veld van de planner en de melding over de motor buiten vertrekken van dit thuis.",
 
 "Pesquisa o sítio e escolhe-o — fica como a tua casa.":"Zoek de plek en kies hem — dan wordt dat je thuis.",
 
 "No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”.":"Op de kaart: houd je vinger op een punt (of rechtsklik op de pc) en kies “Als thuis gebruiken”.",
 "Dias":"Dagen","Sítios":"Plekken","📋 Contexto":"📋 Context","Bom":"Goed","Aviso":"Let op","Risco":"Riskant","Mau":"Slecht","Bom?":"Goed?","Próximas 24 h":"Komende 24 u","toca para o número exato de cada hora":"tik voor het exacte getal van elk uur","Vento":"Wind","céu":"lucht","Atalhos":"Snelkoppelingen","Guardados":"Bewaard",
-"Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.":"Nog niets bewaard. Bereken een route en tik op ⭐ om de bestemming onder je eigen naam te bewaren.",
+
 "Renomear":"Naam wijzigen",
 "Guardar":"Bewaren",
 "Renomeado: {p}":"Naam gewijzigd: {p}",
@@ -5105,14 +5136,22 @@ async function jfetch(url, timeout=14000, origem=null){
 
 /* ---------------- tooltip partilhado ---------------- */
 const tip=$("#viz-tip");
-function tipShow(x,y,title,rows){ // rows: [[label,value],...]
+function tipShow(x,y,title,rows,yB){ // rows: [[label,value],...] · yB: fundo do alvo
   tip.textContent="";
   tip.appendChild(el("div","tt-t",title));
   for(const [k,v] of rows){ const r=el("div","tt-row"); r.appendChild(el("span",null,k)); r.appendChild(el("b",null,v)); tip.appendChild(r); }
   tip.style.display="block";
   const w=tip.offsetWidth,h=tip.offsetHeight;
+  /* ═══ dd-244 §2 — A BOLHA ESCOLHE O LADO PELO ESPAÇO, com um chão: havendo
+     espaço dos DOIS lados, abre para BAIXO. Na fita das 24 h ela abria
+     sempre para cima e tapava o veredicto — que é o produto. O balão é
+     partilhado, por isso a regra é geral e não um caso especial da fita:
+     `yB` é o fundo do alvo; um chamador de ponto (cursor) não o passa e o
+     próprio ponto faz de alvo. */
+  const fundo=Number.isFinite(yB)?yB:y;
+  const cabeEmBaixo=fundo+12+h<=innerHeight-8;
   tip.style.left=clamp(x+14,8,innerWidth-w-8)+"px";
-  tip.style.top=clamp(y-h-12,8,innerHeight-h-8)+"px";
+  tip.style.top=(cabeEmBaixo?(fundo+12):clamp(y-h-12,8,innerHeight-h-8))+"px";
 }
 function tipHide(){ tip.style.display="none"; }
 addEventListener("scroll",tipHide,{passive:true});
@@ -5635,6 +5674,69 @@ async function fetchRouteWx(points, startEpoch, endEpoch){
   }).toString();
   const j=await jfetch(u.toString(), 20000);
   return Array.isArray(j)?j:[j];
+}
+
+/* ═══ dd-243 §3a — O TEMPO EM CADA LINHA DOS SÍTIOS ════════════════════════
+   «Uma lista de sítios sem tempo nenhum é uma lista de contactos.» A pergunta
+   de quem abre a lista não é "que sítios tenho" — é "para onde vale a pena
+   ir hoje".
+   MEDIDO ANTES DE DESENHAR (duas sondas de 15/08 na máquina do dono):
+   · 45 pontos numa chamada `current` = HTTP 200 · 232 ms · 26 KB · URL 1008
+     chars · 45 resultados PELA ORDEM do pedido — o portão da carta
+     («se for mais do que três chamadas, PARA») passa com UMA para
+     casa+guardados+recentes. As planeadas não somam chamada nenhuma: ligam
+     ao tripVerdict que já existe para o calendário.
+   · `visibility` e `relative_humidity_2m` existem no current (sonda 2) —
+     sem elas o scoreHour marcava falta em todas as linhas e o verde nunca
+     seria a cheio sem culpa nenhuma dos dados.
+   A escala é A MESMA que o utilizador já leu com palavra nos Dias
+   (scoreHour → Bom/Aviso/Risco/Mau, dd-233 §2d): não nasce segunda régua,
+   e não nasce string nova — as palavras já vivem nos 5 dicionários.
+   O que não veio cala-se (7g-ter): linha sem dados fica sem bolinha e sem
+   palavra, nunca com um «Bom» inventado. */
+const WX_SITIOS_CAMPOS="temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,relative_humidity_2m,visibility";
+async function tempoDosSitios(pontos){
+  const mapa=new Map();
+  if(!pontos.length) return mapa;
+  const u=new URL(OM_BASE);
+  u.search=new URLSearchParams({
+    latitude:pontos.map(p=>(+p.lat).toFixed(3)).join(","),
+    longitude:pontos.map(p=>(+p.lon).toFixed(3)).join(","),
+    current:WX_SITIOS_CAMPOS,
+    timeformat:"unixtime", timezone:"auto",
+  }).toString();
+  const j=await jfetch(u.toString(), 14000, "sitios");
+  const arr=Array.isArray(j)?j:[j];
+  /* a chave é a coordenada a 4 casas — a MESMA régua do chaveSitio da lista */
+  arr.forEach((r,i)=>{ const p=pontos[i], c=r&&r.current;
+    if(!p||!c) return;
+    mapa.set(`${(+p.lat).toFixed(4)},${(+p.lon).toFixed(4)}`,
+      {t:c.temperature_2m??null, at:c.apparent_temperature??null,
+       pr:c.precipitation??null, pp:null, code:c.weather_code??null,
+       wind:c.wind_speed_10m??null, gust:c.wind_gusts_10m??null,
+       rh:c.relative_humidity_2m??null, vis:c.visibility??null, wb:null}); });
+  return mapa;
+}
+/* a peça visual — a linguagem dos Dias: bolinha da cor do nível +
+   temperatura, palavra por baixo, e a razão de topo no title/aria. */
+function pintaTempoDaLinha(slot, m){
+  if(!slot||!m) return;
+  const sc=scoreHour(m);
+  slot.textContent="";
+  const b=el("b");
+  const dot=el("span","wx-dot");
+  dot.style.background=`var(--${["good","warn","serious","crit"][sc.lvl]})`;
+  b.appendChild(dot);
+  /* U.temp FORA do t() — dentro dele a conversão corre duas vezes (linte
+     unidades; já apanhou este gesto duas vezes noutros turnos) */
+  if(m.t!=null) b.appendChild(document.createTextNode(U.temp(m.t)));
+  slot.appendChild(b);
+  /* verde com faltas não afirma a cheio — é o «Bom?» que os Dias já usam */
+  const pal=(sc.lvl===0&&sc.faltas.length)?t("Bom?"):t(["Bom","Aviso","Risco","Mau"][sc.lvl]);
+  slot.appendChild(el("span","wx-palavra",pal));
+  const razao=sc.reasons&&sc.reasons[0];
+  slot.title=razao?razao.label:t(["Bom p/ moto","Com aviso","Arriscado","Mau p/ moto"][sc.lvl]);
+  slot.setAttribute("aria-label",`${pal}${m.t!=null?" · "+U.temp(m.t):""}${razao?" · "+razao.label:""}`);
 }
 
 /* Nominatim exige ≥1 pedido/seg — fila global para nunca sermos bloqueados */
@@ -6447,14 +6549,30 @@ const PALAVRAS_CASA={pt:["casa","minha casa","lar"], en:["home","my home","house
    três maneiras, nenhum deles a falhar — e por isso ninguém dava por nada.
    Quem precisar de procurar num favorito chama isto e não escolhe campos. */
 function textoDoFav(f){ return [f&&f.label, f&&f.name, f&&f.sub].filter(Boolean).join(" "); }
+/* ═══ dd-244 §4 — O VALOR DE RECURSO É O MAIS HONESTO, NUNCA `undefined` ═══
+   Um favorito legado sem rótulo escrevia `undefined` no ecrã, no renomear,
+   no apagar e na fila de atalhos (fotografia sitios-claro.png). Os
+   escritores de hoje guardam sempre rótulo — os dados é que são legados — e
+   por isso a cura é no LEITOR: um leitor que confia na forma do que está
+   guardado volta a partir-se com os dados seguintes.
+   A escada: nome → morada → coordenada → «Sítio sem nome». Nunca undefined.
+   Violação original: `"⭐ "+f.label` com f.label ausente.
+   Segunda direção: com rótulo presente, mostra-se o rótulo, intacto. */
+function nomeDoSitio(x){
+  const n=(x&&(x.label||x.name||x.sub))||"";
+  if(n) return n;
+  if(x&&Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)) return `${(+x.lat).toFixed(4)}, ${(+x.lon).toFixed(4)}`;
+  return t("Sítio sem nome");
+}
 
 function locaisLocais(q){
   const nq=normTxt(q); if(!nq) return [];
   const out=[];
-  /* A CASA. Está em `state.home`, não nos favoritos — foi definida no separador
-     Agora e é a mesma que o guarda da mota usa. Nunca tinha sido procurada, e
-     era por isso que escrever "casa" não a encontrava. Não se pede ao
-     utilizador para a guardar de novo: procura-se onde ela já está. */
+  /* A CASA. Vem do aCasa() — slot próprio desde o dd-170 §4; o `state.home` é
+     o sítio no ecrã e já não a disfarça (dd-244 §3). É a mesma que o guarda
+     da mota usa. Nunca tinha sido procurada, e era por isso que escrever
+     "casa" não a encontrava. Não se pede ao utilizador para a guardar de
+     novo: procura-se onde ela já está. */
   const casa=aCasa();                 // dd-170 §4: a CASA, não o sítio no ecrã
   if(casa&&Number.isFinite(casa.lat)){
     const alias=[...(PALAVRAS_CASA[state.lang]||PALAVRAS_CASA.pt), ...PALAVRAS_CASA.pt];
@@ -6658,7 +6776,7 @@ function refPesquisa(){
      recente. Chega ao mesmo destino pela porta honesta, e com o nome certo. */
   const ancora=(x)=>real(x)&&x.prov?.como!=="pesquisa";
   for(const x of [state.home, store.get("home")])
-    if(ancora(x)) return {lat:x.lat, lon:x.lon, rotulo:x.name||t("casa")};
+    if(ancora(x)) return {lat:x.lat, lon:x.lon, rotulo:nomeDoSitio(x)};   // dd-244 §3: este degrau é o sítio no ecrã — sem nome diz a morada ou a coordenada, nunca «casa»
   try{ if(state.mapaRota&&state.mapaRota.m){ const c=Mapa.centro(state.mapaRota);
     if(c&&Number.isFinite(c[1])) return {lat:c[1], lon:c[0], rotulo:t("o mapa à vista")}; } }catch(e){}
   for(const x of [(getRecentes()||[])[0], (getFavs()||[])[0]])
@@ -8650,8 +8768,9 @@ function confirmarCasa(loc){
   const card=el("div","card"); card.id="confirmar-casa";
   /* distância em métrico cru dentro do t(): é o próprio t() que converte a
      frase final (regra das unidades — U.* dentro de t() converte duas vezes) */
+  const ref=aCasa()||state.home;   // dd-244 §3: a distância anunciada é DA CASA — o ecrã pode estar noutro sítio
   card.appendChild(el("p",null,t("🏠 Mudar a casa para {p}, a {d} de distância? Isto não veio de um gesto teu, por isso pergunto antes de gravar.",
-    {p:loc.name||"?", d:`${Math.round(haversine(state.home,loc))} km`})));
+    {p:loc.name||"?", d:`${Math.round(haversine(ref,loc))} km`})));
   const acoes=el("div","san-acoes");
   const sim=el("button","btn primary",t("Sim, mudar"));
   sim.addEventListener("click",()=>{ slot.textContent=""; setHome(loc,{prov:"escolha"}); });
@@ -8682,7 +8801,12 @@ function confirmarCasa(loc){
 function definirCasa(loc,{explicito=false}={}){
   if(!loc||!Number.isFinite(loc.lat)||!Number.isFinite(loc.lon)) return;
   if(state.casa&&state.casa.prov?.como==="escolha"&&!explicito) return;
+  /* dd-244 §3 (guarda atribuicao): o registo vai INTEIRO — o `cc` dá o país à
+     porta e o `atrib` leva a licença colada (dd-172 §2). Despir o objeto aqui
+     era perder o país e a atribuição no minuto em que a porta passou a ler
+     a casa. */
   state.casa={name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon,
+              cc:loc.cc||null, atrib:loc.atrib||null,
               prov:loc.prov||(explicito?{como:"escolha", quando:Date.now()}:null)};
   /* ⚠️ SEM EMBRULHO, E É POR ELE JÁ EXISTIR. O `store.set` apanha a exceção
      dentro dele e chama `queixar("gravar no aparelho", e)` — nunca deixa nada
@@ -8765,10 +8889,10 @@ function setHome(loc, {silent=false, prov, deStore=false, semCasa=false}={}){
   /* adotar a casa que JÁ está no store (arranque) não a reescreve: reescrever
      normalizava o objeto e branqueava migrações — a guarda do rename viu-o */
   if(!deStore) store.set("home",{name:loc.name, sub:loc.sub||"", lat:loc.lat, lon:loc.lon, prov:loc.prov||null, atrib:loc.atrib||null});
-  if(sanidadePendente) sanidadeRender();   // a linha da casa no cartão de sanidade acompanha a troca
-  if(typeof renderCamLei==="function") renderCamLei(); // a frase dos radares segue a casa
-  if(typeof pintarSitiosLinha==="function") pintarSitiosLinha(); // a porta das definições diz a casa nova
-  if(typeof renderSitios==="function"&&$("#sitios-drawer")?.classList.contains("open")) renderSitios();
+  if(sanidadePendente) sanidadeRender();   // o cartão de sanidade relê o guardado (a casa só muda se o gesto a nomear — dd-244 §3)
+  if(typeof renderCamLei==="function") renderCamLei(); // a frase dos radares segue o sítio no ecrã — o «Aqui» dela (dd-244 §3)
+  if(typeof pintarSitiosLinha==="function") pintarSitiosLinha(); // a porta das definições relê a casa (só muda se o gesto a nomeou)
+  if(typeof renderSitios==="function"&&$("#view-sitios")?.classList.contains("active")) renderSitios();   // dd-244 bloco 3: a gaveta morreu — repinta-se se o separador estiver à vista
   const box=$("#agora-content");
   if(!silent){ box.textContent="";
     box.appendChild(el("div","skel")); box.lastChild.style.height="150px"; box.lastChild.style.marginBottom="14px";
@@ -8781,7 +8905,7 @@ function setHome(loc, {silent=false, prov, deStore=false, semCasa=false}={}){
       const r=el("button","btn",t("Tentar de novo")); r.style.marginTop="8px";
       r.addEventListener("click",()=>setHome(loc));
       box.appendChild(b); box.appendChild(r); } });
-  pintarCampoDoLocal();   // dd-224 bloco 3: o campo diz a casa NOVA, não a antiga
+  pintarCampoDoLocal();   // dd-224 bloco 3: o campo diz o sítio NOVO do ecrã (dd-244 §3: já não lhe chama casa)
 }
 
 /* ═══ OS TRÊS ESTADOS DA LOCALIZAÇÃO (dd-41, registo 42) ═══════════════════
@@ -8908,9 +9032,11 @@ function renderLocEstado(alvo,tipo){
    que abre a caixa do sistema. Se não houver prova de uso anterior, cala-se:
    uma instalação nova não tem nada a recuperar. */
 function permissoesPerdidas(){
-  const casa=store.get("home");
+  /* dd-244 §3: a prova vem do slot do sítio no ecrã — um GPS concedido escreve
+     lá a proveniência. Chamar-lhe «casa» era o nome antigo do slot, não o facto. */
+  const h=store.get("home")||store.get("casa");
   return {
-    geo: casa?.prov?.como==="gps",                       // a casa nasceu de um GPS concedido
+    geo: h?.prov?.como==="gps",                          // o sítio guardado nasceu de um GPS concedido
     /* a prova lê-se do STORE, não do objeto em memória: é o store que a
        ponte carrega para a casa nova, e ao arranque a sentinela ainda não
        foi retomada (apanhado pela guarda — a prova tem de sobreviver à
@@ -8998,21 +9124,40 @@ function marcarAvisoNaSentinela(mostrar){
     else c.appendChild(m); }
   m.textContent="🔔 "+t("Avisos por permitir — a Sentinela vigia, mas não te consegue avisar.");
 }
-async function preencherOrigemOmissao(){
+async function preencherOrigemOmissao({rapido=false}={}){
   /* dd-54 §2 (decisão da A4.2 registada no r24): o caso comum é A→B agora —
      o De nasce preenchido. Posição fresca SE a permissão já está dada (sem
      caixa nenhuma, dd-41); senão a casa. O utilizador escreve por cima se
-     quiser outra origem. */
+     quiser outra origem.
+     ═══ dd-244 §3 — O «DE» TEM UM PINTOR SÓ, E LÊ A CASA (§10.124) ════════
+     Eram dois pintores com slots diferentes: este lia `state.home` — o
+     SÍTIO NO ECRÃ — e declarava-o «casa»; o do «Rota para {p}» lia a casa
+     a sério. Regra 4 dentro de uma peça só. Fica este, e bebe do aCasa():
+     ver um sítio na pesquisa nunca mais muda de onde a rota parte.
+     `rapido` é o caminho quente (um toque que calcula já): usa a posição
+     em cache e não espera pelo GPS — a política do slot é a mesma. */
   const o=$("#rt-o"); if(!o||o.value.trim()||o._picked) return;
-  const est=await locEstado();
-  if(est==="concedida"){ const p=await freshPos();
-    if(p){ o.value="📍 "+t("A minha posição"); o._picked={...p}; o._suposta="gps"; return; } }
-  const casa=state.home||store.get("home");
+  let p=null;
+  if(rapido) p=posFresca();
+  else { const est=await locEstado();
+    if(est==="concedida") p=await freshPos(); }
+  /* origem ≈ destino trava-se nos DOIS braços — era a «rota de Jumbo para
+     Jumbo» (dd-170 §4) */
+  const dst=$("#rt-d")?._picked||state.foco||null;
+  const longe=(x)=>!(dst&&Number.isFinite(+dst.lat))||haversine(x,dst)>0.05;
+  if(p&&longe(p)){ o.value="📍 "+t("A minha posição"); o._picked={...p}; o._suposta="gps"; return; }
   /* ═══ dd-241 §4.5a — A ORIGEM SUPOSTA DECLARA-SE (§10.95) ═══════════════
      Uma origem que a app escolheu sozinha dá uma rota errada a quem não está
      em casa, e dá-a com ar de certeza. Fica a marca de QUEM a escolheu; quem
      desenha o cartão diz-o em voz alta, e o campo continua editável. */
-  if(casa&&Number.isFinite(casa.lat)){ o.value=casa.name; o._picked={...casa}; o._suposta="casa"; }
+  let casa=aCasa();
+  if(!casa){ const r=state.home||store.get("home");
+    /* sem casa nenhuma, a RESERVA do arranque serve de casa-por-omissão
+       (dd-241 §4.5: a app nunca fica sem origem; a declaração é a cura) —
+       mas só a reserva: um sítio posto no ecrã por um gesto de VER não
+       entra aqui, que era exatamente o defeito. */
+    if(r&&r.prov?.como==="reserva") casa=r; }
+  if(casa&&Number.isFinite(casa.lat)&&longe(casa)){ o.value=casa.name; o._picked={...casa}; o._suposta="casa"; }
 }
 async function useGPS(fromRoute){
   const alvo=fromRoute?"#loc-estado-rota":"#loc-estado-agora";
@@ -9301,12 +9446,14 @@ function renderDashboard(){
      esboço lhe dá em vez de flutuar entre outras quatro. */
   const jc=fraseJanelaChuva(H,metrics,i0,prof);
   if(jc){ const l=el("div","chuva-janela hero-qual"); l.id="chuva-janela"; l.dataset.tipo=jc.tipo; l.textContent=jc.txt; main.appendChild(l); }
-  /* a linha discreta da proveniência da casa (A3.5.35 ponto 5): quem vir
-     "definida a partir de uma pesquisa" percebe sozinho o que aconteceu */
+  /* a linha discreta da proveniência DO SÍTIO NO ECRÃ (A3.5.35 ponto 5): quem
+     vir "definida a partir de uma pesquisa" percebe sozinho o que aconteceu.
+     dd-244 §3: o glifo era 🏠 — chamava casa ao sítio que a Agora mostra, que
+     pode ser qualquer terra pesquisada. O sítio no ecrã chama-se o que é. */
   /* dd-217 §1a: a PROVENIÊNCIA desce. É confiança, não decisão — e a decisão
      é que disputa o primeiro ecrã. Desce inteira, com o mesmo texto e o mesmo
      `data-test`; quem a mede continua a encontrá-la. */
-  contexto.push(el("div","hero-prov","🏠 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
+  contexto.push(el("div","hero-prov","📍 "+(state.home.sub?state.home.sub+" · ":"")+provTexto(state.home.prov)));
   /* dd-172 §2: o NOME deste cartão veio do fornecedor de moradas. A linha de
      proveniência acima («detetada pelo GPS») diz COMO o sítio foi escolhido —
      não é a licença, e uma não substitui a outra. */
@@ -9589,33 +9736,32 @@ function renderTimeline(H,metrics,scores,i0,prof){
   }
   card.appendChild(cab);
 
-  /* ── a fita: uma célula por hora, cor = CHUVA ───────────────────────────
-     Os degraus saem dos mesmos números que já decidem o veredicto — não há
-     um segundo critério de chuva escondido aqui (§10.4: dois caminhos que
-     leem a mesma coisa de maneiras diferentes). */
+  /* ═══ dd-244 §1 — A FITA É DO ÍNDICE; A CHUVA É A FAIXA DE BAIXO ═════════
+     O enchimento da célula é o NÍVEL DO ÍNDICE (n0-n3 — a escala que o
+     utilizador já leu com palavra no veredicto e nos Dias), e a chuva é uma
+     faixa por baixo, lida da `nivelChuva` com o PERFIL DO FACTO (dd-183: a
+     faixa é meteorologia, não conselho).
+     ⚠️ Aqui viveu a `corDaHora` — uma SEGUNDA régua de chuva com números
+     próprios, debaixo de um comentário que garantia «não há um segundo
+     critério de chuva escondido aqui». É o §10.123: um comentário que
+     garante a AUSÊNCIA de um defeito é o sítio mais provável para o
+     encontrar. A régua é UMA, a canónica, e esta superfície bebe-a. */
   const fita=el("div","fita");
   const N=24;
-  /* ⚠️ A CHUVA É AZUL, e o vermelho fica para o veredicto. A primeira versão
-     desta fita pintava a chuva forte de `--crit` — o mesmo vermelho que diz
-     «não vás». Duas coisas diferentes com a mesma cor no mesmo ecrã: quem
-     olha de relance lê «perigo» onde está escrito «chove». O esboço usa azul
-     e o nowcast já usa azul para a mesma coisa, dois cartões abaixo — uma
-     coleção, um dono. A escala é a MESMA em toda a app: mais escuro é mais
-     forte. */
-  const corDaHora=(m)=>{
-    if(m.pr==null&&m.pp==null) return null;                 // buraco: hachura
-    const pr=m.pr??0, pp=m.pp??0;
-    if(pr>=2.5||pp>=70) return "#1d4ed8";                    // chuva a sério
-    if(pr>=0.5||pp>=45) return "#3b82f6";                    // chuva
-    if(pr>=0.1||pp>=25) return "#bfdbfe";                    // chuvisco
-    return "var(--surface2)";                                // seco
-  };
+  /* A chuva continua AZUL (a objeção da dd-225 mantém-se respondida: o
+     vermelho do nível e o vermelho do veredicto passam a significar a MESMA
+     coisa, porque é o mesmo índice) — nos tokens --chuva/--chuva-fraca. */
   for(let k=0;k<N;k++){
     const i=i0+k; if(i>=scores.length) break;
     const m=metrics[i], sc=scores[i];
     const cel=el("i");
-    const cor=corDaHora(m);
-    if(cor) cel.style.background=cor; else cel.classList.add("furo");
+    if(m.pr==null&&m.pp==null) cel.classList.add("furo");   // buraco: hachura, como sempre
+    else{
+      cel.classList.add("n"+sc.lvl);                        // enchimento = nível do índice
+      const nv=nivelChuva(m.pr,m.pp,m.code,PROF_DO_FACTO);  // a régua canónica, UMA
+      if(nv>=2) cel.classList.add("chuva");
+      else if(nv===1) cel.classList.add("chuvisco");
+    }
     cel.setAttribute("tabindex","0");
     cel.setAttribute("role","button");
     const rot=`${fmtH(H.time[i])} · ${m.pr==null?"—":U.prec(m.pr)}${m.pp==null?"":" · "+rnd(m.pp)+"%"}`;
@@ -9627,7 +9773,7 @@ function renderTimeline(H,metrics,scores,i0,prof){
          [t("Chuva"),(m.pr==null&&m.pp==null)?"—":`${m.pr==null?"—":U.prec(m.pr)} · ${m.pp==null?"—":rnd(m.pp)+"%"}`],
          [t("Vento"),m.wind==null?"—":`${U.spd(m.wind)}${m.dir==null?"":" "+windArrow(m.dir)}`],
          [t("Rajadas"),m.gust==null?"—":U.spd(m.gust)],
-         ...(sc.faltas.length?[[t("Sem dados"),sc.faltas.join(", ")]]:[])]); };
+         ...(sc.faltas.length?[[t("Sem dados"),sc.faltas.join(", ")]]:[])], r.bottom); };
     cel.addEventListener("pointermove",show);
     cel.addEventListener("pointerdown",show);
     cel.addEventListener("focus",show);
@@ -10013,10 +10159,12 @@ function setOffline(off){
        promessa sem acção. Ou se faz, ou não se diz: agora faz-se, e as duas
        pontas respondem pelo mesmo canal por onde a promessa saiu. */
     if(state.route&&travel.active) precacheRouteTiles();
-    const casa=state.home||store.get("home");
-    if(casa&&Number.isFinite(casa.lat)){
+    /* dd-244 §3: isto atualiza O SÍTIO NO ECRÃ (é o que o painel mostra) —
+       a variável chamava-lhe «casa» e não era */
+    const sitio=state.home||store.get("home");
+    if(sitio&&Number.isFinite(sitio.lat)){
       toast(t("📶 Internet de volta — a atualizar a meteorologia."),4000);
-      fetchDashboardWx(casa.lat,casa.lon)
+      fetchDashboardWx(sitio.lat,sitio.lon)
         .then(wx=>{ state.wx=wx; renderDashboard(); })
         .catch(()=>toast(t("Voltou a rede, mas a meteorologia não veio. Toca no sítio para tentar outra vez."),7000));
     } else toast(t("📶 Internet de volta."),3000);
@@ -11195,7 +11343,10 @@ async function computeRoute(){
     /* dd-243 §1: a geometria fica guardada COM o recente do destino, a partir
        de agora. Os antigos não ganham traçado nenhum — mostram pino, que é a
        verdade (§7g-ter). Guarda-se JÁ simplificada: é o desenho, não a rota. */
-    try{ marcarRecenteComGeo(d, v0.coords); }catch(e){}
+    /* dd-244: o 100.º catch mudo — a F2 apanhou-o a cruzar o portão 99. A
+       falha continua não-fatal (um recente sem traçado é legítimo); o que
+       morre é o silêncio absoluto, que ninguém consegue depurar. */
+    try{ marcarRecenteComGeo(d, v0.coords); }catch(e){ console.info("[levante] recente sem traçado — a marcação falhou:", e?.message||e); }
     scheduleStayAlerts(state.route); // aviso quando o tempo virar no destino
     loadDrySpell(); // historial de dias secos → aviso de óleo na primeira chuva
     setTimeout(precacheRouteTiles,1200); // mapa offline do corredor da rota
@@ -12795,7 +12946,11 @@ function sanidadeRender(){
       b.addEventListener("click",aoApagar); r.appendChild(b); }
     return r;
   };
-  const h=store.get("home");
+  /* dd-244 §3: o 🏠 deste cartão é a CASA — lê o slot dela e só cai no legado
+     quando o novo não existe. Leitura CRUA do store, de propósito: o cartão
+     existe para VER o que está guardado, e uma casa corrompida tem de
+     aparecer aqui — o aCasa() escondê-la-ia. */
+  const h=store.get("casa")||store.get("home");
   const lc=h?linha("🏠",h.name,h,null):linha("🏠",t("sem casa guardada"),null,null);
   /* dd-172 §2: este cartão mostra a casa PELO NOME — nome do fornecedor */
   { const la=atribLinha([h]); if(la) slot.appendChild(la); }
@@ -13079,16 +13234,16 @@ function renderFavRow(){
   }
   favs.forEach(f=>{
     const c=el("button","chip click fav-chip");
-    c.append(el("span",null,"⭐"), el("b",null,f.label));
+    c.append(el("span",null,"⭐"), el("b",null,nomeDoSitio(f)));   // dd-244 §4: nunca undefined
     const x=el("span","fav-x","✕"); x.title=t("Apagar");
     x.addEventListener("click",(ev)=>{ ev.stopPropagation();
       store.set("favs",getFavs().filter(g=>normTxt(g.label)!==normTxt(f.label)));
-      renderFavRow(); toast(t("Apagado: {p}",{p:f.label})); });
+      renderFavRow(); toast(t("Apagado: {p}",{p:nomeDoSitio(f)})); });   // dd-244 §4
     c.appendChild(x);
     c.addEventListener("click",async ()=>{
       const pos=(await freshPos())||state.home;
       if(!pos){ toast(t("Sem localização. Permite o GPS, ou pesquisa a tua cidade no separador Agora.")); return; }
-      assistantGo(pos,{name:f.label, sub:f.sub||f.name, lat:f.lat, lon:f.lon},[]);
+      assistantGo(pos,{name:nomeDoSitio(f), sub:f.sub||f.name||"", lat:f.lat, lon:f.lon},[]);   // dd-244 §4
     });
     row.appendChild(c);
   });
@@ -13113,8 +13268,9 @@ function renderFavRow(){
    gaveta. A casa nunca se apaga (a app precisa de uma âncora) — redefine-se
    pelos três caminhos que já existem: pesquisa, GPS, toque no mapa. Os
    consumidores da casa (veredicto, âncora da pesquisa, casa-distante,
-   De-omissão, frase dos radares, guarda-da-mota, sanidade) seguem-na por
-   construção: todos leem state.home/store — a guarda meus-sitios afirma-o. */
+   De-omissão, guarda-da-mota, sanidade) seguem-na por construção: leem o
+   aCasa() (dd-244 §3 fechou a divisão do §10.124; a frase dos radares segue
+   o sítio no ecrã — o «Aqui» dela) — a guarda meus-sitios afirma-o. */
 /* ═══ dd-224 — UMA DATA ZERO OU IMPOSSÍVEL NÃO SE IMPRIME ══════════════════
    O dono viu «definida por ti · 01/01/1970» no ecrã dos sítios. É a família
    do `??0`: um valor que não é uma data foi formatado como se fosse, e o ecrã
@@ -13169,7 +13325,11 @@ function provQuando(p){
    obriga a nada. Zero falsos positivos por construção. */
 function pintarSitiosLinha(){
   const li=$("#sitios-casa-linha"); if(!li) return;
-  const h=state.home||store.get("home");
+  /* dd-244 §3: a porta diz A CASA. Lia o sítio no ecrã — ver o Porto punha
+     «🏠 Porto» nas Definições — e afirmava a reserva do arranque como casa
+     de quem nunca escolheu nenhuma. O aCasa() recusa as duas mentiras e o
+     ramo «sem casa guardada» já sabe convidar. */
+  const h=aCasa();
   li.textContent="";
   const linha=el("span");
   if(h){
@@ -13189,21 +13349,18 @@ function pintarSitiosLinha(){
   mudar.setAttribute("data-test","casa-mudar");
   mudar.addEventListener("click",()=>{ abrirSitios(); });
   li.append(document.createTextNode(" "), mudar);
-  const b=$("#btn-sitios"); if(b) b.textContent=t("Gerir os meus sítios");
 }
+/* dd-244 bloco 3: a gaveta morreu. O abrirSitios é a porta de quem vem MUDAR
+   A CASA (o «Não é esta? Mudar» das Definições): aterra no separador Sítios
+   com o menu da casa JÁ ABERTO — quem veio mudar não tem de descobrir onde
+   se muda. Quem entra pela aba normal encontra o menu fechado (salvo sem
+   casa definida, em que ele nasce aberto porque só há uma coisa a fazer). */
+let sitiosMenuPedido=false;
 function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
-  renderSitios(); $("#sitios-drawer").classList.add("open"); $("#sitios-bg").classList.add("open"); }
-function fecharSitios(){ $("#sitios-drawer").classList.remove("open"); $("#sitios-bg").classList.remove("open"); }
-/* ═══ dd-224 bloco 3 — A MESMA LISTA, DUAS SUPERFÍCIES, UM PINTOR ══════════
-   A aba SÍTIOS mostra exatamente o que a gaveta mostra. Não se copia a
-   função: pinta-se nas duas caixas com o MESMO código, porque duas
-   superfícies com o mesmo conteúdo e dois pintores divergem no primeiro dia
-   em que alguém mexe num deles (§10.6 — é a razão por que a atribuição tem
-   porta única). A gaveta fica de pé enquanto o bloco 6 não a substituir, e é
-   o que a ordem permite explicitamente. */
-function renderSitios(){
-  for(const alvo of ["#sitios-corpo","#view-sitios"]) pintarSitiosEm($(alvo));
-}
+  sitiosMenuPedido=true; switchTab("sitios"); }
+/* dd-244 bloco 3: sobrou UMA superfície — o separador. O pintor é o mesmo de
+   sempre (§10.6: um pintor por superfície), só perdeu a segunda caixa. */
+function renderSitios(){ pintarSitiosEm($("#view-sitios")); }
 /* a lombada: traçado quando existe, pino quando não existe */
 function miniDaLinha(x){
   /* ⚠️ A DECISÃO NUM SÍTIO SÓ. A primeira versão perguntava `x.geo?.d` em três
@@ -13246,32 +13403,57 @@ function pintarSitiosEm(box){
   { const c=aCasa(); const k=chaveSitio(c); if(k) jaMostrados.add(k); }
   if(!box) return;
   box.textContent="";
+  const menuPedido=sitiosMenuPedido; sitiosMenuPedido=false;
   /* dd-172 §2: esta gaveta mostra a casa, os favoritos e os recentes — todos
      com nome vindo do fornecedor e todos com o `atrib` guardado. A linha vai
      no fim, uma só, com as licenças de tudo o que está à vista. */
-  const _atribDaGaveta=()=>{ const la=atribLinha([state.home||store.get("home"),
+  const _atribDaGaveta=()=>{ const la=atribLinha([aCasa(),
       ...getFavs(), ...getRecentes()]); if(la) box.appendChild(la); };
-  $("#sitios-head").textContent="📍 "+t("Os meus sítios");
-
-  /* ── CASA: proveniência à vista + consequência dita + 3 caminhos ── */
+  /* dd-243 §3a: cada linha com coordenada pede um slot de tempo; a lista
+     junta-se e vai TODA numa chamada só, no fim da pintura */
+  const querTempo=[];
+  const slotTempo=(x)=>{
+    if(!x||!Number.isFinite(+x.lat)||!Number.isFinite(+x.lon)) return null;
+    const s=el("span","sitio-wx");
+    querTempo.push({k:`${(+x.lat).toFixed(4)},${(+x.lon).toFixed(4)}`, s, p:{lat:+x.lat, lon:+x.lon}});
+    return s; };
+  /* ── CASA (dd-244 bloco 3 · esboço sitios-barra): a casa a sério, com o
+     menu de verbos COM OBJECTO. Lê aCasa() — construir a superfície nova a
+     ler o slot já decidido errado seria trabalhar do chão errado (§10.124);
+     o resto do §7 (o «De» e a frase) é bloco próprio. ── */
   box.appendChild(el("p","san-h","🏠 "+t("Casa")));
-  const h=state.home||store.get("home");
-  const rc=el("div","sitio-row");
+  const h=aCasa();
+  const cx=el("div","casa-cx");
   const tc=el("div","sitio-tx");
   tc.appendChild(el("b",null,h?`${h.name}${h.sub?" — "+h.sub:""}`:t("sem casa guardada")));
   if(h) tc.appendChild(el("span","small muted",provQuando(h.prov)));
-  rc.appendChild(tc); box.appendChild(rc);
-  box.appendChild(el("p","small muted",t("A previsão do Agora, a âncora da pesquisa, o De do planeador e a frase dos radares seguem esta casa.")));
-  const ac=el("div","sitios-acoes");
-  const b1=el("button","btn","🔍 "+t("Escolher pesquisando"));
-  b1.addEventListener("click",()=>{ fecharSitios(); switchTab("agora");
+  cx.appendChild(tc);
+  /* dd-243 §3a: o tempo na linha da casa — linha própria no cartão (dentro
+     do <b> do nome o ellipsis cortava-o) */
+  { const s=slotTempo(h); if(s) cx.appendChild(s); }
+  const bm=el("button","botao-menu","✏️ "+(h?t("Mudar a casa"):t("Definir a casa")));
+  bm.appendChild(el("span","seta","▾"));
+  bm.setAttribute("data-test","casa-menu-btn");
+  const menu=el("div","casa-menu");
+  const acao=(ico,chave,fn)=>{ const b=el("button",null,ico+" "+t(chave));
+    b.addEventListener("click",fn); menu.appendChild(b); };
+  acao("🔍","Procurar uma morada",()=>{ switchTab("agora");
     $("#loc-search")?.focus(); toast(t("Pesquisa o sítio e escolhe-o — fica como a tua casa."),6000); });
-  const b2=el("button","btn","📍 "+t("Usar a minha posição"));
-  b2.addEventListener("click",()=>{ fecharSitios(); switchTab("agora"); useGPS(false); });
-  const b3=el("button","btn","🗺️ "+t("Tocar no mapa"));
-  b3.addEventListener("click",()=>{ fecharSitios(); switchTab("rota"); initRouteMap();
+  acao("📍","Usar onde estou agora",()=>{ switchTab("agora"); useGPS(false); });
+  acao("🗺️","Escolher no mapa",()=>{ switchTab("rota"); initRouteMap();
     toast(t("No mapa: mantém o dedo num ponto (ou clique direito no PC) e escolhe “Usar como casa”."),8000); });
-  ac.append(b1,b2,b3); box.appendChild(ac);
+  /* o menu nasce ABERTO para quem veio pelo «Não é esta? Mudar» e para quem
+     ainda não tem casa (só há uma coisa a fazer); fechado para quem só veio
+     ver os sítios. É a promessa do link, cumprida no destino (§10.119). */
+  menu.hidden=!(menuPedido||!h);
+  bm.setAttribute("aria-expanded",String(!menu.hidden));
+  bm.addEventListener("click",()=>{ menu.hidden=!menu.hidden;
+    bm.setAttribute("aria-expanded",String(!menu.hidden)); });
+  cx.append(bm,menu); box.appendChild(cx);
+  /* dd-244 §3: a frase antiga prometia quatro seguidores e mentia em dois —
+     a previsão do Agora e a frase dos radares seguem o sítio no ecrã. Fica
+     a promessa que o código cumpre, e só essa. */
+  box.appendChild(el("p","small muted",t("A pesquisa, o «De» do planeador e o aviso da moto cá fora partem desta casa.")));
 
   /* ── GUARDADOS: renomear e apagar, nunca em silêncio ── */
   box.appendChild(el("p","san-h","⭐ "+t("Guardados")+` (${getFavs().length}/20)`));
@@ -13280,17 +13462,20 @@ function pintarSitiosEm(box){
      alimentam o conjunto, para os recentes não os repetirem. */
   const favs=getFavs().filter(f=>{ const k=chaveSitio(f); return !k||!jaMostrados.has(k); });
   for(const f of favs){ const k=chaveSitio(f); if(k) jaMostrados.add(k); }
-  if(!favs.length) box.appendChild(el("p","small muted",t("Ainda nada guardado. Calcula uma rota e toca em ⭐ para guardares o destino com o teu nome.")));
+  /* dd-244: o texto vazio ensinava o caminho antigo (⭐ na Rota) quando há ⭐
+     em todas as linhas dos Recentes, dois dedos abaixo. Ensina-se o caminho
+     que está à vista. */
+  if(!favs.length) box.appendChild(el("p","small muted",t("Toca na ⭐ de qualquer sítio recente para lhe dares um nome.")));
   favs.forEach(f=>{
     const r=el("div","sitio-row");
     const tx=el("div","sitio-tx");
-    tx.appendChild(el("b",null,"⭐ "+f.label));
-    tx.appendChild(el("span","small muted",`${f.name}${f.sub?" — "+f.sub:""}`));
+    tx.appendChild(el("b",null,"⭐ "+nomeDoSitio(f)));   // dd-244 §4: nunca undefined
+    tx.appendChild(el("span","small muted",`${f.name||""}${f.sub?" — "+f.sub:""}`));
     r.appendChild(tx);
-    const be=el("button","icon-btn","✏️"); be.title=t("Renomear");
-    be.addEventListener("click",()=>{
+    { const s=slotTempo(f); if(s) r.appendChild(s); }   // dd-243 §3a
+    const abrirRenomear=()=>{
       const ed=el("div","sitio-edit");
-      const inp=document.createElement("input"); inp.value=f.label; inp.maxLength=40;
+      const inp=document.createElement("input"); inp.value=f.label||""; inp.maxLength=40;   // dd-244 §4
       const ok=el("button","btn primary",t("Guardar"));
       ok.addEventListener("click",()=>{
         const novo=inp.value.trim(); if(!novo) return;
@@ -13298,21 +13483,73 @@ function pintarSitiosEm(box){
         renderFavRow(); renderSitios(); toast(t("Renomeado: {p}",{p:novo}));
       });
       r.textContent=""; ed.append(inp,ok); r.appendChild(ed); inp.focus(); inp.select();
-    });
+    };
+    const be=el("button","icon-btn","✏️"); be.title=t("Renomear");
+    be.addEventListener("click",abrirRenomear);
+    /* dd-243 §3e: renomear TAMBÉM por toque longo na linha — o ✏️ fica (é a
+       porta visível); o gesto é o atalho prometido na carta. O molde é o
+       dos Recentes, duas secções abaixo: 550 ms, e o contextmenu do PC
+       vale o mesmo. Os botões e o editor não disparam o gesto. */
+    r.title=t("Toque longo para renomear");
+    let longoF=null;
+    r.addEventListener("pointerdown",(e)=>{
+      if(e.target.closest(".icon-btn,.sitio-edit,.sitio-conf")) return;
+      longoF=setTimeout(abrirRenomear,550); });
+    for(const ev of ["pointerup","pointerleave","pointercancel"])
+      r.addEventListener(ev,()=>clearTimeout(longoF));
+    r.addEventListener("contextmenu",(e)=>{ e.preventDefault(); clearTimeout(longoF); abrirRenomear(); });
     const bx=el("button","icon-btn","🗑️"); bx.title=t("Apagar");
     bx.addEventListener("click",()=>{
       const conf=el("div","sitio-conf");
-      conf.appendChild(el("span","small",t("Apagar {p}?",{p:f.label})));
+      conf.appendChild(el("span","small",t("Apagar {p}?",{p:nomeDoSitio(f)})));   // dd-244 §4
       const sim=el("button","btn primary",t("Sim, apagar"));
       sim.addEventListener("click",()=>{
         store.set("favs",getFavs().filter(g=>normTxt(g.label)!==normTxt(f.label)));
-        renderFavRow(); renderSitios(); toast(t("Apagado: {p}",{p:f.label}));
+        renderFavRow(); renderSitios(); toast(t("Apagado: {p}",{p:nomeDoSitio(f)}));   // dd-244 §4
       });
       const nao=el("button","btn",t("Não"));
       nao.addEventListener("click",()=>renderSitios());
       conf.append(sim,nao); r.textContent=""; r.appendChild(conf);
     });
     r.append(be,bx); box.appendChild(r);
+  });
+
+  /* ── PLANEADAS (dd-243 §3d · dd-244 bloco 3): viagens com hora futura.
+     NÃO se deduplicam contra casa/guardados/recentes: uma ida FUTURA e uma
+     ida passada ao mesmo sítio são factos distintos — esconder um seria
+     perder o outro. O tempo da hora da partida vive na linha (dd-243 §3d). ── */
+  const planos=getTrips();
+  box.appendChild(el("p","san-h","📅 "+t("Planeadas")+(planos.length?` (${planos.length})`:"")));
+  if(!planos.length) box.appendChild(el("p","small muted",t("Sem viagens planeadas.")));
+  planos.forEach(tr=>{
+    const r=el("div","sitio-row sitio-tocavel");
+    const mi=el("span","mini-pino","🗓️"); mi.setAttribute("aria-label",t("Viagem planeada"));
+    r.appendChild(mi);
+    const tx=el("div","sitio-tx");
+    tx.appendChild(el("b",null,nomeDoSitio(tr)));
+    tx.appendChild(el("span","small muted",`${dayLabel(tr.dep)} · ${fmtH(tr.dep)}`));
+    r.appendChild(tx);
+    /* dd-243 §3d: a previsão DA HORA DA PARTIDA — LIGA ao tripVerdict, que
+       já existe para o calendário (coords do hash, réguas canónicas, cache
+       de 30 min, estados honestos). Uma segunda mão a calcular seria a
+       regra 4 outra vez. */
+    { const s=el("span","sitio-wx"); r.appendChild(s);
+      tripVerdict(tr).then(v=>{ if(!v||(!v.ico&&!v.txt)) return;
+        s.textContent="";
+        s.appendChild(el("b",null,v.ico||""));
+        if(v.txt) s.appendChild(el("span","wx-palavra",v.txt));
+        s.title=v.txt||""; })
+      .catch(e=>console.info("[levante] o veredicto da planeada não veio:",e&&e.message||e)); }
+    r.setAttribute("role","button"); r.tabIndex=0;
+    r.title=t("Toca para repor esta rota");
+    const repor=()=>{ $$(".stop-row").forEach(rw=>rw.remove());
+      switchTab("rota"); state._restore&&state._restore(tr.hash); };
+    r.addEventListener("click",repor);
+    r.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); repor(); } });
+    const bx=el("button","icon-btn","✕"); bx.title=t("Apagar");
+    bx.addEventListener("click",(e)=>{ e.stopPropagation();
+      delTrip(tr.id); renderSitios(); toast(t("Apagado: {p}",{p:nomeDoSitio(tr)})); });
+    r.appendChild(bx); box.appendChild(r);
   });
 
   /* ═══ O MESMO SÍTIO NÃO SE MOSTRA TRÊS VEZES (dd-185 §1b) ═════════════════
@@ -13343,9 +13580,10 @@ function pintarSitiosEm(box){
     /* dd-243 §1: com traçado é uma IDA; sem traçado é um SÍTIO. */
     r.appendChild(miniDaLinha(x));
     const tx=el("div","sitio-tx");
-    tx.appendChild(el("b",null,x.name));
+    tx.appendChild(el("b",null,nomeDoSitio(x)));   // dd-244 §4: nunca undefined
     tx.appendChild(el("span","small muted",`${x.sub||""}${x.prov?.quando?(x.sub?" · ":"")+new Date(x.prov.quando).toLocaleDateString(state.lang||"pt"):""}`));
     r.appendChild(tx);
+    { const s=slotTempo(x); if(s) r.appendChild(s); }   // dd-243 §3a
     /* ═══ dd-233 §2f — OS RECENTES PASSAM A FAZER ALGUMA COISA ═════════════
        Até aqui uma linha dos recentes só tinha um ✕: a lista mostrava sítios
        onde o dono já tinha estado e o único gesto possível era apagá-los. O
@@ -13371,9 +13609,9 @@ function pintarSitiosEm(box){
        calcular rotas seria um pintor a mais na mesma superfície.
        ⚠️ E O «VER O TEMPO AÍ» NÃO SE PERDE: passa a toque LONGO, que é onde
        vivem as acções secundárias, e o rótulo do dedo di-lo. */
-    const irAte=()=>{ fecharSitios();
+    const irAte=()=>{
       applyPinChoice("destino",{name:x.name, sub:x.sub||"", lat:x.lat, lon:x.lon, atrib:x.atrib||null}); };
-    const verOTempo=()=>{ fecharSitios(); switchTab("agora");
+    const verOTempo=()=>{ switchTab("agora");
       setHome({name:x.name, sub:x.sub||"", lat:x.lat, lon:x.lon, atrib:x.atrib||null},
               {prov:"escolha", semCasa:true});
       toast("📍 "+t("A usar: {p}",{p:x.name})); };
@@ -13439,6 +13677,13 @@ function pintarSitiosEm(box){
     box.appendChild(lb);
   }
   _atribDaGaveta();
+  /* ═══ dd-243 §3a — o tempo chega numa chamada só (portão medido: 1 ≤ 3) ═══
+     A pintura não espera pela rede: as linhas nascem já; o tempo preenche
+     quando vier. Se não vier, fica o silêncio honesto — e uma voz na
+     consola, porque um erro calado é um erro que ninguém depura. */
+  if(querTempo.length) tempoDosSitios(querTempo.map(q=>q.p))
+    .then(mapa=>{ querTempo.forEach(q=>{ const m=mapa.get(q.k); if(m) pintaTempoDaLinha(q.s,m); }); })
+    .catch(e=>console.info("[levante] o tempo dos sítios não veio:",e&&e.message||e));
 }
 
 /* input à balda → favorito ("vou a casa do joao" acerta em "Casa do João") */
@@ -14393,7 +14638,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-15-0100-7b64ee";
+const BUILD="2026-08-15-2330-be492e";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -14406,9 +14651,11 @@ function isLodgingType(key,val){
   return false;
 }
 async function isLodgingHere(pos){
-  /* a casa vem de `state.home`, como em todo o lado; o armazenamento fica de
-     reserva para o caso de isto correr antes de o arranque a ter posto lá */
-  const H=state.home||store.get("home");
+  /* dd-244 §3 (§10.124): a mota dorme na CASA. O slot dividiu-se no dd-170 §4
+     e este leitor ficou no antigo — `state.home` é o sítio no ecrã, e ver o
+     Porto no Agora não muda onde a mota passa a noite. O aCasa() já traz a
+     ponte para o store de quem ainda não tem o slot novo. */
+  const H=aCasa();
   if(H&&Number.isFinite(H.lat)&&haversine(pos,H)<0.15) return true;
   /* Procura na ETIQUETA e no nome do sítio, não só no nome. Antes só olhava
      para `f.name` e um favorito chamado "Casa" em "Sint Pieterstraat 12"
@@ -15785,7 +16032,7 @@ function renderFocoChip(){
      depois de uma pesquisa escolhida, a oferta é a ação primária visível,
      não um chip discreto que passa despercebido (captura do Ricardo) */
   const c=el("button","btn primary foco-rota",t("Rota para {p}",{p:state.foco.name})+" →");
-  c.addEventListener("click",()=>{
+  c.addEventListener("click",async ()=>{
     /* dd-53: um toque na oferta = TUDO o que é mecânico — Rota ativa,
        destino posto, CÁLCULO a arrancar sozinho, aterragem no mapa com a
        faixa. Tocar na oferta É o gesto (não fura o oferecer-nunca-auto-
@@ -15793,16 +16040,11 @@ function renderFocoChip(){
        passa à frente dos olhos antes de a app guiar alguém. */
     switchTab("rota");
     oferecerFocoNaRota();
-    /* dd-170 §4: a origem é A MINHA POSIÇÃO se a houver fresca, senão a
-       CASA — nunca o sítio no ecrã, que é o próprio destino. Era assim que
-       nascia a rota de Jumbo para Jumbo. */
-    const o=$("#rt-o");
-    if(o&&!o._picked&&!o.value.trim()){
-      const p=posFresca(), c=aCasa();
-      const orig=p?{lat:p.lat, lon:p.lon, name:t("A minha posição"), sub:""}
-                 :(c&&Number.isFinite(c.lat)?{...c}:null);
-      if(orig&&(!state.foco||haversine(orig,state.foco)>0.05)){ o._picked=orig; o.value=orig.name; }
-    }
+    /* dd-244 §3: o «De» tem UM pintor. Este era o segundo, com a mesma
+       escada escrita à mão (regra 4) — e sem declarar a origem suposta.
+       O dd-170 §4 fica de pé por construção: o pintor lê a casa, nunca o
+       sítio no ecrã; `rapido` usa a posição em cache, sem esperar o GPS. */
+    await preencherOrigemOmissao({rapido:true});
     computeRoute();
   });
   box.appendChild(c);
@@ -16056,10 +16298,7 @@ function init(){
   $("#bv-rota").addEventListener("click",()=>{ bvFechar(); switchTab("rota"); });
   $("#loc-search").addEventListener("input",()=>{ if(!bvFeito()&&$("#loc-search").value.trim().length>=2) bvFechar(); },{once:false});
   $("#btn-gps").addEventListener("click",bvFechar);
-  $("#btn-sitios").addEventListener("click",abrirSitios);
-  $("#sitios-close").addEventListener("click",fecharSitios);
-  $("#sitios-bg").addEventListener("click",fecharSitios);
-  pintarSitiosLinha();
+  pintarSitiosLinha();   // dd-244 bloco 3: a porta única é o «Mudar» desta linha
   $("#trips-bg").addEventListener("click",closeTrips);
   planTripAlerts();
   $("#btn-settings").addEventListener("click",(e)=>{ e.stopPropagation(); pop.classList.toggle("open");
@@ -16089,7 +16328,7 @@ function init(){
      ("🏠 A minha casa" como nome, a proveniência como morada) — usa-se o
      objeto real. Re-escolher é um gesto explícito: a proveniência sobe para
      "escolha". */
-  attachAC($("#loc-search"),$("#loc-results"),(it)=>{ const sitio=it._casa?state.home:it;
+  attachAC($("#loc-search"),$("#loc-results"),(it)=>{ const sitio=it._casa?(aCasa()||it):it;   // dd-244 §3: a linha «🏠 A minha casa» entrega A CASA — lia o sítio no ecrã
     setHome(sitio,{prov:(it._casa||it._fav)?"escolha":"pesquisa"});
     focar(sitio);                                  // o sítio em foco atravessa os separadores
     $("#loc-search").value=""; toast(t("Previsão para {p}",{p:it.name})); });
