@@ -65,7 +65,7 @@ footer a{font-weight:600}
   </header>
 
   <h1>Política de Privacidade</h1>
-  <p class="upd">Última atualização: 29 de julho de 2026</p>
+  <p class="upd">Última atualização: 16 de agosto de 2026</p>
 
   <div class="hi">
     <!-- O resumo dizia "não recolhe nada sobre ti" e "a tua localização nunca é
@@ -99,6 +99,15 @@ footer a{font-weight:600}
        ecrã apagado ou o browser minimizado o telemóvel suspende a página e nada
        corre. Foi o que passámos o dia a estabelecer com a Sentinela. -->
     <p>Durante o Modo Viagem, a localização é acompanhada de forma contínua enquanto a aplicação está aberta e no ecrã, para te avisar de chuva, vento e perigos à frente. Se minimizares o browser ou apagares o ecrã, o telemóvel suspende a aplicação e o acompanhamento para. Termina quando terminas a viagem.</p>
+
+    <h2>Microfone e voz</h2>
+    <!-- dd-247 §3: a política não falava do botão de ditado. Medido (16/08):
+         o código usa só a Web Speech API e recebe o TEXTO reconhecido — nunca
+         vê nem guarda áudio (zero getUserMedia/MediaRecorder); o pacote
+         Android não pede a permissão de microfone. O motor de reconhecimento
+         é do browser/sistema, e isso diz-se — no Chrome pode passar pela
+         nuvem da Google, e essa etapa não é nossa. -->
+    <p>Os campos de pesquisa têm um botão de ditado. Quando o usas, o reconhecimento de voz é feito pelo <strong>motor do teu browser ou do teu sistema</strong> — a aplicação recebe apenas o texto reconhecido e <strong>nunca vê nem guarda o áudio</strong>. Conforme o browser, esse motor pode enviar o áudio aos servidores do próprio fabricante do browser para o transcrever; essa etapa pertence ao browser e está coberta pela política dele. A aplicação Android não pede a permissão de microfone — sem ela não há captação de áudio possível; se o teu sistema não oferecer reconhecimento de voz, o botão avisa-te e escreves o destino.</p>
 
     <h2>O que fica guardado no teu dispositivo</h2>
     <p>A aplicação guarda no armazenamento local do teu próprio telemóvel ou computador: a tua localização de referência, os locais e rotas que escolheste guardar, as viagens que agendaste, o teu perfil de decisão, o idioma, as unidades, o tema e o mapa descarregado para funcionar sem internet.</p>
@@ -144,6 +153,6 @@ try{ var th=localStorage.getItem("levante-theme")||localStorage.getItem("vdm-the
   else if(matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme="light";
 }catch(e){}
 </script>
-  <p class="small muted" id="carimbo">Versão publicada: 2026-08-15-2330-be492e</p>
+  <p class="small muted" id="carimbo">Versão publicada: 2026-08-16-2022-e8823f</p>
 </body>
 </html>
