@@ -6,8 +6,31 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v35 — 16/08/2026 ══════════════════════════════
+/* ═══ levante-v36 — 17/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+   dd-254: o que o dono mediu no telemóvel com a app na mão.
+
+   · TOCAR NUMA VIAGEM LEVA MESMO LÁ. O toque num recente ou guardado
+     prometia («a calcular a rota…») e calculava — mas deixava-te no mesmo
+     ecrã, com a rota a nascer num separador invisível. Agora abre o
+     separador Rota, com a rota lá.
+   · A FITA DIZ O PERÍODO EM TEXTO: «chuva 12h–14h» no cabeçalho (ou
+     «chuvisco …», ou «seco as 24 h» quando as 24 horas estão completas e
+     limpas) — a informação-chave sem gesto nenhum, como no esboço.
+   · O ARRASTO LÊ CADA HORA. A bolha que tapava o cartão do Equipamento
+     morreu; os números finos (hora, índice, chuva, temperatura, vento e
+     rajadas) aparecem na linha por baixo da fita e o arrasto atualiza-os
+     hora a hora.
+   · A LEGENDA TAMBÉM NOS DIAS: as quatro palavras com as amostras, no fim
+     da lista dos 7 dias — a mesma legenda do Agora, sem a amostra da
+     chuva (lá a chuva é o ícone do céu, não uma cor).
+   · AS PLANEADAS NUMA LÍNGUA SÓ. «A tua posição», «Your position» e «My
+     location» misturados no calendário acabaram: a viagem guarda o facto
+     e o nome apresenta-se na língua de quem lê; registos antigos
+     reconhecíveis são traduzidos, os teus nomes ficam intocados.
+   ══════════════════════════════════════════════════════════ */
+/* ═══ levante-v35 — 16/08/2026 ══════════════════════════════
+   (arquivo)
    dd-250: as curas do que o dono viu no ar (v34) — e só essas.
 
    · TOCAR NUM GUARDADO LEVA LÁ. A linha de um guardado passa a traçar a
@@ -265,7 +288,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v35";
+const V = "levante-v36";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
