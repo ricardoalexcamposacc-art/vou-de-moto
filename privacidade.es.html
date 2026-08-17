@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0a1120">
+<title>Política de Privacidad — Levante</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+/* Inter é DE CASA, como na app — ver a nota na versão PT, que é a referência.
+   TRADUÇÃO da privacidade.html PT (16/08/2026). Cura-se primeiro o PT. */
+@font-face{font-family:Inter;font-style:normal;font-weight:400 800;font-display:swap;
+  src:url("inter-latin.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Inter;font-style:normal;font-weight:400 800;font-display:swap;
+  src:url("inter-latin-ext.woff2") format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+</style>
+<style>
+:root{--page:#eef1f8;--surface:#fff;--ink:#0c1424;--ink2:#43516b;--muted:#7a869e;
+  --border:rgba(12,20,36,.10);--accent:#2563eb;--good:#0ca30c;
+  --grad:radial-gradient(900px 520px at 12% -8%,rgba(37,99,235,.10),transparent 60%),
+         radial-gradient(820px 480px at 105% 8%,rgba(6,182,212,.10),transparent 55%),
+         linear-gradient(180deg,#f2f5fb,#e9edf6);color-scheme:light}
+html[data-theme="dark"]{--page:#070c16;--surface:#111a2c;--ink:#f2f5fb;--ink2:#b8c2d9;--muted:#7f8aa3;
+  --border:rgba(148,178,255,.14);--accent:#3b82f6;
+  --grad:radial-gradient(1000px 560px at 10% -10%,rgba(59,130,246,.16),transparent 60%),
+         radial-gradient(860px 520px at 108% 6%,rgba(6,182,212,.12),transparent 55%),
+         linear-gradient(180deg,#0a1120,#070c16);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font:16px/1.65 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--grad);background-attachment:fixed}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 70px}
+header{display:flex;align-items:center;gap:13px;margin-bottom:24px}
+header img{width:46px;height:46px;border-radius:14px;box-shadow:0 4px 14px -4px rgba(0,0,0,.4)}
+header b{font-size:19px;font-weight:800;letter-spacing:-.02em;display:block}
+header span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+h1{font-size:27px;line-height:1.2;letter-spacing:-.03em;margin:0 0 6px}
+.upd{color:var(--muted);font-size:13.5px;margin:0 0 10px}
+.langs{font-size:13px;color:var(--muted);margin:0 0 26px;letter-spacing:.04em}
+.langs b{color:var(--ink)}
+.langs a{font-weight:600;text-decoration:none}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 22px 4px;
+  margin-bottom:16px;box-shadow:0 1px 2px rgba(12,20,36,.05),0 12px 32px -14px rgba(12,20,36,.16)}
+h2{font-size:17px;letter-spacing:-.015em;margin:22px 0 8px}
+.card h2:first-child{margin-top:0}
+p{margin:0 0 14px;color:var(--ink2)}
+strong{color:var(--ink)}
+.hi{background:linear-gradient(135deg,rgba(12,163,12,.14),transparent);border:1px solid rgba(12,163,12,.35);
+  border-radius:14px;padding:16px 18px 4px;margin-bottom:18px}
+.hi p{color:var(--ink)}
+ul{margin:0 0 14px;padding-left:20px;color:var(--ink2)}
+li{margin-bottom:7px}
+a{color:var(--accent)}
+footer{margin-top:26px;font-size:13.5px;color:var(--muted);text-align:center}
+footer a{font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="icon.svg" alt="">
+    <div><b>Levante</b><span>Política de Privacidad</span></div>
+  </header>
+
+  <h1>Política de Privacidad</h1>
+  <p class="upd">Última actualización: 16 de agosto de 2026</p>
+  <nav class="langs" aria-label="Idioma"><a href="./privacidade.html">PT</a> · <a href="./privacidade.en.html">EN</a> · <b>ES</b> · <a href="./privacidade.fr.html">FR</a> · <a href="./privacidade.nl.html">NL</a></nav>
+
+  <div class="hi">
+    <p><strong>Resumen en tres líneas:</strong> sin cuentas, sin registros, sin rastreo — no sabemos quién eres y no tenemos ningún servidor. Tu ubicación y tu destino <strong>se envían</strong> a los servicios de meteorología y de rutas, porque sin eso no hay respuesta posible; van sin nombre, sin cuenta y sin identificador, y nosotros no guardamos nada. Cada envío sirve <strong>solo para responder a esa petición</strong> — no guardamos historial de dónde estuviste ni de adónde fuiste, porque no tenemos dónde guardarlo. Es lo mismo que nuestra ficha en Play declara a Google: ubicación enviada, uso efímero, sin retención por nuestra parte. Tus rutas, favoritos y ajustes quedan en el almacenamiento de tu propio dispositivo.</p>
+  </div>
+
+  <div class="card">
+    <h2>Quiénes somos</h2>
+    <p>La aplicación <strong>Levante</strong> es un proyecto independiente que ayuda a los motociclistas a decidir si salir en moto, mostrando la meteorología prevista a lo largo de la ruta a la hora a la que vas a pasar por cada punto.</p>
+    <p>Para cualquier cuestión sobre privacidad puedes escribir a: <a href="mailto:info@getlevante.com">info@getlevante.com</a>.</p>
+
+    <h2>Qué datos recogemos</h2>
+    <p><strong>Ninguno.</strong> No existe registro, no existe cuenta de usuario, no existe base de datos nuestra y no existe ningún sistema de análisis ni de publicidad dentro de la aplicación. No sabemos quién eres, cuántas veces usas la app ni adónde vas. Lo que sale de tu dispositivo va directamente a los servicios listados en <em>Servicios de terceros</em>, y no pasa por nosotros.</p>
+
+    <h2>Ubicación</h2>
+    <p>La aplicación pide acceso a tu ubicación para poder hacer aquello a lo que se dedica: decirte el tiempo donde estás y a lo largo del camino. La ubicación la obtiene tu dispositivo y se usa dentro de la aplicación.</p>
+    <p>Para obtener las previsiones, las <strong>coordenadas de los puntos consultados</strong> se envían a los servicios de meteorología y de mapas descritos abajo, porque sin eso no es técnicamente posible saber qué tiempo hace en ese sitio. Esas coordenadas no van acompañadas de ningún identificador tuyo — no va nombre, no va cuenta, no va identificador de dispositivo.</p>
+    <p>Durante el Modo Viaje, la ubicación se sigue de forma continua mientras la aplicación está abierta y en pantalla, para avisarte de lluvia, viento y peligros por delante. Si minimizas el navegador o apagas la pantalla, el teléfono suspende la aplicación y el seguimiento se detiene. Termina cuando terminas el viaje.</p>
+
+    <h2>Micrófono y voz</h2>
+    <p>Los campos de búsqueda tienen un botón de dictado. Cuando lo usas, el reconocimiento de voz lo hace el <strong>motor de tu navegador o de tu sistema</strong> — la aplicación recibe solo el texto reconocido y <strong>nunca ve ni guarda el audio</strong>. Según el navegador, ese motor puede enviar el audio a los servidores del propio fabricante del navegador para transcribirlo; esa etapa pertenece al navegador y está cubierta por su política. La aplicación Android no pide el permiso de micrófono — sin él no es posible captar audio; si tu sistema no ofrece reconocimiento de voz, el botón te avisa y escribes el destino.</p>
+
+    <h2>Qué queda guardado en tu dispositivo</h2>
+    <p>La aplicación guarda en el almacenamiento local de tu propio teléfono u ordenador: tu ubicación de referencia, los lugares y rutas que elegiste guardar, los viajes que agendaste, tu perfil de decisión, el idioma, las unidades, el tema y el mapa descargado para funcionar sin internet.</p>
+    <p>Estos datos <strong>nunca salen de tu dispositivo</strong> y no nos son accesibles. Puedes borrarlos en cualquier momento limpiando los datos de la aplicación o del sitio en los ajustes de tu navegador o sistema.</p>
+    <p>Como no hay cuentas, tampoco <strong>hay copia nuestra</strong>: si borras los datos del navegador, desinstalas o cambias de teléfono, pierdes lo guardado. Tu navegador también puede borrarlos por su cuenta si se queda sin espacio, o — en iPhone, con la aplicación no instalada en la pantalla de inicio — al cabo de siete días sin abrirla. Instala la aplicación en la pantalla de inicio para reducir ambos riesgos.</p>
+
+    <h2>Servicios de terceros</h2>
+    <p>Para funcionar, la aplicación se comunica con servicios externos. Cada uno recibe solo lo mínimo necesario — típicamente coordenadas geográficas o el texto de una búsqueda — y tiene su propia política de privacidad:</p>
+    <ul>
+      <li><strong>Open-Meteo</strong> — previsiones meteorológicas</li>
+      <li><strong>OSRM</strong> y <strong>OpenStreetMap</strong> — cálculo de rutas y datos de mapa</li>
+      <li><strong>Photon</strong> y <strong>Nominatim</strong> — búsqueda de lugares y direcciones</li>
+      <li><strong>Overpass</strong> — puntos de interés y radares fijos</li>
+      <li><strong>Geoapify</strong> — rutas, búsqueda de sitios y direcciones</li>
+      <li><strong>OpenFreeMap</strong> — las teselas (vectoriales) del fondo del mapa, pedidas cuando abres el mapa; la biblioteca, el estilo, las tipografías y los símbolos del mapa vienen con nosotros, de nuestro origen</li>
+    </ul>
+    <p>Estos servicios pueden, como cualquier servidor de internet, registrar la dirección IP de quien los contacta. No tenemos control sobre esos registros.</p>
+
+    <h2>Cookies y rastreo</h2>
+    <p>La aplicación <strong>no usa cookies</strong>, no usa identificadores de publicidad y no hace rastreo entre sitios ni entre aplicaciones. No compartimos ni vendemos datos a nadie, porque no tenemos datos que compartir.</p>
+
+    <h2>Menores</h2>
+    <p>La aplicación está destinada a conductores de motocicleta y no se dirige a menores de 13 años, ni recoge conscientemente información sobre ellos.</p>
+
+    <h2>Tus derechos</h2>
+    <p>Al amparo del Reglamento General de Protección de Datos (RGPD), tienes derecho a acceder, corregir y borrar tus datos personales. Como no recogemos ni almacenamos ningún dato personal, no hay nada que consultar ni borrar por nuestra parte — los datos guardados localmente están enteramente bajo tu control y los borras cuando quieras.</p>
+
+    <h2>Cambios en esta política</h2>
+    <p>Si esta política cambia — por ejemplo, si en el futuro se introducen cuentas o funciones que exijan un servidor — la fecha de actualización de arriba cambiará y los cambios se comunicarán dentro de la aplicación antes de entrar en vigor.</p>
+  </div>
+
+  <footer>
+    <a href="./">← Volver a la aplicación</a> · <a href="./termos.es.html">Términos de uso</a>
+  </footer>
+</div>
+<script>
+try{ var th=localStorage.getItem("levante-theme")||localStorage.getItem("vdm-theme");
+  if(th) document.documentElement.dataset.theme=JSON.parse(th);
+  else if(matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme="light";
+}catch(e){}
+</script>
+</body>
+</html>

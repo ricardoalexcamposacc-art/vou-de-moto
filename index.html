@@ -366,7 +366,13 @@ body{padding-bottom:calc(var(--h-abas) + env(safe-area-inset-bottom,0px) + 10px)
 .tri span{display:block;font-size:var(--t-sussurro);color:var(--muted);margin-top:1px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ── 3 · A FAIXA DAS 24 H — cor = chuva, e sem legenda (§10.87) ───────── */
+/* ── 3 · A FAIXA DAS 24 H — cor = índice (dd-244 §1), com a legenda mínima
+   da dd-250 §2b. A história em duas frases, porque este cabeçalho já mentiu
+   duas vezes: primeiro a cor era CHUVA e a §10.87 tirou a legenda porque a
+   forma se lia; depois a dd-244 §1 fez da cor o ÍNDICE e da faixa de baixo a
+   chuva — e o dono MEDIU no ar (dd-249 §1) que essa forma nova NÃO se lê
+   sozinha. A §10.87 proíbe legendas redundantes, não legendas necessárias:
+   a legenda mínima (palavra dos Dias + chuva) entrou por ordem, com medição. */
 .faixa24{background:var(--surface);border:1px solid var(--border);
   border-radius:12px;padding:10px 11px 8px;margin-bottom:9px;
   box-shadow:0 1px 2px rgba(0,0,0,.05)}
@@ -375,6 +381,13 @@ body{padding-bottom:calc(var(--h-abas) + env(safe-area-inset-bottom,0px) + 10px)
 .faixa24 .cab b{color:var(--ink);font-weight:650}
 .fita{display:flex;height:26px;border-radius:7px;overflow:hidden}
 .fita i{display:block;flex:1;min-width:0;cursor:pointer;position:relative}
+/* dd-250 §2b: SEPARADORES por hora — o dono viu «um bloco verde contínuo»
+   (dd-249 §1). Densidade decidida pelo espaço MEDIDO: célula = 11,33 px a
+   320 (fita 272 px), um traço de 1 px lê-se; nas fronteiras de 6 h o traço
+   engrossa para amarrar à régua das horas. A cor é a --surface (o «fundo a
+   espreitar»), que serve os dois temas sem cor nova. */
+.fita i + i{border-left:1px solid var(--surface)}
+.fita i:nth-child(6n+1):not(:first-child){border-left-width:2px}
 /* dd-244 §1: o enchimento é o NÍVEL DO ÍNDICE (a escala que já tem palavra no
    veredicto e nos Dias); a chuva é a FAIXA de baixo, lida da nivelChuva */
 .fita i.n0{background:var(--good)} .fita i.n1{background:var(--warn)}
@@ -383,8 +396,25 @@ body{padding-bottom:calc(var(--h-abas) + env(safe-area-inset-bottom,0px) + 10px)
 .fita i.chuvisco::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--chuva-fraca)}
 .fita i.furo{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 3px,var(--border) 3px,var(--border) 6px)}
 .fita i:focus{outline:2px solid var(--accent);outline-offset:-2px}
-.faixa24 .horas{display:flex;justify-content:space-between;
+/* dd-250 §2b: a régua deixou de ser space-between — era uma APROXIMAÇÃO a
+   fingir de exata (medido a 320: «15h» a 194 px com a fronteira real a 204).
+   Cada marca ancora agora na fronteira verdadeira (left em %), centrada no
+   traço grosso que a fita ganhou; a primeira cola ao início, a última ao fim. */
+.faixa24 .horas{position:relative;height:14px;
   font-size:var(--t-sussurro);color:var(--muted);margin-top:4px}
+.faixa24 .horas span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.faixa24 .horas span.ini{transform:none}
+.faixa24 .horas span.fim{transform:translateX(-100%)}
+/* dd-250 §2b: a legenda mínima — vocabulário da casa, zero termos novos
+   (palavra dos Dias + a «Chuva» do toque). Medida a 320: 221 px em 272 úteis,
+   cabe numa linha em pt; o wrap fica para as línguas mais largas. */
+.faixa24 .legenda{display:flex;flex-wrap:wrap;gap:2px 9px;justify-content:center;
+  font-size:var(--t-sussurro);color:var(--muted);margin-top:5px}
+.faixa24 .lg-item{display:inline-flex;align-items:center;gap:4px}
+.faixa24 .lg-item i{width:9px;height:9px;border-radius:2px;flex:none}
+.faixa24 .lg-n0 i{background:var(--good)} .faixa24 .lg-n1 i{background:var(--warn)}
+.faixa24 .lg-n2 i{background:var(--serious)} .faixa24 .lg-n3 i{background:var(--crit)}
+.faixa24 .lg-ch i{background:var(--chuva);height:5px;border-radius:1px}
 /* ⚠️ ISTO NÃO É UMA LEGENDA — é a promessa do toque (§10.27). A legenda que
    a §10.87 proíbe é a que explica COMO SE LÊ a forma; esta diz o que se
    GANHA ao tocar, e sem ela a barra seria uma aproximação a fingir de facto. */
@@ -764,6 +794,12 @@ flex:none;display:grid;place-items:center;border:1px solid var(--line,#0002);fon
 .sitio-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .sitio-tx b{font-size:var(--t-corpo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sitio-tx .small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* dd-250 §2e (medido a 320): num recente com sub comprido, o ellipsis do
+   span único comia a DATA, que está no fim. O sub trunca; a data NUNCA.
+   O white-space:pre guarda o espaço do « · », que abriria o flex item. */
+.sitio-tx .sitio-sub-data{display:flex;min-width:0}
+.sitio-tx .sitio-sub-data .sub-el{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sitio-tx .sitio-sub-data .data-fixa{flex:none;white-space:pre}
 .sitio-row .icon-btn{width:38px;height:38px;flex:none}
 /* dd-243 §3a — o tempo em cada linha: bolinha do nível + temperatura, com a
    palavra dos Dias por baixo; no cartão da casa vira linha horizontal
@@ -2464,9 +2500,15 @@ function applyStaticI18n(){
     ft.append(document.createTextNode(t("Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️ "));
     const mkLink=(href,txt)=>{ const a=document.createElement("a"); a.href=href; a.target="_blank";
       a.rel="noopener"; a.textContent=t(txt); return a; };
+    /* dd-252 g: o link legal cai na LÍNGUA da app — as páginas irmãs
+       (privacidade.en.html, …) existem para en/es/fr/nl; o PT é o original e
+       o recuo. Zero JS nas páginas, zero redirect: o href certo nasce aqui,
+       onde a língua já se sabe (state.lang é a efetiva). O URL PT da Play
+       fica intocado. Os créditos ficam só PT (fora do âmbito da carta). */
+    const legalHref=(base)=>"./"+base+(["en","es","fr","nl"].includes(state.lang)?"."+state.lang:"")+".html";
     const nav=el("div","foot-links");
-    nav.append(mkLink("./privacidade.html","Privacidade"), document.createTextNode(" · "),
-               mkLink("./termos.html","Termos de utilização"), document.createTextNode(" · "),
+    nav.append(mkLink(legalHref("privacidade"),"Privacidade"), document.createTextNode(" · "),
+               mkLink(legalHref("termos"),"Termos de utilização"), document.createTextNode(" · "),
                /* dd-66 §3: a página de créditos vive ao lado das outras duas.
                   O ⓘ do mapa é o caminho curto; isto é o caminho de sempre. */
                mkLink("./creditos.html","Créditos e licenças"));
@@ -2525,7 +2567,7 @@ function applyStaticI18n(){
 }
 const I18N={pt:{},
 en:{
-"Pesquisar cidade ou morada…":"Search city or address…","Cidade ou morada…":"City or address…","Pesquisar…":"Search…","Não é esta? Mudar":"Not this one? Change","Toque longo para renomear":"Long-press to rename","Viagem planeada":"Planned ride","Toca para repor esta rota":"Tap to bring this route back","Sem viagens planeadas.":"No planned rides.","Mudar a casa":"Change home","Procurar uma morada":"Search for an address","Usar onde estou agora":"Use where I am now","Escolher no mapa":"Pick on the map","Sítio sem nome":"Unnamed place","Planeadas":"Planned","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Tap the ⭐ on any recent place to give it a name.","Definir a casa":"Set your home",
+"Pesquisar cidade ou morada…":"Search city or address…","Cidade ou morada…":"City or address…","Pesquisar…":"Search…","Não é esta? Mudar":"Not this one? Change","Toca para ir · toque longo para renomear":"Tap to go · long-press to rename","Viagem planeada":"Planned ride","Toca para repor esta rota":"Tap to bring this route back","Mudar a casa":"Change home","Procurar uma morada":"Search for an address","Usar onde estou agora":"Use where I am now","Escolher no mapa":"Pick on the map","Sítio sem nome":"Unnamed place","Planeadas":"Planned","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Tap the ⭐ on any recent place to give it a name.","Definir a casa":"Set your home",
 
 "Bom, mas {n} de sensação":"Good, but {n} feels-like","Calor perigoso — {n}":"Dangerous heat — {n}",
 "demorou de mais":"timed out",
@@ -3020,7 +3062,7 @@ en:{
 "Idioma":"Language","norte":"north","⚠️ {r} — dá para ir, mas com cuidado":"⚠️ {r} — rideable, but carefully",
 },
 es:{
-"Pesquisar cidade ou morada…":"Buscar ciudad o dirección…","Cidade ou morada…":"Ciudad o dirección…","Pesquisar…":"Buscar…","Não é esta? Mudar":"¿No es esta? Cambiar","Toque longo para renomear":"Mantén pulsado para renombrar","Viagem planeada":"Viaje planeado","Toca para repor esta rota":"Toca para reponer esta ruta","Sem viagens planeadas.":"Sin viajes planeados.","Mudar a casa":"Cambiar la casa","Procurar uma morada":"Buscar una dirección","Usar onde estou agora":"Usar donde estoy ahora","Escolher no mapa":"Elegir en el mapa","Sítio sem nome":"Sitio sin nombre","Planeadas":"Planeadas","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Toca la ⭐ de cualquier sitio reciente para darle un nombre.","Definir a casa":"Definir la casa",
+"Pesquisar cidade ou morada…":"Buscar ciudad o dirección…","Cidade ou morada…":"Ciudad o dirección…","Pesquisar…":"Buscar…","Não é esta? Mudar":"¿No es esta? Cambiar","Toca para ir · toque longo para renomear":"Toca para ir · mantén pulsado para renombrar","Viagem planeada":"Viaje planeado","Toca para repor esta rota":"Toca para reponer esta ruta","Mudar a casa":"Cambiar la casa","Procurar uma morada":"Buscar una dirección","Usar onde estou agora":"Usar donde estoy ahora","Escolher no mapa":"Elegir en el mapa","Sítio sem nome":"Sitio sin nombre","Planeadas":"Planeadas","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Toca la ⭐ de cualquier sitio reciente para darle un nombre.","Definir a casa":"Definir la casa",
 
 "Bom, mas {n} de sensação":"Bien, pero {n} de sensación","Calor perigoso — {n}":"Calor peligroso — {n}",
 "demorou de mais":"tardó demasiado",
@@ -3488,7 +3530,7 @@ es:{
 "Sem previsão. Verifica a ligação à internet e tenta de novo.":"Sin previsión. Comprueba la conexión a internet e inténtalo de nuevo.","Tentar de novo":"Reintentar","Idioma":"Idioma","norte":"norte",
 },
 fr:{
-"Pesquisar cidade ou morada…":"Chercher une ville ou une adresse…","Cidade ou morada…":"Ville ou adresse…","Pesquisar…":"Chercher…","Não é esta? Mudar":"Ce n'est pas ça ? Changer","Toque longo para renomear":"Appui long pour renommer","Viagem planeada":"Trajet prévu","Toca para repor esta rota":"Touche pour remettre cet itinéraire","Sem viagens planeadas.":"Aucun trajet prévu.","Mudar a casa":"Changer le domicile","Procurar uma morada":"Chercher une adresse","Usar onde estou agora":"Utiliser là où je suis","Escolher no mapa":"Choisir sur la carte","Sítio sem nome":"Lieu sans nom","Planeadas":"Prévues","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Touche la ⭐ d'un lieu récent pour lui donner un nom.","Definir a casa":"Définir le domicile",
+"Pesquisar cidade ou morada…":"Chercher une ville ou une adresse…","Cidade ou morada…":"Ville ou adresse…","Pesquisar…":"Chercher…","Não é esta? Mudar":"Ce n'est pas ça ? Changer","Toca para ir · toque longo para renomear":"Touche pour y aller · appui long pour renommer","Viagem planeada":"Trajet prévu","Toca para repor esta rota":"Touche pour remettre cet itinéraire","Mudar a casa":"Changer le domicile","Procurar uma morada":"Chercher une adresse","Usar onde estou agora":"Utiliser là où je suis","Escolher no mapa":"Choisir sur la carte","Sítio sem nome":"Lieu sans nom","Planeadas":"Prévues","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Touche la ⭐ d'un lieu récent pour lui donner un nom.","Definir a casa":"Définir le domicile",
 
 "Bom, mas {n} de sensação":"Bien, mais {n} ressentis","Calor perigoso — {n}":"Chaleur dangereuse — {n}",
 "demorou de mais":"trop lent",
@@ -3964,7 +4006,7 @@ fr:{
    trata-se por tu. */
 nl:{
 "Pesquisar cidade ou morada…":"Zoek stad of adres…","Cidade ou morada…":"Stad of adres…","Pesquisar…":"Zoeken…","Créditos e licenças":"Credits en licenties","Destino":"Naar","Encoberto":"Bewolkt","Hora de partida":"Vertrektijd","Ligação aos serviços":"Verbinding met de diensten","Motor antigo (tem de estar fora)":"Oude motor (moet weg zijn)","Motor do mapa":"Kaartmotor","Origem":"Van","Porta do mapa":"Deur naar de kaart","Preferências":"Voorkeuren","Privacidade":"Privacy","Rota":"Route","Termos de utilização":"Gebruiksvoorwaarden","Tradução":"Vertaling","chuva das {a} às {b}":"regen van {a} tot {b}","ex.: \"vou ao MediaMarkt\" · \"decathlon\" · \"bombas de gasolina\"":"bijv. \"ik ga naar MediaMarkt\" · \"decathlon\" · \"tankstations\"","Vai de moto!":"Rijden maar!","via verde":"vrij baan","Vai, mas equipado":"Rijden, maar goed uitgerust","atenção":"let op","Arriscado — pensa duas vezes":"Riskant — denk twee keer na","risco":"risico","Melhor não ir de moto":"Beter niet rijden","não recomendado":"afgeraden","o motor do mapa":"de kaartmotor","a porta única do mapa":"de enige deur naar de kaart","a tradução":"de vertaling","as tuas preferências":"je voorkeuren","falar com os serviços":"praten met de diensten","Leaflet, que saiu no A2.2":"Leaflet, dat vertrok in A2.2","Chuvisco possível":"Mogelijke motregen","Chuva forte / trovoada":"Zware regen / onweer","Bom p/ moto":"Goed rijweer","Com aviso":"Voorzichtig","Arriscado":"Riskant","Mau p/ moto":"Slecht rijweer",
-"Não é esta? Mudar":"Niet deze? Wijzigen","Toque longo para renomear":"Houd ingedrukt om te hernoemen","Viagem planeada":"Geplande rit","Toca para repor esta rota":"Tik om deze route terug te zetten","Sem viagens planeadas.":"Geen geplande ritten.","Mudar a casa":"Thuis wijzigen","Procurar uma morada":"Een adres zoeken","Usar onde estou agora":"Gebruiken waar ik nu ben","Escolher no mapa":"Op de kaart kiezen","Sítio sem nome":"Plek zonder naam","Planeadas":"Gepland","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Tik op de ⭐ van een recente plek om die een naam te geven.","Definir a casa":"Thuis instellen",
+"Não é esta? Mudar":"Niet deze? Wijzigen","Toca para ir · toque longo para renomear":"Tik om te gaan · lang indrukken om te hernoemen","Viagem planeada":"Geplande rit","Toca para repor esta rota":"Tik om deze route terug te zetten","Mudar a casa":"Thuis wijzigen","Procurar uma morada":"Een adres zoeken","Usar onde estou agora":"Gebruiken waar ik nu ben","Escolher no mapa":"Op de kaart kiezen","Sítio sem nome":"Plek zonder naam","Planeadas":"Gepland","Toca na ⭐ de qualquer sítio recente para lhe dares um nome.":"Tik op de ⭐ van een recente plek om die een naam te geven.","Definir a casa":"Thuis instellen",
 
 "Bom, mas {n} de sensação":"Goed, maar {n} gevoelstemperatuur","Calor perigoso — {n}":"Gevaarlijke hitte — {n}",
 "norte":"noord",
@@ -5064,6 +5106,14 @@ const dayLabel=(epoch)=>{ const now=Date.now()/1000;
   if(isSameDay(epoch,now))return t("hoje");
   if(isSameDay(epoch,now+86400))return t("amanhã");
   return new Date(epoch*1000).toLocaleDateString(LOC(),{weekday:"long"}); };
+/* dd-250 §2e (dd-248 §4c): para colunas ESTREITAS de uma linha — «hoje» e
+   «amanhã» ficam; o dia da semana vem na forma nativa CURTA de cada língua
+   (o fmtDow do Intl), nunca o longo a morrer em reticências. O «Segu…» que
+   o dono viu era o dayLabel longo na linha das Planeadas. */
+const dayLabelCurto=(epoch)=>{ const now=Date.now()/1000;
+  if(isSameDay(epoch,now))return t("hoje");
+  if(isSameDay(epoch,now+86400))return t("amanhã");
+  return fmtDow(epoch); };
 function haversine(a,b){ const R=6371, d=Math.PI/180;
   const dLat=(b.lat-a.lat)*d, dLon=(b.lon-a.lon)*d;
   const h=Math.sin(dLat/2)**2+Math.cos(a.lat*d)*Math.cos(b.lat*d)*Math.sin(dLon/2)**2;
@@ -9783,12 +9833,35 @@ function renderTimeline(H,metrics,scores,i0,prof){
   }
   card.appendChild(fita);
 
+  /* dd-250 §2b: a régua ancora nas FRONTEIRAS verdadeiras (era space-between,
+     uma aproximação que desviava até 10 px — medido) e a última marca diz o
+     FIM da fita, não o início da última célula (dizia «20h» numa fita que
+     acaba às 21h — medido). nReais cobre a fita curta do fim do horizonte. */
+  const nReais=Math.min(N,scores.length-i0);
   const horas=el("div","horas");
-  for(const k of [0,6,12,18,24]){
-    const i=i0+Math.min(k,N-1);
-    horas.appendChild(el("span",null, k===0?t("agora"):fmtH(H.time[i])));
+  const marcas=[0,6,12,18].filter(k=>k<nReais); marcas.push(nReais);
+  for(const k of marcas){
+    const fim=(k===nReais);
+    const ep=fim?(H.time[i0+nReais]??(H.time[i0+nReais-1]+3600)):H.time[i0+k];
+    const s=el("span",null,k===0?t("agora"):fmtH(ep));
+    s.style.left=(k/nReais*100)+"%";
+    if(k===0)s.classList.add("ini"); else if(fim)s.classList.add("fim");
+    horas.appendChild(s);
   }
   card.appendChild(horas);
+  /* dd-250 §2b: a legenda mínima. O dono MEDIU no ar (dd-249 §1) que a fita
+     da dd-244 §1 (cor = índice, faixa de baixo = chuva) não se lê sozinha.
+     A §10.87 tira legendas redundantes; esta deixou de o ser quando a cor
+     passou a dizer o índice. Palavra dos Dias + a «Chuva» do toque — zero
+     termos novos, zero strings novas na i18n. */
+  const leg=el("div","legenda");
+  for(const [cl,txt] of [["lg-n0",t("Bom")],["lg-n1",t("Aviso")],["lg-n2",t("Risco")],["lg-n3",t("Mau")],["lg-ch",t("Chuva")]]){
+    const it=el("span","lg-item "+cl);
+    it.appendChild(el("i"));
+    it.appendChild(document.createTextNode(txt));
+    leg.appendChild(it);
+  }
+  card.appendChild(leg);
   card.appendChild(el("div","dedo",t("toca para o número exato de cada hora")));
   return card;
 }
@@ -13456,12 +13529,19 @@ function pintarSitiosEm(box){
   box.appendChild(el("p","small muted",t("A pesquisa, o «De» do planeador e o aviso da moto cá fora partem desta casa.")));
 
   /* ── GUARDADOS: renomear e apagar, nunca em silêncio ── */
-  box.appendChild(el("p","san-h","⭐ "+t("Guardados")+` (${getFavs().length}/20)`));
   /* os favoritos também se deduplicam contra a Casa — no ecrã do dono o mesmo
      sítio aparecia duas vezes, «uma com estrela e outra sem». Só depois é que
      alimentam o conjunto, para os recentes não os repetirem. */
   const favs=getFavs().filter(f=>{ const k=chaveSitio(f); return !k||!jaMostrados.has(k); });
   for(const f of favs){ const k=chaveSitio(f); if(k) jaMostrados.add(k); }
+  /* dd-250 §2d (dd-248 §4b): a contagem conta O QUE A LISTA MOSTRA. Dizia
+     (3/20) com 2 linhas à vista porque contava o store — e a casa que a
+     deduplicação esconde (dd-185 §1b: vive na secção CASA, dois dedos
+     acima) entrava na régua. §10.21: o número ao lado de um título
+     descreve a coleção viva dessa secção, não o armazém. A quota dos 20
+     continua a ser do store (saveFav corta lá) — mas essa é a mecânica de
+     guardar, não a legenda da lista. */
+  box.appendChild(el("p","san-h","⭐ "+t("Guardados")+` (${favs.length}/20)`));
   /* dd-244: o texto vazio ensinava o caminho antigo (⭐ na Rota) quando há ⭐
      em todas as linhas dos Recentes, dois dedos abaixo. Ensina-se o caminho
      que está à vista. */
@@ -13486,18 +13566,38 @@ function pintarSitiosEm(box){
     };
     const be=el("button","icon-btn","✏️"); be.title=t("Renomear");
     be.addEventListener("click",abrirRenomear);
-    /* dd-243 §3e: renomear TAMBÉM por toque longo na linha — o ✏️ fica (é a
-       porta visível); o gesto é o atalho prometido na carta. O molde é o
-       dos Recentes, duas secções abaixo: 550 ms, e o contextmenu do PC
-       vale o mesmo. Os botões e o editor não disparam o gesto. */
-    r.title=t("Toque longo para renomear");
-    let longoF=null;
+    /* ═══ dd-250 §2a (dd-249 §2 · desenho da dd-243 §2) — TOCAR NO GUARDADO
+       LEVA LÁ. APURADO antes de curar: o gesto nasceu SÓ nos Recentes
+       (dd-233 §2f ligou o funil lá); nos Guardados a fila da 243 foi
+       cortada pelo congelamento antes de a peça nascer — nunca foi
+       construída, não estava defeituosa. A cura é o MESMO funil
+       (applyPinChoice — escreve o destino, preenche o De pela casa,
+       declara, promete e responde se falhar): uma segunda mão a calcular
+       seria a regra 4. O toque LONGO continua a ser o renomear
+       (dd-243 §3e); o click só vale se o longo não disparou — o molde
+       inteiro é o dos Recentes, duas secções abaixo. */
+    const irAte=()=>{
+      applyPinChoice("destino",{name:nomeDoSitio(f), sub:f.sub||f.name||"",
+        lat:f.lat, lon:f.lon, atrib:f.atrib||null}); };
+    r.classList.add("sitio-tocavel");
+    r.setAttribute("role","button"); r.tabIndex=0;
+    r.setAttribute("aria-label",t("Ir outra vez a {p}",{p:nomeDoSitio(f)}));
+    r.title=t("Toca para ir · toque longo para renomear");
+    let longoF=null, foiLongoF=false;
     r.addEventListener("pointerdown",(e)=>{
       if(e.target.closest(".icon-btn,.sitio-edit,.sitio-conf")) return;
-      longoF=setTimeout(abrirRenomear,550); });
+      foiLongoF=false;
+      longoF=setTimeout(()=>{ foiLongoF=true; abrirRenomear(); },550); });
     for(const ev of ["pointerup","pointerleave","pointercancel"])
       r.addEventListener(ev,()=>clearTimeout(longoF));
-    r.addEventListener("contextmenu",(e)=>{ e.preventDefault(); clearTimeout(longoF); abrirRenomear(); });
+    r.addEventListener("click",(e)=>{
+      if(e.target.closest(".icon-btn,.sitio-edit,.sitio-conf")) return;
+      if(foiLongoF){ foiLongoF=false; return; }
+      if(Number.isFinite(+f.lat)) irAte(); });
+    r.addEventListener("contextmenu",(e)=>{ e.preventDefault(); clearTimeout(longoF); foiLongoF=true; abrirRenomear(); });
+    /* teclado: Enter leva lá; Shift+Enter é a ação secundária (renomear) */
+    r.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){
+      e.preventDefault(); (e.shiftKey?abrirRenomear:irAte)(); } });
     const bx=el("button","icon-btn","🗑️"); bx.title=t("Apagar");
     bx.addEventListener("click",()=>{
       const conf=el("div","sitio-conf");
@@ -13520,14 +13620,21 @@ function pintarSitiosEm(box){
      perder o outro. O tempo da hora da partida vive na linha (dd-243 §3d). ── */
   const planos=getTrips();
   box.appendChild(el("p","san-h","📅 "+t("Planeadas")+(planos.length?` (${planos.length})`:"")));
-  if(!planos.length) box.appendChild(el("p","small muted",t("Sem viagens planeadas.")));
+  /* dd-250 §2f (dd-248 §4d): o vazio ENSINA o gesto, como os Guardados —
+     e ensina o gesto VERDADEIRO: o 🗓️ vive na folha do planeador e exige
+     hora de partida no futuro (linha do agd).
+     ⚠️ A FRASE É A DO CALENDÁRIO, de propósito: a lint-textos apanhou a
+     gémea que eu tinha escrito de novo (bat14: «50% em comum») — duas
+     frases para o MESMO ensino é deriva; um ensino, uma frase, e a da
+     casa já existia com as cinco línguas. */
+  if(!planos.length) box.appendChild(el("p","small muted",t("Calcula uma rota com hora futura e toca em «🗓️ Guardar no calendário» para ela aparecer aqui, com o tempo previsto.")));
   planos.forEach(tr=>{
     const r=el("div","sitio-row sitio-tocavel");
     const mi=el("span","mini-pino","🗓️"); mi.setAttribute("aria-label",t("Viagem planeada"));
     r.appendChild(mi);
     const tx=el("div","sitio-tx");
     tx.appendChild(el("b",null,nomeDoSitio(tr)));
-    tx.appendChild(el("span","small muted",`${dayLabel(tr.dep)} · ${fmtH(tr.dep)}`));
+    tx.appendChild(el("span","small muted",`${dayLabelCurto(tr.dep)} · ${fmtH(tr.dep)}`));   // dd-250 §2e: nunca «Segu…»
     r.appendChild(tx);
     /* dd-243 §3d: a previsão DA HORA DA PARTIDA — LIGA ao tripVerdict, que
        já existe para o calendário (coords do hash, réguas canónicas, cache
@@ -13581,7 +13688,16 @@ function pintarSitiosEm(box){
     r.appendChild(miniDaLinha(x));
     const tx=el("div","sitio-tx");
     tx.appendChild(el("b",null,nomeDoSitio(x)));   // dd-244 §4: nunca undefined
-    tx.appendChild(el("span","small muted",`${x.sub||""}${x.prov?.quando?(x.sub?" · ":"")+new Date(x.prov.quando).toLocaleDateString(state.lang||"pt"):""}`));
+    /* dd-250 §2e: a data de um recente sem ano («14/08», o fmtDayMo da casa)
+       — a completa morria em «14/08/2…» na coluna estreita, e um recente é
+       recente por natureza */
+    /* dd-250 §2e, segunda metade MEDIDA a 320: com um sub comprido, o
+       ellipsis do span único comia a DATA — que está no fim e morria
+       primeiro («Nürburg, Alemanha · 14/…»). O sub trunca; a data NUNCA. */
+    { const sd=el("span","small muted sitio-sub-data");
+      if(x.sub) sd.appendChild(el("span","sub-el",x.sub));
+      if(x.prov?.quando) sd.appendChild(el("span","data-fixa",(x.sub?" · ":"")+fmtDayMo(x.prov.quando/1000)));
+      tx.appendChild(sd); }
     r.appendChild(tx);
     { const s=slotTempo(x); if(s) r.appendChild(s); }   // dd-243 §3a
     /* ═══ dd-233 §2f — OS RECENTES PASSAM A FAZER ALGUMA COISA ═════════════
@@ -14638,7 +14754,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-16-2022-e8823f";
+const BUILD="2026-08-17-0953-120ce4";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){

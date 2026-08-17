@@ -40,7 +40,11 @@ header img{width:46px;height:46px;border-radius:14px;box-shadow:0 4px 14px -4px 
 header b{font-size:19px;font-weight:800;letter-spacing:-.02em;display:block}
 header span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 h1{font-size:27px;line-height:1.2;letter-spacing:-.03em;margin:0 0 6px}
-.upd{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+.upd{color:var(--muted);font-size:13.5px;margin:0 0 10px}
+/* dd-252 g: a barra de línguas — as irmãs traduzidas vivem ao lado */
+.langs{font-size:13px;color:var(--muted);margin:0 0 26px;letter-spacing:.04em}
+.langs b{color:var(--ink)}
+.langs a{font-weight:600;text-decoration:none}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 22px 4px;
   margin-bottom:16px;box-shadow:0 1px 2px rgba(12,20,36,.05),0 12px 32px -14px rgba(12,20,36,.16)}
 h2{font-size:17px;letter-spacing:-.015em;margin:22px 0 8px}
@@ -66,6 +70,7 @@ footer a{font-weight:600}
 
   <h1>Política de Privacidade</h1>
   <p class="upd">Última atualização: 16 de agosto de 2026</p>
+  <nav class="langs" aria-label="Língua"><b>PT</b> · <a href="./privacidade.en.html">EN</a> · <a href="./privacidade.es.html">ES</a> · <a href="./privacidade.fr.html">FR</a> · <a href="./privacidade.nl.html">NL</a></nav>
 
   <div class="hi">
     <!-- O resumo dizia "não recolhe nada sobre ti" e "a tua localização nunca é
@@ -153,6 +158,6 @@ try{ var th=localStorage.getItem("levante-theme")||localStorage.getItem("vdm-the
   else if(matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme="light";
 }catch(e){}
 </script>
-  <p class="small muted" id="carimbo">Versão publicada: 2026-08-16-2022-e8823f</p>
+  <p class="small muted" id="carimbo">Versão publicada: 2026-08-17-0953-120ce4</p>
 </body>
 </html>

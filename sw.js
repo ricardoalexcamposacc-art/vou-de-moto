@@ -6,8 +6,35 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v34 — 15/08/2026 ══════════════════════════════
+/* ═══ levante-v35 — 16/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+   dd-250: as curas do que o dono viu no ar (v34) — e só essas.
+
+   · TOCAR NUM GUARDADO LEVA LÁ. A linha de um guardado passa a traçar a
+     rota até ao sítio, como os recentes já faziam — o mesmo gesto nas duas
+     listas. O toque longo continua a renomear; o ✏️ e o 🗑️ ficam.
+   · A CONTAGEM DOS GUARDADOS DIZ O QUE A LISTA MOSTRA. Dizia (3/20) com
+     duas linhas à vista, porque contava a casa que vive na secção de cima.
+   · O VAZIO DAS PLANEADAS ENSINA O GESTO: calcula uma rota com hora de
+     partida e toca em «🗓️ Guardar no calendário» — a viagem fica ali.
+   · A FITA DAS 24 H EXPLICA-SE SOZINHA. Separadores por hora (mais fortes
+     de 6 em 6, presos à régua), marcas na fronteira certa — a do fim dizia
+     «20h» numa fita que acaba às 21h — e a legenda mínima: as quatro cores
+     com a palavra dos Dias (Bom · Aviso · Risco · Mau) e a faixa azul =
+     chuva.
+   · AS DATAS CABEM NO ECRÃ. As Planeadas dizem «hoje», «amanhã» ou o dia
+     na forma curta de cada língua (nunca «Segu…»); a data dos Recentes é
+     curta (dia/mês) em vez de cair pela borda.
+   · AS PÁGINAS LEGAIS FALAM AS CINCO LÍNGUAS (dd-252). Privacidade e
+     Termos ganham irmãs em EN · ES · FR · NL com barra de línguas no
+     topo; o link dentro da app cai na língua da app, e o URL português
+     — o da ficha da Play — fica exatamente onde estava. E o resumo dos
+     Termos deixou de desmentir a Privacidade: dizia «nada do que fazes
+     sai do teu dispositivo», e as coordenadas e pesquisas SAEM (sem
+     identificadores) — agora diz a verdade, nas cinco línguas.
+   ══════════════════════════════════════════════════════════ */
+/* ═══ levante-v34 — 15/08/2026 ══════════════════════════════
+   (arquivo)
 
    · OS TEUS SÍTIOS SAEM DAS DEFINIÇÕES. O separador «Sítios» passa a ser a
      casa deles: a tua casa, os guardados, as viagens planeadas e os
@@ -238,7 +265,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v34";
+const V = "levante-v35";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -253,6 +280,11 @@ const TILE_MAX = 2600;          // ~40 MB; acima disto apagam-se os mais antigos
    já não usamos. */
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./privacidade.html", "./termos.html",
+  /* dd-252 g: as páginas legais falam as cinco línguas — as irmãs entram no
+     shell AO LADO das PT (mesmo padrão, mesma razão: quem abre a política na
+     língua dele merece tê-la offline como o PT já tinha). ~80 KB no total. */
+  "./privacidade.en.html", "./privacidade.es.html", "./privacidade.fr.html", "./privacidade.nl.html",
+  "./termos.en.html", "./termos.es.html", "./termos.fr.html", "./termos.nl.html",
   /* dd-82: a página de créditos entra no shell, autorizada no mesmo pacote.
      Era o item aberto do rel-58 §5: sem isto, o ⓘ do mapa levava a uma página
      que só existia depois de aberta uma vez com rede — e a atribuição é

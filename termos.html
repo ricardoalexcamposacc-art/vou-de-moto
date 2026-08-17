@@ -40,7 +40,11 @@ header img{width:46px;height:46px;border-radius:14px;box-shadow:0 4px 14px -4px 
 header b{font-size:19px;font-weight:800;letter-spacing:-.02em;display:block}
 header span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 h1{font-size:27px;line-height:1.2;letter-spacing:-.03em;margin:0 0 6px}
-.upd{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+.upd{color:var(--muted);font-size:13.5px;margin:0 0 10px}
+/* dd-252 g: a barra de línguas — as irmãs traduzidas vivem ao lado */
+.langs{font-size:13px;color:var(--muted);margin:0 0 26px;letter-spacing:.04em}
+.langs b{color:var(--ink)}
+.langs a{font-weight:600;text-decoration:none}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 22px 4px;
   margin-bottom:16px;box-shadow:0 1px 2px rgba(12,20,36,.05),0 12px 32px -14px rgba(12,20,36,.16)}
 h2{font-size:17px;letter-spacing:-.015em;margin:22px 0 8px}
@@ -65,7 +69,10 @@ footer a{font-weight:600}
   </header>
 
   <h1>Termos de Utilização</h1>
-  <p class="upd">Última atualização: 28 de julho de 2026</p>
+  <!-- dd-252 g: a data subiu com a cura do §10 (a frase que desmentia a
+       privacidade saiu) e com a chegada das versões traduzidas. -->
+  <p class="upd">Última atualização: 16 de agosto de 2026</p>
+  <nav class="langs" aria-label="Língua"><b>PT</b> · <a href="./termos.en.html">EN</a> · <a href="./termos.es.html">ES</a> · <a href="./termos.fr.html">FR</a> · <a href="./termos.nl.html">NL</a></nav>
 
   <div class="warn">
     <p><strong>Antes de tudo o resto:</strong> esta aplicação dá informação para te ajudar a decidir, não instruções a seguir cegamente. A condução é da tua inteira responsabilidade. Nunca manuseies o telemóvel em andamento — usa um suporte e consulta a app parado. Se as condições reais forem piores do que a previsão, é a realidade que manda, não a app.</p>
@@ -108,7 +115,12 @@ footer a{font-weight:600}
     <p>Não podes usar a aplicação para fins ilícitos, tentar contornar limitações técnicas, sobrecarregar deliberadamente os serviços de que depende, nem redistribuí-la apresentando-a como tua.</p>
 
     <h2>10. Privacidade</h2>
-    <p>O tratamento de dados está descrito na <a href="./privacidade.html">Política de Privacidade</a>, que faz parte integrante destes termos. Em resumo: a aplicação não recolhe dados pessoais e nada do que fazes sai do teu dispositivo.</p>
+    <!-- dd-252 g (medido a 17/08): o resumo dizia «nada do que fazes sai do
+         teu dispositivo» — a MESMA mentira-por-resumo que a privacidade já
+         curou três vezes (as coordenadas e as pesquisas SAEM para os
+         serviços, e a ficha da Play declara-o). Curada ANTES de se traduzir:
+         espalhar a frase falsa por cinco línguas seria pior. -->
+    <p>O tratamento de dados está descrito na <a href="./privacidade.html">Política de Privacidade</a>, que faz parte integrante destes termos. Em resumo: não recolhemos dados pessoais nem temos servidor; do teu dispositivo saem apenas as coordenadas consultadas e o texto das pesquisas, enviados sem identificadores aos serviços listados na política — e nada fica guardado por nós.</p>
 
     <h2>11. Alterações</h2>
     <p>Estes termos podem ser atualizados. A data de atualização no topo indica a versão em vigor. Continuar a usar a aplicação após uma alteração significa que aceitas a versão atualizada.</p>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0a1120">
+<title>Términos de Uso — Levante</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+/* Inter é DE CASA, como na app — ver a nota na versão PT, que é a referência.
+   TRADUÇÃO do termos.html PT (16/08/2026). Cura-se primeiro o PT. */
+@font-face{font-family:Inter;font-style:normal;font-weight:400 800;font-display:swap;
+  src:url("inter-latin.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Inter;font-style:normal;font-weight:400 800;font-display:swap;
+  src:url("inter-latin-ext.woff2") format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+</style>
+<style>
+:root{--page:#eef1f8;--surface:#fff;--ink:#0c1424;--ink2:#43516b;--muted:#7a869e;
+  --border:rgba(12,20,36,.10);--accent:#2563eb;--crit:#d03b3b;
+  --grad:radial-gradient(900px 520px at 12% -8%,rgba(37,99,235,.10),transparent 60%),
+         radial-gradient(820px 480px at 105% 8%,rgba(6,182,212,.10),transparent 55%),
+         linear-gradient(180deg,#f2f5fb,#e9edf6);color-scheme:light}
+html[data-theme="dark"]{--page:#070c16;--surface:#111a2c;--ink:#f2f5fb;--ink2:#b8c2d9;--muted:#7f8aa3;
+  --border:rgba(148,178,255,.14);--accent:#3b82f6;
+  --grad:radial-gradient(1000px 560px at 10% -10%,rgba(59,130,246,.16),transparent 60%),
+         radial-gradient(860px 520px at 108% 6%,rgba(6,182,212,.12),transparent 55%),
+         linear-gradient(180deg,#0a1120,#070c16);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font:16px/1.65 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--grad);background-attachment:fixed}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 70px}
+header{display:flex;align-items:center;gap:13px;margin-bottom:24px}
+header img{width:46px;height:46px;border-radius:14px;box-shadow:0 4px 14px -4px rgba(0,0,0,.4)}
+header b{font-size:19px;font-weight:800;letter-spacing:-.02em;display:block}
+header span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+h1{font-size:27px;line-height:1.2;letter-spacing:-.03em;margin:0 0 6px}
+.upd{color:var(--muted);font-size:13.5px;margin:0 0 10px}
+.langs{font-size:13px;color:var(--muted);margin:0 0 26px;letter-spacing:.04em}
+.langs b{color:var(--ink)}
+.langs a{font-weight:600;text-decoration:none}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 22px 4px;
+  margin-bottom:16px;box-shadow:0 1px 2px rgba(12,20,36,.05),0 12px 32px -14px rgba(12,20,36,.16)}
+h2{font-size:17px;letter-spacing:-.015em;margin:22px 0 8px}
+.card h2:first-child{margin-top:0}
+p{margin:0 0 14px;color:var(--ink2)}
+strong{color:var(--ink)}
+.warn{background:linear-gradient(135deg,rgba(208,59,59,.14),transparent);border:1px solid rgba(208,59,59,.38);
+  border-radius:14px;padding:16px 18px 4px;margin-bottom:18px}
+.warn p{color:var(--ink)}
+ul{margin:0 0 14px;padding-left:20px;color:var(--ink2)}
+li{margin-bottom:7px}
+a{color:var(--accent)}
+footer{margin-top:26px;font-size:13.5px;color:var(--muted);text-align:center}
+footer a{font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="icon.svg" alt="">
+    <div><b>Levante</b><span>Términos de Uso</span></div>
+  </header>
+
+  <h1>Términos de Uso</h1>
+  <p class="upd">Última actualización: 16 de agosto de 2026</p>
+  <nav class="langs" aria-label="Idioma"><a href="./termos.html">PT</a> · <a href="./termos.en.html">EN</a> · <b>ES</b> · <a href="./termos.fr.html">FR</a> · <a href="./termos.nl.html">NL</a></nav>
+
+  <div class="warn">
+    <p><strong>Antes de todo lo demás:</strong> esta aplicación te da información para ayudarte a decidir, no instrucciones que seguir a ciegas. La conducción es enteramente responsabilidad tuya. Nunca manipules el teléfono en marcha — usa un soporte y consulta la app parado. Si las condiciones reales son peores que la previsión, manda la realidad, no la app.</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Aceptación</h2>
+    <p>Al usar la aplicación <strong>Levante</strong> aceptas estos términos. Si no estás de acuerdo con ellos, no uses la aplicación.</p>
+
+    <h2>2. Qué es la aplicación</h2>
+    <p>La aplicación presenta previsiones meteorológicas, itinerarios y avisos destinados a apoyar la decisión de un motociclista sobre si, cuándo y cómo hacer un viaje. Es una herramienta de apoyo a la decisión y de información.</p>
+
+    <h2>3. Qué no es la aplicación</h2>
+    <p>La aplicación <strong>no es un instrumento de seguridad</strong>, no sustituye tu evaluación de las condiciones reales de la carretera y no constituye asesoramiento profesional de ninguna naturaleza. Las previsiones meteorológicas son, por definición, estimaciones: pueden estar equivocadas, desactualizadas o no disponibles.</p>
+    <p>Los itinerarios provienen de datos abiertos y pueden no reflejar obras, cortes, sentidos prohibidos o restricciones recientes. Cumple siempre la señalización real de la vía, que prevalece sobre cualquier indicación de la aplicación.</p>
+
+    <h2>4. Uso seguro</h2>
+    <ul>
+      <li>Planifica el viaje <strong>antes</strong> de arrancar.</li>
+      <li>Si usas el Modo Viaje, coloca el teléfono en un soporte adecuado y usa los avisos de voz; no mires la pantalla en marcha.</li>
+      <li>Para cualquier interacción con la aplicación, para en un lugar seguro.</li>
+      <li>Respeta los límites de velocidad y las normas de tráfico vigentes.</li>
+    </ul>
+
+    <h2>5. Avisos de radares de velocidad</h2>
+    <p>La legislación sobre avisos de dispositivos de control de velocidad <strong>difiere de país a país</strong>. En algunos países está prohibido y se castiga con multas elevadas y confiscación del equipo.</p>
+    <p>La aplicación procura respetar esas diferencias automáticamente: desactiva los avisos en los países donde están prohibidos y, donde la ley solo restringe la precisión, presenta zonas de peligro amplias en vez de ubicaciones exactas. Aun así, <strong>es tu responsabilidad</strong> conocer y cumplir la ley del país por el que circulas. Si activas manualmente una función señalada como restringida, lo haces por tu cuenta y riesgo.</p>
+
+    <h2>6. Disponibilidad</h2>
+    <p>La aplicación depende de servicios externos de meteorología, mapas y rutas, y de conexión a internet para los datos más recientes. No garantizamos disponibilidad continua, ausencia de errores ni exactitud. Las funciones pueden cambiar o descontinuarse.</p>
+
+    <h2>7. Limitación de responsabilidad</h2>
+    <p>En la máxima medida permitida por la ley aplicable, la aplicación se proporciona <strong>«tal como está»</strong>, sin garantías de ningún tipo. No somos responsables de ningún daño, pérdida, lesión, retraso, multa o perjuicio derivado del uso — o de la imposibilidad de uso — de la aplicación, ni de decisiones tomadas con base en la información que presenta.</p>
+    <p>Nada en estos términos excluye o limita responsabilidades que no puedan excluirse legalmente, incluidas las derivadas de dolo o negligencia grave, ni afecta a los derechos que la ley del consumidor te confiere.</p>
+
+    <h2>8. Datos y atribución</h2>
+    <p>Los datos de mapa y de puntos de interés provienen de <strong>OpenStreetMap</strong> y sus colaboradores, disponibles bajo la licencia ODbL. Las previsiones meteorológicas provienen de <strong>Open-Meteo</strong>. Los cálculos de itinerario usan <strong>OSRM</strong> y <strong>Geoapify</strong>. Estos datos son de origen comunitario o automatizado y pueden contener errores o lagunas.</p>
+
+    <h2>9. Uso aceptable</h2>
+    <p>No puedes usar la aplicación para fines ilícitos, intentar eludir limitaciones técnicas, sobrecargar deliberadamente los servicios de los que depende, ni redistribuirla presentándola como tuya.</p>
+
+    <h2>10. Privacidad</h2>
+    <p>El tratamiento de datos está descrito en la <a href="./privacidade.es.html">Política de Privacidad</a>, que forma parte integrante de estos términos. En resumen: no recogemos datos personales ni tenemos servidor; de tu dispositivo salen solo las coordenadas consultadas y el texto de las búsquedas, enviados sin identificadores a los servicios listados en la política — y nosotros no guardamos nada.</p>
+
+    <h2>11. Cambios</h2>
+    <p>Estos términos pueden actualizarse. La fecha de actualización de arriba indica la versión vigente. Seguir usando la aplicación tras un cambio significa que aceptas la versión actualizada.</p>
+
+    <h2>12. Ley aplicable</h2>
+    <p>Estos términos se rigen por la ley portuguesa, sin perjuicio de las normas imperativas de protección del consumidor del país donde tengas tu residencia habitual.</p>
+
+    <h2>13. Contacto</h2>
+    <p>Para cualquier cuestión sobre estos términos: <a href="mailto:info@getlevante.com">info@getlevante.com</a>.</p>
+  </div>
+
+  <footer>
+    <a href="./">← Volver a la aplicación</a> · <a href="./privacidade.es.html">Política de Privacidad</a>
+  </footer>
+</div>
+<script>
+try{ var th=localStorage.getItem("levante-theme")||localStorage.getItem("vdm-theme");
+  if(th) document.documentElement.dataset.theme=JSON.parse(th);
+  else if(matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme="light";
+}catch(e){}
+</script>
+</body>
+</html>
