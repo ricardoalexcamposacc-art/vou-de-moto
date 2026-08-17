@@ -6,8 +6,18 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
-/* ═══ levante-v36 — 17/08/2026 ══════════════════════════════
+/* ═══ levante-v37 — 17/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+   dd-256 h2: a velocidade da primeira abertura.
+
+   · A PRIMEIRA ABERTURA FICA MAIS LEVE: o servido é minificado no build
+     — 579→392 KB na rede (−32 %), ≈ −1 s no frio numa rede móvel média,
+     na primeira visita e sempre que há versão nova. O código-mestre fica
+     intacto; nada muda no que se vê — é o mesmo código, servido sem o
+     peso morto. (Baseline e números: relatórios 175/176.)
+   ══════════════════════════════════════════════════════════ */
+/* ═══ levante-v36 — 17/08/2026 ══════════════════════════════
+   (arquivo — publicada pelo dono a 17/08, medida no ar)
    dd-254: o que o dono mediu no telemóvel com a app na mão.
 
    · TOCAR NUMA VIAGEM LEVA MESMO LÁ. O toque num recente ou guardado
@@ -288,7 +298,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v36";
+const V = "levante-v37";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */

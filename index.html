@@ -14890,7 +14890,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-17-1243-bfb957";
+const BUILD="2026-08-17-2001-716b31";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -16662,9 +16662,19 @@ function init(){
     renderInstalacao();
   });
   addEventListener("appinstalled",()=>{ pwa.prompt=null; pwa.instalada=true; toast(t("App instalada! 🏍️")); renderInstalacao(); });
-  if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){
+  /* ═══ dd-257 §2 — O SERVICE WORKER SAI DO NATIVO (gate, não remoção) ═════
+     Dentro do WebView do Capacitor o SW luta com o servidor local do
+     runtime (defeito documentado: serve o velho por cima do bundled). No
+     pacote nativo o bundled já serve local sem SW nenhum — o offline
+     prova-se em modo avião. A PWA fica EXATAMENTE como estava: o gate é o
+     objeto global que só o runtime nativo injeta (window.Capacitor), e no
+     browser este if é o de sempre. Medição pendente do §5 da carta: o
+     console.log no teste interno confirma o Capacitor no WebView. */
+  const emNativo=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+  if(!emNativo&&"serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){
     addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
   }
+  if(emNativo) console.info("[levante] nativo (Capacitor): service worker não registado — dd-257 §2");
   if(pwa.ios&&!navigator.standalone&&/^https?:$/.test(location.protocol)){
     setTimeout(()=>toast(t("💡 No iPhone: botão Partilhar → “Adicionar ao ecrã principal” para instalares a app."),7000),4000);
   }
