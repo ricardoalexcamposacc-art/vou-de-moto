@@ -6,6 +6,25 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v38 — 18/08/2026 ══════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+   dd-261: A CASA SÓ SE ESCREVE COM UM GESTO QUE A NOMEIE.
+
+   · A TUA CASA DEIXA DE MUDAR SOZINHA. Calcular uma rota, escolher um
+     destino, pesquisar um sítio, tocar num guardado ou num recente, ou
+     simplesmente abrir a app — nada disto lhe toca. Só três gestos a
+     escrevem, e todos dizem o que são: responder «Sim» ao cartão que
+     pergunta, «Usar como casa» no mapa, e «Usar onde estou agora» no
+     menu da casa.
+   · «MUDAR A CASA → USAR ONDE ESTOU AGORA» PASSA A FUNCIONAR. Antes ia
+     buscar a posição, dizia onde estavas, e deixava a casa na mesma —
+     metade do gesto, calada. Agora escreve a casa e di-lo:
+     «🏠 Casa atualizada: …».
+   · «MUDAR A CASA → PROCURAR UMA MORADA» pergunta antes de escrever, em
+     vez de escrever por ti.
+   ⚠️ A casa que já lá está NÃO se corrige sozinha — esta versão fecha a
+     torneira, não reescreve o passado. Muda-a uma vez à mão.
+   ══════════════════════════════════════════════════════════ */
 /* ═══ levante-v37 — 17/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
    dd-256 h2: a velocidade da primeira abertura.
@@ -298,7 +317,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v37";
+const V = "levante-v38";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
