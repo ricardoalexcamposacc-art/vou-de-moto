@@ -6,6 +6,12 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v39 — 20/08/2026 ════════════════════════════════════════
+   As duas portas fechadas da pesquisa: a perna do mundo passa a ser pedida
+   quando a página vem cheia de um só sítio, e a reserva passa a entrar quando
+   o degrau responde qualquer coisa que não serve a classe da consulta. A
+   mesma rua deixa de ocupar cinco linhas, e a linha passa a dizer o país e a
+   região. E o menu «Mudar a casa» deixa de se fechar sozinho. */
 /* ═══ levante-v38 — 18/08/2026 ══════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
    dd-261: A CASA SÓ SE ESCREVE COM UM GESTO QUE A NOMEIE.
@@ -317,7 +323,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v38";
+const V = "levante-v39";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */

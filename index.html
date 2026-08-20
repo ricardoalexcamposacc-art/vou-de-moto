@@ -3009,6 +3009,12 @@ en:{
 "Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Storm expected around {h}. If your bike is outside, bring it in.",
 
 "Chuva a chegar à tua zona por volta das {h}.":"Rain reaching your area around {h}.",
+"🌧️ Talvez tenhas de abrigar a moto":"🌧️ You may need to shelter the bike",
+"Pode chover por volta das {h} — se puderes, deixa a moto abrigada.":"It may rain around {h} — if you can, keep the bike under cover.",
+"🌧️ Pode começar a chover":"🌧️ It may start raining",
+"Pode chover por volta das {h} — se a moto está cá fora, talvez queiras guardá-la.":"It may rain around {h} — if the bike is outside, you may want to put it away.",
+"Pode chegar chuva à tua zona por volta das {h}.":"Rain may reach your area around {h}.",
+"☁️ Pode haver chuva: ~{h}.":"☁️ There may be rain: ~{h}.",
 "Boa notícia: a chuva deve parar por volta das {h}.":"Good news: the rain should stop around {h}.",
 "Sem chuva no que veio — faltam {n} das próximas horas.":"No rain in what arrived — {n} of the next hours are missing.",
 
@@ -3480,6 +3486,12 @@ es:{
 "Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Tormenta prevista hacia las {h}. Si la moto está fuera, guárdala.",
 
 "Chuva a chegar à tua zona por volta das {h}.":"Lluvia llegando a tu zona hacia las {h}.",
+"🌧️ Talvez tenhas de abrigar a moto":"🌧️ Quizá tengas que resguardar la moto",
+"Pode chover por volta das {h} — se puderes, deixa a moto abrigada.":"Puede llover hacia las {h} — si puedes, deja la moto a cubierto.",
+"🌧️ Pode começar a chover":"🌧️ Puede empezar a llover",
+"Pode chover por volta das {h} — se a moto está cá fora, talvez queiras guardá-la.":"Puede llover hacia las {h} — si la moto está fuera, quizá quieras guardarla.",
+"Pode chegar chuva à tua zona por volta das {h}.":"Puede llegar lluvia a tu zona hacia las {h}.",
+"☁️ Pode haver chuva: ~{h}.":"☁️ Puede haber lluvia: ~{h}.",
 "Boa notícia: a chuva deve parar por volta das {h}.":"Buena noticia: la lluvia parará hacia las {h}.",
 "Sem chuva no que veio — faltam {n} das próximas horas.":"Sin lluvia en lo que llegó — faltan {n} de las próximas horas.",
 
@@ -3947,6 +3959,12 @@ fr:{
 "Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Orage prévu vers {h}. Si ta moto est dehors, rentre-la.",
 
 "Chuva a chegar à tua zona por volta das {h}.":"Pluie sur ta zone vers {h}.",
+"🌧️ Talvez tenhas de abrigar a moto":"🌧️ Tu devras peut-être abriter la moto",
+"Pode chover por volta das {h} — se puderes, deixa a moto abrigada.":"Il peut pleuvoir vers {h} — si tu peux, laisse la moto à l'abri.",
+"🌧️ Pode começar a chover":"🌧️ Il peut se mettre à pleuvoir",
+"Pode chover por volta das {h} — se a moto está cá fora, talvez queiras guardá-la.":"Il peut pleuvoir vers {h} — si la moto est dehors, tu voudras peut-être la rentrer.",
+"Pode chegar chuva à tua zona por volta das {h}.":"De la pluie peut atteindre ta zone vers {h}.",
+"☁️ Pode haver chuva: ~{h}.":"☁️ Il peut y avoir de la pluie : ~{h}.",
 "Boa notícia: a chuva deve parar por volta das {h}.":"Bonne nouvelle : la pluie devrait cesser vers {h}.",
 "Sem chuva no que veio — faltam {n} das próximas horas.":"Pas de pluie dans ce qui est arrivé — il manque {n} des prochaines heures.",
 
@@ -4147,6 +4165,12 @@ nl:{
 "Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.":"Onweer verwacht rond {h}. Staat je motor op straat, zet hem weg.",
 
 "Chuva a chegar à tua zona por volta das {h}.":"Regen komt jouw kant op rond {h}.",
+"🌧️ Talvez tenhas de abrigar a moto":"🌧️ Misschien moet je de motor onder dak zetten",
+"Pode chover por volta das {h} — se puderes, deixa a moto abrigada.":"Het kan rond {h} gaan regenen — zet de motor onder dak als dat kan.",
+"🌧️ Pode começar a chover":"🌧️ Het kan gaan regenen",
+"Pode chover por volta das {h} — se a moto está cá fora, talvez queiras guardá-la.":"Het kan rond {h} gaan regenen — als de motor buiten staat, wil je hem misschien wegzetten.",
+"Pode chegar chuva à tua zona por volta das {h}.":"Er kan rond {h} regen in jouw omgeving komen.",
+"☁️ Pode haver chuva: ~{h}.":"☁️ Er kan regen komen: ~{h}.",
 "Boa notícia: a chuva deve parar por volta das {h}.":"Goed nieuws: de regen zou rond {h} moeten stoppen.",
 "Sem chuva no que veio — faltam {n} das próximas horas.":"Geen regen in wat binnenkwam — {n} van de komende uren ontbreken.",
 
@@ -5106,6 +5130,20 @@ function uconv(s){
 }
 const fmtHM=(epoch)=>new Date(epoch*1000).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"});
 const fmtH=(epoch)=>new Date(epoch*1000).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"}).replace(":00","h");
+/* ═══ A HORA DIZ-SE COM A PRECISÃO QUE A PREVISÃO SUPORTA ════════════════
+   MEDIDO NO APARELHO DO DONO a 20/08: a app disse-lhe para cobrir a mota
+   porque havia «chuva prevista para as 21h20». Não choveu, e o céu estava a
+   abrir. O motor não errou — chuvisco possível que não cai é resultado normal.
+   Errou a FRASE, de duas maneiras, e esta é a segunda: **os 21h20 nunca
+   existiram na previsão**. A série é HORÁRIA; cada valor vale por uma hora
+   inteira. O «:20» saiu de um `Math.max(hora, agora)` — o limite da hora
+   esmagado contra o relógio — e a frase imprimiu-o ao minuto como se a
+   previsão tivesse essa resolução. Não tem: o tempo convectivo não se prende
+   ao minuto com horas de antecedência (Hohenegger & Schär, e está medido na
+   casa). Um número preciso pede confiança que os dados não compraram.
+   ⚠️ E por isso separam-se DOIS instantes que antes eram um: o que se
+   AGENDA (pode e deve ser ao minuto — é um temporizador) e o que se DIZ. */
+const fmtHoraAprox=(epoch)=>fmtH(Math.floor(epoch/3600)*3600);
 const fmtDow=(epoch)=>new Date(epoch*1000).toLocaleDateString(LOC(),{weekday:"short"}).replace(".","");
 const fmtDayMo=(epoch)=>new Date(epoch*1000).toLocaleDateString(LOC(),{day:"numeric",month:"numeric"});
 const fmtDur=(sec)=>{ const m=Math.round(sec/60); return m<60?`${m} min`:`${Math.floor(m/60)} h ${String(m%60).padStart(2,"0")} min`; };
@@ -5918,6 +5956,95 @@ function paiDaCategoria(cat){
   return null;
 }
 
+/* ═══ O ELEMENTO-PAI DE UM RESULTADO — e as duas portas que ele abre ═════
+   Uma PORTA pertence a uma RUA; uma rua pertence a si própria; um lugar é o
+   seu próprio pai. Nasce nos MAPEADORES, que é por onde todas as pernas
+   passam — a mesma lei que o `_tipo` já segue no `geoFeature`: uma coleção,
+   um dono. Escrever isto em cada perna era garantir que uma delas divergia.
+
+   É UMA SÓ PEÇA E SERVE TRÊS COISAS, de propósito:
+     · a dedução da lista (dd-264 §7c) — nenhum pai ocupa duas linhas;
+     · a condição da perna do MUNDO (a 1.ª porta fechada);
+     · o critério de «o degrau não serviu a classe da consulta» (a 2.ª).
+   Três defeitos que pareciam independentes têm a mesma pergunta por baixo:
+   «quantos SÍTIOS distintos é que isto é?», e não «quantas linhas». */
+/* ⚠️ SEM IDENTIDADE NÃO HÁ PAI — e foi a `pesquisa-longe` que mo apanhou,
+   na primeira corrida depois de eu escrever isto. A minha primeira versão
+   recuava para `"id:?"` quando a feature não trazia identificação nenhuma, e
+   com isso DOIS resultados desconhecidos ficavam com o MESMO pai: o Jumbo de
+   Cartum e o de Alfragide colapsavam num. Uma chave de recuo que junta o que
+   não é igual é pior do que não haver chave — apaga resultados certos e
+   parece arrumação. Devolve-se `null`, e quem não tem pai não é deduzido
+   nem serve de prova de nada. */
+/* ⚠️ UM SÍTIO COM NOME É O SEU PRÓPRIO PAI — e foi a `largura-da-resposta`
+   que mo apanhou, com quatro sítios distintos na MESMA morada fabricada
+   («Teaching Hotel», um B&B, um hostel e um motel em «Straat 1, Maastricht»).
+   A minha primeira chave dava-lhes a rua por pai e a lista colapsava em UM.
+   Um hotel e um hostel na mesma rua são DOIS SÍTIOS, não duas portas.
+   O que pertence a uma rua é uma MORADA: rua + porta, sem nome próprio — e
+   é exatamente o que as sete linhas do «buren» eram (`result_type:building`,
+   sem `name`, só `address_line1`). A distinção está nos dados. */
+function paiGeoapify(p){
+  if(!p.name){ const rua=p.street||"";
+    if(rua) return ["rua",rua,p.city||p.town||p.village||"",p.postcode||"",p.country_code||""].join("|").toLowerCase(); }
+  const id=p.place_id||p.formatted||p.address_line1||"";
+  return id?"id:"+String(id).toLowerCase():null;
+}
+function paiPhoton(p){
+  const cid=p.city||p.town||p.village||p.district||"";
+  if(!p.name){ const rua=p.street||"";
+    if(rua) return ["rua",rua,cid,p.postcode||"",p.countrycode||""].join("|").toLowerCase(); }
+  /* ⚠️ UMA RUA É O SEU PRÓPRIO PAI, E IDENTIFICA-SE PELO NOME — medido na
+     fixture da reserva: o Photon devolve a Rue Burenville em DOIS caminhos
+     OSM distintos (`n469390491` e `n32516970`), e pelo id eram dois sítios.
+     Para quem lê o ecrã são a mesma rua duas vezes. O id é do mapa; o nome
+     é do sítio. */
+  if(p.osm_key==="highway"&&p.name) return ["rua",p.name,cid,"",p.countrycode||""].join("|").toLowerCase();
+  const id=(p.osm_type||"")+(p.osm_id||"");
+  return id?"id:"+String(id).toLowerCase():null;
+}
+/* «UM DEGRAU FALHA» NÃO É SÓ «O FORNECEDOR REBENTOU» — definição do diretor
+   (ordem de 20/08), e não se reabre. Um degrau falha também quando devolve
+   resultados que NÃO SERVEM A CLASSE da consulta. O critério mínimo, sem
+   inventar classificação de intenção (isso é da sala de planeamento): todos
+   os resultados debaixo do MESMO elemento-pai e a consulta sem número.
+   ⚠️ MEDIDO CONTRA AS CINCO FIXTURES ANTES DE SER FIXADO (19/08): dispara no
+   `buren-perto` (7 portas da Rue Burenville, 1 pai) e não dispara em
+   `buren-mundo`, `buren-sem-vies`, `buren-pais` nem na reserva — e não
+   dispara com «buren 13», porque aí o número diz que ele quer a porta. */
+const semNumero=(q)=>!/\d/.test(String(q||""));
+/* ⚠️ A SEGUNDA EXCEÇÃO, E FOI A BANCADA QUE A EXIGIU — não eu.
+   A primeira versão deste critério pôs a `pesquisa-categoria` vermelha, e
+   com razão: ela escreve «Ireneweg» e espera as QUATRO portas da rua do
+   dono («26-TR», «30A», «26-28», «40/3» — a cena dele, dd-86). Sem
+   número e todos debaixo de um pai: pelo critério v1, idêntico ao «buren».
+   NÃO SÃO A MESMA COISA, e a diferença está nos DADOS, não na intenção:
+   em «Ireneweg» a consulta é o NOME DO PRÓPRIO PAI; em «buren» não é — o
+   pai chama-se «Rue Burenville». Compara-se texto com texto; ninguém
+   adivinha o que a pessoa queria (isso é da sala de planeamento).
+   MEDIDO EM 11 CASOS ANTES DE SER FIXADO, incluindo «Rue Burenville» (dá as
+   portas), «Ireneweg Maastricht» (dá as portas) e «Irene» (uma linha por
+   rua, porque aí ele ainda está a escrever). */
+function consultaNomeiaOPai(q,pai){
+  const m=/^rua\|([^|]*)\|/.exec(pai||"");
+  if(!m) return false;
+  const norm=(x)=>String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+  const r=norm(m[1]), t=norm(q);
+  return !!r && (t===r || t.startsWith(r+" "));
+}
+function naoServeAClasse(q,lista){
+  if(!semNumero(q)) return false;
+  const l=lista||[];
+  if(l.length<2) return false;
+  const pais=l.map(r=>r&&r._pai);
+  /* um pai desconhecido NÃO é prova de nada — nem a favor nem contra. Se
+     algum resultado não tem pai, esta pergunta não se responde (7g-ter: o
+     valor de recuo é o honesto, nunca o tranquilizador). */
+  if(pais.some(x=>!x)) return false;
+  if(new Set(pais).size!==1) return false;
+  return !consultaNomeiaOPai(q,pais[0]);
+}
+
 /* Photon (komoot) — pesquisa instantânea, tolerante a gralhas, com viés de proximidade */
 function photonMap(f){
   const p=f.properties||{};
@@ -5930,13 +6057,38 @@ function photonMap(f){
      hierarquia até algo que distinga; nunca o nome em cru outra vez */
   if(sub.trim().toLowerCase()===String(name).trim().toLowerCase())
     sub=[p.state,p.country].filter(Boolean).join(", ")||p.country||"";
+  /* dd-264 §7b, TAMBÉM AQUI — e é aqui que faz mais falta: quando a reserva
+     responde, é esta linha que o dono lê. Pô-lo só no `geoFeature` deixava
+     metade dos caminhos a dizer «Liège» e mais nada. Uma coleção, um dono —
+     e um dono por mapeador, porque os campos dos dois fornecedores são
+     outros. */
+  { const tem=(x)=>sub.toLowerCase().split(/\s*,\s*/).includes(String(x).toLowerCase());
+    for(const x of [p.state||"", p.country||""])
+      if(x&&!tem(x)) sub=sub?`${sub}, ${x}`:String(x); }
   /* dd-87 §2: o osm_key também atravessa — "residential" sozinho não diz se
      é rua ou bairro; place/highway/amenity é que desambigua */
-  return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value, key:p.osm_key};
+  return {name, sub, lat:f.geometry?.coordinates?.[1], lon:f.geometry?.coordinates?.[0], kind:p.osm_value, key:p.osm_key, _pai:paiPhoton(p)};
 }
 async function photonSearch(q,pos,limit=7){
+  /* o que o principal devolveu quando NÃO serviu a classe: não se deita
+     fora, entra no fim da lista depois da reserva ter dito o que sabe. */
+  let doPrincipal=[];
   if(geoOn()){
-    try{ return await geoSearch(q,pos,limit); }
+    try{
+      const r=await geoSearch(q,pos,limit);
+      /* ⚠️ A SEGUNDA PORTA FECHADA. Até 20/08 a reserva só entrava se o
+         `geoSearch` ATIRASSE — transporte caído ou HTTP do fornecedor. Uma
+         resposta ERRADA MAS CHEIA nunca lhe chegava, e por isso os 67,3 %
+         do Photon medidos na dd-263 §3 eram inalcançáveis exatamente nos
+         casos em que faziam falta: no «buren» a reserva traz a Buren
+         neerlandesa nas DUAS primeiras linhas, e nunca foi perguntada.
+         ⚠️ E NÃO SE CHAMA `degradarPesquisa` AQUI, de propósito: o
+         fornecedor respondeu. O aviso «A pesquisa principal não respondeu»
+         seria uma afirmação falsa no ecrã do dono — ela respondeu, e o que
+         disse é que não sabia. São coisas diferentes e dizem-se diferentes. */
+      if(!naoServeAClasse(q,r)) return r;
+      doPrincipal=r;
+    }
     catch(e){
       /* dd-168: só se degrada o que se sabe que É uma queda do fornecedor —
          o `fornecedorCaiu` do geoSearch. Qualquer outro erro sobe inteiro:
@@ -5979,9 +6131,11 @@ async function photonSearch(q,pos,limit=7){
     const dLat=RAIO_PERTO_M/111320, dLon=RAIO_PERTO_M/(111320*Math.max(.05,Math.cos(pos.lat*Math.PI/180)));
     perto=mapa(await pede({bbox:`${(pos.lon-dLon).toFixed(4)},${(pos.lat-dLat).toFixed(4)},${(pos.lon+dLon).toFixed(4)},${(pos.lat+dLat).toFixed(4)}`}).catch(cai));
   }
-  const mundo=perto.length<limit?mapa(await pede({}).catch(cai)):[];
+  /* a MESMA porta, na reserva sem chave — varrimento da classe, não
+     correção do caso. Aqui não custa crédito nenhum: o Photon é grátis. */
+  const mundo=(perto.length<limit||naoServeAClasse(q,perto))?mapa(await pede({}).catch(cai)):[];
   const seen=new Set();
-  const res=[...perto,...mundo].filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
+  const res=[...perto,...mundo,...doPrincipal].filter(r=>{ const k=`${r.name}|${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
     if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,Math.max(limit,perto.length));
   if(!res.length&&redeCaiu) throw Object.assign(new Error("pesquisa: transporte caiu"),{semTransporte:true});
   return res;
@@ -6860,10 +7014,27 @@ async function geocode(q){
   const here=refPesquisa();
   const out=[];
   const seen=new Set();
+  /* ═══ dd-264 §7c — NENHUM ELEMENTO-PAI OCUPA MAIS DE UMA LINHA ════════
+     O dono escreveu «buren» e recebeu CINCO linhas da mesma Rue Burenville
+     (13, 22, 21, 30, 45). Não eram cinco respostas: era uma resposta
+     repetida cinco vezes, a ocupar o ecrã inteiro e a empurrar para fora
+     tudo o que podia estar certo.
+     ⚠️ A dedução QUE JÁ EXISTIA — por `lat/lon` a 4 casas — não junta
+     nenhuma das cinco: são células distintas a ~11 m de resolução. Medido.
+     Só a dedução por elemento-pai resolve isto; a por coordenada não serve,
+     e continua cá porque resolve outra coisa (o mesmo sítio por duas pernas).
+     ⚠️ EXCEÇÃO ÚNICA, e é do diretor: se o utilizador escreveu um NÚMERO,
+     ele quer a porta, e as portas da mesma rua deixam de ser repetição —
+     passam a ser a resposta. */
+  const paisVistos=new Set(), semNum=semNumero(q);
   const add=(arr)=>{ for(const r of (arr||[])){
     if(!Number.isFinite(r.lat)||!Number.isFinite(r.lon)) continue;
     const k=`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`;
-    if(seen.has(k)) continue; seen.add(k); out.push(r);
+    if(seen.has(k)) continue;
+    /* a MESMA exceção da classe: quem escreveu o nome da rua quer as portas
+       dela, e aí as portas deixam de ser repetição — são a resposta. */
+    if(semNum&&r._pai&&!consultaNomeiaOPai(q,r._pai)){ if(paisVistos.has(r._pai)) continue; paisVistos.add(r._pai); }
+    seen.add(k); out.push(r);
   }};
 
   // 1) OS TEUS SÍTIOS primeiro — favoritos e recentes, sem rede e sem créditos
@@ -7227,6 +7398,18 @@ function geoFeature(f){
     sub=[p.state,p.country].filter(Boolean).join(", ")||p.address_line2||p.country||"";
   if(sub.toLowerCase().startsWith(nome.toLowerCase()+","))
     sub=sub.slice(nome.length+1).trim(); // "Jumbo, Sudan" → "Sudan"
+  /* ═══ dd-264 §7b — O PAÍS NUNCA FALTA, E A REGIÃO VAI COM ELE ═════════
+     O dono escreveu «buren», recebeu cinco moradas com «Liège» por baixo, e
+     a linha NÃO DIZIA O PAÍS. Ele estava a olhar para a Bélgica a pensar que
+     via os Países Baixos, e nada no ecrã o desmentia. Uma resposta que não
+     diz onde está obriga quem lê a adivinhar — e ele adivinhou o que era
+     razoável adivinhar.
+     E a REGIÃO entra pela mesma razão, que é o mesmo caso: há duas Burens
+     nos Países Baixos (Gelderland e Frisia) e o país sozinho não as separa.
+     Acrescenta-se só o que ainda lá não está — nada se repete. */
+  { const tem=(x)=>sub.toLowerCase().split(/\s*,\s*/).includes(String(x).toLowerCase());
+    for(const x of [p.state||p.county||"", p.country||""])
+      if(x&&!tem(x)) sub=sub?`${sub}, ${x}`:String(x); }
   /* dd-102 §2.11: a atribuição da licença vive POR FEATURE (datasource) —
      MEDIDO AO VIVO a 02/08 com a chave real: o topo da resposta Geoapify
      NÃO traz attribution (o mock antigo dizia que sim — 7i família a, e a
@@ -7242,7 +7425,7 @@ function geoFeature(f){
   const _tipo=tipoDoResultado(p.categories)||tipoDoResultado(p.category)||null;
   return {name:nome, sub, lat:p.lat??f.geometry?.coordinates?.[1],
           lon:p.lon??f.geometry?.coordinates?.[0], kind:p.result_type||p.category,
-          ...(_tipo?{_tipo}:{}), atrib};
+          ...(_tipo?{_tipo}:{}), atrib, _pai:paiGeoapify(p)};
 }
 const RAIO_PERTO_M=50000; // o "por aqui" de quem anda de mota: 50 km. 7b: errado se
                           // um caso real mostrar um sítio querido escondido além dos
@@ -7311,7 +7494,20 @@ async function geoSearch(q,pos,limit=7){
     if(/^HTTP \d/.test(m)) httpCaiu=m; else redeCaiu=true; return null; };
   const perto=temRef?mapa(await pede({filter:`circle:${pos.lon.toFixed(5)},${pos.lat.toFixed(5)},${RAIO_PERTO_M}`}).catch(cai)):[];
   let mundo=[];
-  if(perto.length<limit) mundo=mapa(await pede({}).catch(cai));
+  /* ⚠️ A PRIMEIRA PORTA FECHADA, medida no caso real do dono a 19/08.
+     A condição era só `perto.length<limit`. O «buren» devolveu SETE com
+     `limit=7` — e 7<7 é falso, logo a perna do MUNDO, a ÚNICA que traz a
+     Buren neerlandesa (e traz-la em PRIMEIRO), nunca chegava a ser pedida.
+     A resposta certa estava a uma chamada de distância e a app não a fez.
+     A página estava cheia — cheia de UM SÓ SÍTIO: sete portas da Rue
+     Burenville, em Liège. «Encheu a página» nunca foi a pergunta certa;
+     a pergunta é quantos SÍTIOS distintos vieram.
+     ⚠️ CUSTO MEDIDO ANTES DE ABRIR (20/08, 60 consultas sem número, 60
+     créditos): a página enche em 9 (15,0 %) e dessas só 3 têm pai único.
+     +3 chamadas em 60 — a média por consulta passa de 1,850 para 1,900.
+     E os três casos são o mesmo defeito outra vez, em consultas que ninguém
+     tinha olhado: «Helmond», «Hoorn» e «Den Burg». */
+  if(perto.length<limit||naoServeAClasse(q,perto)) mundo=mapa(await pede({}).catch(cai));
   const vistos=new Set(perto.map(r=>`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`));
   const res=[...perto, ...mundo.filter(r=>!vistos.has(`${r.lat.toFixed(4)},${r.lon.toFixed(4)}`))].slice(0,Math.max(limit,perto.length));
   if(!res.length&&(redeCaiu||httpCaiu))
@@ -13575,9 +13771,20 @@ function pintarSitiosLinha(){
    com o menu da casa JÁ ABERTO — quem veio mudar não tem de descobrir onde
    se muda. Quem entra pela aba normal encontra o menu fechado (salvo sem
    casa definida, em que ele nasce aberto porque só há uma coisa a fazer). */
-let sitiosMenuPedido=false;
+/* ⚠️ MEDIDO a 19/08, sonda fora do repositório: isto era uma INTENÇÃO DE UM
+   SÓ USO. A primeira pintura consumia-a (`sitiosMenuPedido=false`) e qualquer
+   REPINTURA da gaveta a seguir — o `setHome` e o repintar da troca de língua,
+   ambos com o comentário «a gaveta morreu — repinta-se» — reconstruía o menu
+   com a intenção já gasta e FECHAVA-O. E não era só a promessa do link a
+   perder-se: o menu que o DONO ABRIU COM O DEDO no ✏️ fechava-se sozinho ao
+   primeiro `setHome` — medido, sem carga nenhuma, três em três.
+   Passa a ser ESTADO, com três valores: `null` = ninguém decidiu (vale a regra
+   de omissão — aberto só se não houver casa), `true`/`false` = alguém decidiu,
+   e uma repintura NÃO desfaz uma decisão. Esquece-se ao SAIR do separador,
+   para quem volta pela aba encontrar a gaveta como sempre a encontrou. */
+let sitiosMenu=null;
 function abrirSitios(){ $("#settings-pop")?.classList.remove("open");
-  sitiosMenuPedido=true; switchTab("sitios"); }
+  sitiosMenu=true; switchTab("sitios"); }
 /* dd-244 bloco 3: sobrou UMA superfície — o separador. O pintor é o mesmo de
    sempre (§10.6: um pintor por superfície), só perdeu a segunda caixa. */
 function renderSitios(){ pintarSitiosEm($("#view-sitios")); }
@@ -13623,7 +13830,6 @@ function pintarSitiosEm(box){
   { const c=aCasa(); const k=chaveSitio(c); if(k) jaMostrados.add(k); }
   if(!box) return;
   box.textContent="";
-  const menuPedido=sitiosMenuPedido; sitiosMenuPedido=false;
   /* dd-172 §2: esta gaveta mostra a casa, os favoritos e os recentes — todos
      com nome vindo do fornecedor e todos com o `atrib` guardado. A linha vai
      no fim, uma só, com as licenças de tudo o que está à vista. */
@@ -13671,10 +13877,13 @@ function pintarSitiosEm(box){
   /* o menu nasce ABERTO para quem veio pelo «Não é esta? Mudar» e para quem
      ainda não tem casa (só há uma coisa a fazer); fechado para quem só veio
      ver os sítios. É a promessa do link, cumprida no destino (§10.119). */
-  menu.hidden=!(menuPedido||!h);
+  const menuAberto = sitiosMenu===null ? !h : sitiosMenu;
+  menu.hidden=!menuAberto;
   bm.setAttribute("aria-expanded",String(!menu.hidden));
-  bm.addEventListener("click",()=>{ menu.hidden=!menu.hidden;
-    bm.setAttribute("aria-expanded",String(!menu.hidden)); });
+  /* o dedo escreve a DECISÃO, não só o `hidden` — se escrevesse só o `hidden`,
+     a repintura seguinte apagava-a, que é exatamente o defeito que isto cura */
+  bm.addEventListener("click",()=>{ sitiosMenu=!!menu.hidden; menu.hidden=!sitiosMenu;
+    bm.setAttribute("aria-expanded",String(sitiosMenu)); });
   cx.append(bm,menu); box.appendChild(cx);
   /* dd-244 §3: a frase antiga prometia quatro seguidores e mentia em dois —
      a previsão do Agora e a frase dos radares seguem o sítio no ecrã. Fica
@@ -14905,24 +15114,29 @@ function pintarGuarda(){
     ? t("Quando chegas e paras num alojamento, digo-te se a moto pode ficar cá fora — e aviso se a chuva vier antes da tua próxima saída. Com a app aberta.")
     : t("A app não fala da moto cá fora.");
 }
-function motoFrase(rainAt,until){
+function motoFrase(r,until){
   const now=Date.now()/1000;
-  if(rainAt==null){
+  if(r==null){
     const horas=Math.max(1,Math.round((until-now)/3600));
-    return {ok:true, horas, ateH:fmtHM(until),
+    return {ok:true, horas, ateH:fmtHoraAprox(until),
       titulo:t("🏍️ A moto pode ficar cá fora"),
-      corpo:t("✅ Podes deixar a mota cá fora cerca de {n} horas — sem chuva prevista até às {h}.",{n:horas,h:fmtHM(until)})};
+      corpo:t("✅ Podes deixar a mota cá fora cerca de {n} horas — sem chuva prevista até às {h}.",{n:horas,h:fmtHoraAprox(until)})};
   }
-  return {ok:false, ateH:fmtHM(rainAt),
-    titulo:t("🌧️ Abriga a moto"),
-    corpo:t("Chuva prevista por volta das {h} — se puderes, deixa a moto abrigada.",{h:fmtHM(rainAt)})};
+  /* nível 1 é «Chuvisco possível» — a app NÃO afirma o que só sabe como
+     possibilidade. Nível 2+ é «Chuva» e aí a afirmação é honesta. */
+  const possivel=r.lvl<2;
+  return {ok:false, possivel, ateH:fmtHoraAprox(r.dizer),
+    titulo:possivel?t("🌧️ Talvez tenhas de abrigar a moto"):t("🌧️ Abriga a moto"),
+    corpo:possivel
+      ?t("Pode chover por volta das {h} — se puderes, deixa a moto abrigada.",{h:fmtHoraAprox(r.dizer)})
+      :t("Chuva prevista por volta das {h} — se puderes, deixa a moto abrigada.",{h:fmtHoraAprox(r.dizer)})};
 }
 window.__levT={travel, motoGuard}; // para testes
 window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachada, não pelo motor
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-18-1338-f38242";
+const BUILD="2026-08-20-2345-950eae";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -14978,8 +15192,16 @@ function findNextRain(wx, from, until){
     /* dd-61 a: a régua é a mesma do cartão. Tinha aqui pr≥0,2 e pp≥65 —
        eram estes números que faziam a voz dizer "seco" sobre um cartão que
        dizia "chuvisco possível". */
-    if(vaiChover(pr,pp,H.weather_code?.[k]))
-      return Math.max(tt,from);
+    /* ⚠️ O NÍVEL ATRAVESSA, e é a cura da primeira metade do defeito de
+       20/08. `vaiChover()` é `nivelChuva(...)>=1` — e o nível 1 chama-se, na
+       própria app, **«Chuvisco possível»** (`rainLabel`). Devolver só «quando»
+       apagava a diferença entre uma possibilidade e um facto, e quem recebia
+       só podia escrever uma frase — a afirmativa. A app dizia «Chuva
+       prevista» sobre a coisa a que ela própria chama «possível».
+       `quando` é para AGENDAR (ao minuto, é um temporizador);
+       `dizer` é a hora da PREVISÃO, que é a única que se pode dizer. */
+    const lvl=nivelChuva(pr,pp,H.weather_code?.[k]);
+    if(lvl>=1) return {quando:Math.max(tt,from), dizer:tt, lvl};
   }
   return null;
 }
@@ -15001,16 +15223,20 @@ function guardWindow(){
   if(R&&dep>now+600&&!travel.active) return {until:dep, why:t("até à tua próxima viagem ({h})",{h:fmtHM(dep)})};
   return {until:now+12*3600, why:t("nas próximas {n} horas",{n:12})};
 }
-function scheduleMotoReminder(rainAt){
+function scheduleMotoReminder(r){
   if(motoGuard.timer){ clearTimeout(motoGuard.timer); motoGuard.timer=null; }
   if(!guardaMoto.on){ scheduleNativeAlerts([],9100,10); return; }   // dd-86 §3
-  motoGuard.rainAt=rainAt;
-  if(rainAt==null){ scheduleNativeAlerts([],9100,10); return; }
+  motoGuard.rainAt=r?.quando??null;
+  if(r==null){ scheduleNativeAlerts([],9100,10); return; }
   const now=Date.now()/1000;
+  const rainAt=r.quando;                       // AGENDAR: ao minuto, é um relógio
   const lead=Math.min(45*60,(rainAt-now)*0.5);
   const fireAt=rainAt-lead;
-  const title=t("🌧️ Vai começar a chover");
-  const body=t("Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.",{h:fmtHM(rainAt)});
+  const possivel=r.lvl<2;                      // DIZER: a forma segue o nível
+  const title=possivel?t("🌧️ Pode começar a chover"):t("🌧️ Vai começar a chover");
+  const body=possivel
+    ?t("Pode chover por volta das {h} — se a moto está cá fora, talvez queiras guardá-la.",{h:fmtHoraAprox(r.dizer)})
+    :t("Chuva por volta das {h} — se a moto está cá fora, guarda-a agora.",{h:fmtHoraAprox(r.dizer)});
   if(fireAt>now+60){
     motoGuard.timer=setTimeout(()=>motoNotify(title,body),(fireAt-now)*1000);
     /* dd-108: o agendamento NATIVO morreu como disparador — parar a mota é
@@ -15051,10 +15277,18 @@ async function motoGuardRefresh(){
     const {until}=guardWindow();
     const wxs=await fetchRouteWx([motoGuard.lastPos], now-3600, until+3600);
     const rainAt=findNextRain(wxs&&wxs[0], now, until);
-    const changed=(rainAt==null)!==(motoGuard.rainAt==null)||
-      (rainAt!=null&&motoGuard.rainAt!=null&&Math.abs(rainAt-motoGuard.rainAt)>1200);
+    /* ⚠️ COMPARA-SE O INSTANTE, NÃO O OBJETO. O `findNextRain` passou a
+       devolver `{quando,dizer,lvl}` — a cura da certeza fabricada — e o
+       `motoGuard.rainAt` é, e continua a ser, um NÚMERO: o instante de
+       agendamento que o `scheduleMotoReminder` lá pôs. Subtrair um objeto a
+       um número dá `NaN`, e `NaN>1200` é `false`: a re-verificação ficava
+       muda exatamente no caso para que nasceu — a chuva a chegar mais cedo
+       do que se pensava. Ninguém veria um erro; a app apenas calava-se. */
+    const quando=rainAt?.quando??null;
+    const changed=(quando==null)!==(motoGuard.rainAt==null)||
+      (quando!=null&&motoGuard.rainAt!=null&&Math.abs(quando-motoGuard.rainAt)>1200);
     if(changed){
-      if(rainAt!=null&&(motoGuard.rainAt==null||rainAt<motoGuard.rainAt-1200)&&rainAt-now<5400){
+      if(quando!=null&&(motoGuard.rainAt==null||quando<motoGuard.rainAt-1200)&&quando-now<5400){
         const f=motoFrase(rainAt,0);          // a MESMA frase do funil (dd-86 §1)
         motoGuard.cartao={...f, quando:now};
         motoNotify(f.titulo, f.corpo);
@@ -16001,34 +16235,64 @@ async function sentinelCheck({recuperacao=false}={}){
     let i0=times.findIndex(t=>t>now-3600); if(i0<0)i0=0;
     const cp=j.current?.precipitation;
     const curWet=(cp!=null&&cp>0.05);
-    let startIdx=-1, stopIdx=-1;
+    let startIdx=-1, startLvl=0, stopIdx=-1;
     /* três horas para a frente: é o horizonte que a forma antiga cobria com
        oito quartos de hora, na única resolução que existe em toda a parte */
-    for(let k=i0;k<Math.min(i0+3,times.length);k++){ if(prs[k]!=null&&prs[k]>0.1){ startIdx=k; break; } }
+    /* ⚠️ A SÉTIMA RÉGUA, E ERA A ÚLTIMA VIVA. A dd-61 a inventariou SETE
+       caminhos a decidir «chove/não chove», cada um com os seus números, e
+       fechou-os todos numa: «uma função decide, e todos bebem dela.» Esta
+       linha não bebia: tinha um `prs[k]>0.1` próprio — um limiar que NÃO
+       existe em lado nenhum (o nível 1 começa em 0,08 e o 2 em 0,8), e que
+       ignorava a probabilidade e o código do céu por completo. Com pp=80 e
+       pr=0,05 a Sentinela dizia «seco» sobre um cartão que dizia «chuvisco
+       possível» — exatamente as duas cabeças que a dd-61 a matou.
+       E era preciso para a cura das FRASES: sem nível não há forma verbal. */
+    for(let k=i0;k<Math.min(i0+3,times.length);k++){
+      const l=nivelChuva(prs[k],H.precipitation_probability?.[k],H.weather_code?.[k]);
+      if(l>=1){ startIdx=k; startLvl=l; break; } }
     /* "a chuva deve parar" é uma BOA notícia — não pode sair de uma hora sem
        dados (`??0` fazia exatamente isso) */
     if(curWet) for(let k=i0;k<Math.min(i0+4,times.length);k++){ if(prs[k]!=null&&prs[k]<=0.05){ stopIdx=k; break; } }
     const gust=j.current?.wind_gusts_10m??null;
     let thunderAt=-1;
     (H.time||[]).forEach((t,k)=>{ if(thunderAt<0&&t>now&&t<now+2.5*3600&&THUNDER.includes(H.weather_code?.[k])) thunderAt=t; });
+    /* ⚠️ A HORA AQUI TAMBÉM É DA PREVISÃO, e ficou de fora da primeira
+       passagem da cura. O `thunderAt` é um `H.time[k]` — uma hora inteira —
+       e o `fmtHM` imprimia-a «22:00», ao minuto, sobre uma série horária. A
+       forma verbal desta frase está certa (nível 3 afirma-se, e uma trovoada
+       merece imperativo); o que estava errado era a promessa do minuto. Foi
+       o INVENTÁRIO a apanhá-la, não a bateria — enumerar todas as frases é
+       o que faz aparecer as que ninguém se lembrava de ter escrito. */
     if(thunderAt>0) sentinelAlert("th-"+Math.floor(thunderAt/3600),
-      t("Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.",{h:fmtHM(thunderAt)}),true);
+      t("Trovoada prevista por volta das {h}. Se tens a moto na rua, recolhe-a.",{h:fmtHoraAprox(thunderAt)}),true);
     /* ⚠️ E A FRASE MUDA COM O DADO. Dizer «daqui a 12 minutos» com um número
        horário é vestir de precisão o que não a tem — a §10.85 aplicada a um
        NÚMERO em vez de a uma palavra. Diz-se a hora, que é o que se sabe. */
     if(!curWet&&startIdx>=0&&times[startIdx]-now<=2*3600)
       sentinelAlert("start-"+times[startIdx],
-        t("Chuva a chegar à tua zona por volta das {h}.",{h:fmtHM(times[startIdx])}),true);
+        startLvl<2
+          ?t("Pode chegar chuva à tua zona por volta das {h}.",{h:fmtHoraAprox(times[startIdx])})
+          :t("Chuva a chegar à tua zona por volta das {h}.",{h:fmtHoraAprox(times[startIdx])}),true);
+    /* esta frase JÁ estava na forma certa — «deve parar» é possibilidade — e
+       a assimetria era o achado: a app hesitava na boa notícia e afirmava a
+       má, com dados da mesma qualidade. Só lhe faltava a hora honesta. */
     if(curWet&&stopIdx>=0)
-      sentinelAlert("stop-"+times[stopIdx],t("Boa notícia: a chuva deve parar por volta das {h}.",{h:fmtHM(times[stopIdx])}));
+      sentinelAlert("stop-"+times[stopIdx],t("Boa notícia: a chuva deve parar por volta das {h}.",{h:fmtHoraAprox(times[stopIdx])}));
     if(gust>=45&&(sentinel.last?.gust??0)<gust-8)
       sentinelAlert("gust-"+Math.round(gust/10),t("O vento subiu: rajadas de {g} quilómetros por hora.",{g:Math.round(gust)}));
     sentinel.last={gust, curWet};
     motoGuardRefresh(); // a moto ficou cá fora? re-verifica a chuva no sítio dela
     let st;
     const furosSent=times.slice(i0,i0+3).filter((_,k)=>prs[i0+k]==null).length;
-    if(curWet) st=stopIdx>=0?t("🌧️ A chover agora — deve parar ~{h}.",{h:fmtHM(times[stopIdx])}):t("🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.");
-    else if(startIdx>=0) st=t("☁️ Chuva a caminho: ~{h}.",{h:fmtHM(times[startIdx])});
+    /* a mesma correção da hora, no resumo do painel: o `times[stopIdx]` é da
+       previsão e não do relógio. O `fmtHM(now)` mais abaixo FICA — a última
+       verificação é um facto do relógio, e um facto do relógio diz-se ao
+       minuto. É a linha que separa as duas: o que se mediu, ao minuto; o que
+       se prevê, à hora. */
+    if(curWet) st=stopIdx>=0?t("🌧️ A chover agora — deve parar ~{h}.",{h:fmtHoraAprox(times[stopIdx])}):t("🌧️ A chover agora, sem paragem à vista nas próximas ~2 h.");
+    else if(startIdx>=0) st=startLvl<2
+      ?t("☁️ Pode haver chuva: ~{h}.",{h:fmtHoraAprox(times[startIdx])})
+      :t("☁️ Chuva a caminho: ~{h}.",{h:fmtHoraAprox(times[startIdx])});
     else if(furosSent) st=t("Sem chuva no que veio — faltam {n} das próximas horas.",{n:furosSent});
     else st=t("✅ Sem chuva à vista nas próximas 2 horas.");
     sentinel.lastAt=Date.now();
@@ -16274,6 +16538,10 @@ function switchTab(name){
      vazia para quem a abre entre atualizações — e uma aba vazia é uma aba
      que mente sobre não haver nada. */
   if(name==="dias") pintarDias(null);
+  /* sair do separador esquece a decisão do menu da casa: quem volta pela aba
+     encontra a gaveta como sempre a encontrou. Quem volta pelo «Não é esta?
+     Mudar» rearma-a no `abrirSitios`. */
+  if(name!=="sitios") sitiosMenu=null;
   if(name==="sitios") renderSitios();
   if(name==="rota"){ initRouteMap(); setTimeout(()=>state.mapaRota&&Mapa.redimensionar(state.mapaRota),60);
     oferecerFocoNaRota();              // o que se procurou no Agora já espera aqui (dd-06 §1a)
