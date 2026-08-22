@@ -6,6 +6,13 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v40 — 21/08/2026 ════════════════════════════════════════
+   A app deixa de dizer que vai chover quando só sabe que pode chover. A
+   forma verbal passa a seguir o nível (o nível 1 chama-se, na própria app,
+   «chuvisco possível») e a hora passa a ser a da PREVISÃO, arredondada — os
+   «21h20» nunca existiram: eram o relógio esmagado contra a hora prevista.
+   A Sentinela passa a beber da mesma régua que o resto da app, e por isso
+   avisa em casos em que ficava calada. */
 /* ═══ levante-v39 — 20/08/2026 ════════════════════════════════════════
    As duas portas fechadas da pesquisa: a perna do mundo passa a ser pedida
    quando a página vem cheia de um só sítio, e a reserva passa a entrar quando
@@ -323,7 +330,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v39";
+const V = "levante-v40";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */

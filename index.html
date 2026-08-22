@@ -1831,7 +1831,9 @@ html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip{borde
 
   <footer>
     Dados gratuitos: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (previsões) ·
-    <a href="https://project-osrm.org" target="_blank" rel="noopener">OSRM</a> &amp; <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> (rotas e pesquisa) ·
+    <a href="https://project-osrm.org" target="_blank" rel="noopener">OSRM</a> (rotas) ·
+    <a href="https://www.geoapify.com/" target="_blank" rel="noopener">Geoapify</a>, Photon e Nominatim, sobre dados do <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> (pesquisa e moradas) ·
+    Overpass (radares fixos) ·
     Mapas © <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &amp; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a><br>
     Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa. 🏍️
   </footer>
@@ -2508,7 +2510,16 @@ function applyStaticI18n(){
        o OpenFreeMap e o OpenMapTiles — que são quem serve mesmo os tiles — sem
        nome nenhum no rodapé. Creditar quem não trabalha e calar quem trabalha é
        falso nas duas pontas; o `lint-declarados` passou a mordê-lo. */
-    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM & OpenStreetMap · OpenFreeMap & OpenMapTiles — "));
+    /* ⚠️ OITO CONTACTADOS, OITO NOMEADOS — e é o rodapé que se lê sem clicar.
+       Esta linha dizia «Open-Meteo · OSRM & OpenStreetMap · OpenFreeMap &
+       OpenMapTiles» e calava QUATRO terceiros que recebem coordenadas e o
+       texto das pesquisas: Geoapify, Photon, Nominatim e Overpass. A
+       privacidade e os créditos nomeavam-nos há muito; o rodapé não — e o
+       `lint-declarados` media essas duas páginas e não media esta. Creditar
+       quem não trabalha e calar quem trabalha é o mesmo defeito do dd-60,
+       apanhado outra vez do outro lado.
+       Os nomes são próprios e não se traduzem: zero chaves novas. */
+    ft.append(document.createTextNode(t("Dados:")+" Open-Meteo · OSRM · Geoapify · Photon · Nominatim & OpenStreetMap · Overpass · OpenFreeMap & OpenMapTiles — "));
     ft.append(document.createTextNode(t("Sem contas, sem registos, sem rastreio. A tua localização e o teu destino são enviados aos serviços de meteorologia e de rotas para te dar a resposta — e não ficam guardados por nós. Conduz com cabeça: em caso de aviso vermelho, fica em casa.")+" 🏍️ "));
     const mkLink=(href,txt)=>{ const a=document.createElement("a"); a.href=href; a.target="_blank";
       a.rel="noopener"; a.textContent=t(txt); return a; };
@@ -5985,8 +5996,33 @@ function paiDaCategoria(cat){
    é exatamente o que as sete linhas do «buren» eram (`result_type:building`,
    sem `name`, só `address_line1`). A distinção está nos dados. */
 function paiGeoapify(p){
-  if(!p.name){ const rua=p.street||"";
-    if(rua) return ["rua",rua,p.city||p.town||p.village||"",p.postcode||"",p.country_code||""].join("|").toLowerCase(); }
+  /* ⚠️ DUAS CURAS DE UMA VEZ, e a segunda é a que faz a primeira funcionar.
+     Medido a 21/08 contra o motor, fixtures em `heuvel-eindhoven-*.json`.
+
+     C1 — a chave de rua só nascia quando o resultado NÃO tinha `name`. Uma
+     rua CHAMADA «Heuvel» caía para `id:place_id`, único por resultado: cinco
+     linhas da mesma rua, cinco pais, zero colapso. O irmão `paiPhoton` já
+     tinha a regra certa — regra 4, assimetria entre funções irmãs.
+
+     C2 — ⚠️ e a chave levava o `postcode`. As cinco linhas de Budel-Schoot
+     têm CINCO postcodes (6024 AP, 6023 RD/RA/RC/RB): **um código postal é
+     mais fino do que uma rua**, e uma rua comprida atravessa vários. Curar
+     só a C1 deixava-as separadas na mesma — falhava em SILÊNCIO. A chave
+     passou no «buren» porque aquelas sete portas partilhavam o postcode:
+     passou no caso para que foi escrita e caía no seguinte.
+
+     ⚠️ O QUE O `postcode` COMPRAVA: **não medido.** Que o `paiPhoton` deixe
+     o lugar vazio de propósito é indício, não prova. A guarda G6
+     (`heuvel-um-pai-uma-linha`) fica a valer por isso: uma chave mais grossa
+     não sub-colapsa, SOBRE-colapsa, e é ela que prova que duas ruas de nome
+     igual em cidades diferentes continuam separadas.
+
+     ⚠️ E NÃO TOCA NAS MORADAS: isto é só a chave de agrupamento. Não muda
+     coordenadas nem escolhe resultados, e só corre quando `semNumero(q)` —
+     com um número escrito, não há dedução nenhuma. */
+  const rua=p.street||"";
+  if(rua&&(p.result_type==="street"||!p.name))
+    return ["rua",rua,p.city||p.town||p.village||"",p.country_code||""].join("|").toLowerCase();
   const id=p.place_id||p.formatted||p.address_line1||"";
   return id?"id:"+String(id).toLowerCase():null;
 }
@@ -15136,7 +15172,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-20-2345-950eae";
+const BUILD="2026-08-22-2246-2179dd";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
