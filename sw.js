@@ -6,6 +6,24 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v41 — 25/08/2026 ════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   · O NEERLANDÊS DEIXA DE FALAR PORTUGUÊS. Faltavam 97 chaves — a série do
+     mau tempo inteira, os nomes dos serviços, os avisos de radar de quatro
+     países e os dois avisos legais. Estão escritas. As cinco línguas do
+     seletor ficam a 100% na auditoria de cobertura.
+   · O BANNER DE «SEM INTERNET» era o único texto do ecrã fixo em português,
+     em qualquer língua. Passa pela tabela de tradução como os outros.
+   · O MAPA VAI DENTRO DO PACOTE. O estilo, os glifos e o sprite não iam no
+     AAB: quem instalasse a app da loja via fundo liso, sem ruas e sem nomes.
+     A página de créditos também não ia, e o service worker listava-a.
+   · A CAIXA DE PESQUISA GANHA UM TECTO E UM CHÃO. «...» são três caracteres
+     e pagavam um pedido; um texto colado de 200 caracteres também. Agora só
+     sai pedido com 3 a 160 caracteres e pelo menos dois alfanuméricos.
+   · PORTÕES NOVOS: um que compara os dicionários de duas línguas lado a lado
+     (não existia nenhum), e um que verifica que o pacote leva os ficheiros a
+     que a app aponta. */
 /* ═══ levante-v40 — 21/08/2026 ════════════════════════════════════════
    A app deixa de dizer que vai chover quando só sabe que pode chover. A
    forma verbal passa a seguir o nível (o nível 1 chama-se, na própria app,
@@ -330,7 +348,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v40";
+const V = "levante-v41";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
