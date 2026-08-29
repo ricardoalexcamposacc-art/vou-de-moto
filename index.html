@@ -885,7 +885,15 @@ input.sw{appearance:none;-webkit-appearance:none;margin:0}
 #rota-folha{position:fixed;left:0;right:0;bottom:0;z-index:1700;background:var(--surface-tapa);
   border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.28);max-height:80vh;overflow:auto;
   transform:translateY(105%);transition:transform .28s ease;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px))}
-body.folha-aberta #rota-folha{transform:none}
+/* dd-320 §1 · REMENDO, NAO CURA — 26/08. A faixa continua desenhada por baixo
+   da folha e le-se nas frestas: no ecra largo sobravam 36 px dela acima do topo
+   da folha (0 no telemovel, onde a folha ja e mais alta). Ate o desenho novo dar
+   casa aos dez textos, a folha aberta tem altura minima igual a da faixa.
+   O valor e MEDIDO ao abrir (folhaTapaAFaixa), nunca uma constante a mao: a
+   faixa cresce com o conteudo e um numero fixo mentia no dia em que crescesse.
+   REVERTER — e tem de se poder reverter sozinho: apaga o `min-height` desta
+   linha e a funcao folhaTapaAFaixa com a sua chamada. Nada mais depende deles. */
+body.folha-aberta #rota-folha{transform:none;min-height:var(--folha-min,0px)}
 /* a conduzir, a folha do planeador sai do caminho (dd-33 fase 1): os chips de
    adiar a partida e o resumo do planeamento não servem quem já está a andar —
    e tapavam metade do ecrã por cima do mapa. Quem conduz tem o painel em cima
@@ -2774,6 +2782,7 @@ en:{
 "Ponto no mapa":"Point on the map",
 "A tua localização":"Your location",
 "Ponto escolhido":"Chosen point",
+"Ponto partilhado":"Shared point",
 "Não sei como se chama esse sítio — escolhe-o na lista de sugestões, ou mantém o dedo num ponto do mapa.":"I don't know what that place is called — pick it from the suggestions, or press and hold a point on the map.",
 "📍 A tua localização":"📍 Your location",
 "Ir para aqui":"Go here",
@@ -3273,6 +3282,7 @@ es:{
 "Ponto no mapa":"Punto en el mapa",
 "A tua localização":"Tu ubicación",
 "Ponto escolhido":"Punto elegido",
+"Ponto partilhado":"Punto compartido",
 "Não sei como se chama esse sítio — escolhe-o na lista de sugestões, ou mantém o dedo num ponto do mapa.":"No sé cómo se llama ese sitio — elígelo en la lista de sugerencias, o mantén el dedo en un punto del mapa.",
 "📍 A tua localização":"📍 Tu ubicación",
 "Ir para aqui":"Ir aquí",
@@ -3751,6 +3761,7 @@ fr:{
 "Ponto no mapa":"Point sur la carte",
 "A tua localização":"Ta position",
 "Ponto escolhido":"Point choisi",
+"Ponto partilhado":"Point partagé",
 "Não sei como se chama esse sítio — escolhe-o na lista de sugestões, ou mantém o dedo num ponto do mapa.":"Je ne sais pas comment s'appelle cet endroit — choisis-le dans la liste, ou garde le doigt sur un point de la carte.",
 "📍 A tua localização":"📍 Ta position",
 "Ir para aqui":"Aller ici",
@@ -4516,6 +4527,7 @@ nl:{
 "Ponto no mapa":"Punt op de kaart",
 "A tua localização":"Je locatie",
 "Ponto escolhido":"Gekozen punt",
+"Ponto partilhado":"Gedeeld punt",
 "Não sei como se chama esse sítio — escolhe-o na lista de sugestões, ou mantém o dedo num ponto do mapa.":"Ik weet niet hoe die plek heet — kies hem uit de suggesties, of houd je vinger op een punt op de kaart.",
 "📍 A tua localização":"📍 Je locatie",
 "Ir para aqui":"Hierheen rijden",
@@ -11723,7 +11735,11 @@ async function resolveInput(input, label){
      conhecida **não se baptiza por parecença** — recusa-se, e a pessoa
      escolhe-o na lista ou marca-o no mapa. Uma mentira plausível é pior do
      que um `undefined`: o `undefined` vê-se. */
-  const NOME_DA_ORIGEM={gps:"A tua localização", mapa:"Ponto escolhido"};
+  /* dd-316 §0 · o TERCEIRO caminho, e nao e nenhum dos outros dois. Um ponto
+     que chega num link nao foi escolhido por quem esta a ler — foi escolhido
+     por quem mandou o link. Chamar-lhe «Ponto escolhido» seria a mesma mentira
+     plausivel do dd-313 §1: dizer «escolhido» a quem nao escolheu. */
+  const NOME_DA_ORIGEM={gps:"A tua localização", mapa:"Ponto escolhido", link:"Ponto partilhado"};
   const guarda=(p)=>{
     if(!coordsBoas(p))
       /* estado + consequência + ação, que é o contrato do dd-95 §1 */
@@ -14047,7 +14063,7 @@ function dataCredivel(ms){
 }
 function provQuando(p){
   let s=provTexto(p);
-  if(p&&dataCredivel(p.quando)){ try{ s+=" · "+new Date(p.quando).toLocaleDateString(state.lang||"pt"); }catch(e){} }
+  if(p&&dataCredivel(p.quando)){ try{ s+=" · "+new Date(p.quando).toLocaleDateString(LOC()); }catch(e){} }
   return s;
 }
 /* ═══ dd-196 §2b — A CASA É VISÍVEL, E CORRIGE-SE NUM TOQUE ════════════════
@@ -15472,7 +15488,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-26-2051-49aefb";
+const BUILD="2026-08-29-0036-b8d97a";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){
@@ -16989,7 +17005,7 @@ function setTheme(t,{guardar=true}={}){
    (BUILD="trabalho") está morta. */
 const VNOVA={ultima:0, achada:null};
 async function checkVersao(){
-  if(BUILD==="trabalho") return;                      // bancada: nunca
+  if(BUILD==="trabalho"||BUILD.startsWith("build-")) return;   // bancada: nunca — e a bancada tem DUAS palavras (dd-324 N4)
   if(Date.now()-VNOVA.ultima<55*60000) return;        // no máximo 1×/hora
   VNOVA.ultima=Date.now();
   try{
@@ -17254,7 +17270,25 @@ function init(){
   $("#btn-route").addEventListener("click",computeRoute);
   // A4.2 — o ecrã-mapa: voltar, abrir/fechar a folha, regressar ao mapa
   $("#rt-voltar")?.addEventListener("click",()=>rotaMapaModo(false));
-  $("#rota-faixa")?.addEventListener("click",()=>document.body.classList.toggle("folha-aberta"));
+  /* dd-320 §1 · REMENDO — mede a faixa ANTES de abrir a folha e da a altura
+     minima que a tapa. Mede-se aqui porque neste instante a faixa ainda esta
+     desenhada; depois de a folha abrir ela continua la, por baixo. Se a faixa
+     nao tiver caixa, poe 0 — nunca adivinha uma altura. Ponto cego declarado:
+     o valor e do INSTANTE do gesto; rodar o telemovel com a folha aberta
+     deixa-o velho ate ao proximo abrir. E remendo, e o remendo diz o que nao
+     cobre. REVERTER: apaga esta funcao e volta a chamada a uma linha so. */
+  function folhaTapaAFaixa(){
+    const fx=$("#rota-faixa"); const r=(fx&&!fx.hidden)?fx.getBoundingClientRect():null;
+    /* ⚠️ so se aceita uma faixa INTEIRA E DENTRO do ecra. Apanhado a construir
+       isto: medida antes de o desenho assentar, a faixa dava top=-236 e a folha
+       ficava com 1036 px num ecra de 800, a sair pelo topo. Uma faixa fora do
+       ecra nao e uma faixa alta, e uma leitura que nao presta — e o remendo
+       prefere nao tapar nada a esticar a folha por um numero que nao entende. */
+    const bom=r&&r.height>0&&r.top>0&&r.bottom<=window.innerHeight+2;
+    const alto=bom?Math.ceil(window.innerHeight-r.top):0;
+    document.documentElement.style.setProperty("--folha-min",alto+"px");
+  }
+  $("#rota-faixa")?.addEventListener("click",()=>{folhaTapaAFaixa();document.body.classList.toggle("folha-aberta");});
   $("#rota-folha-grab")?.addEventListener("click",()=>document.body.classList.remove("folha-aberta"));
   $("#btn-ver-mapa")?.addEventListener("click",()=>rotaMapaModo(true));
   $("#rt-swap").addEventListener("click",()=>{
@@ -17334,8 +17368,15 @@ function init(){
     try{
       const h=(hstr||"").match(/^#r2=([^|]+)\|(\d+)\|(\d+)(?:\|(-?\d+))?$/);
       if(!h) return false;
+      /* dd-316 §0 · o nome de um ponto sem nome no link era o literal minusculo
+         «ponto» — fora do dicionario, invisivel ao lint-i18n, e igual nas cinco
+         linguas. Passa a chave traduzida. O nome que VEM no link mantem-se: e o
+         nome verdadeiro que quem partilhou tinha. E o `orig:"link"` viaja com o
+         objecto, para o guarda do resolveInput saber baptiza-lo se ele chegar
+         sem nome por outro caminho. */
       const pts=h[1].split("~").map(s=>{ const p=s.split(",");
-        return {lat:+p[0], lon:+p[1], name:decodeURIComponent(p.slice(2).join(",")||"ponto"), sub:""}; });
+        const cru=p.slice(2).join(",");
+        return {lat:+p[0], lon:+p[1], name:cru?decodeURIComponent(cru):t("Ponto partilhado"), sub:"", orig:"link"}; });
       if(pts.length<2||!pts.every(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon))) return false;
       const o=pts[0], d=pts[pts.length-1];
       $("#rt-o").value=o.name; $("#rt-o")._picked=o;

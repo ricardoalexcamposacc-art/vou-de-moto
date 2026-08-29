@@ -6,6 +6,47 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v42 — 27/08/2026 ════════════════════════════════════════
+   NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
+
+   ⚠️ ESCRITA PELO DIRETOR (dd-322 §1) E COLADA AQUI VERBATIM, sem acentos
+   e sem uma palavra mudada: a nota é gesto de produto e não é do executor.
+
+v42 — integridade do pacote, o neerlandes completo, e as horas certas
+
+INTEGRIDADE
+· Portao lint-pacote: compara sha256 em dois eixos e verifica o tamanho
+  declarado. Apanhou tres ficheiros truncados a meio e um sw.js perdido
+  na v40. Um ficheiro pode responder 200 e ser metade de um ficheiro.
+· O portao cobre tambem o que o publicar.sh escreve DEPOIS das barreiras:
+  o index.html e o versao.json. Provado em oito casos.
+· Trave nova: o build fica por verificar ate o portao passar, e a
+  publicacao recusa-se a correr enquanto isso durar.
+· O build carimba (build-<sha8> do mestre). O checkVersao() dentro do
+  pacote deixa de estar morto.
+
+NEERLANDES E AVISOS LEGAIS
+· 97 chaves em falta: a serie meteorologica inteira, o turn-by-turn do
+  modo viagem, os avisos legais. O portugues deixa de vazar para dentro
+  do neerlandes quando comeca o mau tempo.
+· Portao lint-i18n: abre os quatro dicionarios lado a lado e falha se
+  faltar chave, ou se uma traducao for igual a chave portuguesa.
+· Banner de offline traduzido nas cinco linguas.
+
+CORRECOES
+· A origem por GPS deixa de sair sem nome: o titulo, a folha, o resumo
+  copiado e a entrada do calendario deixam de dizer "undefined". Um
+  ponto vindo de um link partilhado passa a dizer o que e.
+· A folha da rota ganha superficie opaca e deixa de deixar passar uma
+  segunda camada de texto por baixo.
+· As horas seguem o fuso do sitio, nao o relogio do aparelho.
+· As unidades seguem o pais onde estas, nao o idioma do telemovel.
+· Guarda antes de gastar na pesquisa.
+· creditos.html passa a ir dentro do pacote.
+
+BATERIA
+· 202 -> 207 portoes. As 60 chaves sem caminho passam a divida declarada
+  com catraca: so pode encolher. */
 /* ═══ levante-v41 — 25/08/2026 ════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -348,7 +389,7 @@
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v41";
+const V = "levante-v42";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
