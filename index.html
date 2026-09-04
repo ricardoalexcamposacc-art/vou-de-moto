@@ -987,7 +987,7 @@ font:inherit;font-size:.92em;text-align:left;cursor:pointer}
   animation:sh 1.2s infinite}
 @keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 .muted{color:var(--muted)} .small{font-size:var(--t-corpo)}
-.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(6px);
+.toast{position:fixed;left:50%;bottom:calc(var(--h-abas, 0px) + 26px);transform:translateX(-50%) translateY(6px);
   background:rgba(12,20,36,.92);color:#f2f5fb;border:1px solid rgba(255,255,255,.12);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   padding:11px 19px;border-radius:16px;font-size:var(--t-corpo);font-weight:600;z-index:6000;opacity:0;
@@ -4275,9 +4275,9 @@ nl:{
 "Sim — vai de moto!":"Ja — pak de motor!",
 "Trajeto seco até {p} a esta hora.":"Droge route naar {p} op dit tijdstip.",
 "Vento demasiado forte para ir descansado":"Te veel wind om ontspannen te rijden",
-"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Windstoten tot {g} km/u, wind {d}{x} — op de motor is dat zwaar; ga je toch, hou de snelheid gematigd en haal geen vrachtwagens krap in.",
+"Rajadas até {g} km/h, vento {d}{x} — em moto castiga muito; se fores, velocidade moderada e nada de ultrapassar pesados à justa.":"Windstoten tot {g} km/u, {d}{x} — op de motor is dat zwaar; ga je toch, hou de snelheid gematigd en haal geen vrachtwagens krap in.",
 ", com lateral forte perto do km {k}":", met harde zijwind rond km {k}",
-"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Windstoten tot {g} km/u, wind {d}{x} — stevig aan het stuur op bruggen en open stukken.",
+"Rajadas até {g} km/h, vento {d}{x} — firme no guiador em pontes e zonas expostas.":"Windstoten tot {g} km/u, {d}{x} — stevig aan het stuur op bruggen en open stukken.",
 " com lateral perto do km {k}":" met zijwind rond km {k}",
 "Vento tranquilo: rajadas máximas de {g} km/h, {d}.":"Rustige wind: windstoten tot {g} km/u, {d}.",
 "Frio a sério (mínima de {t}° no percurso): luvas de inverno, camada térmica e corta-vento.":"Echt koud (minimaal {t}° onderweg): winterhandschoenen, thermolaag en windstopper.",
@@ -15488,7 +15488,7 @@ window.__levMapa=Mapa;            // idem: os testes conduzem o mapa pela fachad
 /* Substituído por tools/publicar.sh no momento de copiar para pwa-gh/.
    Fica "trabalho" enquanto for o ficheiro de desenvolvimento — e ver "trabalho"
    no site publicado é, por si, o aviso de que a publicação saiu do processo. */
-const BUILD="2026-08-29-0036-b8d97a";
+const BUILD="2026-09-04-0536-0d1a4f";
 window.__levCred=CRED;            // para medir créditos por sessão
 const GUARD_WET=[51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
 function isLodgingType(key,val){

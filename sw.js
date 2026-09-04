@@ -6,6 +6,21 @@
      um sw byte-igual não dispara ciclo de atualização nenhum, e as janelas
      abertas ficam sem qualquer sinal de que há versão nova. O portão em
      tools/publicar.sh recusa publicar index novo com sw byte-igual. */
+/* ═══ levante-v43 — 29/08/2026 ════════════════════════════════════════
+   NOTA DE RELEASE — ⚠️ POR ESCREVER, E NÃO É DO EXECUTOR.
+
+   Por dd-322 §1 a nota é gesto de produto: escreve-a o DIRETOR e cola-se
+   aqui verbatim, sem acentos e sem uma palavra mudada. O V subiu porque o
+   index mudou e o portão do dd-55 exige-o — sem V novo nenhuma app
+   instalada recebe sinal de que há versão nova. **A ausência da nota está
+   declarada de propósito: um texto inventado pela bancada seria pior do
+   que um espaço em branco com o nome de quem o tem de encher.**
+
+   O que mudou no código, para quem a escrever (dd-329 blocos A e C):
+   · «wind meewind» em neerlandês — o substantivo do vento deixa de se dizer
+     duas vezes nas duas linhas de perigo.
+   · o toast deixa de aterrar em cima da barra de abas (entrava 31 px).
+   ═══════════════════════════════════════════════════════════════════════ */
 /* ═══ levante-v42 — 27/08/2026 ════════════════════════════════════════
    NOTA DE RELEASE (dd-55: o V sobe SEMPRE que o index muda)
 
@@ -389,7 +404,7 @@ BATERIA
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v42";
+const V = "levante-v43";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
