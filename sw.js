@@ -403,8 +403,21 @@ BATERIA
      o composto onde ele se parte: MOTOR- / INDEX.
    · O cartão do equipamento diz agora a que janela se refere no próprio
      título — «🧤 Equipamento · próximas 6 h» — em vez de num subtítulo.
+   ───────────────────────────────────────────────────────────────────────────
+   v44 (13/09) — MEDIDO antes de subir: o `sw.js` SERVIDO em getlevante.com já
+   dizia `levante-v43`, portanto o v43 foi publicado a 04/09 e o número estava
+   consumido. O index mudou depois disso e sem V novo nenhuma janela aberta e
+   nenhuma app instalada recebiam sinal. O que mudou:
+   · O routing é creditado ao **Geoapify**, que é quem o faz. O OSRM passa a
+     reserva em todas as superfícies (rodapé, créditos, privacidade ×5,
+     termos ×5) — medido: `osrmRoute` devolve `geoRoute` na primeira linha
+     enquanto houver chave, e há.
+   · As 13 páginas publicadas ganharam `<link rel="canonical">`, e as dez
+     traduzidas um conjunto `hreflang` recíproco com x-default em pt.
+   · O `LEIA-ME.md` saiu da pasta publicada.
+   ⚠️ A NOTA DE RELEASE fica por escrever — é gesto do dono (dd-322 §1).
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v43";
+const V = "levante-v44";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
