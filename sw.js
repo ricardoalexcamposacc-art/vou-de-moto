@@ -417,7 +417,7 @@ BATERIA
    · O `LEIA-ME.md` saiu da pasta publicada.
    ⚠️ A NOTA DE RELEASE fica por escrever — é gesto do dono (dd-322 §1).
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v44";
+const V = "levante-v45";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -443,6 +443,14 @@ const SHELL = [
      condição de licença, não um extra. O sítio dela é ao lado das outras duas
      legais, que já cá estavam. */
   "./creditos.html",
+  /* dd-340 §2: e as quatro irmãs, pela mesma razão que as outras duas
+     famílias já tinham. A atribuição é condição de licença — se o ⓘ leva um
+     holandês a uma página que só existe com rede, a licença cumpre-se só com
+     rede. ~45 KB. */
+  "./creditos.en.html", "./creditos.es.html", "./creditos.fr.html", "./creditos.nl.html",
+  /* dd-342 §1.3: a linha de direitos do rodapé liga aqui. 752 bytes, uma só
+     língua (é uma declaração de direitos, não uma página de produto). */
+  "./LICENSE.html",
   "./paises.json",
   /* ⚠️ dd-228: O MOTOR DO MAPA ENTRA NO SHELL PORQUE SAIU DO `index.html`.
      Ele deixou de ser pedido por uma etiqueta no arranque — passou a ser
