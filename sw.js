@@ -417,7 +417,7 @@ BATERIA
    · O `LEIA-ME.md` saiu da pasta publicada.
    ⚠️ A NOTA DE RELEASE fica por escrever — é gesto do dono (dd-322 §1).
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v45";
+const V = "levante-v46";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -435,8 +435,8 @@ const SHELL = [
   /* dd-252 g: as páginas legais falam as cinco línguas — as irmãs entram no
      shell AO LADO das PT (mesmo padrão, mesma razão: quem abre a política na
      língua dele merece tê-la offline como o PT já tinha). ~80 KB no total. */
-  "./privacidade.en.html", "./privacidade.es.html", "./privacidade.fr.html", "./privacidade.nl.html",
-  "./termos.en.html", "./termos.es.html", "./termos.fr.html", "./termos.nl.html",
+  "./privacidade.en.html", "./privacidade.es.html", "./privacidade.fr.html", "./privacidade.nl.html", "./privacidade.de.html",
+  "./termos.en.html", "./termos.es.html", "./termos.fr.html", "./termos.nl.html", "./termos.de.html",
   /* dd-82: a página de créditos entra no shell, autorizada no mesmo pacote.
      Era o item aberto do rel-58 §5: sem isto, o ⓘ do mapa levava a uma página
      que só existia depois de aberta uma vez com rede — e a atribuição é
@@ -447,7 +447,7 @@ const SHELL = [
      famílias já tinham. A atribuição é condição de licença — se o ⓘ leva um
      holandês a uma página que só existe com rede, a licença cumpre-se só com
      rede. ~45 KB. */
-  "./creditos.en.html", "./creditos.es.html", "./creditos.fr.html", "./creditos.nl.html",
+  "./creditos.en.html", "./creditos.es.html", "./creditos.fr.html", "./creditos.nl.html", "./creditos.de.html",
   /* dd-342 §1.3: a linha de direitos do rodapé liga aqui. 752 bytes, uma só
      língua (é uma declaração de direitos, não uma página de produto). */
   "./LICENSE.html",
