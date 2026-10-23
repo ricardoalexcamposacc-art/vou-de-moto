@@ -417,7 +417,7 @@ BATERIA
    · O `LEIA-ME.md` saiu da pasta publicada.
    ⚠️ A NOTA DE RELEASE fica por escrever — é gesto do dono (dd-322 §1).
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v46";
+const V = "levante-v49";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
