@@ -408,16 +408,16 @@ BATERIA
    dizia `levante-v43`, portanto o v43 foi publicado a 04/09 e o número estava
    consumido. O index mudou depois disso e sem V novo nenhuma janela aberta e
    nenhuma app instalada recebiam sinal. O que mudou:
-   · O routing é creditado ao **Geoapify**, que é quem o faz. O OSRM passa a
-     reserva em todas as superfícies (rodapé, créditos, privacidade ×5,
-     termos ×5) — medido: `osrmRoute` devolve `geoRoute` na primeira linha
-     enquanto houver chave, e há.
+   · O routing é creditado ao **Geoapify**, que é quem o faz. O motor de reserva antigo passou
+     a reserva em todas as superfícies (rodapé, créditos, privacidade x5,
+     termos x5) — medido: a função de rota devolvia o `geoRoute` na primeira
+     linha enquanto houvesse chave, e havia. (A 29/10 saiu da app — dd-476.)
    · As 13 páginas publicadas ganharam `<link rel="canonical">`, e as dez
      traduzidas um conjunto `hreflang` recíproco com x-default em pt.
    · O `LEIA-ME.md` saiu da pasta publicada.
    ⚠️ A NOTA DE RELEASE fica por escrever — é gesto do dono (dd-322 §1).
    ═══════════════════════════════════════════════════════════════════════════ */
-const V = "levante-v54";
+const V = "levante-v55";
 const TILES = "levante-tiles-v1";
 /* a cache de tiles do nome antigo continua a ser lida — quem já tinha o mapa
    descarregado não fica sem ele por causa de uma mudança de nome */
@@ -475,7 +475,7 @@ const isTile = (u) => TILE_HOSTS.test(u.host);
    cinzenta da era raster — a um pedido de tile **VETORIAL**. O MapLibre pede
    um protobuf, recebe SVG, não consegue interpretar e **não desenha nada**.
    Sem rede, ou fora do corredor que estava descarregado, cada tile em falta
-   apagava o mapa: foi o que o Ricardo viu a meio de uma viagem (dd-78), e foi
+   apagava o mapa: foi o que se viu a meio de uma viagem (dd-78), e foi
    o que ficou previsto por escrito no relatório 57 §2.
 
    O que se devolve agora é o tile vetorial sintético de **42 bytes** — um

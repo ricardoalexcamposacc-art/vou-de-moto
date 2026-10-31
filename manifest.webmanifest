@@ -40,11 +40,5 @@
       "purpose": "any"
     }
   ],
-  "related_applications": [
-    {
-      "platform": "webapp",
-      "url": "https://ricardoalexcamposacc-art.github.io/vou-de-moto/manifest.webmanifest"
-    }
-  ],
   "prefer_related_applications": false
 }

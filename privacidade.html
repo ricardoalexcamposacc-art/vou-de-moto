@@ -94,7 +94,7 @@ footer a{font-weight:600}
     <h2>Quem somos</h2>
     <p>A aplicação <strong>Levante</strong> é um projeto independente que ajuda motociclistas a decidir se devem sair de mota, mostrando a meteorologia prevista ao longo do trajeto à hora a que vais passar em cada ponto.</p>
     <!-- dd-98 §1 / dd-100: o domínio existe (getlevante.com) e o
-       reencaminhamento foi TESTADO ida e volta pelo Ricardo ANTES desta troca
+       reencaminhamento foi TESTADO ida e volta ANTES desta troca
        entrar — a regra era essa: um endereço institucional que ressalta numa
        página de privacidade é pior do que a conta pessoal que cá estava.
        O endereço é o público; o mecanismo por trás (reencaminhamento hoje,
@@ -120,7 +120,7 @@ footer a{font-weight:600}
          Android não pede a permissão de microfone. O motor de reconhecimento
          é do browser/sistema, e isso diz-se — no Chrome pode passar pela
          nuvem da Google, e essa etapa não é nossa. -->
-    <p>Os campos de pesquisa têm um botão de ditado. Quando o usas, o reconhecimento de voz é feito pelo <strong>motor do teu browser ou do teu sistema</strong> — a aplicação recebe apenas o texto reconhecido e <strong>nunca vê nem guarda o áudio</strong>. Conforme o browser, esse motor pode enviar o áudio aos servidores do próprio fabricante do browser para o transcrever; essa etapa pertence ao browser e está coberta pela política dele. A aplicação Android não pede a permissão de microfone — sem ela não há captação de áudio possível; se o teu sistema não oferecer reconhecimento de voz, o botão avisa-te e escreves o destino.</p>
+    <p>Os campos de pesquisa têm um botão de ditado. Quando o usas, o reconhecimento de voz é feito pelo <strong>motor do teu browser ou do teu sistema</strong> — a aplicação recebe apenas o texto reconhecido e <strong>nunca vê nem guarda o áudio</strong>. Conforme o browser, esse motor pode enviar o áudio aos servidores do próprio fabricante do browser para o transcrever; essa etapa pertence ao browser e está coberta pela política dele. A aplicação Android não pede a permissão de microfone — sem ela não há captação de áudio possível. Se o telemóvel não tiver reconhecimento de voz, o botão do microfone não aparece.</p>
 
     <h2>O que fica guardado no teu dispositivo</h2>
     <p>A aplicação guarda no armazenamento local do teu próprio telemóvel ou computador: a tua localização de referência, os locais e rotas que escolheste guardar, as viagens que agendaste, o teu perfil de decisão, o idioma, as unidades, o tema e o mapa descarregado para funcionar sem internet.</p>
@@ -135,7 +135,6 @@ footer a{font-weight:600}
     <p>Para funcionar, a aplicação comunica com serviços externos. Cada um deles recebe apenas o mínimo necessário — tipicamente coordenadas geográficas ou o texto de uma pesquisa — e tem a sua própria política de privacidade:</p>
     <ul>
       <li><strong>Open-Meteo</strong> — previsões meteorológicas</li>
-      <li><strong>OSRM</strong> — reserva de rotas, não contactada nesta versão</li>
       <li><strong>OpenStreetMap</strong> — dados de mapa</li>
       <li><strong>Photon</strong> e <strong>Nominatim</strong> — pesquisa de locais e moradas</li>
       <li><strong>Overpass</strong> — pontos de interesse e radares fixos</li>
@@ -167,6 +166,6 @@ try{ var th=localStorage.getItem("levante-theme")||localStorage.getItem("vdm-the
   else if(matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme="light";
 }catch(e){}
 </script>
-  <p class="small muted" id="carimbo">Versão publicada: 2026-10-30-2244-7bb2fc-4410130f</p>
+  <p class="small muted" id="carimbo">Versão publicada: 2026-10-31-1442-082486-bfee1156</p>
 </body>
 </html>
